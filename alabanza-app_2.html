@@ -1385,6 +1385,84 @@
         onSnapshot = firebaseRefs.onSnapshot;
         showToast = firebaseRefs.showToast;
 
+        // Bind btn-add-ensayo now that Firebase is ready and DOM is fully loaded
+        const btnAddEnsayo = document.getElementById('btn-add-ensayo');
+        const modalEnsayo = document.getElementById('admin-ensayo-modal');
+        const btnCancelEnsayo = document.getElementById('btn-cancel-ensayo');
+        const btnSaveEnsayo = document.getElementById('btn-save-ensayo');
+
+        if (btnAddEnsayo) {
+          btnAddEnsayo.addEventListener('click', () => {
+            window.renderEnsayoMembers();
+            renderEnsayoCancionesModal();
+            // Reset fields
+            document.getElementById('ensayo-nombre').value = '';
+            document.getElementById('ensayo-fecha').value = '';
+            const horaEl = document.getElementById('ensayo-hora');
+            if (horaEl) horaEl.value = '';
+            if (modalEnsayo) modalEnsayo.classList.add('active');
+          });
+        }
+
+        if (btnCancelEnsayo) {
+          btnCancelEnsayo.addEventListener('click', () => {
+            if (modalEnsayo) modalEnsayo.classList.remove('active');
+          });
+        }
+
+        if (btnSaveEnsayo) {
+          btnSaveEnsayo.addEventListener('click', async () => {
+            const ensayoMiembrosList = document.getElementById('ensayo-miembros-list');
+            const nombreInput = document.getElementById('ensayo-nombre');
+            const fechaInput = document.getElementById('ensayo-fecha');
+            const horaInput = document.getElementById('ensayo-hora');
+            const nombre = nombreInput.value.trim();
+            const fecha = fechaInput.value;
+            const hora = horaInput ? horaInput.value : '';
+            if (!fecha) { alert('Selecciona una fecha para el ensayo.'); return; }
+            const defaultLabel = `Ensayo ${fecha}${hora ? ' ' + hora : ''}`;
+            const etiqueta = nombre || defaultLabel;
+
+            // Members
+            const selectedIds = [];
+            if (ensayoMiembrosList) {
+              ensayoMiembrosList.querySelectorAll('.assign-check.on').forEach(el => {
+                const id = el.getAttribute('data-id');
+                if (id) selectedIds.push(id);
+              });
+            }
+            if (selectedIds.length === 0) { alert('Selecciona al menos un integrante.'); return; }
+
+            // Songs
+            const selectedSongIds = [];
+            const cancionesListEl = document.getElementById('ensayo-canciones-list');
+            if (cancionesListEl) {
+              cancionesListEl.querySelectorAll('.assign-check.on').forEach(el => {
+                const sid = el.getAttribute('data-song-id');
+                if (sid) selectedSongIds.push(sid);
+              });
+            }
+
+            try {
+              await addDoc(collection(db, 'ensayos'), {
+                nombre: etiqueta,
+                fecha: fecha,
+                hora: hora,
+                miembros: selectedIds,
+                canciones: selectedSongIds,
+                confirmaciones: {}
+              });
+              if (modalEnsayo) modalEnsayo.classList.remove('active');
+              nombreInput.value = ''; fechaInput.value = ''; if (horaInput) horaInput.value = '';
+              showToast(`✅ Ensayo "${etiqueta}" creado`);
+              renderEnsayosAdmin();
+            } catch (err) {
+              console.error('Error creando ensayo', err);
+              alert('Error al crear el ensayo');
+            }
+          });
+        }
+
         // Initialize view rendering
         renderEnsayosAdmin();
       };
@@ -1393,27 +1471,10 @@
         activeSessionUser = user;
         renderEnsayosMusico();
       };
-      // ==============================
-      // ENSAYO MODAL LOGIC (ADMIN)
-      // ==============================
-      const btnAddEnsayo = document.getElementById('btn-add-ensayo');
-      const modalEnsayo = document.getElementById('admin-ensayo-modal');
-      const btnCancelEnsayo = document.getElementById('btn-cancel-ensayo');
-      const btnSaveEnsayo = document.getElementById('btn-save-ensayo');
-      const ensayoMiembrosList = document.getElementById('ensayo-miembros-list');
 
-      // Open modal – populate members AND songs
-      if (btnAddEnsayo) {
-        btnAddEnsayo.addEventListener('click', () => {
-          renderEnsayoMembers();
-          renderEnsayoCancionesModal();
-          // Reset fields
-          document.getElementById('ensayo-nombre').value = '';
-          document.getElementById('ensayo-fecha').value = '';
-          document.getElementById('ensayo-hora').value = '';
-          modalEnsayo.classList.add('active');
-        });
-      }
+      // ==============================
+      // ENSAYO HELPERS
+      // ==============================
 
       // Populate song checkboxes inside the modal
       function renderEnsayoCancionesModal() {
@@ -1443,15 +1504,9 @@
         });
       }
 
-      // Cancel modal
-      if (btnCancelEnsayo) {
-        btnCancelEnsayo.addEventListener('click', () => {
-          modalEnsayo.classList.remove('active');
-        });
-      }
-
       // Render member checkboxes for ensayo selection
       window.renderEnsayoMembers = function () {
+        const ensayoMiembrosList = document.getElementById('ensayo-miembros-list');
         if (!ensayoMiembrosList) return;
         ensayoMiembrosList.innerHTML = '';
         if (!window.cacheMembers) return;
@@ -1474,57 +1529,6 @@
             check.classList.toggle('on');
           });
           ensayoMiembrosList.appendChild(div);
-        });
-      }
-
-      // Save ensayo – now includes hora and songs
-      if (btnSaveEnsayo) {
-        btnSaveEnsayo.addEventListener('click', async () => {
-          const nombreInput = document.getElementById('ensayo-nombre');
-          const fechaInput = document.getElementById('ensayo-fecha');
-          const horaInput = document.getElementById('ensayo-hora');
-          const nombre = nombreInput.value.trim();
-          const fecha = fechaInput.value;
-          const hora = horaInput ? horaInput.value : '';
-          if (!fecha) { alert('Selecciona una fecha para el ensayo.'); return; }
-          const defaultLabel = `Ensayo ${fecha}${hora ? ' ' + hora : ''}`;
-          const etiqueta = nombre || defaultLabel;
-
-          // Members
-          const selectedIds = [];
-          ensayoMiembrosList.querySelectorAll('.assign-check.on').forEach(el => {
-            const id = el.getAttribute('data-id');
-            if (id) selectedIds.push(id);
-          });
-          if (selectedIds.length === 0) { alert('Selecciona al menos un integrante.'); return; }
-
-          // Songs
-          const selectedSongIds = [];
-          const cancionesListEl = document.getElementById('ensayo-canciones-list');
-          if (cancionesListEl) {
-            cancionesListEl.querySelectorAll('.assign-check.on').forEach(el => {
-              const sid = el.getAttribute('data-song-id');
-              if (sid) selectedSongIds.push(sid);
-            });
-          }
-
-          try {
-            await addDoc(collection(db, 'ensayos'), {
-              nombre: etiqueta,
-              fecha: fecha,
-              hora: hora,
-              miembros: selectedIds,
-              canciones: selectedSongIds,
-              confirmaciones: {}
-            });
-            modalEnsayo.classList.remove('active');
-            nombreInput.value = ''; fechaInput.value = ''; if (horaInput) horaInput.value = '';
-            showToast(`✅ Ensayo "${etiqueta}" creado`);
-            renderEnsayosAdmin();
-          } catch (err) {
-            console.error('Error creando ensayo', err);
-            alert('Error al crear el ensayo');
-          }
         });
       }
     </script>
