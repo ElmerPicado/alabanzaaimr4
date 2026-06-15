@@ -2395,6 +2395,60 @@
   <!-- TOAST NOTIFICATION -->
   <div id="toast-notification" class="toast"></div>
 
+  <!-- PWA INSTALL BANNER -->
+  <div id="pwa-install-banner" style="
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 9999;
+    background: linear-gradient(135deg, #1a1828 0%, #23213a 100%);
+    border-top: 2px solid var(--teal);
+    padding: 14px 16px 20px;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.5);
+    animation: slideUpBanner 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  ">
+    <style>
+      @keyframes slideUpBanner {
+        from { transform: translateY(100%); opacity: 0; }
+        to   { transform: translateY(0);   opacity: 1; }
+      }
+    </style>
+    <div style="display:flex; align-items:center; gap:12px; max-width:480px; margin:0 auto;">
+      <img src="logo.png" alt="Alabanza IMR4" style="width:48px; height:48px; border-radius:12px; flex-shrink:0; object-fit:cover; box-shadow:0 4px 12px rgba(78,205,196,0.3);">
+      <div style="flex:1; min-width:0;">
+        <div style="font-weight:700; font-size:14px; color:var(--teal); margin-bottom:2px;">Instalar Alabanza IMR4</div>
+        <div style="font-size:12px; color:var(--text2); line-height:1.4;">Agrégala a tu pantalla de inicio y úsala como una app nativa 📱</div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+        <button id="pwa-install-btn" style="
+          background: var(--teal);
+          color: #0f0e17;
+          border: none;
+          border-radius: 10px;
+          padding: 8px 16px;
+          font-weight: 700;
+          font-size: 13px;
+          cursor: pointer;
+          white-space: nowrap;
+        ">📲 Instalar</button>
+        <button id="pwa-dismiss-btn" style="
+          background: transparent;
+          color: var(--text3);
+          border: 1px solid var(--border2);
+          border-radius: 10px;
+          padding: 6px 10px;
+          font-size: 11px;
+          cursor: pointer;
+          white-space: nowrap;
+        ">Ahora no</button>
+      </div>
+    </div>
+    <!-- iOS instructions (only shown on iOS) -->
+    <div id="pwa-ios-hint" style="display:none; margin-top:10px; max-width:480px; margin-left:auto; margin-right:auto; text-align:center; font-size:11px; color:var(--text3); border-top:1px solid var(--border); padding-top:8px; line-height:1.5;">
+      En Safari: toca <b style="color:var(--teal);">Compartir</b> (↑) → <b style="color:var(--teal);">"Añadir a pantalla de inicio"</b>
+    </div>
+  </div>
+
   <!-- CAPA LOGICA COMPLETA DE FIREBASE V10+ -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
@@ -4525,6 +4579,72 @@
     }
 
     intentarAutoLogin();
+
+    // ====================================================
+    // BANNER DE INSTALACIÓN PWA
+    // ====================================================
+    (function setupPWAInstallBanner() {
+      const banner = document.getElementById('pwa-install-banner');
+      const installBtn = document.getElementById('pwa-install-btn');
+      const dismissBtn = document.getElementById('pwa-dismiss-btn');
+      const iosHint = document.getElementById('pwa-ios-hint');
+      if (!banner) return;
+
+      // No mostrar si ya fue descartado hace menos de 7 días
+      const dismissed = localStorage.getItem('pwa-banner-dismissed');
+      if (dismissed && (Date.now() - parseInt(dismissed)) < 7 * 24 * 60 * 60 * 1000) return;
+
+      // No mostrar si ya está instalada (en modo standalone)
+      if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) return;
+
+      let deferredPrompt = null;
+
+      // Detectar iOS
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+
+      if (isIOS) {
+        // En iOS no hay evento, mostramos el banner con instrucciones de Safari
+        if (iosHint) iosHint.style.display = 'block';
+        if (installBtn) installBtn.style.display = 'none'; // ocultar botón instalar en iOS
+        setTimeout(() => { banner.style.display = 'block'; }, 3000);
+      } else {
+        // Android/Chrome: esperar el evento beforeinstallprompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          setTimeout(() => { banner.style.display = 'block'; }, 3000);
+        });
+      }
+
+      // Botón INSTALAR
+      if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+          banner.style.display = 'none';
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log('[PWA] Install outcome:', outcome);
+            deferredPrompt = null;
+          }
+          localStorage.setItem('pwa-banner-dismissed', Date.now().toString());
+        });
+      }
+
+      // Botón AHORA NO
+      if (dismissBtn) {
+        dismissBtn.addEventListener('click', () => {
+          banner.style.display = 'none';
+          localStorage.setItem('pwa-banner-dismissed', Date.now().toString());
+        });
+      }
+
+      // Ocultar si el usuario ya instaló
+      window.addEventListener('appinstalled', () => {
+        banner.style.display = 'none';
+        localStorage.setItem('pwa-banner-dismissed', Date.now().toString());
+        console.log('[PWA] App instalada exitosamente ✅');
+      });
+    })();
 
     // REGISTRO DE SERVICE WORKER PARA SOPORTE PWA
     if ('serviceWorker' in navigator) {
