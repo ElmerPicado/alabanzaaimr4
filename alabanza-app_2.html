@@ -1445,7 +1445,7 @@
             const nombreInput = document.getElementById('ensayo-nombre');
             const fechaInput = document.getElementById('ensayo-fecha');
             const horaInput = document.getElementById('ensayo-hora');
-            
+
             const nombre = nombreInput ? nombreInput.value.trim() : '';
             const fecha = fechaInput ? fechaInput.value : '';
             const hora = horaInput ? horaInput.value : '';
@@ -1488,11 +1488,11 @@
               });
 
               if (modalEnsayo) modalEnsayo.classList.remove('active');
-              if (nombreInput) nombreInput.value = ''; 
-              if (fechaInput) fechaInput.value = ''; 
+              if (nombreInput) nombreInput.value = '';
+              if (fechaInput) fechaInput.value = '';
               if (horaInput) horaInput.value = '';
               showToast(`✅ Ensayo "${etiqueta}" creado`);
-              
+
               if (window.renderEnsayosAdmin) window.renderEnsayosAdmin();
 
               // Handle WhatsApp notification if selected
@@ -2256,31 +2256,37 @@
 
         <!-- Caja para Rápidas (Alabanza) -->
         <div class="card" style="margin-bottom: 16px; border-color: var(--teal); padding: 16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" id="head-rapidas">
+          <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;"
+            id="head-rapidas">
             <h3 style="font-size:16px; color:var(--teal); margin:0; display:flex; align-items:center; gap:8px;">
-              ⚡ Alabanzas (Rápidas) <span id="count-rapidas" style="font-size:12px; color:var(--text3); font-weight:normal;"></span>
+              ⚡ Alabanzas (Rápidas) <span id="count-rapidas"
+                style="font-size:12px; color:var(--text3); font-weight:normal;"></span>
             </h3>
             <span id="arrow-rapidas" style="font-size:14px; color:var(--text2);">▼</span>
           </div>
           <div id="body-rapidas" style="margin-top: 14px; display: none;">
-            <input type="text" id="search-rapidas" placeholder="🔍 Buscar alabanza..." 
+            <input type="text" id="search-rapidas" placeholder="🔍 Buscar alabanza..."
               style="width:100%; padding:8px 12px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); margin-bottom:12px; font-size:13px;">
-            <div id="list-rapidas" style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;"></div>
+            <div id="list-rapidas"
+              style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;"></div>
           </div>
         </div>
 
         <!-- Caja para Lentas (Adoración) -->
         <div class="card" style="margin-bottom: 16px; border-color: var(--purple); padding: 16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" id="head-lentas">
+          <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;"
+            id="head-lentas">
             <h3 style="font-size:16px; color:var(--purple); margin:0; display:flex; align-items:center; gap:8px;">
-              🙏 Adoración (Lentas) <span id="count-lentas" style="font-size:12px; color:var(--text3); font-weight:normal;"></span>
+              🙏 Adoración (Lentas) <span id="count-lentas"
+                style="font-size:12px; color:var(--text3); font-weight:normal;"></span>
             </h3>
             <span id="arrow-lentas" style="font-size:14px; color:var(--text2);">▼</span>
           </div>
           <div id="body-lentas" style="margin-top: 14px; display: none;">
-            <input type="text" id="search-lentas" placeholder="🔍 Buscar adoración..." 
+            <input type="text" id="search-lentas" placeholder="🔍 Buscar adoración..."
               style="width:100%; padding:8px 12px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); margin-bottom:12px; font-size:13px;">
-            <div id="list-lentas" style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;"></div>
+            <div id="list-lentas"
+              style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;"></div>
           </div>
         </div>
       </div>
@@ -2409,15 +2415,24 @@
   ">
     <style>
       @keyframes slideUpBanner {
-        from { transform: translateY(100%); opacity: 0; }
-        to   { transform: translateY(0);   opacity: 1; }
+        from {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
       }
     </style>
     <div style="display:flex; align-items:center; gap:12px; max-width:480px; margin:0 auto;">
-      <img src="logo.png" alt="Alabanza IMR4" style="width:48px; height:48px; border-radius:12px; flex-shrink:0; object-fit:cover; box-shadow:0 4px 12px rgba(78,205,196,0.3);">
+      <img src="logo.png" alt="Alabanza IMR4"
+        style="width:48px; height:48px; border-radius:12px; flex-shrink:0; object-fit:cover; box-shadow:0 4px 12px rgba(78,205,196,0.3);">
       <div style="flex:1; min-width:0;">
         <div style="font-weight:700; font-size:14px; color:var(--teal); margin-bottom:2px;">Instalar Alabanza IMR4</div>
-        <div style="font-size:12px; color:var(--text2); line-height:1.4;">Agrégala a tu pantalla de inicio y úsala como una app nativa 📱</div>
+        <div style="font-size:12px; color:var(--text2); line-height:1.4;">Agrégala a tu pantalla de inicio y úsala como
+          una app nativa 📱</div>
       </div>
       <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
         <button id="pwa-install-btn" style="
@@ -2444,8 +2459,10 @@
       </div>
     </div>
     <!-- iOS instructions (only shown on iOS) -->
-    <div id="pwa-ios-hint" style="display:none; margin-top:10px; max-width:480px; margin-left:auto; margin-right:auto; text-align:center; font-size:11px; color:var(--text3); border-top:1px solid var(--border); padding-top:8px; line-height:1.5;">
-      En Safari: toca <b style="color:var(--teal);">Compartir</b> (↑) → <b style="color:var(--teal);">"Añadir a pantalla de inicio"</b>
+    <div id="pwa-ios-hint"
+      style="display:none; margin-top:10px; max-width:480px; margin-left:auto; margin-right:auto; text-align:center; font-size:11px; color:var(--text3); border-top:1px solid var(--border); padding-top:8px; line-height:1.5;">
+      En Safari: toca <b style="color:var(--teal);">Compartir</b> (↑) → <b style="color:var(--teal);">"Añadir a pantalla
+        de inicio"</b>
     </div>
   </div>
 
@@ -2609,7 +2626,7 @@
       localStorage.removeItem('sessionPassword');
       localStorage.removeItem('activeLeaderTab');
       localStorage.removeItem('activeMusicoTab');
-      
+
       // Limpiar inputs del formulario
       document.getElementById('login-email').value = '';
       document.getElementById('login-password').value = '';
@@ -3653,7 +3670,7 @@
         filteredRapidas.forEach(s => {
           const row = document.createElement('div');
           row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04);';
-          
+
           const youtubeBtn = s.youtube && s.youtube.trim()
             ? `<a href="${s.youtube}" target="_blank" class="chip chip-coral" style="text-decoration:none; padding:4px 8px; font-size:11px; display:inline-flex; align-items:center; gap:3px;">▶ YouTube</a>`
             : '';
@@ -3692,7 +3709,7 @@
         filteredLentas.forEach(s => {
           const row = document.createElement('div');
           row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04);';
-          
+
           const youtubeBtn = s.youtube && s.youtube.trim()
             ? `<a href="${s.youtube}" target="_blank" class="chip chip-coral" style="text-decoration:none; padding:4px 8px; font-size:11px; display:inline-flex; align-items:center; gap:3px;">▶ YouTube</a>`
             : '';
@@ -4699,10 +4716,12 @@
       </div>
       <p class="modal-subtitle" style="margin-top:8px; margin-bottom:4px;">Notificar por:</p>
       <div style="display:flex; gap:16px; margin-bottom: 16px;">
-        <label style="display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--text); cursor:pointer;">
+        <label
+          style="display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--text); cursor:pointer;">
           <input type="radio" name="ensayo-notify-mode" value="app" checked style="accent-color:var(--teal);"> Solo App
         </label>
-        <label style="display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--text); cursor:pointer;">
+        <label
+          style="display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--text); cursor:pointer;">
           <input type="radio" name="ensayo-notify-mode" value="both" style="accent-color:var(--teal);"> App y WhatsApp
         </label>
       </div>
