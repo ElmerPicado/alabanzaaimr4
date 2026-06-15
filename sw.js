@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-imr4-v1';
+const CACHE_NAME = 'alabanza-imr4-v2';
 const ASSETS = [
   './alabanza-app_2.html',
   './manifest.json',
@@ -9,7 +9,7 @@ self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS).catch(() => {
-        // Ignorar errores si algún recurso (como logo.png) aún no existe
+        // Ignorar errores si algún recurso aún no existe
       });
     })
   );
@@ -33,7 +33,12 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   // Ignorar peticiones de Firebase y externas para no interferir con la base de datos en tiempo real
-  if (e.request.url.includes('firestore.googleapis.com') || e.request.url.includes('firebaseapp.com')) {
+  if (
+    e.request.url.includes('firestore.googleapis.com') ||
+    e.request.url.includes('firebaseapp.com') ||
+    e.request.url.includes('gstatic.com') ||
+    e.request.url.includes('googleapis.com')
+  ) {
     return;
   }
   e.respondWith(

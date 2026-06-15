@@ -1,10 +1,10 @@
 {
-  "name": "AppIMR4",
-  "short_name": "AppIMR4",
+  "name": "Alabanza IMR4",
+  "short_name": "Alabanza",
   "start_url": "./alabanza-app_2.html",
   "display": "standalone",
-  "background_color": "#0f0e17",
-  "theme_color": "#0f0e17",
+  "background_color": "#1a1828",
+  "theme_color": "#4ecdc4",
   "orientation": "portrait-primary",
   "icons": [
     {

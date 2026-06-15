@@ -3,8 +3,12 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Alabanza — Panel de Equipo IMR4</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Alabanza IMR4">
+  <meta name="theme-color" content="#4ecdc4">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
@@ -1393,14 +1397,39 @@
 
         if (btnAddEnsayo) {
           btnAddEnsayo.addEventListener('click', () => {
-            window.renderEnsayoMembers();
-            renderEnsayoCancionesModal();
-            // Reset fields
-            document.getElementById('ensayo-nombre').value = '';
-            document.getElementById('ensayo-fecha').value = '';
+            try {
+              if (window.renderEnsayoMembers) {
+                window.renderEnsayoMembers();
+              }
+            } catch (e) {
+              console.error("Error al renderizar miembros para el ensayo:", e);
+            }
+
+            try {
+              if (typeof renderEnsayoCancionesModal === 'function') {
+                renderEnsayoCancionesModal();
+              }
+            } catch (e) {
+              console.error("Error al renderizar canciones para el ensayo:", e);
+            }
+
+            // Reset fields safely
+            const nameEl = document.getElementById('ensayo-nombre');
+            const dateEl = document.getElementById('ensayo-fecha');
             const horaEl = document.getElementById('ensayo-hora');
+            if (nameEl) nameEl.value = '';
+            if (dateEl) dateEl.value = '';
             if (horaEl) horaEl.value = '';
-            if (modalEnsayo) modalEnsayo.classList.add('active');
+
+            // Reset notify radio
+            const defaultNotify = document.querySelector('input[name="ensayo-notify-mode"][value="app"]');
+            if (defaultNotify) defaultNotify.checked = true;
+
+            if (modalEnsayo) {
+              modalEnsayo.classList.add('active');
+            } else {
+              console.error("No se encontró el elemento admin-ensayo-modal en el DOM.");
+            }
           });
         }
 
@@ -1416,9 +1445,11 @@
             const nombreInput = document.getElementById('ensayo-nombre');
             const fechaInput = document.getElementById('ensayo-fecha');
             const horaInput = document.getElementById('ensayo-hora');
-            const nombre = nombreInput.value.trim();
-            const fecha = fechaInput.value;
+            
+            const nombre = nombreInput ? nombreInput.value.trim() : '';
+            const fecha = fechaInput ? fechaInput.value : '';
             const hora = horaInput ? horaInput.value : '';
+
             if (!fecha) { alert('Selecciona una fecha para el ensayo.'); return; }
             const defaultLabel = `Ensayo ${fecha}${hora ? ' ' + hora : ''}`;
             const etiqueta = nombre || defaultLabel;
@@ -1443,6 +1474,9 @@
               });
             }
 
+            // Read notify mode
+            const notifyVal = document.querySelector('input[name="ensayo-notify-mode"]:checked')?.value || 'app';
+
             try {
               await addDoc(collection(db, 'ensayos'), {
                 nombre: etiqueta,
@@ -1452,19 +1486,86 @@
                 canciones: selectedSongIds,
                 confirmaciones: {}
               });
+
               if (modalEnsayo) modalEnsayo.classList.remove('active');
-              nombreInput.value = ''; fechaInput.value = ''; if (horaInput) horaInput.value = '';
+              if (nombreInput) nombreInput.value = ''; 
+              if (fechaInput) fechaInput.value = ''; 
+              if (horaInput) horaInput.value = '';
               showToast(`✅ Ensayo "${etiqueta}" creado`);
-              renderEnsayosAdmin();
+              
+              if (window.renderEnsayosAdmin) window.renderEnsayosAdmin();
+
+              // Handle WhatsApp notification if selected
+              if (notifyVal === 'both') {
+                let msg = `✨ *CONVOCATORIA A ENSAYO* ✨\n\n`;
+                msg += `🎵 *Ensayo:* ${etiqueta}\n`;
+                msg += `📅 *Fecha:* ${fecha}\n`;
+                msg += `⏰ *Hora:* ${hora ? hora : 'No especificada'}\n\n`;
+
+                const mList = window.cacheMembers || [];
+                const musiciansNames = selectedIds
+                  .map(uid => mList.find(x => x.usuario === uid))
+                  .filter(x => x && x.type !== 'corista')
+                  .map(x => x.nombre)
+                  .join(', ');
+                const singersNames = selectedIds
+                  .map(uid => mList.find(x => x.usuario === uid))
+                  .filter(x => x && x.type === 'corista')
+                  .map(x => x.nombre)
+                  .join(', ');
+
+                if (musiciansNames) {
+                  msg += `🎹 *Músicos Convocados:* ${musiciansNames}\n`;
+                }
+                if (singersNames) {
+                  msg += `🎤 *Voces Convocadas:* ${singersNames}\n`;
+                }
+                msg += `\n`;
+
+                if (selectedSongIds.length > 0) {
+                  msg += `🎶 *Canciones a ensayar:* \n`;
+                  selectedSongIds.forEach((sid, idx) => {
+                    const s = (window.cacheSongs || []).find(x => x.id === sid);
+                    if (s) {
+                      msg += `  ${idx + 1}. *${s.nombre}* (${s.artista})`;
+                      if (s.youtube && s.youtube.trim()) {
+                        msg += `\n     Link: ${s.youtube}`;
+                      }
+                      msg += `\n`;
+                    }
+                  });
+                }
+
+                // WhatsApp redirection
+                const encodedMsg = encodeURIComponent(msg);
+                const groupLink = (window._whatsappGroupLink || "").trim();
+                let waUrl;
+                if (groupLink && groupLink.startsWith('https://wa.me/')) {
+                  waUrl = groupLink.split('?')[0] + '?text=' + encodedMsg;
+                } else if (groupLink) {
+                  waUrl = groupLink + (groupLink.includes('?') ? '&' : '?') + 'text=' + encodedMsg;
+                } else {
+                  waUrl = 'https://api.whatsapp.com/send?text=' + encodedMsg;
+                }
+
+                // Open synchronously
+                const a = document.createElement('a');
+                a.href = waUrl;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+              }
             } catch (err) {
               console.error('Error creando ensayo', err);
-              alert('Error al crear el ensayo');
+              alert('Error al crear el ensayo: ' + err.message);
             }
           });
         }
 
         // Initialize view rendering
-        renderEnsayosAdmin();
+        if (window.renderEnsayosAdmin) window.renderEnsayosAdmin();
       };
 
       window.updateRehearsalsActiveUser = function (user) {
@@ -1481,21 +1582,25 @@
         const cont = document.getElementById('ensayo-canciones-list');
         if (!cont) return;
         cont.innerHTML = '';
-        if (!window.cacheSongs || window.cacheSongs.length === 0) {
+        if (!window.cacheSongs || !Array.isArray(window.cacheSongs) || window.cacheSongs.length === 0) {
           cont.innerHTML = `<p style='color:var(--text3);font-size:12px;text-align:center;'>No hay canciones en la biblioteca aún.</p>`;
           return;
         }
         window.cacheSongs.forEach(s => {
+          if (!s) return;
           const div = document.createElement('div');
           div.className = 'member-row';
           div.style.padding = '6px 0';
+          const nameVal = s.nombre || 'Canción sin título';
+          const artistVal = s.artista || 'Artista Desconocido';
+          const typeVal = s.tipo || 'alabanza';
           div.innerHTML = `
-        <div class="assign-check" data-song-id="${s.id}"></div>
-        <div class="member-info">
-          <div class="member-name" style="font-size:13px;">${s.nombre}</div>
-          <div class="member-role">${s.artista} | <span class="chip-type chip-${s.tipo}">${s.tipo}</span></div>
-        </div>
-      `;
+            <div class="assign-check" data-song-id="${s.id}"></div>
+            <div class="member-info">
+              <div class="member-name" style="font-size:13px; font-weight:500;">${nameVal}</div>
+              <div class="member-role">${artistVal} | <span class="chip-type chip-${typeVal}">${typeVal}</span></div>
+            </div>
+          `;
           div.querySelector('.assign-check').addEventListener('click', e => {
             e.stopPropagation();
             e.currentTarget.classList.toggle('on');
@@ -1504,32 +1609,48 @@
         });
       }
 
-      // Render member checkboxes for ensayo selection
+      // Render member checkboxes for ensayo selection (categorized as Musicians & Voices)
       window.renderEnsayoMembers = function () {
         const ensayoMiembrosList = document.getElementById('ensayo-miembros-list');
         if (!ensayoMiembrosList) return;
         ensayoMiembrosList.innerHTML = '';
-        if (!window.cacheMembers) return;
-        window.cacheMembers.forEach(member => {
-          if (member.usuario === 'admin') return;
-          const idVal = member.usuario || member.id;
-          const div = document.createElement('div');
-          div.className = 'member-row';
-          div.innerHTML = `
-        <div class="assign-check" data-id="${idVal}"></div>
-        <div class="member-info">
-          <div class="member-name">${member.nombre}</div>
-          <div class="member-role">${member.instrumento || ''}</div>
-        </div>
-      `;
-          // toggle check on click
-          div.querySelector('.assign-check').addEventListener('click', (e) => {
-            e.stopPropagation();
-            const check = e.currentTarget;
-            check.classList.toggle('on');
+        if (!window.cacheMembers || !Array.isArray(window.cacheMembers)) return;
+
+        // Group members by type
+        const musicos = window.cacheMembers.filter(m => m && m.usuario !== 'admin' && m.type !== 'corista');
+        const voces = window.cacheMembers.filter(m => m && m.usuario !== 'admin' && m.type === 'corista');
+
+        const renderSection = (title, list) => {
+          if (list.length === 0) return;
+          const header = document.createElement('div');
+          header.style.cssText = 'font-weight:600;font-size:11px;text-transform:uppercase;color:var(--teal);margin:8px 0 4px;letter-spacing:0.8px;';
+          header.textContent = title;
+          ensayoMiembrosList.appendChild(header);
+
+          list.forEach(member => {
+            const idVal = member.usuario || member.id || '';
+            const nombreVal = member.nombre || 'Sin Nombre';
+            const instVal = member.instrumento || (member.type === 'corista' ? 'Voz' : '');
+            const div = document.createElement('div');
+            div.className = 'member-row';
+            div.innerHTML = `
+              <div class="assign-check" data-id="${idVal}"></div>
+              <div class="member-info">
+                <div class="member-name">${nombreVal}</div>
+                <div class="member-role">${instVal}</div>
+              </div>
+            `;
+            // toggle check on click
+            div.querySelector('.assign-check').addEventListener('click', (e) => {
+              e.stopPropagation();
+              e.currentTarget.classList.toggle('on');
+            });
+            ensayoMiembrosList.appendChild(div);
           });
-          ensayoMiembrosList.appendChild(div);
-        });
+        };
+
+        renderSection('🎹 Músicos', musicos);
+        renderSection('🎤 Voces', voces);
       }
     </script>
 
@@ -1554,7 +1675,11 @@
             cont.innerHTML = `<p style='color:var(--text3);font-size:13px;text-align:center;padding:20px;'>No hay ensayos programados aún. Crea uno con el botón de arriba.</p>`;
             return;
           }
-          ensayos.sort((a, b) => a.fecha.localeCompare(b.fecha));
+          ensayos.sort((a, b) => {
+            const dateA = a.fecha || '';
+            const dateB = b.fecha || '';
+            return dateA.localeCompare(dateB);
+          });
           cont.innerHTML = '';
           ensayos.forEach(e => {
             const totalMiembros = e.miembros ? e.miembros.length : 0;
@@ -1638,7 +1763,11 @@
             cont.innerHTML = `<p style='color:var(--text3);font-size:13px;text-align:center;padding:20px;'>No tienes ensayos programados todavía.</p>`;
             return;
           }
-          filtered.sort((a, b) => a.fecha.localeCompare(b.fecha));
+          filtered.sort((a, b) => {
+            const dateA = a.fecha || '';
+            const dateB = b.fecha || '';
+            return dateA.localeCompare(dateB);
+          });
 
           filtered.forEach(e => {
             const confirmed = e.confirmaciones && e.confirmaciones[musicoId] === true;
@@ -2059,6 +2188,7 @@
       <button class="nav-tab-musico active" data-mtab="mtab-servicio">Servicio</button>
       <button class="nav-tab-musico" data-mtab="mtab-asistencia">Mi Asistencia</button>
       <button class="nav-tab-musico" data-mtab="mtab-ensayos-musico">📅 Ensayos</button>
+      <button class="nav-tab-musico" data-mtab="mtab-repertorio-musico">🎵 Repertorio</button>
     </nav>
 
     <main class="content">
@@ -2116,6 +2246,42 @@
         <p class="section-sub">Ensayos en los que estás invitado. Confirma tu asistencia.</p>
         <div id="ensayo-list-musico">
           <p style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Cargando ensayos...</p>
+        </div>
+      </div>
+
+      <!-- PESTAÑA 4: REPERTORIO MÚSICO -->
+      <div id="mtab-repertorio-musico" class="tab-panel">
+        <h2 class="section-title">Repertorio General</h2>
+        <p class="section-sub">Explora la biblioteca completa de canciones rápidas (Alabanzas) y lentas (Adoración).</p>
+
+        <!-- Caja para Rápidas (Alabanza) -->
+        <div class="card" style="margin-bottom: 16px; border-color: var(--teal); padding: 16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" id="head-rapidas">
+            <h3 style="font-size:16px; color:var(--teal); margin:0; display:flex; align-items:center; gap:8px;">
+              ⚡ Alabanzas (Rápidas) <span id="count-rapidas" style="font-size:12px; color:var(--text3); font-weight:normal;"></span>
+            </h3>
+            <span id="arrow-rapidas" style="font-size:14px; color:var(--text2);">▼</span>
+          </div>
+          <div id="body-rapidas" style="margin-top: 14px; display: none;">
+            <input type="text" id="search-rapidas" placeholder="🔍 Buscar alabanza..." 
+              style="width:100%; padding:8px 12px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); margin-bottom:12px; font-size:13px;">
+            <div id="list-rapidas" style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;"></div>
+          </div>
+        </div>
+
+        <!-- Caja para Lentas (Adoración) -->
+        <div class="card" style="margin-bottom: 16px; border-color: var(--purple); padding: 16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" id="head-lentas">
+            <h3 style="font-size:16px; color:var(--purple); margin:0; display:flex; align-items:center; gap:8px;">
+              🙏 Adoración (Lentas) <span id="count-lentas" style="font-size:12px; color:var(--text3); font-weight:normal;"></span>
+            </h3>
+            <span id="arrow-lentas" style="font-size:14px; color:var(--text2);">▼</span>
+          </div>
+          <div id="body-lentas" style="margin-top: 14px; display: none;">
+            <input type="text" id="search-lentas" placeholder="🔍 Buscar adoración..." 
+              style="width:100%; padding:8px 12px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); margin-bottom:12px; font-size:13px;">
+            <div id="list-lentas" style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;"></div>
+          </div>
         </div>
       </div>
 
@@ -2287,12 +2453,14 @@
     serviceDateSelect.value = baseDay.toISOString().split('T')[0];
 
     // Controladores de Pestañas
+    // Controladores de Pestañas
     document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
         tab.classList.add('active');
         document.getElementById(tab.dataset.tab).classList.add('active');
+        localStorage.setItem('activeLeaderTab', tab.dataset.tab);
       });
     });
     loginForm.addEventListener('submit', async (e) => {
@@ -2303,17 +2471,17 @@
       // 1. VALIDACIÓN CUENTA MAESTRA PRINCIPAL (SUPER ADMIN & GENERIC ADMIN)
       if (userVal === "alimr4" && passVal === "030819") {
         console.log("Acceso concedido al Super Administrador.");
-        iniciarSesionDashboard({ nombre: "Super Admin", role: "lider", usuario: "alimr4" });
+        iniciarSesionDashboard({ nombre: "Super Admin", role: "lider", usuario: "alimr4", password: "030819" });
         return;
       }
       if (userVal === "imr4" && passVal === "222222") {
         console.log("Acceso concedido al Administrador General.");
-        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4" });
+        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222" });
         return;
       }
       if (userVal === "admin" && passVal === "1234") {
         console.log("Acceso concedido al Administrador General legacy.");
-        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin" });
+        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234" });
         return;
       }
 
@@ -2345,11 +2513,31 @@
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
         screenDashboard.classList.add('active');
         cargarConfiguracion();
+
+        // Restore tab
+        const lastTab = localStorage.getItem('activeLeaderTab');
+        if (lastTab && document.getElementById(lastTab)) {
+          const tabBtn = Array.from(document.querySelectorAll('.nav-tab')).find(t => t.dataset.tab === lastTab);
+          if (tabBtn) tabBtn.click();
+        }
       } else {
         // Vista de Músico
         document.getElementById('musico-name-badge').textContent = userData.nombre;
         screenMusico.classList.add('active');
         iniciarVistaMusico();
+
+        // Restore tab
+        const lastTab = localStorage.getItem('activeMusicoTab');
+        if (lastTab && document.getElementById(lastTab)) {
+          const tabBtn = Array.from(document.querySelectorAll('.nav-tab-musico')).find(t => t.dataset.mtab === lastTab);
+          if (tabBtn) tabBtn.click();
+        }
+      }
+
+      // Guardar credenciales en local storage
+      if (userData.usuario && userData.password) {
+        localStorage.setItem('sessionUserKey', userData.usuario);
+        localStorage.setItem('sessionPassword', userData.password);
       }
 
       // Set user session in rehearsals logic
@@ -2362,6 +2550,16 @@
     }
 
     function cerrarSesion() {
+      // Limpiar sesión local
+      localStorage.removeItem('sessionUserKey');
+      localStorage.removeItem('sessionPassword');
+      localStorage.removeItem('activeLeaderTab');
+      localStorage.removeItem('activeMusicoTab');
+      
+      // Limpiar inputs del formulario
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-password').value = '';
+
       screenLogin.classList.add('active');
       screenDashboard.classList.remove('active');
       screenMusico.classList.remove('active');
@@ -2409,6 +2607,7 @@
         } else if (currentUserRole === 'musico') {
           const msDate = document.getElementById('musico-service-date').value;
           if (msDate) cargarServicioMusico(msDate);
+          if (typeof renderRepertorioMusico === 'function') renderRepertorioMusico();
         }
       });
 
@@ -3295,6 +3494,7 @@
           document.querySelectorAll('#screen-musico .tab-panel').forEach(p => p.classList.remove('active'));
           tab.classList.add('active');
           document.getElementById(tab.dataset.mtab).classList.add('active');
+          localStorage.setItem('activeMusicoTab', tab.dataset.mtab);
         });
       });
 
@@ -3314,6 +3514,160 @@
 
       cargarServicioMusico(dateStr);
       cargarAsistenciaMusico(dateStr);
+
+      // Configurar controles de pestaña de Repertorio
+      setupRepertorioMusico();
+    }
+
+    function setupRepertorioMusico() {
+      // Toggle Alabanzas (Rápidas) colapsable
+      const headRapidas = document.getElementById('head-rapidas');
+      const bodyRapidas = document.getElementById('body-rapidas');
+      const arrowRapidas = document.getElementById('arrow-rapidas');
+      if (headRapidas && bodyRapidas && arrowRapidas) {
+        headRapidas.onclick = () => {
+          const isHidden = bodyRapidas.style.display === 'none';
+          bodyRapidas.style.display = isHidden ? 'block' : 'none';
+          arrowRapidas.textContent = isHidden ? '▲' : '▼';
+        };
+      }
+
+      // Toggle Adoración (Lentas) colapsable
+      const headLentas = document.getElementById('head-lentas');
+      const bodyLentas = document.getElementById('body-lentas');
+      const arrowLentas = document.getElementById('arrow-lentas');
+      if (headLentas && bodyLentas && arrowLentas) {
+        headLentas.onclick = () => {
+          const isHidden = bodyLentas.style.display === 'none';
+          bodyLentas.style.display = isHidden ? 'block' : 'none';
+          arrowLentas.textContent = isHidden ? '▲' : '▼';
+        };
+      }
+
+      // Configurar buscadores en tiempo real
+      const searchRapidas = document.getElementById('search-rapidas');
+      if (searchRapidas) {
+        searchRapidas.addEventListener('input', () => renderRepertorioMusico());
+      }
+      const searchLentas = document.getElementById('search-lentas');
+      if (searchLentas) {
+        searchLentas.addEventListener('input', () => renderRepertorioMusico());
+      }
+
+      // Renderizado inicial
+      renderRepertorioMusico();
+    }
+
+    function renderRepertorioMusico() {
+      const listRapidas = document.getElementById('list-rapidas');
+      const listLentas = document.getElementById('list-lentas');
+      const countRapidas = document.getElementById('count-rapidas');
+      const countLentas = document.getElementById('count-lentas');
+
+      if (!listRapidas || !listLentas) return;
+
+      const queryRapidas = (document.getElementById('search-rapidas')?.value || '').toLowerCase().trim();
+      const queryLentas = (document.getElementById('search-lentas')?.value || '').toLowerCase().trim();
+
+      const allSongs = cacheSongs || [];
+
+      // Filtrar Alabanzas (Rápidas)
+      const rapidas = allSongs.filter(s => s && s.tipo === 'alabanza');
+      const filteredRapidas = rapidas.filter(s => {
+        const name = (s.nombre || '').toLowerCase();
+        const artist = (s.artista || '').toLowerCase();
+        return name.includes(queryRapidas) || artist.includes(queryRapidas);
+      });
+
+      // Filtrar Adoraciones (Lentas)
+      const lentas = allSongs.filter(s => s && s.tipo === 'adoracion');
+      const filteredLentas = lentas.filter(s => {
+        const name = (s.nombre || '').toLowerCase();
+        const artist = (s.artista || '').toLowerCase();
+        return name.includes(queryLentas) || artist.includes(queryLentas);
+      });
+
+      // Actualizar contadores
+      if (countRapidas) countRapidas.textContent = `(${filteredRapidas.length})`;
+      if (countLentas) countLentas.textContent = `(${filteredLentas.length})`;
+
+      // Renderizar Alabanzas (Rápidas)
+      listRapidas.innerHTML = '';
+      if (filteredRapidas.length === 0) {
+        listRapidas.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:12px;">Ninguna canción encontrada.</p>`;
+      } else {
+        filteredRapidas.forEach(s => {
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04);';
+          
+          const youtubeBtn = s.youtube && s.youtube.trim()
+            ? `<a href="${s.youtube}" target="_blank" class="chip chip-coral" style="text-decoration:none; padding:4px 8px; font-size:11px; display:inline-flex; align-items:center; gap:3px;">▶ YouTube</a>`
+            : '';
+          const lyricsBtn = s.letra && s.letra.trim()
+            ? `<button class="chip chip-teal view-lyrics-btn" data-id="${s.id}" style="border:none; cursor:pointer; padding:4px 8px; font-size:11px; display:inline-flex; align-items:center; gap:3px;">📖 Letra</button>`
+            : '';
+
+          row.innerHTML = `
+            <div style="flex:1; min-width:0; margin-right:8px;">
+              <div style="font-weight:500; font-size:13.5px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.nombre}</div>
+              <div style="font-size:11px; color:var(--text3);">${s.artista} · <span style="color:var(--gold); font-weight:600;">${s.tonoBase}</span></div>
+            </div>
+            <div style="display:flex; gap:6px; flex-shrink:0;">
+              ${youtubeBtn}
+              ${lyricsBtn}
+            </div>
+          `;
+
+          const btnLy = row.querySelector('.view-lyrics-btn');
+          if (btnLy) {
+            btnLy.onclick = () => {
+              if (window.abrirModalLetraGlobal) {
+                window.abrirModalLetraGlobal(s.id);
+              }
+            };
+          }
+          listRapidas.appendChild(row);
+        });
+      }
+
+      // Renderizar Adoraciones (Lentas)
+      listLentas.innerHTML = '';
+      if (filteredLentas.length === 0) {
+        listLentas.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:12px;">Ninguna canción encontrada.</p>`;
+      } else {
+        filteredLentas.forEach(s => {
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04);';
+          
+          const youtubeBtn = s.youtube && s.youtube.trim()
+            ? `<a href="${s.youtube}" target="_blank" class="chip chip-coral" style="text-decoration:none; padding:4px 8px; font-size:11px; display:inline-flex; align-items:center; gap:3px;">▶ YouTube</a>`
+            : '';
+          const lyricsBtn = s.letra && s.letra.trim()
+            ? `<button class="chip chip-teal view-lyrics-btn" data-id="${s.id}" style="border:none; cursor:pointer; padding:4px 8px; font-size:11px; display:inline-flex; align-items:center; gap:3px;">📖 Letra</button>`
+            : '';
+
+          row.innerHTML = `
+            <div style="flex:1; min-width:0; margin-right:8px;">
+              <div style="font-weight:500; font-size:13.5px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.nombre}</div>
+              <div style="font-size:11px; color:var(--text3);">${s.artista} · <span style="color:var(--gold); font-weight:600;">${s.tonoBase}</span></div>
+            </div>
+            <div style="display:flex; gap:6px; flex-shrink:0;">
+              ${youtubeBtn}
+              ${lyricsBtn}
+            </div>
+          `;
+
+          const btnLy = row.querySelector('.view-lyrics-btn');
+          if (btnLy) {
+            btnLy.onclick = () => {
+              if (window.abrirModalLetraGlobal) {
+                window.abrirModalLetraGlobal(s.id);
+              }
+            };
+          }
+          listLentas.appendChild(row);
+        });
+      }
     }
 
     function cargarServicioMusico(dateStr) {
@@ -3685,7 +4039,19 @@
 
     window.abrirModalLetraGlobal = function (cancionId) {
       const cache = window._lyricsCache || {};
-      const song = cache[cancionId];
+      let song = cache[cancionId];
+      if (!song) {
+        // Buscar en la lista global de canciones
+        const found = (cacheSongs || []).find(x => x.id === cancionId);
+        if (found) {
+          song = {
+            nombre: found.nombre,
+            tonoBase: found.tonoBase,
+            tonoServicio: found.tonoBase,
+            letra: found.letra
+          };
+        }
+      }
       if (!song) return;
       const tonoMostrar = song.tonoServicio || song.tonoBase;
       document.getElementById('lyrics-modal-title').textContent = song.nombre;
@@ -4119,6 +4485,47 @@
       });
     }
 
+    // AUTO-LOGIN LOGIC ON LOAD
+    async function intentarAutoLogin() {
+      const savedUserKey = localStorage.getItem('sessionUserKey');
+      const savedPassword = localStorage.getItem('sessionPassword');
+      if (!savedUserKey || !savedPassword) {
+        return;
+      }
+
+      // 1. Verificar cuentas maestras/admin hardcoded
+      if (savedUserKey === "alimr4" && savedPassword === "030819") {
+        iniciarSesionDashboard({ nombre: "Super Admin", role: "lider", usuario: "alimr4", password: "030819" });
+        return;
+      }
+      if (savedUserKey === "imr4" && savedPassword === "222222") {
+        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222" });
+        return;
+      }
+      if (savedUserKey === "admin" && savedPassword === "1234") {
+        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234" });
+        return;
+      }
+
+      // 2. Verificar en Firestore en tiempo real
+      try {
+        const uSnap = await getDoc(doc(db, "usuarios", savedUserKey));
+        if (uSnap.exists() && uSnap.data().password === savedPassword) {
+          iniciarSesionDashboard(uSnap.data());
+        } else {
+          console.warn("Sesión local caducada o usuario modificado.");
+          localStorage.removeItem('sessionUserKey');
+          localStorage.removeItem('sessionPassword');
+          localStorage.removeItem('activeLeaderTab');
+          localStorage.removeItem('activeMusicoTab');
+        }
+      } catch (err) {
+        console.error("Error al re-autenticar la sesión guardada:", err);
+      }
+    }
+
+    intentarAutoLogin();
+
     // REGISTRO DE SERVICE WORKER PARA SOPORTE PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -4170,8 +4577,17 @@
         style="max-height:150px; overflow-y:auto; border:1px solid var(--border2); border-radius:var(--radius-sm); padding:8px; background:var(--bg2); margin-bottom: 12px;">
         <!-- Las canciones de la biblioteca se cargarán aquí con checkboxes -->
       </div>
+      <p class="modal-subtitle" style="margin-top:8px; margin-bottom:4px;">Notificar por:</p>
+      <div style="display:flex; gap:16px; margin-bottom: 16px;">
+        <label style="display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--text); cursor:pointer;">
+          <input type="radio" name="ensayo-notify-mode" value="app" checked style="accent-color:var(--teal);"> Solo App
+        </label>
+        <label style="display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--text); cursor:pointer;">
+          <input type="radio" name="ensayo-notify-mode" value="both" style="accent-color:var(--teal);"> App y WhatsApp
+        </label>
+      </div>
       <button class="btn-primary" id="btn-save-ensayo"
-        style="background: var(--teal); color:#0f0e17; margin-top:12px;">Guardar Ensayo</button>
+        style="background: var(--teal); color:#0f0e17; margin-top:0;">Guardar Ensayo</button>
       <button class="btn-primary" id="btn-cancel-ensayo"
         style="background: var(--coral); color:#0f0e17; margin-left:8px;">Cancelar</button>
     </div>
