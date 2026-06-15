@@ -1,0 +1,4175 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Alabanza — Panel de Equipo IMR4</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <link href="https://googleapis.com" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0e17;
+      --bg2: #1a1828;
+      --bg3: #23213a;
+      --border: rgba(255, 255, 255, 0.08);
+      --border2: rgba(255, 255, 255, 0.14);
+      --gold: #f4c542;
+      --gold2: #e8a820;
+      --teal: #4ecdc4;
+      --coral: #ff6b6b;
+      --purple: #9b8fff;
+      --text: #f0eeff;
+      --text2: #a09cc0;
+      --text3: #6b6890;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-lg: 20px;
+      --font-display: 'Instrument Serif', serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://w3.org id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.35;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    .app-header {
+      padding: 20px 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 24px;
+      color: var(--gold);
+      letter-spacing: -0.5px;
+    }
+
+    .logo span {
+      color: var(--text2);
+      font-style: italic;
+      font-size: 18px;
+    }
+
+    .role-badge {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      color: var(--text2);
+      font-weight: 500;
+    }
+
+    .btn-logout {
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: var(--font-body);
+    }
+
+    #screen-login {
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      background: var(--bg);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 24px;
+      padding: 36px 28px;
+    }
+
+    .login-title {
+      font-family: var(--font-display);
+      font-size: 32px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .login-sub {
+      color: var(--text2);
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      padding: 13px 16px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--gold);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 14px 16px 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-tab {
+      flex-shrink: 0;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text2);
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px 8px 0 0;
+      transition: color 0.2s, background 0.2s;
+      font-family: var(--font-body);
+    }
+
+    .nav-tab.active {
+      color: var(--gold);
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-bottom: 1px solid var(--bg2);
+    }
+
+    /* New styles for repertoire tabs */
+    .repertorio-tabs {
+      display: flex;
+      gap: 4px;
+      margin-top: 12px;
+      overflow-x: auto;
+    }
+
+    .repertorio-tab {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: var(--text2);
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .repertorio-tab.active {
+      background: var(--bg2);
+      color: var(--gold);
+      border-color: var(--gold);
+    }
+
+    .nav-tab-musico {
+      flex-shrink: 0;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text2);
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px 8px 0 0;
+      transition: color 0.2s, background 0.2s;
+      font-family: var(--font-body);
+    }
+
+    .nav-tab-musico.active {
+      color: var(--teal);
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-bottom: 1px solid var(--bg2);
+    }
+
+    .content {
+      flex: 1;
+      padding: 20px 16px 90px;
+      background: var(--bg2);
+      overflow-y: auto;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .section-sub {
+      color: var(--text2);
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .song-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .song-item:last-child {
+      border-bottom: none;
+    }
+
+    .song-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 2px solid var(--border2);
+      background: var(--bg);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .song-check.checked {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+
+    .song-check.checked::after {
+      content: '✓';
+      font-size: 12px;
+      color: #0f0e17;
+      font-weight: 700;
+    }
+
+    .song-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .song-name {
+      font-weight: 500;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .song-meta {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px;
+    }
+
+    .song-locked {
+      opacity: 0.4;
+      pointer-events: none !important;
+    }
+
+    .song-list-scroll {
+      max-height: 250px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .song-list-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .song-list-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .song-list-scroll::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 4px;
+    }
+
+    .member-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .member-row:last-child {
+      border-bottom: none;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .av-gold {
+      background: rgba(244, 197, 66, 0.2);
+      color: var(--gold);
+    }
+
+    .av-teal {
+      background: rgba(78, 205, 196, 0.2);
+      color: var(--teal);
+    }
+
+    .av-purple {
+      background: rgba(155, 143, 255, 0.2);
+      color: var(--purple);
+    }
+
+    .member-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .member-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .member-role {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .assign-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid var(--border2);
+      background: var(--bg);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+
+    .assign-check.on {
+      background: var(--teal);
+      border-color: var(--teal);
+    }
+
+    .assign-check.on::after {
+      content: '✓';
+      font-size: 12px;
+      color: #0f0e17;
+      font-weight: 700;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--gold);
+      color: #0f0e17;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 15px;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 4px;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+      background: var(--gold2);
+    }
+
+    .btn-delete {
+      background: none;
+      border: none;
+      color: var(--coral);
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s;
+    }
+
+    .btn-delete:hover {
+      opacity: 0.7;
+    }
+
+    .tone-indicator {
+      background: rgba(244, 197, 66, 0.15);
+      color: var(--gold);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-left: auto;
+      border: 1px solid rgba(244, 197, 66, 0.3);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 24px;
+      width: 100%;
+      max-width: 340px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .modal-subtitle {
+      color: var(--text2);
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    .search-wrapper {
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--teal);
+    }
+
+    .block-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin: 16px 0 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      margin-top: 14px;
+      margin-bottom: 8px;
+    }
+
+    .category-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--teal);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .send-card {
+      background: linear-gradient(135deg, rgba(244, 197, 66, 0.08) 0%, rgba(78, 205, 196, 0.06) 100%);
+      border: 1px solid rgba(244, 197, 66, 0.2);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-top: 16px;
+    }
+
+    .chip-type {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-left: 8px;
+    }
+
+    .chip-alabanza {
+      background: rgba(78, 205, 196, 0.15);
+      color: var(--teal);
+    }
+
+    .chip-adoracion {
+      background: rgba(155, 143, 255, 0.15);
+      color: var(--purple);
+    }
+
+    .avail-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .avail-yes {
+      background: #4ade80;
+      box-shadow: 0 0 8px #4ade80;
+    }
+
+    .avail-no {
+      background: var(--coral);
+      box-shadow: 0 0 8px var(--coral);
+    }
+
+    .chip-select {
+      display: inline-block;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .chip-select:hover {
+      border-color: var(--purple);
+      color: var(--text);
+    }
+
+    .chip-select.selected {
+      background: rgba(155, 143, 255, 0.15);
+      border-color: var(--purple);
+      color: var(--purple);
+      font-weight: 600;
+      box-shadow: 0 0 10px rgba(155, 143, 255, 0.1);
+    }
+
+    /* --- DROPDOWN MULTISELECT --- */
+    .custom-multiselect {
+      position: relative;
+      width: 100%;
+      font-family: var(--font-body);
+      font-size: 14px;
+    }
+
+    .multiselect-header {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .multiselect-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-top: 4px;
+      padding: 10px;
+      z-index: 100;
+      display: none;
+      max-height: 250px;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    .multiselect-dropdown.active {
+      display: block;
+    }
+
+    .multiselect-dropdown label {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 8px 4px;
+      cursor: pointer;
+      color: var(--text2);
+      font-weight: normal;
+      margin-bottom: 0;
+      border-radius: 4px;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+
+    .multiselect-dropdown label:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--teal);
+    }
+
+    .optgroup-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: bold;
+      margin-bottom: 4px;
+      margin-top: 6px;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 4px;
+    }
+
+    .inst-cb {
+      width: auto !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      cursor: pointer;
+    }
+
+    /* --- BOTON DE FECHA (iOS fix) --- */
+    .date-btn {
+      width: 100%;
+      background: rgba(78, 205, 196, 0.1);
+      border: 1px solid var(--teal);
+      color: var(--teal);
+      font-size: 18px;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      outline: none;
+      cursor: pointer;
+      text-align: center;
+      font-family: var(--font-body);
+      letter-spacing: 1px;
+      min-height: 56px;
+      height: auto;
+      padding: 26px 14px 8px;
+      -webkit-appearance: none;
+      appearance: none;
+      display: block;
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .date-btn::-webkit-calendar-picker-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    /* --- MODAL DE LETRAS --- */
+    .lyrics-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 9990;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      backdrop-filter: blur(4px);
+      overflow: hidden;
+    }
+
+    .lyrics-modal-overlay.active {
+      display: flex;
+    }
+
+    .lyrics-modal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 1000px;
+      height: 90vh;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .lyrics-modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .lyrics-modal-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      color: var(--gold);
+      margin: 0;
+    }
+
+    .lyrics-modal-meta {
+      font-size: 13px;
+      color: var(--text3);
+      margin-top: 4px;
+    }
+
+    .lyrics-modal-close {
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-size: 28px;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .lyrics-modal-body {
+      padding: 20px;
+      overflow-y: auto !important;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: 100%;
+      background: #0f0e17;
+    }
+
+    .lyrics-content {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text);
+      white-space: pre-wrap;
+      overflow-x: auto;
+      tab-size: 4;
+      word-break: break-all;
+    }
+
+    .chord-highlight {
+      color: var(--teal);
+      font-weight: bold;
+    }
+
+    /* === TOAST NOTIFICATION === */
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--bg2);
+      border: 1px solid var(--gold);
+      border-radius: 30px;
+      padding: 10px 22px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.35s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+      white-space: nowrap;
+      max-width: 90vw;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* === MUSICIAN SONG CARD === */
+    .musico-song-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 12px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+
+    .musico-song-card:active {
+      border-color: var(--border2);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .song-num {
+      font-family: var(--font-display);
+      font-size: 32px;
+      color: rgba(255, 255, 255, 0.10);
+      min-width: 30px;
+      text-align: center;
+      font-weight: 700;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .song-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .song-card-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .song-card-artist {
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    .song-tone-badge {
+      background: rgba(244, 197, 66, 0.12);
+      color: var(--gold);
+      border: 1.5px solid rgba(244, 197, 66, 0.40);
+      border-radius: 10px;
+      padding: 8px 8px;
+      font-size: 20px;
+      font-weight: 800;
+      font-family: var(--font-display);
+      min-width: 52px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      flex-shrink: 0;
+      line-height: 1;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .song-tone-badge:active {
+      transform: scale(0.92);
+      background: rgba(244, 197, 66, 0.28);
+    }
+
+    .song-order-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+
+    .order-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text3);
+      border-radius: 5px;
+      width: 26px;
+      height: 22px;
+      cursor: pointer;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .order-btn:active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(244, 197, 66, 0.08);
+    }
+
+    /* === TONE PICKER (bottom sheet) === */
+    .tone-picker-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 5000;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .tone-picker-overlay.active {
+      display: flex;
+    }
+
+    .tone-picker-box {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 20px 20px 0 0;
+      padding: 20px 18px 38px;
+      width: 100%;
+      max-width: 500px;
+      animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+      }
+
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    .tone-picker-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      color: var(--gold);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tone-picker-subtitle {
+      font-size: 11px;
+      color: var(--text3);
+      margin-bottom: 16px;
+    }
+
+    .tone-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .tone-grid-btn {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      border-radius: 10px;
+      padding: 13px 4px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .tone-grid-btn.current {
+      background: rgba(244, 197, 66, 0.15);
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 10px rgba(244, 197, 66, 0.2);
+    }
+
+    .tone-grid-btn:active {
+      transform: scale(0.93);
+    }
+
+    /* === TABLET MEDIA QUERIES === */
+    @media (min-width: 600px) {
+      .lyrics-modal {
+        max-width: 95vw !important;
+        width: 95vw !important;
+        max-height: 94vh !important;
+        height: 94vh !important;
+      }
+
+      .lyrics-modal-body {
+        padding: 24px 32px;
+      }
+
+      .lyrics-content {
+        font-size: 15px;
+        line-height: 1.7;
+      }
+
+      .modal-box {
+        max-width: 460px !important;
+      }
+
+      .tone-picker-box {
+        border-radius: 20px;
+        margin: 20px;
+      }
+
+      .musico-song-card {
+        padding: 16px 18px;
+      }
+
+      .song-card-name {
+        font-size: 18px;
+      }
+
+      .song-tone-badge {
+        font-size: 22px;
+        padding: 10px 12px;
+        min-width: 58px;
+      }
+    }
+
+    /* === NUEVOS ESTILOS REORDENAMIENTO, SOS Y MODAL === */
+    .btn-ver-letra {
+      background: rgba(244, 197, 66, 0.08);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 6px;
+      transition: all 0.15s;
+      font-family: var(--font-body);
+      box-shadow: 0 2px 6px rgba(244, 197, 66, 0.15);
+    }
+
+    .btn-ver-letra:hover {
+      background: rgba(244, 197, 66, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .btn-ver-letra:active {
+      transform: scale(0.96);
+      background: rgba(244, 197, 66, 0.25);
+    }
+
+    .btn-remove-song {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: none;
+      border: none;
+      color: var(--text3);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.15s;
+      line-height: 1;
+      z-index: 10;
+    }
+
+    .btn-remove-song:hover {
+      color: var(--coral);
+      background: rgba(255, 107, 107, 0.12);
+    }
+
+    .btn-add-song-musico {
+      transition: all 0.2s ease;
+    }
+
+    .btn-add-song-musico:active {
+      transform: scale(0.98);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .sos-btn {
+      background: var(--coral);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 8px rgba(217, 65, 65, 0.3);
+      transition: all 0.15s;
+      line-height: 1;
+      height: 32px;
+    }
+
+    .sos-btn:active {
+      transform: scale(0.95);
+    }
+
+    .theme-btn {
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .theme-btn:active {
+      transform: scale(0.9);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* === TEMA CLARO === */
+    body.theme-light {
+      --bg: #ffffff;
+      --bg2: #f4f5f8;
+      --bg3: #ffffff;
+      --border: rgba(0, 0, 0, 0.08);
+      --border2: rgba(0, 0, 0, 0.14);
+      --text: #131219;
+      --text2: #4f4b66;
+      --text3: #7b7899;
+      --teal: #0d837b;
+      --purple: #6a5be2;
+      --gold: #b38200;
+      --gold2: #8f6800;
+      --coral: #d94141;
+    }
+
+    body.theme-light::before {
+      opacity: 0.15;
+    }
+
+    body.theme-light .chord-highlight {
+      color: #ff6b00 !important;
+    }
+
+    body.theme-light .lyrics-modal-body {
+      background: #ffffff !important;
+      color: #131219 !important;
+    }
+
+    body.theme-light .lyrics-content {
+      color: #131219 !important;
+    }
+
+    body.theme-light .lyrics-modal-header {
+      background: #f4f5f8 !important;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+    }
+
+    body.theme-light .lyrics-modal-close {
+      color: #131219 !important;
+    }
+
+    body.theme-light .lyrics-modal-title {
+      color: #ff6b00 !important;
+    }
+
+    body.theme-light .lyrics-modal-meta {
+      color: #4f4b66 !important;
+    }
+
+    body.theme-light .musico-song-card {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+    }
+
+    body.theme-light .song-num {
+      color: rgba(0, 0, 0, 0.12) !important;
+    }
+
+    body.theme-light .btn-ver-letra {
+      background: rgba(230, 92, 0, 0.08);
+      border: 1px solid #e65c00;
+      color: #e65c00;
+      box-shadow: 0 2px 6px rgba(230, 92, 0, 0.15);
+    }
+
+    body.theme-light .btn-ver-letra:hover {
+      background: rgba(230, 92, 0, 0.15);
+    }
+
+    body.theme-light .btn-ver-letra:active {
+      background: rgba(230, 92, 0, 0.25);
+    }
+
+    body.theme-light .order-btn {
+      background: #f4f5f8;
+      border-color: rgba(0, 0, 0, 0.1);
+      color: #4f4b66;
+    }
+
+    body.theme-light .order-btn:active {
+      background: #e1e3e8;
+    }
+
+    body.theme-light .theme-btn {
+      border-color: rgba(0, 0, 0, 0.15);
+      color: #4f4b66;
+    }
+
+    body.theme-light .theme-btn:active {
+      background: rgba(0, 0, 0, 0.05);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- PANTALLA DE ACCESO -->
+  <div id="screen-login" class="screen active">
+    <div class="login-card">
+      <h1 class="login-title">Alabanza</h1>
+      <p class="login-sub">Panel de Coordinación IMR4</p>
+      <form id="login-form">
+        <div class="field">
+          <label>Usuario / Correo</label>
+          <input type="text" id="login-email" required placeholder="admin o tu usuario">
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <input type="password" id="login-password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn-primary">Entrar al Panel</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="screen-dashboard" class="screen">
+    <header class="app-header">
+      <div class="logo">Alabanza <span>IMR4</span></div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <span class="role-badge" id="display-role">Cargando...</span>
+        <button class="btn-logout" id="btn-logout">Salir</button>
+      </div>
+    </header>
+    <script>
+      // Placeholder to hook global Firebase references
+      let db = null;
+      let collection = null;
+      let addDoc = null;
+      let doc = null;
+      let getDoc = null;
+      let updateDoc = null;
+      let deleteDoc = null;
+      let onSnapshot = null;
+      let showToast = null;
+      let activeSessionUser = null;
+
+      // Define function to setup rehearsal listeners and logic once Firebase is ready
+      window.initRehearsalsLogic = function (firebaseRefs) {
+        db = firebaseRefs.db;
+        collection = firebaseRefs.collection;
+        addDoc = firebaseRefs.addDoc;
+        doc = firebaseRefs.doc;
+        getDoc = firebaseRefs.getDoc;
+        updateDoc = firebaseRefs.updateDoc;
+        deleteDoc = firebaseRefs.deleteDoc;
+        onSnapshot = firebaseRefs.onSnapshot;
+        showToast = firebaseRefs.showToast;
+
+        // Initialize view rendering
+        renderEnsayosAdmin();
+      };
+
+      window.updateRehearsalsActiveUser = function (user) {
+        activeSessionUser = user;
+        renderEnsayosMusico();
+      };
+      // ==============================
+      // ENSAYO MODAL LOGIC (ADMIN)
+      // ==============================
+      const btnAddEnsayo = document.getElementById('btn-add-ensayo');
+      const modalEnsayo = document.getElementById('admin-ensayo-modal');
+      const btnCancelEnsayo = document.getElementById('btn-cancel-ensayo');
+      const btnSaveEnsayo = document.getElementById('btn-save-ensayo');
+      const ensayoMiembrosList = document.getElementById('ensayo-miembros-list');
+
+      // Open modal – populate members AND songs
+      if (btnAddEnsayo) {
+        btnAddEnsayo.addEventListener('click', () => {
+          renderEnsayoMembers();
+          renderEnsayoCancionesModal();
+          // Reset fields
+          document.getElementById('ensayo-nombre').value = '';
+          document.getElementById('ensayo-fecha').value = '';
+          document.getElementById('ensayo-hora').value = '';
+          modalEnsayo.classList.add('active');
+        });
+      }
+
+      // Populate song checkboxes inside the modal
+      function renderEnsayoCancionesModal() {
+        const cont = document.getElementById('ensayo-canciones-list');
+        if (!cont) return;
+        cont.innerHTML = '';
+        if (!window.cacheSongs || window.cacheSongs.length === 0) {
+          cont.innerHTML = `<p style='color:var(--text3);font-size:12px;text-align:center;'>No hay canciones en la biblioteca aún.</p>`;
+          return;
+        }
+        window.cacheSongs.forEach(s => {
+          const div = document.createElement('div');
+          div.className = 'member-row';
+          div.style.padding = '6px 0';
+          div.innerHTML = `
+        <div class="assign-check" data-song-id="${s.id}"></div>
+        <div class="member-info">
+          <div class="member-name" style="font-size:13px;">${s.nombre}</div>
+          <div class="member-role">${s.artista} | <span class="chip-type chip-${s.tipo}">${s.tipo}</span></div>
+        </div>
+      `;
+          div.querySelector('.assign-check').addEventListener('click', e => {
+            e.stopPropagation();
+            e.currentTarget.classList.toggle('on');
+          });
+          cont.appendChild(div);
+        });
+      }
+
+      // Cancel modal
+      if (btnCancelEnsayo) {
+        btnCancelEnsayo.addEventListener('click', () => {
+          modalEnsayo.classList.remove('active');
+        });
+      }
+
+      // Render member checkboxes for ensayo selection
+      window.renderEnsayoMembers = function () {
+        if (!ensayoMiembrosList) return;
+        ensayoMiembrosList.innerHTML = '';
+        if (!window.cacheMembers) return;
+        window.cacheMembers.forEach(member => {
+          if (member.usuario === 'admin') return;
+          const idVal = member.usuario || member.id;
+          const div = document.createElement('div');
+          div.className = 'member-row';
+          div.innerHTML = `
+        <div class="assign-check" data-id="${idVal}"></div>
+        <div class="member-info">
+          <div class="member-name">${member.nombre}</div>
+          <div class="member-role">${member.instrumento || ''}</div>
+        </div>
+      `;
+          // toggle check on click
+          div.querySelector('.assign-check').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const check = e.currentTarget;
+            check.classList.toggle('on');
+          });
+          ensayoMiembrosList.appendChild(div);
+        });
+      }
+
+      // Save ensayo – now includes hora and songs
+      if (btnSaveEnsayo) {
+        btnSaveEnsayo.addEventListener('click', async () => {
+          const nombreInput = document.getElementById('ensayo-nombre');
+          const fechaInput = document.getElementById('ensayo-fecha');
+          const horaInput = document.getElementById('ensayo-hora');
+          const nombre = nombreInput.value.trim();
+          const fecha = fechaInput.value;
+          const hora = horaInput ? horaInput.value : '';
+          if (!fecha) { alert('Selecciona una fecha para el ensayo.'); return; }
+          const defaultLabel = `Ensayo ${fecha}${hora ? ' ' + hora : ''}`;
+          const etiqueta = nombre || defaultLabel;
+
+          // Members
+          const selectedIds = [];
+          ensayoMiembrosList.querySelectorAll('.assign-check.on').forEach(el => {
+            const id = el.getAttribute('data-id');
+            if (id) selectedIds.push(id);
+          });
+          if (selectedIds.length === 0) { alert('Selecciona al menos un integrante.'); return; }
+
+          // Songs
+          const selectedSongIds = [];
+          const cancionesListEl = document.getElementById('ensayo-canciones-list');
+          if (cancionesListEl) {
+            cancionesListEl.querySelectorAll('.assign-check.on').forEach(el => {
+              const sid = el.getAttribute('data-song-id');
+              if (sid) selectedSongIds.push(sid);
+            });
+          }
+
+          try {
+            await addDoc(collection(db, 'ensayos'), {
+              nombre: etiqueta,
+              fecha: fecha,
+              hora: hora,
+              miembros: selectedIds,
+              canciones: selectedSongIds,
+              confirmaciones: {}
+            });
+            modalEnsayo.classList.remove('active');
+            nombreInput.value = ''; fechaInput.value = ''; if (horaInput) horaInput.value = '';
+            showToast(`✅ Ensayo "${etiqueta}" creado`);
+            renderEnsayosAdmin();
+          } catch (err) {
+            console.error('Error creando ensayo', err);
+            alert('Error al crear el ensayo');
+          }
+        });
+      }
+    </script>
+
+    <!-- === ENSAYOS LISTADO ADMIN === -->
+    <script>
+      // ============================================================
+      // RENDER ENSAYOS – VISTA ADMIN (tarjetas ricas con confirmaciones)
+      // ============================================================
+      window.renderEnsayosAdmin = function () {
+        const cont = document.getElementById('ensayo-list');
+        if (!cont) return;
+        cont.innerHTML = '';
+        if (!db || !collection || !onSnapshot) return;
+        onSnapshot(collection(db, 'ensayos'), (snap) => {
+          const ensayos = [];
+          snap.forEach(docSnap => {
+            const data = docSnap.data();
+            data.id = docSnap.id;
+            ensayos.push(data);
+          });
+          if (ensayos.length === 0) {
+            cont.innerHTML = `<p style='color:var(--text3);font-size:13px;text-align:center;padding:20px;'>No hay ensayos programados aún. Crea uno con el botón de arriba.</p>`;
+            return;
+          }
+          ensayos.sort((a, b) => a.fecha.localeCompare(b.fecha));
+          cont.innerHTML = '';
+          ensayos.forEach(e => {
+            const totalMiembros = e.miembros ? e.miembros.length : 0;
+            const confirmados = Object.values(e.confirmaciones || {}).filter(v => v === true).length;
+            const songNames = (e.canciones || []).map(sid => {
+              const s = (window.cacheSongs || []).find(x => x.id === sid);
+              return s ? s.nombre : sid;
+            }).join(', ') || 'Sin canciones';
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.cssText = 'margin-bottom:12px; border-color: var(--teal);';
+            card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:4px;">🎵 ${e.nombre}</div>
+                <div style="font-size:12px; color:var(--teal); margin-bottom:4px;">📅 ${e.fecha}${e.hora ? ' &nbsp;⏰ ' + e.hora : ''}</div>
+                <div style="font-size:11px; color:var(--text3); margin-bottom:6px;">👥 ${confirmados}/${totalMiembros} confirmados</div>
+                <div style="font-size:11px; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🎶 ${songNames}</div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px; margin-left:10px; flex-shrink:0;">
+                <button class="btn-ver-conf chip chip-teal" style="cursor:pointer; border:none; padding:6px 12px; font-weight:600; white-space:nowrap;">👁 Confirmaciones</button>
+                <button class="btn-del-ensayo chip chip-coral" style="cursor:pointer; border:none; padding:6px 12px; font-weight:600;" data-id="${e.id}">🗑 Eliminar</button>
+              </div>
+            </div>
+          `;
+            card.querySelector('.btn-ver-conf').addEventListener('click', () => openEnsayoAdmin(e.id));
+            card.querySelector('.btn-del-ensayo').addEventListener('click', async () => {
+              if (confirm(`¿Eliminar el ensayo "${e.nombre}"?`)) {
+                await deleteDoc(doc(db, 'ensayos', e.id));
+                showToast('🗑 Ensayo eliminado');
+              }
+            });
+            cont.appendChild(card);
+          });
+        });
+      }
+
+      // Admin: ver tabla de confirmaciones
+      window.openEnsayoAdmin = function (id) {
+        if (!doc || !db || !getDoc) return;
+        const docRef = doc(db, 'ensayos', id);
+        getDoc(docRef).then(snap => {
+          if (!snap.exists()) return;
+          const data = snap.data();
+          const confs = data.confirmaciones || {};
+          const miembros = data.miembros || [];
+          let lista = '';
+          miembros.forEach(uid => {
+            const m = (window.cacheMembers || []).find(x => x.usuario === uid);
+            const nombre = m ? m.nombre : uid;
+            const estado = confs[uid] === true ? '✅ Confirmado' : '❌ Sin confirmar';
+            lista += `\n  • ${nombre}: ${estado}`;
+          });
+          const confirmed = Object.values(confs).filter(v => v === true).length;
+          alert(`Ensayo: ${data.nombre}\nFecha: ${data.fecha}${data.hora ? ' ⏰ ' + data.hora : ''}\nConfirmados: ${confirmed}/${miembros.length}\n${lista}`);
+        });
+      }
+
+      // ============================================================
+      // RENDER ENSAYOS – VISTA MÚSICO (tarjetas con canciones + YouTube)
+      // ============================================================
+      window.renderEnsayosMusico = function () {
+        const musicoId = activeSessionUser?.usuario;
+        if (!musicoId) return;
+        const cont = document.getElementById('ensayo-list-musico');
+        if (!cont) return;
+        cont.innerHTML = '';
+        if (!db || !collection || !onSnapshot) return;
+
+        onSnapshot(collection(db, 'ensayos'), (snap) => {
+          const ensayos = [];
+          snap.forEach(docSnap => {
+            const data = docSnap.data();
+            data.id = docSnap.id;
+            ensayos.push(data);
+          });
+          const filtered = ensayos.filter(e => e.miembros && e.miembros.includes(musicoId));
+          cont.innerHTML = '';
+          if (filtered.length === 0) {
+            cont.innerHTML = `<p style='color:var(--text3);font-size:13px;text-align:center;padding:20px;'>No tienes ensayos programados todavía.</p>`;
+            return;
+          }
+          filtered.sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+          filtered.forEach(e => {
+            const confirmed = e.confirmaciones && e.confirmaciones[musicoId] === true;
+
+            // Build songs HTML with YouTube links
+            const songIds = e.canciones || [];
+            let songsHtml = '';
+            if (songIds.length > 0) {
+              songsHtml = '<div style="margin-top:10px; border-top:1px solid var(--border); padding-top:8px;">';
+              songsHtml += '<div style="font-size:10px; text-transform:uppercase; color:var(--gold); letter-spacing:0.8px; margin-bottom:8px;">🎶 Canciones a ensayar</div>';
+              songIds.forEach((sid, idx) => {
+                const s = (window.cacheSongs || []).find(x => x.id === sid);
+                if (!s) return;
+                const ytLink = s.youtube && s.youtube.trim()
+                  ? `<a href="${s.youtube}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:4px; background:rgba(255,0,0,0.12); color:#ff4444; border:1px solid rgba(255,0,0,0.25); border-radius:6px; padding:3px 8px; font-size:10px; font-weight:600; text-decoration:none; margin-left:8px;">▶ YouTube</a>`
+                  : '';
+                songsHtml += `<div style="display:flex; align-items:center; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+                <span style="font-size:18px; color:var(--teal); min-width:28px; text-align:center;">${idx + 1}</span>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size:13px; font-weight:500; color:var(--text);">${s.nombre}</div>
+                  <div style="font-size:11px; color:var(--text3);">${s.artista} · <span class="chip-type chip-${s.tipo}">${s.tipo}</span></div>
+                </div>
+                ${ytLink}
+              </div>`;
+              });
+              songsHtml += '</div>';
+            }
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.cssText = `margin-bottom:14px; border-color:${confirmed ? 'var(--gold)' : 'var(--teal)'};`;
+            card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:2px;">🎵 ${e.nombre}</div>
+                <div style="font-size:12px; color:var(--teal);">📅 ${e.fecha}${e.hora ? ' &nbsp;⏰ <b>' + e.hora + '</b>' : ''}</div>
+              </div>
+              <button class="btn-confirm-ensayo btn-primary" data-id="${e.id}" style="background:${confirmed ? 'var(--gold)' : 'var(--teal)'}; color:#0f0e17; width:auto; padding:8px 14px; margin-top:0; margin-left:10px; flex-shrink:0; font-size:12px;">${confirmed ? '✅ Confirmado' : 'Confirmar'}</button>
+            </div>
+            ${songsHtml}
+          `;
+            card.querySelector('.btn-confirm-ensayo').addEventListener('click', (ev) => {
+              toggleEnsayoConfirm(e.id, musicoId, ev.currentTarget);
+            });
+            cont.appendChild(card);
+          });
+        });
+      }
+
+      function toggleEnsayoConfirm(ensayoId, userId, btnElem) {
+        const docRef = doc(db, 'ensayos', ensayoId);
+        getDoc(docRef).then(snap => {
+          if (!snap.exists()) return;
+          const data = snap.data();
+          const current = !!(data.confirmaciones && data.confirmaciones[userId]);
+          const newVal = !current;
+          updateDoc(docRef, { [`confirmaciones.${userId}`]: newVal }).then(() => {
+            btnElem.textContent = newVal ? '✅ Confirmado' : 'Confirmar';
+            btnElem.style.background = newVal ? 'var(--gold)' : 'var(--teal)';
+            // update card border
+            const parentCard = btnElem.closest('.card');
+            if (parentCard) parentCard.style.borderColor = newVal ? 'var(--gold)' : 'var(--teal)';
+            showToast(newVal ? '✅ Asistencia confirmada' : '❌ Confirmación cancelada');
+          });
+        });
+      }
+    </script>
+    <!-- END ENSAYOS LOGIC -->
+
+
+    <!-- NAVEGACIÓN PRINCIPAL -->
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-tab="tab-servicios">🗓️ Servicios</button>
+      <button class="nav-tab" data-tab="tab-historial">📜 Historial</button>
+      <button class="nav-tab" data-tab="tab-repertorio">🎵 Biblioteca</button>
+      <button class="nav-tab" data-tab="tab-ensayos">📅 Ensayos</button>
+      <button class="nav-tab" data-tab="tab-miembros">👥 Miembros</button>
+      <button class="nav-tab" data-tab="tab-ajustes">⚙️ Ajustes</button>
+    </nav>
+
+    <!-- CONTENIDO DE PANELES -->
+    <main class="content">
+
+      <!-- 1. PANEL UNIFICADO: ARMAR SERVICIOS -->
+      <div id="tab-servicios" class="tab-panel active">
+        <h2 class="section-title">Armado de Servicio Semanal</h2>
+        <p class="section-sub">Configura la fecha, asigna el equipo disponible y el repertorio.</p>
+
+        <!-- Selector de Fecha Base -->
+        <div class="card" style="border-color: var(--gold);">
+          <div class="field" style="margin-bottom: 0;">
+            <label>Selecciona la Fecha del Servicio</label>
+            <input type="date" id="service-date-select">
+          </div>
+        </div>
+
+        <!-- Card de Disponibilidad del Músico Logueado -->
+        <div id="my-availability-card" class="card"
+          style="border-color: var(--teal); display: none; background: linear-gradient(135deg, rgba(78,205,196,0.08) 0%, rgba(26,24,40,0.8) 100%);">
+          <h4
+            style="font-size: 14px; text-transform: uppercase; color: var(--teal); letter-spacing: 0.5px; margin-bottom: 8px;">
+            📢 Mi Disponibilidad para esta fecha</h4>
+          <p style="font-size: 13px; color: var(--text2); margin-bottom: 12px;">Confirma si estarás disponible para
+            tocar/cantar en este servicio.</p>
+          <div style="display: flex; gap: 10px;">
+            <button id="btn-avail-confirm" class="btn-primary"
+              style="margin-top: 0; background: var(--teal); color: #0f0e17; font-size: 13px; padding: 10px 16px; flex: 1;">Voy
+              a Asistir 👍</button>
+            <button id="btn-avail-decline" class="btn-primary"
+              style="margin-top: 0; background: var(--coral); color: #0f0e17; font-size: 13px; padding: 10px 16px; flex: 1;">No
+              Disponible 👎</button>
+          </div>
+          <p id="my-avail-status"
+            style="font-size: 13px; font-weight: 600; color: var(--gold); margin-top: 10px; text-align: center;"></p>
+        </div>
+
+
+        <!-- SECCIÓN DE MÚSICOS (Filtrados por disponibilidad real) -->
+        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin: 20px 0 10px;">🎹
+          Asignación de Equipo</h3>
+        <p class="section-sub" style="margin-bottom: 10px;">Solo se muestran los integrantes confirmados mediante su
+          asistencia.</p>
+        <div class="card">
+          <div id="service-team-container">
+            <p style="color: var(--text3); font-size: 13px; text-align: center; padding: 10px;">Selecciona una fecha
+              para
+              cargar el personal confirmado...</p>
+          </div>
+        </div>
+
+        <!-- SECCIÓN DE CANCIONES (Buscador y Categorías) -->
+        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin: 24px 0 10px;">🎤
+          Selección de Canciones</h3>
+        <div class="field">
+          <input type="text" id="search-service-songs" placeholder="🔍 Buscar canción por nombre o artista...">
+        </div>
+
+        <!-- Lista dividida por Alabanza -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0 8px;">
+          <h4 style="font-size: 13px; text-transform: uppercase; color: var(--teal); letter-spacing: 0.5px; margin:0;">
+            🔥
+            Alabanza (Rápidas)</h4>
+          <button class="btn-add-song-trigger admin-only" data-type="alabanza"
+            style="background:none; border:none; color:var(--teal); font-size:12px; font-weight:600; cursor:pointer; display:none;">➕
+            Agregar Alabanza</button>
+        </div>
+        <div class="card song-list-scroll" id="songs-alabanza-container"></div>
+
+        <!-- Lista dividida por Adoración -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0 8px;">
+          <h4
+            style="font-size: 13px; text-transform: uppercase; color: var(--purple); letter-spacing: 0.5px; margin:0;">
+            🙏 Adoración (Lentas)</h4>
+          <button class="btn-add-song-trigger admin-only" data-type="adoracion"
+            style="background:none; border:none; color:var(--purple); font-size:12px; font-weight:600; cursor:pointer; display:none;">➕
+            Agregar Adoración</button>
+        </div>
+        <div class="card song-list-scroll" id="songs-adoracion-container"></div>
+
+        <!-- ORDEN DEL REPERTORIO SELECCIONADO (Líder) -->
+        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin: 24px 0 10px;">📋 Orden
+          del Repertorio</h3>
+        <p class="section-sub">Usa las flechas ▲ y ▼ para ordenar las canciones y cambia el tono de cada una.</p>
+        <div class="card" id="admin-selected-songs-container" style="margin-bottom: 24px;">
+          <p style="color: var(--text3); font-size: 13px; text-align: center; padding: 10px;">No hay canciones
+            seleccionadas aún.</p>
+        </div>
+
+        <!-- NOTA ADICIONAL DEL LÍDER (Solo visible para líderes) -->
+        <div class="card admin-only" style="border-color: var(--purple); margin-top: 20px;">
+          <h4
+            style="font-size: 13px; text-transform: uppercase; color: var(--purple); letter-spacing: 0.5px; margin-bottom: 10px;">
+            Nota Adicional para el Equipo</h4>
+          <textarea id="service-nota-input"
+            placeholder="Ej: Practicar el puente de 'Grande eres Tú'. Llegar 20 min antes..."
+            style="width:100%; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px; color:var(--text); font-family:var(--font-body); font-size:14px; resize:vertical; min-height:80px; outline:none;"></textarea>
+          <button id="btn-save-nota" class="btn-primary"
+            style="margin-top:10px; background:var(--purple); color:#0f0e17; padding:10px 20px; width:auto; font-size:13px;">Guardar
+            Nota</button>
+        </div>
+
+        <!-- GENERADOR DE MENSAJE PARA WHATSAPP -->
+        <div class="send-card" style="margin-top: 30px;">
+          <h3 style="font-family: var(--font-display); font-size: 22px; color: var(--gold); margin-bottom: 4px;">Resumen
+            del Plan</h3>
+          <p style="color: var(--text2); font-size: 13px; margin-bottom: 16px;">Genera el esquema estructurado para
+            compartir en el grupo de WhatsApp del equipo.</p>
+
+          <!-- Previsualización en Tiempo Real -->
+          <div
+            style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 16px; max-height: 350px; overflow-y: auto;">
+            <h4
+              style="font-size: 11px; text-transform: uppercase; color: var(--gold); letter-spacing: 0.5px; margin-bottom: 8px;">
+              Mensaje de WhatsApp (Editable):</h4>
+            <textarea id="whatsapp-preview"
+              style="width:100%; min-height: 200px; background: rgba(0,0,0,0.2); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 12px; font-family: var(--font-body); font-size: 13px; color: var(--text2); resize: vertical; margin-bottom: 12px;"
+              placeholder="Generando mensaje..."></textarea>
+
+            <div style="display:flex; gap: 10px; flex-wrap: wrap;">
+              <button class="btn-primary" id="btn-regen-whatsapp"
+                style="background: var(--bg3); color: var(--text); border: 1px solid var(--border); flex: 1; font-size:12px; padding: 12px;">🔄
+                Restaurar Auto</button>
+              <button class="btn-primary" id="btn-save-draft"
+                style="background: var(--purple); color: #0f0e17; flex: 1; font-size:12px; padding: 12px;">💾
+                Guardar</button>
+              <button class="btn-primary" id="btn-copy-whatsapp"
+                style="background: var(--teal); color: #0f0e17; width: 100%; margin-top: 0;">💬 Enviar por WhatsApp
+                ✅</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1.5. PANEL: HISTORIAL DE SERVICIOS -->
+      <div id="tab-historial" class="tab-panel">
+        <h2 class="section-title">Historial de Programaciones</h2>
+        <p class="section-sub">Filtra por fecha para ver el detalle de un servicio o editar el mensaje antes de
+          enviarlo.
+        </p>
+        <div class="card" style="border-color: var(--gold); margin-bottom: 16px;">
+          <div class="field" style="margin-bottom:0;">
+            <label>Filtrar por Fecha</label>
+            <input type="date" id="historial-date-filter" placeholder="Todos los servicios">
+          </div>
+          <div style="text-align:right; margin-top:10px;">
+            <button id="btn-clear-historial-filter"
+              style="background:none; border:none; color:var(--text3); font-size:12px; cursor:pointer;">✕ Ver
+              todos</button>
+          </div>
+        </div>
+        <div class="card" id="historial-list-container">
+          <p style='color:var(--text3);font-size:13px;text-align:center;'>Cargando historial...</p>
+        </div>
+      </div>
+
+      <!-- 1.6. PANEL: ENSAYOS -->
+      <div id="tab-ensayos" class="tab-panel">
+        <h2 class="section-title">Ensayos Programados</h2>
+        <p class="section-sub">Crea y gestiona los ensayos. Los músicos pueden confirmar su asistencia.</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px;">
+          <input type="text" id="ensayo-search" placeholder="🔍 Buscar por nombre o fecha..."
+            style="flex:1; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text);">
+          <button id="btn-add-ensayo" class="btn-primary admin-only"
+            style="background:var(--teal); color:#0f0e17; margin-top:0; padding:9px 16px; font-size:13px; width:auto; white-space:nowrap;">➕
+            Nuevo Ensayo</button>
+        </div>
+        <div id="ensayo-list">
+          <!-- Ensayos serán renderizados aquí -->
+        </div>
+      </div>
+
+      <!-- 2. PANEL: MANTENIMIENTO DE REPERTORIO -->
+      <div id="tab-repertorio" class="tab-panel">
+        <div class="card admin-only" id="panel-add-song" style="border-color: var(--teal); margin-bottom: 24px;">
+          <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--teal); margin-bottom: 12px;">
+            Agregar
+            Nueva Canción a la Biblioteca</h3>
+          <form id="form-add-song">
+            <div class="field"><label>Nombre de la Canción</label><input type="text" id="song-name-input" required
+                placeholder="Ej: Grande y Fuerte"></div>
+            <div class="field"><label>Artista / Ministerio</label><input type="text" id="song-artist-input" required
+                placeholder="Ej: Miel San Marcos"></div>
+            <div class="field">
+              <label>Tonalidad Base sugerida</label>
+              <select id="song-key-input" required>
+                <option value="" disabled selected>Selecciona un tono...</option>
+                <option value="C">C (Do)</option>
+                <option value="Cm">Cm (Do menor)</option>
+                <option value="C#">C# (Do#)</option>
+                <option value="C#m">C#m (Do# menor)</option>
+                <option value="D">D (Re)</option>
+                <option value="Dm">Dm (Re menor)</option>
+                <option value="D#">D# (Re#)</option>
+                <option value="D#m">D#m (Re# menor)</option>
+                <option value="E">E (Mi)</option>
+                <option value="Em">Em (Mi menor)</option>
+                <option value="F">F (Fa)</option>
+                <option value="Fm">Fm (Fa menor)</option>
+                <option value="F#">F# (Fa#)</option>
+                <option value="F#m">F#m (Fa# menor)</option>
+                <option value="G">G (Sol)</option>
+                <option value="Gm">Gm (Sol menor)</option>
+                <option value="G#">G# (Sol#)</option>
+                <option value="G#m">G#m (Sol# menor)</option>
+                <option value="A">A (La)</option>
+                <option value="Am">Am (La menor)</option>
+                <option value="A#">A# (La#)</option>
+                <option value="A#m">A#m (La# menor)</option>
+                <option value="B">B (Si)</option>
+                <option value="Bm">Bm (Si menor)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Tipo de Canción</label>
+              <select id="song-type-input">
+                <option value="alabanza">Alabanza (Rápida)</option>
+                <option value="adoracion">Adoración (Lenta)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Enlace de YouTube <span style="color: var(--text3); font-weight: 400;">(Opcional)</span></label>
+              <input type="url" id="song-youtube-input" placeholder="Ej: https://www.youtube.com/watch?v=...">
+            </div>
+            <div class="field">
+              <label>Letra y Acordes <span style="color: var(--text3); font-weight: 400;">(Opcional. Pega formato tipo
+                  LaCuerda.net)</span></label>
+              <textarea id="song-lyrics-input" placeholder="Pegar aquí la letra con los acordes arriba..."
+                style="width:100%; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px; color:var(--text); font-family:'Courier New', Courier, monospace; font-size:13px; resize:vertical; min-height:120px; white-space: pre; outline:none;"></textarea>
+            </div>
+            <button type="submit" class="btn-primary" style="background: var(--teal); color: #0f0e17;">Guardar en
+              Biblioteca</button>
+          </form>
+        </div>
+
+        <h2 class="section-title">Biblioteca Global de Canciones</h2>
+        <p class="section-sub">Lista total de canciones registradas en la iglesia.</p>
+        <div class="card song-list-scroll" id="global-songs-list" style="max-height: 400px;"></div>
+      </div>
+
+      <!-- 3. PANEL: MANTENIMIENTO DE MIEMBROS -->
+      <div id="tab-miembros" class="tab-panel">
+        <div class="card admin-only" id="panel-add-member" style="border-color: var(--purple); margin-bottom: 24px;">
+          <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--purple); margin-bottom: 12px;">
+            Registrar Integrante del Equipo</h3>
+          <form id="form-add-member">
+            <div class="field"><label>Nombre Completo</label><input type="text" id="member-name-input" required
+                placeholder="Ej: Carlos Ruiz"></div>
+            <div class="field">
+              <label style="margin-bottom: 8px; display: block;">Roles / Instrumentos</label>
+              <div class="custom-multiselect" id="inst-multiselect-container">
+                <div class="multiselect-header" id="inst-multiselect-header">
+                  <span id="inst-multiselect-text">Seleccionar roles...</span>
+                  <span style="font-size:10px;">▼</span>
+                </div>
+                <div class="multiselect-dropdown" id="inst-multiselect-dropdown">
+                  <div class="optgroup-label">Instrumentistas</div>
+                  <label><input type="checkbox" value="Batería" class="inst-cb"> Batería</label>
+                  <label><input type="checkbox" value="Bajo" class="inst-cb"> Bajo</label>
+                  <label><input type="checkbox" value="Teclado" class="inst-cb"> Teclado</label>
+                  <label><input type="checkbox" value="Guitarra Eléctrica" class="inst-cb"> Guitarra Eléctrica</label>
+                  <label><input type="checkbox" value="Guitarra Acústica" class="inst-cb"> Guitarra Acústica</label>
+                  <label><input type="checkbox" value="Percusión" class="inst-cb"> Percusión</label>
+                  <div class="optgroup-label" style="margin-top: 10px;">Voces / Cantantes</div>
+                  <label><input type="checkbox" value="Voz Principal" class="inst-cb"> Voz Principal</label>
+                  <label><input type="checkbox" value="Corista" class="inst-cb"> Corista</label>
+                </div>
+              </div>
+            </div>
+            <div class="field"><label>Usuario de Acceso</label><input type="text" id="member-user-input" required
+                placeholder="Ej: carlos12"></div>
+            <div class="field"><label>Contraseña Asignada</label><input type="text" id="member-pass-input" required
+                placeholder="Clave para Netlify"></div>
+            <div class="field">
+              <label>Nivel de Permiso</label>
+              <select id="member-role-input">
+                <option value="musico">Músico (Solo lectura del servicio)</option>
+                <option value="lider">Líder (Control total de armado)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-primary" style="background: var(--purple); color: #0f0e17;">Agregar
+              Integrante</button>
+
+          </form>
+        </div>
+
+        <h2 class="section-title">Nómina del Ministerio</h2>
+        <div class="card" id="global-members-list"></div>
+      </div>
+
+      <!-- 4. PANEL: AJUSTES -->
+      <div id="tab-ajustes" class="tab-panel">
+        <h2 class="section-title">Configuración</h2>
+        <p class="section-sub">Ajustes generales del sistema de Alabanza IMR4.</p>
+
+        <div class="card" style="border-color: var(--teal); margin-bottom: 20px;">
+          <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--teal); margin-bottom: 6px;">📲
+            Grupo
+            de WhatsApp</h3>
+          <p style="font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55;">
+            Pega aquí el enlace del grupo. Al tocar <b>Enviar por WhatsApp</b>, la app abrirá ese chat con el mensaje ya
+            listo — solo hay que presionar enviar.<br>
+            <span style="color:var(--text3); font-size:12px;">Ejemplo: <code
+                style="background:var(--bg3);padding:2px 6px;border-radius:4px;">https://wa.me/+50299887766</code></span>
+          </p>
+          <div class="field">
+            <label>Enlace del Grupo (wa.me o chat.whatsapp.com)</label>
+            <input type="url" id="whatsapp-group-link-input" placeholder="https://wa.me/+502..."
+              style="font-size:14px;">
+          </div>
+          <button id="btn-save-whatsapp-link" class="btn-primary"
+            style="background:var(--teal);color:#0f0e17;width:auto;padding:10px 24px;font-size:13px;margin-top:6px;">💾
+            Guardar Enlace</button>
+          <p id="whatsapp-link-status" style="font-size:12px;color:var(--teal);margin-top:8px;min-height:18px;"></p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+  <!-- END #screen-dashboard -->
+
+  <!-- ========================================================= -->
+  <!-- PANTALLA DEL MÚSICO                                        -->
+  <!-- ========================================================= -->
+  <div id="screen-musico" class="screen">
+    <header class="app-header">
+      <div class="logo">Alabanza <span>IMR4</span></div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <!-- Botón S.O.S estático en cabecera -->
+        <button id="btn-musico-sos" class="sos-btn" title="Pedir Asistencia (S.O.S)">🚨 S.O.S</button>
+        <!-- Selector de Tema Claro/Oscuro -->
+        <button id="btn-musico-theme" class="theme-btn" title="Cambiar Tema">☀️</button>
+        <span id="musico-name-badge" class="role-badge"></span>
+        <button class="btn-logout" id="btn-musico-logout">Salir</button>
+      </div>
+    </header>
+
+    <nav class="nav-tabs">
+      <button class="nav-tab-musico active" data-mtab="mtab-servicio">Servicio</button>
+      <button class="nav-tab-musico" data-mtab="mtab-asistencia">Mi Asistencia</button>
+      <button class="nav-tab-musico" data-mtab="mtab-ensayos-musico">📅 Ensayos</button>
+    </nav>
+
+    <main class="content">
+
+      <!-- PESTAÑA 1: VER EL SERVICIO -->
+      <div id="mtab-servicio" class="tab-panel active">
+        <h2 class="section-title">Servicio Programado</h2>
+        <p class="section-sub">Consulta la programación del equipo y el repertorio para el servicio.</p>
+
+        <div style="position: relative; margin-bottom: 20px;">
+          <label
+            style="display:block; font-size:10px; color:var(--text3); text-transform:uppercase; text-align:center; position:absolute; top: 8px; left: 0; right: 0; pointer-events:none; z-index:10;">🗓️
+            Tocar para cambiar fecha</label>
+          <input type="date" id="musico-service-date" class="date-btn">
+        </div>
+
+        <div id="musico-service-content" style="margin-top: 16px;">
+          <p style="color: var(--text3); font-size: 13px; text-align: center; padding: 20px;">Selecciona una fecha para
+            ver el plan del servicio.</p>
+        </div>
+      </div>
+
+      <!-- PESTAÑA 2: CONFIRMAR ASISTENCIA -->
+      <div id="mtab-asistencia" class="tab-panel">
+        <h2 class="section-title">Mi Asistencia</h2>
+        <p class="section-sub">Confirma si podrás asistir a cada servicio. El líder armará el equipo con los
+          confirmados.</p>
+
+        <div style="position: relative; margin-bottom: 12px;">
+          <label
+            style="display:block; font-size:10px; color:var(--text3); text-transform:uppercase; text-align:center; position:absolute; top: 8px; left: 0; right: 0; pointer-events:none; z-index:10;">🗓️
+            Tocar para cambiar fecha</label>
+          <input type="date" id="musico-avail-date" class="date-btn">
+        </div>
+
+        <div id="musico-avail-status-card" class="card"
+          style="margin-top: 12px; display: none; background: linear-gradient(135deg, rgba(78,205,196,0.08) 0%, rgba(26,24,40,0.8) 100%); border-color: var(--teal);">
+          <p id="musico-avail-current" style="font-size: 13px; color: var(--text2); margin-bottom: 14px;"></p>
+          <div style="display: flex; gap: 10px;">
+            <button id="btn-musico-confirm" class="btn-primary"
+              style="margin-top:0; background:var(--teal); color:#0f0e17; font-size:14px; padding:12px; flex:1;">Puedo
+              ir</button>
+            <button id="btn-musico-decline" class="btn-primary"
+              style="margin-top:0; background:var(--coral); color:#0f0e17; font-size:14px; padding:12px; flex:1;">No
+              puedo ir</button>
+          </div>
+        </div>
+
+        <div id="musico-team-status" style="margin-top: 24px;"></div>
+      </div>
+
+      <!-- PESTAÑA 3: ENSAYOS MÚSICO -->
+      <div id="mtab-ensayos-musico" class="tab-panel">
+        <h2 class="section-title">Mis Ensayos</h2>
+        <p class="section-sub">Ensayos en los que estás invitado. Confirma tu asistencia.</p>
+        <div id="ensayo-list-musico">
+          <p style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Cargando ensayos...</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL DE LETRAS Y ACORDES                                  -->
+  <!-- ========================================================= -->
+  <!-- MODAL DE AGREGAR CANCIÓN (VISTA MÚSICO/LÍDER) -->
+  <div id="musico-add-song-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 480px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 class="modal-title" id="musico-add-song-title" style="font-size:22px;">Agregar Canción</h3>
+        <button id="musico-add-song-close"
+          style="background:none; border:none; color:var(--text2); font-size:26px; cursor:pointer; padding:0; line-height:1;">&times;</button>
+      </div>
+
+      <!-- Buscador -->
+      <div class="search-wrapper">
+        <input type="text" id="musico-add-song-search" class="search-input"
+          placeholder="🔍 Buscar por nombre o artista...">
+      </div>
+
+      <!-- Lista de resultados de la biblioteca -->
+      <div id="musico-add-song-results" class="song-list-scroll" style="max-height: 200px; margin-bottom: 16px;">
+        <!-- Canciones cargadas dinámicamente -->
+      </div>
+
+      <!-- Opción de agregar canción personalizada -->
+      <div style="border-top: 1px solid var(--border); padding-top: 14px;">
+        <h4
+          style="font-size:12px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;">
+          ¿No está en la lista? Escríbela rápido:</h4>
+        <div class="field" style="margin-bottom: 10px;">
+          <label style="font-size: 10px;">Nombre de la canción</label>
+          <input type="text" id="musico-custom-name" placeholder="Ej: Nueva Canción de Adoración">
+        </div>
+        <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+          <div class="field" style="flex: 1; margin-bottom: 0;">
+            <label style="font-size: 10px;">Artista (Opcional)</label>
+            <input type="text" id="musico-custom-artist" placeholder="Ej: Autor">
+          </div>
+          <div class="field" style="width: 100px; margin-bottom: 0;">
+            <label style="font-size: 10px;">Tono sugerido</label>
+            <select id="musico-custom-tone">
+              <option value="C">C</option>
+              <option value="Cm">Cm</option>
+              <option value="C#">C#</option>
+              <option value="C#m">C#m</option>
+              <option value="D">D</option>
+              <option value="Dm">Dm</option>
+              <option value="D#">D#</option>
+              <option value="D#m">D#m</option>
+              <option value="E">E</option>
+              <option value="Em">Em</option>
+              <option value="F">F</option>
+              <option value="Fm">Fm</option>
+              <option value="F#">F#</option>
+              <option value="F#m">F#m</option>
+              <option value="G">G</option>
+              <option value="Gm">Gm</option>
+              <option value="G#">G#</option>
+              <option value="G#m">G#m</option>
+              <option value="A">A</option>
+              <option value="Am">Am</option>
+              <option value="A#">A#</option>
+              <option value="A#m">A#m</option>
+              <option value="B">B</option>
+              <option value="Bm">Bm</option>
+            </select>
+          </div>
+        </div>
+        <button id="btn-musico-add-custom" class="btn-primary"
+          style="background:var(--gold); color:#0f0e17; font-size:13px; padding:10px; margin-top:0;">Agregar
+          Personalizada 🚀</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="lyrics-modal-overlay" class="lyrics-modal-overlay">
+    <div class="lyrics-modal">
+      <div class="lyrics-modal-header">
+        <div>
+          <h3 id="lyrics-modal-title" class="lyrics-modal-title">Nombre de la Canción</h3>
+          <div id="lyrics-modal-meta" class="lyrics-modal-meta">Tono Original: C | Tono Actual: D</div>
+        </div>
+        <button id="lyrics-modal-close" class="lyrics-modal-close">&times;</button>
+      </div>
+      <div class="lyrics-modal-body">
+        <div id="lyrics-modal-content" class="lyrics-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TONE PICKER OVERLAY (bottom sheet) -->
+  <div id="tone-picker-overlay" class="tone-picker-overlay">
+    <div class="tone-picker-box">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+        <div style="flex:1;min-width:0;">
+          <div class="tone-picker-title" id="tone-picker-song-name">Canción</div>
+          <div class="tone-picker-subtitle">Toca un tono — cambia para todo el equipo 🎵</div>
+        </div>
+        <button id="tone-picker-close"
+          style="background:none;border:none;color:var(--text2);font-size:26px;cursor:pointer;padding:0;line-height:1;margin-left:12px;flex-shrink:0;">×</button>
+      </div>
+      <div class="tone-grid" id="tone-picker-grid"></div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast-notification" class="toast"></div>
+
+  <!-- CAPA LOGICA COMPLETA DE FIREBASE V10+ -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc,
+      collection,
+      onSnapshot,
+      updateDoc,
+      deleteDoc,
+      deleteField,
+      addDoc
+    } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyDjA2d8zn02Iu9Nm-Jy2mVw6GgbjeKUEJ4",
+      authDomain: "alabanza-d2185.firebaseapp.com",
+      projectId: "alabanza-d2185",
+      storageBucket: "alabanza-d2185.firebasestorage.app",
+      messagingSenderId: "696632316366",
+      appId: "1:696632316366:web:8727b4bb633f35995f1b9f",
+      measurementId: "G-YLK9DBWT10"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Nodos DOM globales
+    const screenLogin = document.getElementById('screen-login');
+    const screenDashboard = document.getElementById('screen-dashboard');
+    const loginForm = document.getElementById('login-form');
+    const btnLogout = document.getElementById('btn-logout');
+    const displayRole = document.getElementById('display-role');
+    const serviceDateSelect = document.getElementById('service-date-select');
+
+    let currentUserRole = 'musico';
+    let activeSessionUser = null;
+    let unsubscribeService = null;
+    let editingUserKey = null;
+    let editingSongId = null;
+    let currentAutoMsg = "";
+    window._whatsappGroupLink = "";
+    window._prevCambiosTono = {};
+    window._unsubMusicoServicePlan = null;
+
+    // Variables locales de caché de datos globales para render dinámico
+    let cacheSongs = [];
+    let cacheMembers = [];
+    let cacheHistorial = [];
+
+    // Poner el próximo domingo por defecto
+    const baseDay = new Date();
+    baseDay.setDate(baseDay.getDate() + (7 - baseDay.getDay()) % 7);
+    serviceDateSelect.value = baseDay.toISOString().split('T')[0];
+
+    // Controladores de Pestañas
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+      });
+    });
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userVal = document.getElementById('login-email').value.trim().toLowerCase();
+      const passVal = document.getElementById('login-password').value.trim();
+
+      // 1. VALIDACIÓN CUENTA MAESTRA PRINCIPAL (SUPER ADMIN & GENERIC ADMIN)
+      if (userVal === "alimr4" && passVal === "030819") {
+        console.log("Acceso concedido al Super Administrador.");
+        iniciarSesionDashboard({ nombre: "Super Admin", role: "lider", usuario: "alimr4" });
+        return;
+      }
+      if (userVal === "imr4" && passVal === "222222") {
+        console.log("Acceso concedido al Administrador General.");
+        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4" });
+        return;
+      }
+      if (userVal === "admin" && passVal === "1234") {
+        console.log("Acceso concedido al Administrador General legacy.");
+        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin" });
+        return;
+      }
+
+      // 2. LOGICA DE CONSULTA PARA MÚSICOS REGISTRADOS
+      try {
+        const uSnap = await getDoc(doc(db, "usuarios", userVal));
+        if (uSnap.exists() && uSnap.data().password === passVal) {
+          iniciarSesionDashboard(uSnap.data());
+        } else {
+          alert("Credenciales inválidas. Revisa tu usuario y clave.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error de conexión a la base de datos de Firebase.");
+      }
+    });
+
+    const screenMusico = document.getElementById('screen-musico');
+
+    function iniciarSesionDashboard(userData) {
+      activeSessionUser = userData;
+      currentUserRole = userData.role;
+      displayRole.textContent = currentUserRole === 'lider' ? 'Líder' : 'Músico';
+
+      screenLogin.classList.remove('active');
+
+      if (currentUserRole === 'lider') {
+        // Vista de Líder
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+        screenDashboard.classList.add('active');
+        cargarConfiguracion();
+      } else {
+        // Vista de Músico
+        document.getElementById('musico-name-badge').textContent = userData.nombre;
+        screenMusico.classList.add('active');
+        iniciarVistaMusico();
+      }
+
+      // Set user session in rehearsals logic
+      if (window.updateRehearsalsActiveUser) {
+        window.updateRehearsalsActiveUser(userData);
+      }
+
+      // Cargar datos base en caché sin importar el rol
+      escucharBaseDatosGlobal();
+    }
+
+    function cerrarSesion() {
+      screenLogin.classList.add('active');
+      screenDashboard.classList.remove('active');
+      screenMusico.classList.remove('active');
+      if (unsubscribeService) unsubscribeService();
+      if (unsubscribeMusicoService) unsubscribeMusicoService();
+      if (window._unsubMusicoServicePlan) { window._unsubMusicoServicePlan(); window._unsubMusicoServicePlan = null; }
+      window._prevCambiosTono = {};
+      activeSessionUser = null;
+    }
+
+    btnLogout.addEventListener('click', cerrarSesion);
+    document.getElementById('btn-musico-logout').addEventListener('click', cerrarSesion);
+
+    // === CONTROLADOR DE TEMAS (CLARO / OSCURO) PARA MÚSICOS ===
+    const btnMusicoTheme = document.getElementById('btn-musico-theme');
+    const themeInit = localStorage.getItem('musico-theme') || 'dark';
+    if (themeInit === 'light') {
+      document.body.classList.add('theme-light');
+      if (btnMusicoTheme) btnMusicoTheme.textContent = '🌙';
+    } else {
+      document.body.classList.remove('theme-light');
+      if (btnMusicoTheme) btnMusicoTheme.textContent = '☀️';
+    }
+    if (btnMusicoTheme) {
+      btnMusicoTheme.addEventListener('click', () => {
+        document.body.classList.toggle('theme-light');
+        const isLight = document.body.classList.contains('theme-light');
+        localStorage.setItem('musico-theme', isLight ? 'light' : 'dark');
+        btnMusicoTheme.textContent = isLight ? '🌙' : '☀️';
+      });
+    }
+
+
+    // ====================================================
+    // ESCUCHA DE DATOS BASE Y ENLACE DE EVENTOS
+    // ====================================================
+    function escucharBaseDatosGlobal() {
+      onSnapshot(collection(db, "biblioteca_canciones"), (snap) => {
+        cacheSongs = [];
+        snap.forEach(doc => cacheSongs.push({ id: doc.id, ...doc.data() }));
+        window.cacheSongs = cacheSongs;
+        if (currentUserRole === 'lider') {
+          renderizarMantenimientoCanciones();
+          sincronizarPanelArmado();
+        } else if (currentUserRole === 'musico') {
+          const msDate = document.getElementById('musico-service-date').value;
+          if (msDate) cargarServicioMusico(msDate);
+        }
+      });
+
+      onSnapshot(collection(db, "usuarios"), (snap) => {
+        cacheMembers = [];
+        snap.forEach(doc => cacheMembers.push({ id: doc.id, ...doc.data() }));
+        window.cacheMembers = cacheMembers;
+        if (currentUserRole === 'lider') {
+          renderizarMantenimientoMiembros();
+          sincronizarPanelArmado();
+        } else if (currentUserRole === 'musico') {
+          const msDate = document.getElementById('musico-service-date').value;
+          const maDate = document.getElementById('musico-avail-date').value;
+          if (msDate) cargarServicioMusico(msDate);
+          if (maDate) cargarAsistenciaMusico(maDate);
+        }
+
+        // Setup rehearsal members when members change
+        if (window.renderEnsayoMembers) {
+          window.renderEnsayoMembers();
+        }
+      });
+
+      onSnapshot(collection(db, "planes_servicio"), (snap) => {
+        cacheHistorial = [];
+        snap.forEach(doc => cacheHistorial.push({ id: doc.id, ...doc.data() }));
+        cacheHistorial.sort((a, b) => b.fecha.localeCompare(a.fecha));
+        if (currentUserRole === 'lider') renderizarHistorialServicios();
+      });
+
+      // Initialize rehearsals logic helper
+      if (window.initRehearsalsLogic) {
+        window.initRehearsalsLogic({
+          db: db,
+          collection: collection,
+          addDoc: addDoc,
+          doc: doc,
+          getDoc: getDoc,
+          updateDoc: updateDoc,
+          deleteDoc: deleteDoc,
+          onSnapshot: onSnapshot,
+          showToast: showToast
+        });
+      }
+    }
+
+    function renderizarHistorialServicios() {
+      const cont = document.getElementById('historial-list-container');
+      if (!cont) return;
+      cont.innerHTML = "";
+
+      const filtroFecha = document.getElementById('historial-date-filter');
+      const fechaSeleccionada = filtroFecha ? filtroFecha.value : "";
+
+      const lista = fechaSeleccionada
+        ? cacheHistorial.filter(s => s.fecha === fechaSeleccionada)
+        : cacheHistorial;
+
+      if (lista.length === 0) {
+        cont.innerHTML = fechaSeleccionada
+          ? `<p style='color:var(--text3);font-size:13px;text-align:center;padding:20px;'>No hay ningún servicio registrado para el <b>${fechaSeleccionada}</b>.</p>`
+          : `<p style='color:var(--text3);font-size:13px;text-align:center;padding:20px;'>No hay servicios creados aún.</p>`;
+        return;
+      }
+
+      lista.forEach(s => {
+        const isSent = s.estadoEnvio === 'enviado';
+        const badge = isSent
+          ? `<span class="chip chip-teal" style="font-size:10px;">🟢 Enviado</span>`
+          : `<span class="chip chip-gold" style="font-size:10px;">🟡 Pendiente — edita y envía cuando quieras</span>`;
+
+        const totalCanciones = s.cancionesSeleccionadas ? Object.values(s.cancionesSeleccionadas).filter(v => v !== false).length : 0;
+        const totalMusicos = s.musicosAsignados ? Object.values(s.musicosAsignados).filter(v => v === true).length : 0;
+
+        const div = document.createElement('div');
+        div.className = "member-row";
+        div.style.justifyContent = "space-between";
+        div.style.alignItems = "flex-start";
+        div.innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="font-size:24px;">🗓️</div>
+          <div class="member-info">
+            <div class="member-name" style="font-size:15px; margin-bottom:5px;">Servicio: ${s.fecha}</div>
+            <div class="member-role" style="margin-bottom:4px;">${badge}</div>
+            <div style="font-size:11px; color:var(--text3);">🎵 ${totalCanciones} canción(es) &nbsp;|&nbsp; 👥 ${totalMusicos} integrante(s)</div>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+          <button class="chip chip-purple btn-load-historial" style="cursor:pointer; border:none; padding:7px 14px; font-weight:600; white-space:nowrap;" data-date="${s.fecha}">
+            ${isSent ? '✏️ Ver / Editar' : '📤 Abrir y Enviar'}
+          </button>
+        </div>
+      `;
+        div.querySelector('.btn-load-historial').addEventListener('click', () => {
+          document.getElementById('service-date-select').value = s.fecha;
+          sincronizarPanelArmado();
+          document.querySelector('.nav-tab[data-tab="tab-servicios"]').click();
+        });
+        cont.appendChild(div);
+      });
+    }
+
+    // Escuchar el selector de fecha principal
+    serviceDateSelect.addEventListener('change', () => {
+      sincronizarPanelArmado();
+    });
+
+    // Listeners del filtro del historial
+    document.getElementById('historial-date-filter').addEventListener('change', () => renderizarHistorialServicios());
+    document.getElementById('btn-clear-historial-filter').addEventListener('click', () => {
+      document.getElementById('historial-date-filter').value = '';
+      renderizarHistorialServicios();
+    });
+
+    // Buscador de canciones en vivo
+    document.getElementById('search-service-songs').addEventListener('input', () => {
+      sincronizarPanelArmado();
+    });
+
+    // ====================================================
+    // LOGICA CENTRAL: ARMADO DE SERVICIOS POR FECHA
+    // ====================================================
+    function sincronizarPanelArmado() {
+      const targetDate = serviceDateSelect.value;
+      if (!targetDate) return;
+
+      if (unsubscribeService) unsubscribeService();
+
+      const serviceDocRef = doc(db, "planes_servicio", targetDate);
+
+      unsubscribeService = onSnapshot(serviceDocRef, async (snap) => {
+        if (!snap.exists()) {
+          // Inicializar estructura limpia de la fecha en Firestore para todos
+          await setDoc(serviceDocRef, {
+            fecha: targetDate,
+            cancionesSeleccionadas: {}, // id_cancion: tono_elegido
+            musicosAsignados: {},       // id_usuario: true/false
+            disponibilidad: {}          // id_usuario: 'confirmado' | 'ausente'
+          });
+          return;
+        }
+
+        const dataServicio = snap.data();
+        window._currentServiceData = dataServicio;
+        renderizarComponentesServicio(dataServicio);
+      });
+    }
+
+    function renderizarServicioVacio() {
+      document.getElementById('service-team-container').innerHTML = `<p style='color:var(--text3);font-size:13px;text-align:center;padding:10px;'>No hay datos configurados para esta fecha.</p>`;
+      document.getElementById('songs-alabanza-container').innerHTML = '';
+      document.getElementById('songs-adoracion-container').innerHTML = '';
+    }
+
+    function generarMensajeTexto(dataServicio) {
+      const targetDate = serviceDateSelect.value;
+      if (!targetDate) return "";
+
+      const partesFecha = targetDate.split('-');
+      const objetoFecha = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
+      const fechaLegible = objetoFecha.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+
+      let msg = `*PROGRAMACIÓN DE ALABANZA - IMR4*\n🗓️ *${fechaLegible.toUpperCase()}*\n\n`;
+
+      if (dataServicio.nota_adicional && dataServicio.nota_adicional.trim() !== "") {
+        msg += `📌 *NOTA DEL LÍDER:*\n_${dataServicio.nota_adicional}_\n\n`;
+      }
+
+      // Combinar canciones de la biblioteca y personalizadas
+      const cancionesSeleccionadas = dataServicio.cancionesSeleccionadas || {};
+      const selectedIds = Object.keys(cancionesSeleccionadas).filter(k => cancionesSeleccionadas[k] !== false);
+      const ordenCanciones = dataServicio.ordenCanciones || [];
+      const customSongsMetadata = dataServicio.customSongsMetadata || {};
+
+      let allSelected = [];
+      selectedIds.forEach(id => {
+        if (id.startsWith('custom_')) {
+          const meta = customSongsMetadata[id];
+          if (meta) {
+            allSelected.push({
+              id: id,
+              nombre: meta.nombre,
+              artista: meta.artista || "Personalizada",
+              tonoBase: meta.tonoBase,
+              tipo: meta.tipo,
+              isCustom: true
+            });
+          }
+        } else {
+          const song = cacheSongs.find(s => s.id === id);
+          if (song) {
+            allSelected.push(song);
+          }
+        }
+      });
+
+      // Ordenar por ordenCanciones
+      allSelected.sort((a, b) => {
+        const ia = ordenCanciones.indexOf(a.id);
+        const ib = ordenCanciones.indexOf(b.id);
+        if (ia === -1 && ib === -1) return 0;
+        if (ia === -1) return 1;
+        if (ib === -1) return -1;
+        return ia - ib;
+      });
+
+      const adoraciones = allSelected.filter(s => s.tipo === 'adoracion');
+      const alabanzas = allSelected.filter(s => s.tipo === 'alabanza');
+
+      msg += `🎵 *REPERTORIO SELECCIONADO:*\n`;
+
+      // Adoración primero
+      msg += `*🙏 ADORACIÓN (Lentas):*\n`;
+      if (adoraciones.length > 0) {
+        adoraciones.forEach((s, idx) => {
+          const tone = cancionesSeleccionadas[s.id];
+          msg += `  ${idx + 1}. ${s.nombre} (_Tono: ${tone}_)\n`;
+        });
+      } else {
+        msg += "  _Ninguna seleccionada_\n";
+      }
+
+      // Alabanza después
+      msg += `\n*🔥 ALABANZA (Rápidas):*\n`;
+      if (alabanzas.length > 0) {
+        alabanzas.forEach((s, idx) => {
+          const tone = cancionesSeleccionadas[s.id];
+          msg += `  ${idx + 1}. ${s.nombre} (_Tono: ${tone}_)\n`;
+        });
+      } else {
+        msg += "  _Ninguna seleccionada_\n";
+      }
+
+      msg += `\n👥 *EQUIPO ASIGNADO:*\n`;
+      let countMusicos = 0;
+      let countCoristas = 0;
+      let cuerpoMusicos = " *🎹 Músicos:*\n";
+      let cuerpoCoristas = " *🎤 Voces/Coros:*\n";
+
+      cacheMembers.forEach(m => {
+        if (dataServicio.musicosAsignados && dataServicio.musicosAsignados[m.usuario]) {
+          if (m.type === 'musico') {
+            countMusicos++;
+            cuerpoMusicos += `  • ${m.nombre} [${m.instrumento}]\n`;
+          } else {
+            countCoristas++;
+            cuerpoCoristas += `  • ${m.nombre} [${m.instrumento}]\n`;
+          }
+        }
+      });
+
+      if (countMusicos > 0) msg += cuerpoMusicos;
+      if (countCoristas > 0) msg += cuerpoCoristas;
+      if (countMusicos === 0 && countCoristas === 0) {
+        msg += "  _No se han asignado integrantes._\n";
+      }
+
+      msg += `\n_“Alabadle con salterio y arpa. Alabadle con pandero y danza...” Ps. 150_ 🙌🚀`;
+      return msg;
+    }
+
+    function renderizarComponentesServicio(dataServicio) {
+      const filterText = document.getElementById('search-service-songs').value.toLowerCase().trim();
+
+      const teamCont = document.getElementById('service-team-container');
+      const alabCont = document.getElementById('songs-alabanza-container');
+      const adorCont = document.getElementById('songs-adoracion-container');
+
+      // --- 0. MOSTRAR U OCULTAR CARD DE DISPONIBILIDAD PERSONAL ---
+      const availCard = document.getElementById('my-availability-card');
+      if (activeSessionUser && activeSessionUser.usuario !== 'admin') {
+        availCard.style.display = 'block';
+        const userAvail = dataServicio.disponibilidad ? dataServicio.disponibilidad[activeSessionUser.usuario] : null;
+        const statusText = document.getElementById('my-avail-status');
+        if (userAvail === 'confirmado') {
+          statusText.innerHTML = 'Tu estado: <span style="color:var(--teal);">Voy a Asistir 👍</span>';
+        } else if (userAvail === 'ausente') {
+          statusText.innerHTML = 'Tu estado: <span style="color:var(--coral);">No Disponible 👎</span>';
+        } else {
+          statusText.innerHTML = 'Tu estado: <span style="color:var(--text3);">Sin Confirmar ⏳</span>';
+        }
+      } else {
+        availCard.style.display = 'none';
+      }
+
+      // --- 0. NOTA ADICIONAL DEL LÍDER ---
+      if (currentUserRole === 'lider') {
+        const notaInput = document.getElementById('service-nota-input');
+        notaInput.value = dataServicio.nota_adicional || "";
+
+        // Sobrescribir evento para que no se dupliquen listeners
+        const btnSaveNota = document.getElementById('btn-save-nota');
+        const newBtnSaveNota = btnSaveNota.cloneNode(true);
+        btnSaveNota.parentNode.replaceChild(newBtnSaveNota, btnSaveNota);
+
+        newBtnSaveNota.addEventListener('click', async () => {
+          const val = notaInput.value.trim();
+          // Al guardar nota, borramos el borrador para que el preview se regenere con la nota incluida
+          await updateDoc(doc(db, "planes_servicio", targetDate), {
+            nota_adicional: val,
+            mensajeEditado: deleteField()
+          });
+          showToast('📌 Nota guardada — el mensaje de WhatsApp se actualizó');
+        });
+      }
+
+      // --- 1. RENDER DE MÚSICOS (Filtrados por disponibilidad real) ---
+      teamCont.innerHTML = "";
+      const miembrosFiltrados = cacheMembers.filter(m => m.usuario !== 'admin');
+
+      if (miembrosFiltrados.length === 0) {
+        teamCont.innerHTML = `<p style="color: var(--text3); font-size:12px; text-align:center;">No hay personal registrado en el sistema.</p>`;
+      } else {
+        // 1a. Contar instrumentos asignados para advertir duplicados
+        const assignedCounts = {};
+        miembrosFiltrados.forEach(m => {
+          const isAssigned = dataServicio.musicosAsignados && dataServicio.musicosAsignados[m.usuario];
+          if (isAssigned) {
+            const userInsts = m.instrumento.split(',').map(s => s.trim());
+            userInsts.forEach(inst => {
+              assignedCounts[inst] = (assignedCounts[inst] || 0) + 1;
+            });
+          }
+        });
+
+        const duplicateInstruments = [];
+        for (const [inst, count] of Object.entries(assignedCounts)) {
+          const isVoice = ["Voz Principal", "Corista"].includes(inst);
+          if (!isVoice && count > 1) {
+            duplicateInstruments.push(inst);
+          }
+        }
+
+        if (duplicateInstruments.length > 0) {
+          const warningBanner = document.createElement('div');
+          warningBanner.style.background = 'rgba(255, 107, 107, 0.12)';
+          warningBanner.style.border = '1px solid var(--coral)';
+          warningBanner.style.borderRadius = '8px';
+          warningBanner.style.padding = '10px 14px';
+          warningBanner.style.marginBottom = '14px';
+          warningBanner.style.fontSize = '12px';
+          warningBanner.style.color = 'var(--coral)';
+          warningBanner.style.fontWeight = '500';
+          warningBanner.innerHTML = `⚠️ Atención líder: Hay más de un integrante asignado para: <b>${duplicateInstruments.join(', ')}</b>.`;
+          teamCont.appendChild(warningBanner);
+        }
+
+        // 1b. Helper para renderizar filas de miembros
+        const crearFilaMiembro = (m, isAvailableGroup) => {
+          const isChecked = dataServicio.musicosAsignados && dataServicio.musicosAsignados[m.usuario];
+          const userAvail = dataServicio.disponibilidad ? dataServicio.disponibilidad[m.usuario] : null;
+
+          let statusBadge = "";
+          if (!isAvailableGroup) {
+            if (userAvail === 'ausente') {
+              statusBadge = `<span style="color:var(--coral); font-size:11px; margin-left: auto; margin-right: 10px; font-weight: 500;">❌ Ausente</span>`;
+            } else {
+              statusBadge = `<span style="color:var(--text3); font-size:11px; margin-left: auto; margin-right: 10px;">⏳ Sin Responder</span>`;
+            }
+          }
+
+          const containsVoice = m.instrumento.includes("Voz") || m.instrumento.includes("Corista");
+          const containsRhythm = m.instrumento.includes("Batería") || m.instrumento.includes("Bajo") || m.instrumento.includes("Percusión");
+          const containsInst = m.instrumento.includes("Batería") || m.instrumento.includes("Bajo") || m.instrumento.includes("Teclado") || m.instrumento.includes("Guitarra") || m.instrumento.includes("Percusión");
+
+          let avatarClass = "av-gold";
+          if (containsRhythm) {
+            avatarClass = "av-purple";
+          } else if (containsVoice) {
+            avatarClass = "av-teal";
+          }
+
+          const row = document.createElement('div');
+          row.className = "member-row";
+          if (!isAvailableGroup) {
+            row.style.opacity = "0.5";
+          }
+
+          row.innerHTML = `
+          <div class="avatar ${avatarClass}">${m.nombre.substring(0, 2).toUpperCase()}</div>
+          <div class="member-info">
+            <div class="member-name">${m.nombre}</div>
+            <div class="member-role">${m.instrumento}</div>
+          </div>
+          ${statusBadge}
+          <div class="assign-check ${isChecked ? 'on' : ''} ${(!isAvailableGroup || currentUserRole !== 'lider') ? 'song-locked' : ''}"></div>
+
+
+        `;
+
+          if (currentUserRole === 'lider' && isAvailableGroup) {
+            row.querySelector('.assign-check').addEventListener('click', async () => {
+              const path = `musicosAsignados.${m.usuario}`;
+              await updateDoc(doc(db, "planes_servicio", serviceDateSelect.value), {
+                [path]: !isChecked
+              });
+            });
+          }
+          return row;
+        };
+
+        // 1c. Clasificar miembros
+        const disponibles = [];
+        const noDisponibles = [];
+
+        miembrosFiltrados.forEach(m => {
+          const userAvail = dataServicio.disponibilidad ? dataServicio.disponibilidad[m.usuario] : null;
+          if (userAvail === 'confirmado') {
+            disponibles.push(m);
+          } else {
+            noDisponibles.push(m);
+          }
+        });
+
+        // Renderizar Confirmados
+        const headerDisp = document.createElement('div');
+        headerDisp.className = "block-title";
+        headerDisp.style.marginTop = "0";
+        headerDisp.style.color = "var(--teal)";
+        headerDisp.style.borderBottomColor = "rgba(78,205,196,0.15)";
+        headerDisp.textContent = "Confirmados (Disponibles para el Servicio)";
+        teamCont.appendChild(headerDisp);
+
+        if (disponibles.length === 0) {
+          const p = document.createElement('p');
+          p.style.color = "var(--text3)";
+          p.style.fontSize = "12px";
+          p.style.padding = "12px 6px";
+          p.style.textAlign = "center";
+          p.textContent = "Ningún integrante ha confirmado disponibilidad para esta fecha.";
+          teamCont.appendChild(p);
+        } else {
+          disponibles.forEach(m => {
+            teamCont.appendChild(crearFilaMiembro(m, true));
+          });
+        }
+
+        // Renderizar No Disponibles / Sin Confirmar
+        const headerNoDisp = document.createElement('div');
+        headerNoDisp.className = "block-title";
+        headerNoDisp.style.marginTop = "20px";
+        headerNoDisp.style.color = "var(--text3)";
+        headerNoDisp.style.borderBottomColor = "rgba(255,255,255,0.05)";
+        headerNoDisp.textContent = "No Disponibles / Sin Confirmar (Bloqueados)";
+        teamCont.appendChild(headerNoDisp);
+
+        if (noDisponibles.length === 0) {
+          const p = document.createElement('p');
+          p.style.color = "var(--text3)";
+          p.style.fontSize = "12px";
+          p.style.padding = "12px 6px";
+          p.style.textAlign = "center";
+          p.textContent = "Todos los integrantes han confirmado asistencia.";
+          teamCont.appendChild(p);
+        } else {
+          noDisponibles.forEach(m => {
+            teamCont.appendChild(crearFilaMiembro(m, false));
+          });
+        }
+      }
+
+      // --- 2. RENDER DE REPERTORIO CON TONO DINÁMICO ---
+      alabCont.innerHTML = "";
+      adorCont.innerHTML = "";
+
+      const filteredSongs = cacheSongs.filter(s => s.nombre.toLowerCase().includes(filterText) || s.artista.toLowerCase().includes(filterText));
+
+      filteredSongs.forEach(s => {
+        const selectedTone = dataServicio.cancionesSeleccionadas && dataServicio.cancionesSeleccionadas[s.id];
+        const isSelected = selectedTone !== undefined && selectedTone !== null && selectedTone !== false;
+        const displayTone = isSelected ? selectedTone : s.tonoBase;
+        const keysOptions = ['C', 'Cm', 'C#', 'C#m', 'D', 'Dm', 'D#', 'D#m', 'E', 'Em', 'F', 'Fm', 'F#', 'F#m', 'G', 'Gm', 'G#', 'G#m', 'A', 'Am', 'A#', 'A#m', 'B', 'Bm'];
+
+        const item = document.createElement('div');
+        item.className = "song-item";
+
+        let keySelectionMarkup = "";
+        if (isSelected) {
+          if (currentUserRole === 'lider') {
+            keySelectionMarkup = `
+            <div style="margin-top:5px; display:inline-flex; align-items:center; gap:6px;">
+              <span style="font-size:11px; color:var(--gold);">Tono en uso:</span>
+              <select class="select-change-tone" style="background:var(--bg3); border:1px solid rgba(244,197,66,0.5); color:var(--gold); border-radius:4px; padding:2px 6px; font-size:11px; font-family:var(--font-body); outline:none; cursor:pointer;">
+                ${keysOptions.map(t => `<option value="${t}" ${t === displayTone ? 'selected' : ''}>${t}</option>`).join('')}
+              </select>
+            </div>
+          `;
+          } else {
+            keySelectionMarkup = `
+            <div style="margin-top:5px; display:inline-flex; align-items:center; gap:6px;">
+              <span style="font-size:11px; color:var(--gold);">Tono en uso:</span>
+              <span style="background:rgba(244,197,66,0.15); color:var(--gold); border:1px solid rgba(244,197,66,0.3); padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600;">${displayTone}</span>
+            </div>
+          `;
+          }
+        }
+
+        item.innerHTML = `
+        <div class="song-check ${isSelected ? 'checked' : ''} ${currentUserRole !== 'lider' ? 'song-locked' : ''}"></div>
+        <div class="song-info">
+          <div class="song-name">${s.nombre}</div>
+          <div class="song-meta">${s.artista} | Tono Base: <b>${s.tonoBase}</b></div>
+          ${keySelectionMarkup}
+        </div>
+      `;
+
+        if (currentUserRole === 'lider') {
+          item.querySelector('.song-check').addEventListener('click', async () => {
+            const path = `cancionesSeleccionadas.${s.id}`;
+            if (!isSelected) {
+              await updateDoc(doc(db, "planes_servicio", serviceDateSelect.value), { [path]: s.tonoBase });
+            } else {
+              await updateDoc(doc(db, "planes_servicio", serviceDateSelect.value), { [path]: false });
+            }
+          });
+
+          if (isSelected) {
+            item.querySelector('.select-change-tone').addEventListener('change', async (e) => {
+              const nuevoTono = e.target.value;
+              const path = `cancionesSeleccionadas.${s.id}`;
+              await updateDoc(doc(db, "planes_servicio", serviceDateSelect.value), {
+                [path]: nuevoTono
+              });
+            });
+          }
+        }
+
+        if (s.tipo === 'alabanza') alabCont.appendChild(item);
+        else adorCont.appendChild(item);
+      });
+
+      // --- 3. ACTUALIZAR PREVISUALIZACIÓN EN TIEMPO REAL ---
+      currentAutoMsg = generarMensajeTexto(dataServicio);
+      const previewEl = document.getElementById('whatsapp-preview');
+      if (dataServicio.mensajeEditado) {
+        previewEl.value = dataServicio.mensajeEditado;
+      } else {
+        previewEl.value = currentAutoMsg || "Selecciona integrantes y canciones para armar el plan...";
+      }
+
+      // Render ordered repertory in admin view
+      renderSelectedSongsAdmin(dataServicio);
+    }
+
+    // Eventos de Disponibilidad del Músico
+    document.getElementById('btn-avail-confirm').addEventListener('click', async () => {
+      const targetDate = serviceDateSelect.value;
+      if (!targetDate || !activeSessionUser) return;
+      const path = `disponibilidad.${activeSessionUser.usuario}`;
+      await updateDoc(doc(db, "planes_servicio", targetDate), {
+        [path]: 'confirmado'
+      });
+    });
+
+    document.getElementById('btn-avail-decline').addEventListener('click', async () => {
+      const targetDate = serviceDateSelect.value;
+      if (!targetDate || !activeSessionUser) return;
+      const path = `disponibilidad.${activeSessionUser.usuario}`;
+      const pathAsignado = `musicosAsignados.${activeSessionUser.usuario}`;
+      await updateDoc(doc(db, "planes_servicio", targetDate), {
+        [path]: 'ausente',
+        [pathAsignado]: false
+      });
+    });
+
+
+    // ====================================================
+    // GENERADOR INTERACTIVO DEL MENSAJE DE WHATSAPP
+    // ====================================================
+    document.getElementById('btn-regen-whatsapp').addEventListener('click', () => {
+      const previewEl = document.getElementById('whatsapp-preview');
+      previewEl.value = currentAutoMsg || "Selecciona integrantes y canciones para armar el plan...";
+    });
+
+    // Guardar como BORRADOR (sin marcar enviado)
+    document.getElementById('btn-save-draft').addEventListener('click', async () => {
+      const targetDate = serviceDateSelect.value;
+      if (!targetDate) { alert('Primero selecciona una fecha.'); return; }
+      const newMsg = document.getElementById('whatsapp-preview').value;
+      await updateDoc(doc(db, "planes_servicio", targetDate), {
+        mensajeEditado: newMsg,
+        estadoEnvio: 'pendiente'
+      });
+      alert("Borrador guardado. El historial lo muestra como 🟡 Pendiente.");
+    });
+
+    // Enviar por WhatsApp (iOS-safe: sin await antes de abrir enlace)
+    document.getElementById('btn-copy-whatsapp').addEventListener('click', () => {
+      const previewEl = document.getElementById('whatsapp-preview');
+      const msg = previewEl.value;
+      if (!msg || msg.startsWith("Selecciona") || msg.trim() === "") {
+        alert("No hay datos cargados para generar un mensaje aún.");
+        return;
+      }
+
+      // Construir URL de forma SÍNCRONA (requerido por iOS para que no bloquee la apertura)
+      const encodedMsg = encodeURIComponent(msg);
+      const groupLink = (window._whatsappGroupLink || "").trim();
+      let waUrl;
+      if (groupLink && groupLink.startsWith('https://wa.me/')) {
+        waUrl = groupLink.split('?')[0] + '?text=' + encodedMsg;
+      } else if (groupLink) {
+        waUrl = groupLink + (groupLink.includes('?') ? '&' : '?') + 'text=' + encodedMsg;
+      } else {
+        waUrl = 'https://api.whatsapp.com/send?text=' + encodedMsg;
+      }
+
+      // Abrir enlace SINCRÓNICAMENTE usando elemento <a> (funciona en iOS Safari)
+      const a = document.createElement('a');
+      a.href = waUrl;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      // Clipboard (best effort, no bloquea en iOS)
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(msg).catch(() => { });
+      }
+
+      // Firebase update (no-blocking)
+      const targetDate = serviceDateSelect.value;
+      if (targetDate) {
+        updateDoc(doc(db, "planes_servicio", targetDate), {
+          mensajeEditado: msg,
+          estadoEnvio: 'enviado'
+        }).catch(e => console.error(e));
+      }
+    });
+
+
+    function resetSongForm() {
+      editingSongId = null;
+      document.getElementById('form-add-song').reset();
+      const btnSubmit = document.querySelector('#form-add-song button[type="submit"]');
+      btnSubmit.textContent = "Guardar Canción";
+      btnSubmit.style.background = "var(--gold)";
+      const cancelBtn = document.getElementById('btn-cancel-song-edit');
+      if (cancelBtn) cancelBtn.style.display = 'none';
+    }
+
+    // ====================================================
+    // RESPALDO: CRUD MANTENIMIENTOS (REPERTORIO Y MIEMBROS)
+    // ====================================================
+    document.getElementById('form-add-song').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const idUnico = editingSongId || ("song_" + Date.now());
+      const payload = {
+        nombre: document.getElementById('song-name-input').value.trim(),
+        artista: document.getElementById('song-artist-input').value.trim(),
+        tonoBase: document.getElementById('song-key-input').value.trim(),
+        tipo: document.getElementById('song-type-input').value,
+        youtube: document.getElementById('song-youtube-input').value.trim(),
+        letra: document.getElementById('song-lyrics-input').value
+      };
+      await setDoc(doc(db, "biblioteca_canciones", idUnico), payload);
+      const wasEditing = !!editingSongId;
+      resetSongForm();
+      alert(wasEditing ? "Canción actualizada." : "Canción añadida al catálogo global.");
+    });
+
+    function renderizarMantenimientoCanciones() {
+      const listCont = document.getElementById('global-songs-list');
+      listCont.innerHTML = "";
+      if (cacheSongs.length === 0) {
+        listCont.innerHTML = "<p style='color:var(--text3);font-size:12px;text-align:center;'>Biblioteca vacía.</p>";
+        return;
+      }
+      cacheSongs.forEach(s => {
+        const div = document.createElement('div');
+        div.className = "song-item";
+        div.style.justifyContent = "space-between";
+        div.innerHTML = `
+        <div class="song-info">
+          <div class="song-name">${s.nombre} <span class="chip ${s.tipo === 'alabanza' ? 'chip-teal' : 'chip-purple'}" style="font-size:9px; padding:2px 6px;">${s.tipo}</span></div>
+          <div class="song-meta">${s.artista} | Tono Base: ${s.tonoBase}</div>
+        </div>
+        ${currentUserRole === 'lider' ? `
+          <div style="display:flex; gap:6px;">
+            <button class="chip chip-teal click-edit-song" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Editar">✏️ Editar</button>
+            <button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Eliminar">🗑️ Eliminar</button>
+          </div>
+        ` : ''}
+      `;
+        if (currentUserRole === 'lider') {
+          div.querySelector('.click-edit-song').addEventListener('click', () => {
+            editingSongId = s.id;
+            document.getElementById('song-name-input').value = s.nombre;
+            document.getElementById('song-artist-input').value = s.artista;
+            document.getElementById('song-key-input').value = s.tonoBase;
+            document.getElementById('song-type-input').value = s.tipo;
+            document.getElementById('song-youtube-input').value = s.youtube || "";
+            document.getElementById('song-lyrics-input').value = s.letra || "";
+
+            const btnSubmit = document.querySelector('#form-add-song button[type="submit"]');
+            btnSubmit.textContent = "Actualizar Canción";
+            btnSubmit.style.background = "var(--teal)";
+
+            let cancelBtn = document.getElementById('btn-cancel-song-edit');
+            if (!cancelBtn) {
+              cancelBtn = document.createElement('button');
+              cancelBtn.id = 'btn-cancel-song-edit';
+              cancelBtn.type = 'button';
+              cancelBtn.className = 'btn-primary';
+              cancelBtn.style.background = 'var(--coral)';
+              cancelBtn.style.marginTop = '8px';
+              cancelBtn.textContent = 'Cancelar Edición';
+              cancelBtn.onclick = () => resetSongForm();
+              document.getElementById('form-add-song').appendChild(cancelBtn);
+            }
+            cancelBtn.style.display = 'block';
+
+            document.getElementById('form-add-song').scrollIntoView({ behavior: 'smooth' });
+          });
+
+          div.querySelector('.click-del-song').addEventListener('click', async () => {
+            if (confirm(`¿Quieres borrar definitivamente "${s.nombre}" del catálogo?`)) {
+              await deleteDoc(doc(db, "biblioteca_canciones", s.id));
+            }
+          });
+        }
+        listCont.appendChild(div);
+      });
+    }
+
+    // ====================================================
+    // LOGICA PARA DROPDOWN MULTISELECT DE INSTRUMENTOS
+    // ====================================================
+    const msHeader = document.getElementById('inst-multiselect-header');
+    const msDropdown = document.getElementById('inst-multiselect-dropdown');
+    const msText = document.getElementById('inst-multiselect-text');
+    const msCheckboxes = document.querySelectorAll('.inst-cb');
+
+    msHeader.addEventListener('click', (e) => {
+      msDropdown.classList.toggle('active');
+      e.stopPropagation();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!msDropdown.contains(e.target) && e.target !== msHeader) {
+        msDropdown.classList.remove('active');
+      }
+    });
+
+    msCheckboxes.forEach(cb => {
+      cb.addEventListener('change', () => {
+        const selected = Array.from(msCheckboxes).filter(c => c.checked).map(c => c.value);
+        if (selected.length === 0) msText.textContent = "Seleccionar roles...";
+        else msText.textContent = selected.join(', ');
+      });
+    });
+
+    function resetMemberForm() {
+      editingUserKey = null;
+      document.getElementById('form-add-member').reset();
+      document.getElementById('member-user-input').disabled = false;
+      document.querySelectorAll('.inst-cb').forEach(c => c.checked = false);
+      document.getElementById('inst-multiselect-text').textContent = "Seleccionar roles...";
+      const btnSubmit = document.querySelector('#form-add-member button[type="submit"]');
+      btnSubmit.textContent = "Agregar Integrante";
+      btnSubmit.style.background = "var(--purple)";
+      const cancelBtn = document.getElementById('btn-cancel-edit');
+      if (cancelBtn) cancelBtn.style.display = 'none';
+    }
+
+    // Envío Formulario Nuevo Integrante / Editar
+    document.getElementById('form-add-member').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userKey = editingUserKey || document.getElementById('member-user-input').value.trim().toLowerCase();
+
+      // Obtener los instrumentos seleccionados de los checkboxes
+      const selectedChips = Array.from(msCheckboxes).filter(c => c.checked).map(c => c.value);
+
+      if (selectedChips.length === 0) {
+        alert("Por favor, selecciona al menos un rol o instrumento de la lista.");
+        return;
+      }
+
+      const instVal = selectedChips.join(', ');
+      const isCoro = !selectedChips.some(val => ["Batería", "Bajo", "Teclado", "Guitarra Eléctrica", "Guitarra Acústica", "Percusión"].includes(val));
+
+      const payload = {
+        nombre: document.getElementById('member-name-input').value.trim(),
+        type: isCoro ? 'corista' : 'musico',
+        instrumento: instVal,
+        usuario: userKey,
+        password: document.getElementById('member-pass-input').value.trim(),
+        role: document.getElementById('member-role-input').value
+      };
+      await setDoc(doc(db, "usuarios", userKey), payload);
+
+      const wasEditing = !!editingUserKey;
+      resetMemberForm();
+      alert(wasEditing ? "Integrante actualizado exitosamente." : "Integrante guardado exitosamente.");
+    });
+
+
+    function renderizarMantenimientoMiembros() {
+      const listCont = document.getElementById('global-members-list');
+      listCont.innerHTML = "";
+      const filtrados = cacheMembers.filter(m => m.usuario !== 'admin');
+      if (filtrados.length === 0) {
+        listCont.innerHTML = "<p style='color:var(--text3);font-size:12px;text-align:center;'>No hay músicos registrados.</p>";
+        return;
+      }
+      filtrados.forEach(m => {
+        const div = document.createElement('div');
+        div.className = "member-row";
+        div.style.justifyContent = "space-between";
+        div.innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="avatar av-purple">${m.nombre.substring(0, 2).toUpperCase()}</div>
+          <div class="member-info">
+            <div class="member-name">${m.nombre} ${m.role === 'lider' ? '<b style="color:var(--gold)">[Líder]</b>' : ''}</div>
+            <div class="member-role">User: ${m.usuario} | Clave: ${m.password} | Instrumento: ${m.instrumento}</div>
+          </div>
+        </div>
+        ${currentUserRole === 'lider' ? `
+          <div style="display:flex; gap:6px;">
+            <button class="chip chip-teal click-edit-member" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Editar">✏️</button>
+            <button class="chip chip-coral click-del-member" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Eliminar">🗑️</button>
+          </div>
+        ` : ''}
+      `;
+        if (currentUserRole === 'lider') {
+          div.querySelector('.click-edit-member').addEventListener('click', () => {
+            editingUserKey = m.usuario;
+            document.getElementById('member-name-input').value = m.nombre;
+            document.getElementById('member-user-input').value = m.usuario;
+            document.getElementById('member-user-input').disabled = true;
+            document.getElementById('member-pass-input').value = m.password;
+            document.getElementById('member-role-input').value = m.role;
+
+            const instArr = m.instrumento.split(',').map(s => s.trim());
+            document.querySelectorAll('.inst-cb').forEach(c => {
+              c.checked = instArr.includes(c.value);
+            });
+            document.getElementById('inst-multiselect-text').textContent = m.instrumento;
+
+            const btnSubmit = document.querySelector('#form-add-member button[type="submit"]');
+            btnSubmit.textContent = "Actualizar Integrante";
+            btnSubmit.style.background = "var(--teal)";
+
+            let cancelBtn = document.getElementById('btn-cancel-edit');
+            if (!cancelBtn) {
+              cancelBtn = document.createElement('button');
+              cancelBtn.id = 'btn-cancel-edit';
+              cancelBtn.type = 'button';
+              cancelBtn.className = 'btn-primary';
+              cancelBtn.style.background = 'var(--coral)';
+              cancelBtn.style.marginTop = '8px';
+              cancelBtn.textContent = 'Cancelar Edición';
+              cancelBtn.onclick = () => resetMemberForm();
+              document.getElementById('form-add-member').appendChild(cancelBtn);
+            }
+            cancelBtn.style.display = 'block';
+
+            document.getElementById('form-add-member').scrollIntoView({ behavior: 'smooth' });
+          });
+
+          div.querySelector('.click-del-member').addEventListener('click', async () => {
+            if (confirm(`¿Eliminar la cuenta de "${m.nombre}" del sistema de acceso?`)) {
+              await deleteDoc(doc(db, "usuarios", m.usuario));
+            }
+          });
+        }
+        listCont.appendChild(div);
+      });
+    }
+
+    // ====================================================
+    // LOGICA DE LA VISTA EXCLUSIVA DEL MÚSICO
+    // ====================================================
+    let unsubscribeMusicoService = null;
+    const btnMusicoConfirm = document.getElementById('btn-musico-confirm');
+    const btnMusicoDecline = document.getElementById('btn-musico-decline');
+
+    function iniciarVistaMusico() {
+      // Controladores Pestañas Músico
+      document.querySelectorAll('.nav-tab-musico').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.nav-tab-musico').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('#screen-musico .tab-panel').forEach(p => p.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(tab.dataset.mtab).classList.add('active');
+        });
+      });
+
+      const msDate = document.getElementById('musico-service-date');
+      const maDate = document.getElementById('musico-avail-date');
+
+      // Set next sunday
+      const baseDay = new Date();
+      baseDay.setDate(baseDay.getDate() + (7 - baseDay.getDay()) % 7);
+      const dateStr = baseDay.toISOString().split('T')[0];
+
+      msDate.value = dateStr;
+      maDate.value = dateStr;
+
+      msDate.addEventListener('change', () => cargarServicioMusico(msDate.value));
+      maDate.addEventListener('change', () => cargarAsistenciaMusico(maDate.value));
+
+      cargarServicioMusico(dateStr);
+      cargarAsistenciaMusico(dateStr);
+    }
+
+    function cargarServicioMusico(dateStr) {
+      if (!dateStr) return;
+      const content = document.getElementById('musico-service-content');
+      content.innerHTML = "<p style='color:var(--text3);font-size:13px;text-align:center;padding:20px;'>Cargando servicio...</p>";
+
+      // Cancelar suscripción anterior y crear nueva (tiempo real)
+      if (window._unsubMusicoServicePlan) { window._unsubMusicoServicePlan(); }
+
+      window._unsubMusicoServicePlan = onSnapshot(doc(db, "planes_servicio", dateStr), (snap) => {
+        if (!snap.exists()) {
+          content.innerHTML = "<p style='color:var(--text3);font-size:13px;text-align:center;padding:20px;'>Aún no hay programación creada para esta fecha.</p>";
+          return;
+        }
+        const data = snap.data();
+
+        // 🔔 Detectar cambios de tono y mostrar notificación
+        const cambios = data.cambiosTono || {};
+        for (const [songId, info] of Object.entries(cambios)) {
+          const prev = (window._prevCambiosTono || {})[songId];
+          if (prev && info.timestamp !== prev.timestamp && info.usuario !== activeSessionUser.nombre) {
+            const song = cacheSongs.find(s => s.id === songId) || (data.customSongsMetadata && data.customSongsMetadata[songId]);
+            showToast(`🎵 ${info.usuario} cambió "${song ? song.nombre : songId}" → ${info.tono}`);
+          }
+        }
+        window._prevCambiosTono = Object.assign({}, cambios);
+
+        // Cache global para que el modal de agregar pueda leer los datos
+        window._currentServiceData = data;
+
+        let html = "";
+
+        // Nota del líder
+        if (data.nota_adicional && data.nota_adicional.trim() !== "") {
+          html += `<div class="card" style="border-color:var(--purple);background:rgba(155,143,255,0.06);margin-bottom:16px;">
+          <h4 style="font-size:11px;text-transform:uppercase;color:var(--purple);margin-bottom:8px;">📌 Nota del Líder</h4>
+          <p style="font-size:14px;color:var(--text2);line-height:1.6;margin:0;">${data.nota_adicional.replace(/\n/g, '<br>')}</p>
+        </div>`;
+        }
+
+        // Canciones seleccionadas
+        const cancionesSeleccionadas = data.cancionesSeleccionadas || {};
+        const selectedIds = Object.keys(cancionesSeleccionadas).filter(k => cancionesSeleccionadas[k] !== false);
+        const ordenCanciones = data.ordenCanciones || [];
+        const customSongsMetadata = data.customSongsMetadata || {};
+
+        let allSelected = [];
+        selectedIds.forEach(id => {
+          if (id.startsWith('custom_')) {
+            const meta = customSongsMetadata[id];
+            if (meta) {
+              allSelected.push({
+                id: id,
+                nombre: meta.nombre,
+                artista: meta.artista || "Personalizada",
+                tonoBase: meta.tonoBase,
+                tipo: meta.tipo,
+                isCustom: true
+              });
+            }
+          } else {
+            const song = cacheSongs.find(s => s.id === id);
+            if (song) {
+              allSelected.push(song);
+            }
+          }
+        });
+
+        // Ordenar según orden guardado
+        allSelected.sort((a, b) => {
+          const ia = ordenCanciones.indexOf(a.id);
+          const ib = ordenCanciones.indexOf(b.id);
+          if (ia === -1 && ib === -1) return 0;
+          if (ia === -1) return 1;
+          if (ib === -1) return -1;
+          return ia - ib;
+        });
+
+        const adoraciones = allSelected.filter(s => s.tipo === 'adoracion');
+        const alabanzas = allSelected.filter(s => s.tipo === 'alabanza');
+
+        const renderGroup = (songs, titulo, color, emoji, startNum, type) => {
+          let g = `<h4 style="font-size:11px;text-transform:uppercase;color:var(--${color});letter-spacing:0.8px;margin:20px 0 10px;">${emoji} ${titulo}</h4>`;
+          if (songs.length === 0) {
+            g += `<p style="color:var(--text3); font-size:12px; padding:12px; text-align:center; background:rgba(255,255,255,0.02); border-radius:10px;">Ninguna canción seleccionada en esta sección.</p>`;
+          } else {
+            songs.forEach((s, i) => {
+              const tone = cancionesSeleccionadas[s.id];
+              const hasLetra = s.letra && s.letra.trim() !== "";
+              if (hasLetra) {
+                window._lyricsCache = window._lyricsCache || {};
+                window._lyricsCache[s.id] = { nombre: s.nombre, tonoBase: s.tonoBase, tonoServicio: tone, letra: s.letra };
+              }
+              const num = startNum + i;
+              const safeNombre = (s.nombre || "").replace(/"/g, '&quot;');
+
+              g += `<div class="musico-song-card" data-song-id="${s.id}">
+              <!-- Extremo Izquierdo: Reordenamiento y Número -->
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div class="song-order-btns">
+                  <button class="order-btn btn-order-up" data-song-id="${s.id}" data-type="${type}">▲</button>
+                  <button class="order-btn btn-order-down" data-song-id="${s.id}" data-type="${type}">▼</button>
+                </div>
+                <div class="song-num" style="min-width: 24px;">${num}</div>
+              </div>
+              
+              <!-- Centro: Info e icono letra -->
+              <div class="song-card-info" style="margin-left: 4px;">
+                <div class="song-card-name">${s.nombre}</div>
+                <div class="song-card-artist">${s.artista}</div>
+                ${hasLetra ? `
+                  <div>
+                    <button class="btn-ver-letra" onclick="window.abrirModalLetraGlobal('${s.id}')">
+                      📄 Ver Letra
+                    </button>
+                  </div>
+                ` : ''}
+              </div>
+              
+              <!-- Extremo Derecho: Tono -->
+              <div style="display:flex; align-items:center;">
+                <div class="song-tone-badge" data-song-id="${s.id}" data-current-tone="${tone}" data-song-name="${safeNombre}" data-date="${dateStr}">${tone}</div>
+              </div>
+              
+              <!-- Botón Quitar en Esquina Superior Derecha -->
+              <button class="btn-remove-song-musico btn-remove-song" data-song-id="${s.id}" title="Quitar canción">✕</button>
+            </div>`;
+            });
+          }
+
+          // Agregar botón "+"
+          g += `
+        <button class="btn-add-song-musico" data-type="${type}" style="width: 100%; background: rgba(${color === 'teal' ? '78,205,196' : '155,143,255'}, 0.08); border: 1px dashed var(--${color}); color: var(--${color}); border-radius: 10px; padding: 12px; font-family: var(--font-body); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; border-style: dashed;">
+          <span>➕</span> Agregar otra canción
+        </button>`;
+
+          return g;
+        };
+
+        // Adoración primero, luego Alabanza
+        html += renderGroup(adoraciones, 'Adoración (Lentas)', 'purple', '🙏', 1, 'adoracion');
+        html += renderGroup(alabanzas, 'Alabanza (Rápidas)', 'teal', '🔥', adoraciones.length + 1, 'alabanza');
+
+        content.innerHTML = html;
+
+        // Eventos: tone badge → abrir picker
+        content.querySelectorAll('.song-tone-badge').forEach(badge => {
+          badge.addEventListener('click', () => {
+            abrirTonePicker(badge.dataset.songId, badge.dataset.currentTone, badge.dataset.songName, badge.dataset.date);
+          });
+        });
+
+        // Eventos: botones de orden ▲▼
+        content.querySelectorAll('.btn-order-up').forEach(btn => {
+          btn.addEventListener('click', () => moverCancionOrden(btn.dataset.songId, -1, allSelected, ordenCanciones, dateStr, btn.dataset.type));
+        });
+        content.querySelectorAll('.btn-order-down').forEach(btn => {
+          btn.addEventListener('click', () => moverCancionOrden(btn.dataset.songId, 1, allSelected, ordenCanciones, dateStr, btn.dataset.type));
+        });
+
+        // Evento: remover canción con advertencia clara
+        content.querySelectorAll('.btn-remove-song-musico').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const songId = btn.dataset.songId;
+            const sName = cacheSongs.find(s => s.id === songId)?.nombre || (customSongsMetadata[songId]?.nombre) || "Canción";
+            if (confirm(`⚠️ ATENCIÓN:\nSi quitas "${sName}", se eliminará de la vista de TODO el equipo y tendrás que agregarla de nuevo si te equivocas.\n\n¿Quieres continuar y quitarla?`)) {
+              const path = `cancionesSeleccionadas.${songId}`;
+              await updateDoc(doc(db, "planes_servicio", dateStr), {
+                [path]: false
+              });
+              showToast(`🗑️ "${sName}" quitada del servicio`);
+            }
+          });
+        });
+
+        // Evento: agregar canción
+        content.querySelectorAll('.btn-add-song-musico').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const type = btn.dataset.type;
+            window._targetAddSongType = type;
+
+            document.getElementById('musico-add-song-title').textContent = `Agregar a ${type === 'adoracion' ? 'Adoración' : 'Alabanza'}`;
+            document.getElementById('musico-add-song-search').value = "";
+            document.getElementById('musico-custom-name').value = "";
+            document.getElementById('musico-custom-artist').value = "";
+            document.getElementById('musico-custom-tone').value = "C";
+
+            renderAddSongResults(type, "");
+
+            document.getElementById('musico-add-song-modal').classList.add('active');
+          });
+        });
+      });
+    }
+
+    function cargarAsistenciaMusico(dateStr) {
+      if (!dateStr) return;
+      const sCard = document.getElementById('musico-avail-status-card');
+      sCard.style.display = 'block';
+
+      if (unsubscribeMusicoService) unsubscribeMusicoService();
+
+      unsubscribeMusicoService = onSnapshot(doc(db, "planes_servicio", dateStr), (snap) => {
+        const data = snap.exists() ? snap.data() : { disponibilidad: {}, musicosAsignados: {} };
+        const disp = data.disponibilidad || {};
+
+        const myStat = disp[activeSessionUser.usuario];
+        const pCur = document.getElementById('musico-avail-current');
+
+        if (myStat === 'confirmado') {
+          pCur.innerHTML = `Estado actual: <span style="color:var(--teal); font-weight:bold;">✅ Voy a Asistir</span>`;
+          btnMusicoConfirm.style.opacity = '1';
+          btnMusicoConfirm.style.boxShadow = '0 0 15px rgba(78,205,196,0.4)';
+          btnMusicoDecline.style.opacity = '0.3';
+          btnMusicoDecline.style.boxShadow = 'none';
+        } else if (myStat === 'ausente') {
+          pCur.innerHTML = `Estado actual: <span style="color:var(--coral); font-weight:bold;">❌ No Disponible</span>`;
+          btnMusicoDecline.style.opacity = '1';
+          btnMusicoDecline.style.boxShadow = '0 0 15px rgba(255,107,107,0.4)';
+          btnMusicoConfirm.style.opacity = '0.3';
+          btnMusicoConfirm.style.boxShadow = 'none';
+        } else {
+          pCur.innerHTML = `Estado actual: <span style="color:var(--text3);">Sin confirmar</span>`;
+          btnMusicoConfirm.style.opacity = '1';
+          btnMusicoDecline.style.opacity = '1';
+          btnMusicoConfirm.style.boxShadow = 'none';
+          btnMusicoDecline.style.boxShadow = 'none';
+        }
+
+        btnMusicoConfirm.onclick = () => actualizarDisponibilidadMusico(dateStr, 'confirmado');
+        btnMusicoDecline.onclick = () => actualizarDisponibilidadMusico(dateStr, 'ausente');
+
+        const tDiv = document.getElementById('musico-team-status');
+        let thtml = `<h4 style="font-size: 13px; text-transform: uppercase; color: var(--gold); margin: 0 0 10px;">Estado de tus compañeros</h4><div class="card">`;
+        const mlist = cacheMembers.filter(m => m.usuario !== 'admin' && m.usuario !== activeSessionUser.usuario);
+        if (mlist.length === 0) {
+          thtml += `<p style='color:var(--text3); font-size:13px;'>No hay más miembros registrados.</p>`;
+        } else {
+          mlist.forEach(m => {
+            const st = disp[m.usuario];
+            let badge = `<span class="status-badge status-none">Sin Confir.</span>`;
+            if (st === 'confirmado') badge = `<span class="status-badge status-si">Confirma</span>`;
+            if (st === 'ausente') badge = `<span class="status-badge status-no">No Puede</span>`;
+
+            let avatarClass = "av-gold";
+            if (m.instrumento.includes('Batería') || m.instrumento.includes('Percusión')) avatarClass = "av-purple";
+            else if (m.instrumento.includes('Voz') || m.instrumento.includes('Corista')) avatarClass = "av-teal";
+
+            thtml += `
+          <div class="member-row" style="padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <div class="avatar ${avatarClass}" style="width: 28px; height: 28px; font-size: 11px;">${m.nombre.substring(0, 2).toUpperCase()}</div>
+            <div class="member-info">
+              <div class="member-name">${m.nombre}</div>
+              <div class="member-role">${m.instrumento}</div>
+            </div>
+            ${badge}
+          </div>`;
+          });
+        }
+        thtml += `</div>`;
+        tDiv.innerHTML = thtml;
+      });
+    }
+
+    async function actualizarDisponibilidadMusico(dateStr, estado) {
+      if (!dateStr) return;
+      const docRef = doc(db, "planes_servicio", dateStr);
+      const snap = await getDoc(docRef);
+      if (!snap.exists()) {
+        await setDoc(docRef, {
+          fecha: dateStr,
+          cancionesSeleccionadas: {},
+          musicosAsignados: {},
+          disponibilidad: { [activeSessionUser.usuario]: estado },
+          nota_adicional: ""
+        });
+      } else {
+        const data = snap.data();
+        const d = data.disponibilidad || {};
+        d[activeSessionUser.usuario] = estado;
+
+        const payload = { disponibilidad: d };
+        // si declina, lo quitamos del equipo asignado
+        if (estado === 'ausente') {
+          const mAsig = data.musicosAsignados || {};
+          mAsig[activeSessionUser.usuario] = false;
+          payload.musicosAsignados = mAsig;
+        }
+
+        await updateDoc(docRef, payload);
+      }
+    }
+
+    // ====================================================
+    // MOTOR DE TRANSPOSICIÓN Y MODAL DE LETRAS
+    // ====================================================
+    const ACORDES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+    function transponerAcordeUnico(acorde, diff) {
+      const match = acorde.match(/^([A-G][b#]?)(.*)$/);
+      if (!match) return acorde;
+      let base = match[1];
+      let mods = match[2];
+
+      const eq = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
+      if (eq[base]) base = eq[base];
+
+      let i = ACORDES.indexOf(base);
+      if (i === -1) return acorde;
+
+      let newI = (i + diff) % 12;
+      if (newI < 0) newI += 12;
+      let nuevoAcorde = ACORDES[newI];
+
+      if (mods.includes('/')) {
+        let parts = mods.split('/');
+        let bajoMatch = parts[1].match(/^([A-G][b#]?)(.*)$/);
+        if (bajoMatch) {
+          let bBase = bajoMatch[1];
+          if (eq[bBase]) bBase = eq[bBase];
+          let bi = ACORDES.indexOf(bBase);
+          if (bi !== -1) {
+            let bnI = (bi + diff) % 12;
+            if (bnI < 0) bnI += 12;
+            parts[1] = ACORDES[bnI] + bajoMatch[2];
+            mods = parts.join('/');
+          }
+        }
+      }
+      return nuevoAcorde + mods;
+    }
+
+    function renderizarLetraTranspuesta(texto, tonoBase, tonoDestino) {
+      if (!texto) return "";
+
+      let diff = 0;
+      if (tonoBase && tonoDestino) {
+        const eq = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
+        let tb = tonoBase.replace(/m$/, '');
+        let td = tonoDestino.replace(/m$/, '');
+        if (eq[tb]) tb = eq[tb];
+        if (eq[td]) td = eq[td];
+
+        const idxBase = ACORDES.indexOf(tb);
+        const idxDest = ACORDES.indexOf(td);
+
+        if (idxBase !== -1 && idxDest !== -1) {
+          diff = idxDest - idxBase;
+        }
+      }
+
+      const lineas = texto.split('\\n');
+      return lineas.map(linea => {
+        return linea.replace(/([A-G][b#]?(?:m|min|maj|dim|aug|sus|add)?\d?(?:\/[A-G][b#]?)?)/g, (match, p1, offset, fullStr) => {
+          const prevChar = offset > 0 ? fullStr[offset - 1] : ' ';
+          const nextChar = offset + match.length < fullStr.length ? fullStr[offset + match.length] : ' ';
+
+          if (/[a-zA-Z]/.test(prevChar) || /[a-zA-Z]/.test(nextChar)) {
+            return match;
+          }
+
+          if (diff === 0) return `<span class="chord-highlight">${match}</span>`;
+          let trans = transponerAcordeUnico(match, diff);
+          return `<span class="chord-highlight">${trans}</span>`;
+        });
+      }).join('\\n');
+    }
+
+    window.abrirModalLetraGlobal = function (cancionId) {
+      const cache = window._lyricsCache || {};
+      const song = cache[cancionId];
+      if (!song) return;
+      const tonoMostrar = song.tonoServicio || song.tonoBase;
+      document.getElementById('lyrics-modal-title').textContent = song.nombre;
+      document.getElementById('lyrics-modal-meta').textContent = `Tono Original: ${song.tonoBase} | Tono del Servicio: ${tonoMostrar}`;
+      document.getElementById('lyrics-modal-content').innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, tonoMostrar);
+      document.getElementById('lyrics-modal-overlay').classList.add('active');
+    };
+
+    document.getElementById('lyrics-modal-close').addEventListener('click', () => {
+      document.getElementById('lyrics-modal-overlay').classList.remove('active');
+    });
+
+    // ====================================================
+    // FUNCIONES AUXILIARES: TOAST, TONO, ORDEN, CONFIG
+    // ====================================================
+
+    function showToast(msg, options = {}) {
+      const toast = document.getElementById('toast-notification');
+      if (!toast) return;
+      const { duration = 4500, type = 'info' } = options;
+      // Clear previous content
+      toast.innerHTML = '';
+      const messageSpan = document.createElement('span');
+      messageSpan.textContent = msg;
+      toast.appendChild(messageSpan);
+      // X button
+      const closeBtn = document.createElement('button');
+      closeBtn.innerHTML = '&times;';
+      closeBtn.style.background = 'none';
+      closeBtn.style.border = 'none';
+      closeBtn.style.color = 'var(--text2)';
+      closeBtn.style.fontSize = '20px';
+      closeBtn.style.cursor = 'pointer';
+      closeBtn.style.marginLeft = '12px';
+      closeBtn.addEventListener('click', () => {
+        toast.classList.remove('show');
+        clearTimeout(window._toastTimer);
+      });
+      toast.appendChild(closeBtn);
+      toast.classList.add('show');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    function abrirTonePicker(songId, currentTone, songName, dateStr) {
+      const overlay = document.getElementById('tone-picker-overlay');
+      const grid = document.getElementById('tone-picker-grid');
+      document.getElementById('tone-picker-song-name').textContent = songName;
+
+      const keys = ['C', 'Cm', 'C#', 'C#m', 'D', 'Dm', 'D#', 'D#m', 'E', 'Em', 'F', 'Fm', 'F#', 'F#m', 'G', 'Gm', 'G#', 'G#m', 'A', 'Am', 'A#', 'A#m', 'B', 'Bm'];
+      grid.innerHTML = keys.map(k =>
+        `<button class="tone-grid-btn ${k === currentTone ? 'current' : ''}" data-key="${k}">${k}</button>`
+      ).join('');
+
+      grid.querySelectorAll('.tone-grid-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const newTone = btn.dataset.key;
+          overlay.classList.remove('active');
+          const path = `cancionesSeleccionadas.${songId}`;
+          const cambioPath = `cambiosTono.${songId}`;
+          await updateDoc(doc(db, "planes_servicio", dateStr), {
+            [path]: newTone,
+            [cambioPath]: {
+              usuario: activeSessionUser.nombre,
+              tono: newTone,
+              timestamp: Date.now()
+            }
+          });
+        });
+      });
+
+      overlay.classList.add('active');
+    }
+
+    document.getElementById('tone-picker-close').addEventListener('click', () => {
+      document.getElementById('tone-picker-overlay').classList.remove('active');
+    });
+
+    async function moverCancionOrden(songId, dir, allSelected, currentOrder, dateStr, type) {
+      // Filtrar canciones del mismo tipo
+      const songsOfType = allSelected.filter(s => s.tipo === type);
+      const idsOfType = songsOfType.map(s => s.id);
+
+      let orden = currentOrder.length > 0 ? [...currentOrder] : [];
+
+      // Filtrar la ordenación actual para incluir solo las del tipo correspondiente
+      let ordenFiltered = orden.filter(id => idsOfType.includes(id));
+
+      // Asegurar que todas las seleccionadas de este tipo estén en la lista
+      idsOfType.forEach(id => {
+        if (!ordenFiltered.includes(id)) {
+          ordenFiltered.push(id);
+        }
+      });
+
+      const idx = ordenFiltered.indexOf(songId);
+      if (idx === -1) return;
+      const newIdx = idx + dir;
+      if (newIdx < 0 || newIdx >= ordenFiltered.length) return;
+
+      // Intercambiar posiciones
+      [ordenFiltered[idx], ordenFiltered[newIdx]] = [ordenFiltered[newIdx], ordenFiltered[idx]];
+
+      // Reconstruir la lista final de ordenación: Adoración primero, Alabanza después
+      const otherType = type === 'adoracion' ? 'alabanza' : 'adoracion';
+      const otherSongs = allSelected.filter(s => s.tipo === otherType);
+      const otherIds = otherSongs.map(s => s.id);
+
+      let otherOrderFiltered = orden.filter(id => otherIds.includes(id));
+      otherIds.forEach(id => {
+        if (!otherOrderFiltered.includes(id)) {
+          otherOrderFiltered.push(id);
+        }
+      });
+
+      // Armar el array final respetando la regla: Adoración primero, Alabanza después
+      const finalOrder = type === 'adoracion'
+        ? [...ordenFiltered, ...otherOrderFiltered]
+        : [...otherOrderFiltered, ...ordenFiltered];
+
+      await updateDoc(doc(db, "planes_servicio", dateStr), { ordenCanciones: finalOrder });
+    }
+
+    // --- Configuración: Enlace de WhatsApp ---
+    async function cargarConfiguracion() {
+      try {
+        const snap = await getDoc(doc(db, "config", "app_settings"));
+        if (snap.exists() && snap.data().whatsapp_link) {
+          window._whatsappGroupLink = snap.data().whatsapp_link;
+          const input = document.getElementById('whatsapp-group-link-input');
+          if (input) input.value = window._whatsappGroupLink;
+        }
+      } catch (e) { console.error('Error cargando config:', e); }
+    }
+
+    document.getElementById('btn-save-whatsapp-link').addEventListener('click', async () => {
+      const link = document.getElementById('whatsapp-group-link-input').value.trim();
+      try {
+        await setDoc(doc(db, "config", "app_settings"), { whatsapp_link: link }, { merge: true });
+        window._whatsappGroupLink = link;
+        const status = document.getElementById('whatsapp-link-status');
+        status.textContent = '✅ Enlace guardado correctamente';
+        setTimeout(() => status.textContent = '', 3500);
+      } catch (e) { alert('Error al guardar: ' + e.message); }
+    });
+
+    // ====================================================
+    // LISTA Y GESTIÓN DE CANCIONES SELECCIONADAS (LÍDER)
+    // ====================================================
+    function renderSelectedSongsAdmin(dataServicio) {
+      const cont = document.getElementById('admin-selected-songs-container');
+      if (!cont) return;
+
+      const cancionesSeleccionadas = dataServicio.cancionesSeleccionadas || {};
+      const selectedIds = Object.keys(cancionesSeleccionadas).filter(k => cancionesSeleccionadas[k] !== false);
+      const ordenCanciones = dataServicio.ordenCanciones || [];
+      const customSongsMetadata = dataServicio.customSongsMetadata || {};
+      const dateStr = serviceDateSelect.value;
+
+      let allSelected = [];
+      selectedIds.forEach(id => {
+        if (id.startsWith('custom_')) {
+          const meta = customSongsMetadata[id];
+          if (meta) {
+            allSelected.push({
+              id: id,
+              nombre: meta.nombre,
+              artista: meta.artista || "Personalizada",
+              tonoBase: meta.tonoBase,
+              tipo: meta.tipo,
+              isCustom: true
+            });
+          }
+        } else {
+          const song = cacheSongs.find(s => s.id === id);
+          if (song) {
+            allSelected.push(song);
+          }
+        }
+      });
+
+      // Ordenar por ordenCanciones
+      allSelected.sort((a, b) => {
+        const ia = ordenCanciones.indexOf(a.id);
+        const ib = ordenCanciones.indexOf(b.id);
+        if (ia === -1 && ib === -1) return 0;
+        if (ia === -1) return 1;
+        if (ib === -1) return -1;
+        return ia - ib;
+      });
+
+      if (allSelected.length === 0) {
+        cont.innerHTML = `<p style="color: var(--text3); font-size: 13px; text-align: center; padding: 10px;">No hay canciones seleccionadas aún.</p>`;
+        return;
+      }
+
+      const adoraciones = allSelected.filter(s => s.tipo === 'adoracion');
+      const alabanzas = allSelected.filter(s => s.tipo === 'alabanza');
+
+      let html = "";
+
+      const renderAdminGroup = (songs, titulo, color, emoji, startNum, type) => {
+        if (songs.length === 0) return "";
+        let g = `<h4 style="font-size:11px;text-transform:uppercase;color:var(--${color});letter-spacing:0.8px;margin:12px 0 6px;">${emoji} ${titulo}</h4>`;
+        songs.forEach((s, i) => {
+          const tone = cancionesSeleccionadas[s.id];
+          const num = startNum + i;
+          g += `
+          <div class="musico-song-card" style="padding: 10px; margin-bottom: 6px; background: var(--bg2);">
+            <!-- Extremo Izquierdo: Reordenamiento y Número -->
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="song-order-btns">
+                <button class="order-btn btn-admin-order-up" data-song-id="${s.id}" data-type="${type}">▲</button>
+                <button class="order-btn btn-admin-order-down" data-song-id="${s.id}" data-type="${type}">▼</button>
+              </div>
+              <div class="song-num" style="font-size:24px; min-width: 24px;">${num}</div>
+            </div>
+            
+            <!-- Centro: Info -->
+            <div class="song-card-info" style="margin-left: 4px;">
+              <div class="song-card-name" style="font-size:14px;">${s.nombre}</div>
+              <div class="song-card-artist" style="font-size:11px;">${s.artista}</div>
+            </div>
+            
+            <!-- Extremo Derecho: Tono -->
+            <div style="display:flex; align-items:center;">
+              <div class="tone-indicator" style="font-size:12px; margin-left:auto; margin-right:10px; padding: 4px 10px; cursor:pointer;" onclick="window.abrirTonePickerAdmin('${s.id}', '${tone}', '${s.nombre.replace(/'/g, "\\'")}', '${dateStr}')">${tone}</div>
+            </div>
+            
+            <!-- Botón Quitar en Esquina Superior Derecha -->
+            <button class="btn-delete-selected-admin btn-remove-song" data-song-id="${s.id}" title="Quitar canción">✕</button>
+          </div>
+        `;
+        });
+        return g;
+      };
+
+      html += renderAdminGroup(adoraciones, 'Adoración (Lentas)', 'purple', '🙏', 1, 'adoracion');
+      html += renderAdminGroup(alabanzas, 'Alabanza (Rápidas)', 'teal', '🔥', adoraciones.length + 1, 'alabanza');
+
+      cont.innerHTML = html;
+
+      // Bind reordering click events
+      cont.querySelectorAll('.btn-admin-order-up').forEach(btn => {
+        btn.addEventListener('click', () => moverCancionOrden(btn.dataset.songId, -1, allSelected, ordenCanciones, dateStr, btn.dataset.type));
+      });
+      cont.querySelectorAll('.btn-admin-order-down').forEach(btn => {
+        btn.addEventListener('click', () => moverCancionOrden(btn.dataset.songId, 1, allSelected, ordenCanciones, dateStr, btn.dataset.type));
+      });
+
+      // Bind remove button
+      cont.querySelectorAll('.btn-delete-selected-admin').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const songId = btn.dataset.songId;
+          const sName = cacheSongs.find(s => s.id === songId)?.nombre || (customSongsMetadata[songId]?.nombre) || "Canción";
+          if (confirm(`⚠️ ATENCIÓN:\nSi quitas "${sName}", se eliminará de la vista de TODO el equipo y tendrás que agregarla de nuevo si te equivocas.\n\n¿Quieres continuar y quitarla?`)) {
+            const path = `cancionesSeleccionadas.${songId}`;
+            await updateDoc(doc(db, "planes_servicio", dateStr), {
+              [path]: false
+            });
+            showToast(`🗑️ "${sName}" quitada del servicio`);
+          }
+        });
+      });
+    }
+
+    window.abrirTonePickerAdmin = function (songId, currentTone, songName, dateStr) {
+      abrirTonePicker(songId, currentTone, songName, dateStr);
+    };
+
+    // ====================================================
+    // MODAL DE BÚSQUEDA Y ADICIÓN DE CANCIONES
+    // ====================================================
+    function renderAddSongResults(type, filterText) {
+      const resultsCont = document.getElementById('musico-add-song-results');
+      if (!resultsCont) return;
+
+      resultsCont.innerHTML = "";
+
+      const dataServicio = window._currentServiceData || {};
+      const cancionesSeleccionadas = dataServicio.cancionesSeleccionadas || {};
+      const selectedIds = Object.keys(cancionesSeleccionadas).filter(k => cancionesSeleccionadas[k] !== false);
+
+      // Filtrar canciones del tipo correcto que coincidan y no estén ya agregadas
+      const filtered = cacheSongs.filter(s => {
+        const matchType = (s.tipo || "").toLowerCase() === (type || "").toLowerCase();
+        const sNombre = s.nombre || "";
+        const sArtista = s.artista || "";
+        const matchSearch = sNombre.toLowerCase().includes(filterText) || sArtista.toLowerCase().includes(filterText);
+        const notAlreadySelected = !selectedIds.includes(s.id);
+        return matchType && matchSearch && notAlreadySelected;
+      });
+
+      if (filtered.length === 0) {
+        resultsCont.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:15px;">No se encontraron canciones disponibles en la biblioteca.</p>`;
+        return;
+      }
+
+      filtered.forEach(s => {
+        const div = document.createElement('div');
+        div.className = "member-row";
+        div.style.justifyContent = "space-between";
+        div.style.padding = "8px 0";
+        div.innerHTML = `
+        <div class="member-info">
+          <div class="member-name" style="font-size:13px;">${s.nombre}</div>
+          <div class="member-role" style="font-size:11px;">${s.artista} | Tono sugerido: <b>${s.tonoBase}</b></div>
+        </div>
+        <button class="chip chip-teal btn-add-song-select" style="cursor:pointer; border:none; padding:6px 12px; font-weight:600;" data-id="${s.id}">
+          ➕ Agregar
+        </button>
+      `;
+        div.querySelector('.btn-add-song-select').addEventListener('click', async () => {
+          const songId = s.id;
+          const dateStr = serviceDateSelect.value || document.getElementById('musico-service-date').value;
+          const path = `cancionesSeleccionadas.${songId}`;
+
+          const docRef = doc(db, "planes_servicio", dateStr);
+          const currentOrder = dataServicio.ordenCanciones || [];
+          await updateDoc(docRef, {
+            [path]: s.tonoBase,
+            ordenCanciones: [...currentOrder, songId]
+          });
+
+          document.getElementById('musico-add-song-modal').classList.remove('active');
+          showToast(`🎵 "${s.nombre}" agregada al servicio`);
+        });
+        resultsCont.appendChild(div);
+      });
+    }
+
+    // Listener para el buscador en tiempo real del modal
+    const modalSearchInput = document.getElementById('musico-add-song-search');
+    if (modalSearchInput) {
+      modalSearchInput.addEventListener('input', () => {
+        const filterText = modalSearchInput.value.toLowerCase().trim();
+        renderAddSongResults(window._targetAddSongType, filterText);
+      });
+    }
+
+    // Cerrar modal
+    const btnCloseAddModal = document.getElementById('musico-add-song-close');
+    if (btnCloseAddModal) {
+      btnCloseAddModal.addEventListener('click', () => {
+        document.getElementById('musico-add-song-modal').classList.remove('active');
+      });
+    }
+
+    // Agregar canción personalizada
+    const btnAddCustomSong = document.getElementById('btn-musico-add-custom');
+    if (btnAddCustomSong) {
+      btnAddCustomSong.addEventListener('click', async () => {
+        const customName = document.getElementById('musico-custom-name').value.trim();
+        const customArtist = document.getElementById('musico-custom-artist').value.trim() || "Personalizada";
+        const customTone = document.getElementById('musico-custom-tone').value;
+        const type = window._targetAddSongType;
+
+        if (!customName) {
+          alert("Por favor escribe el nombre de la canción.");
+          return;
+        }
+
+        const dateStr = serviceDateSelect.value || document.getElementById('musico-service-date').value;
+        const customId = 'custom_' + Date.now();
+
+        const docRef = doc(db, "planes_servicio", dateStr);
+        const dataServicio = window._currentServiceData || {};
+        const currentOrder = dataServicio.ordenCanciones || [];
+
+        await updateDoc(docRef, {
+          [`cancionesSeleccionadas.${customId}`]: customTone,
+          [`customSongsMetadata.${customId}`]: {
+            nombre: customName,
+            artista: customArtist,
+            tonoBase: customTone,
+            tipo: type
+          },
+          ordenCanciones: [...currentOrder, customId]
+        });
+
+        document.getElementById('musico-add-song-modal').classList.remove('active');
+        showToast(`🚀 "${customName}" agregada de forma personalizada`);
+      });
+    }
+
+    // Bind para los botones "+" en la vista de Líder/Admin
+    document.querySelectorAll('.btn-add-song-trigger').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.dataset.type;
+        window._targetAddSongType = type;
+
+        document.getElementById('musico-add-song-title').textContent = `Agregar a ${type === 'adoracion' ? 'Adoración' : 'Alabanza'}`;
+        document.getElementById('musico-add-song-search').value = "";
+        document.getElementById('musico-custom-name').value = "";
+        document.getElementById('musico-custom-artist').value = "";
+        document.getElementById('musico-custom-tone').value = "C";
+
+        renderAddSongResults(type, "");
+
+        document.getElementById('musico-add-song-modal').classList.add('active');
+      });
+    });
+
+    // ====================================================
+    // CONFIGURACIÓN Y LISTENER DEL BOTÓN S.O.S (MÚSICOS)
+    // ====================================================
+    const btnMusicoSos = document.getElementById('btn-musico-sos');
+    if (btnMusicoSos) {
+      btnMusicoSos.addEventListener('click', () => {
+        const userName = activeSessionUser ? activeSessionUser.nombre : "Usuario";
+        const msg = `🚨 *${userName}* necesita asistencia (S.O.S) 🚨`;
+        const encodedMsg = encodeURIComponent(msg);
+
+        const groupLink = (window._whatsappGroupLink || "").trim();
+        let waUrl;
+        if (groupLink && groupLink.startsWith('https://wa.me/')) {
+          waUrl = groupLink.split('?')[0] + '?text=' + encodedMsg;
+        } else if (groupLink) {
+          waUrl = groupLink + (groupLink.includes('?') ? '&' : '?') + 'text=' + encodedMsg;
+        } else {
+          waUrl = 'https://api.whatsapp.com/send?text=' + encodedMsg;
+        }
+
+        const a = document.createElement('a');
+        a.href = waUrl;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      });
+    }
+
+    // REGISTRO DE SERVICE WORKER PARA SOPORTE PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('PWA Service Worker registrado:', reg.scope))
+          .catch(err => console.error('Error de registro de Service Worker:', err));
+      });
+    }
+  </script>
+  <!-- Admin Repertorio Modal -->
+  <div class="modal-overlay" id="admin-repertorio-modal">
+    <div class="modal-box">
+      <h2 class="modal-title">Nuevo / Editar Repertorio</h2>
+      <p class="modal-subtitle">Etiqueta (editable, por defecto YYYY-MM-DD-N)</p>
+      <input type="text" id="repertorio-etiqueta" placeholder="Etiqueta"
+        style="width:100%; margin-bottom:12px; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text);">
+      <button class="btn-primary" id="btn-save-repertorio"
+        style="background: var(--teal); color:#0f0e17;">Guardar</button>
+      <button class="btn-primary" id="btn-cancel-repertorio"
+        style="background: var(--coral); color:#0f0e17; margin-left:8px;">Cancelar</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="admin-ensayo-modal">
+    <div class="modal-box" style="max-width: 500px; max-height: 90vh; overflow-y: auto;">
+      <h2 class="modal-title">Nuevo / Editar Ensayo</h2>
+      <p class="modal-subtitle">Nombre del ensayo</p>
+      <input type="text" id="ensayo-nombre" placeholder="Ej: Ensayo General"
+        style="width:100%; margin-bottom:12px; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text);">
+      <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+        <div style="flex: 1;">
+          <label for="ensayo-fecha" style="font-size:12px; margin-bottom:4px; display:block;">Fecha del Ensayo</label>
+          <input type="date" id="ensayo-fecha"
+            style="width:100%; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text);">
+        </div>
+        <div style="width: 120px;">
+          <label for="ensayo-hora" style="font-size:12px; margin-bottom:4px; display:block;">Hora</label>
+          <input type="time" id="ensayo-hora"
+            style="width:100%; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text);">
+        </div>
+      </div>
+      <p class="modal-subtitle" style="margin-top:8px;">Selecciona los integrantes invitados (todos los miembros de la
+        nómina)</p>
+      <div id="ensayo-miembros-list"
+        style="max-height:150px; overflow-y:auto; border:1px solid var(--border2); border-radius:var(--radius-sm); padding:8px; background:var(--bg2); margin-bottom: 12px;">
+      </div>
+      <p class="modal-subtitle" style="margin-top:8px;">Selecciona las canciones para ensayar</p>
+      <div id="ensayo-canciones-list"
+        style="max-height:150px; overflow-y:auto; border:1px solid var(--border2); border-radius:var(--radius-sm); padding:8px; background:var(--bg2); margin-bottom: 12px;">
+        <!-- Las canciones de la biblioteca se cargarán aquí con checkboxes -->
+      </div>
+      <button class="btn-primary" id="btn-save-ensayo"
+        style="background: var(--teal); color:#0f0e17; margin-top:12px;">Guardar Ensayo</button>
+      <button class="btn-primary" id="btn-cancel-ensayo"
+        style="background: var(--coral); color:#0f0e17; margin-left:8px;">Cancelar</button>
+    </div>
+  </div>
+</body>
