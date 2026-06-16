@@ -1408,6 +1408,93 @@
     body.theme-light .theme-btn:active {
       background: rgba(0, 0, 0, 0.05);
     }
+
+    /* Responsive adjustment for top tabs menu centering and overflow */
+    .nav-tabs {
+      justify-content: center;
+    }
+
+    @media (max-width: 650px) {
+      .nav-tabs {
+        justify-content: flex-start !important;
+      }
+    }
+
+    /* Avatar styling and upload indicators */
+    .user-avatar-container {
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .user-avatar-container:hover .avatar {
+      transform: scale(1.08);
+      border-color: var(--teal) !important;
+    }
+    
+    .user-avatar-container::after {
+      content: '📷';
+      position: absolute;
+      bottom: -3px;
+      right: -3px;
+      font-size: 9px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 50%;
+      width: 14px;
+      height: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+    
+    body.theme-light .user-avatar-container::after {
+      background: #ffffff;
+      border-color: rgba(0,0,0,0.15);
+    }
+
+    /* Hide text on mobile for tighter header fit */
+    @media (max-width: 480px) {
+      .hide-mobile {
+        display: none !important;
+      }
+      .app-header {
+        padding: 12px 12px 0 !important;
+      }
+      .logo {
+        font-size: 19px !important;
+      }
+      .logo span {
+        font-size: 13px !important;
+      }
+      .role-badge {
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 4px 8px !important;
+        font-size: 11px !important;
+      }
+      .theme-btn, .sos-btn, .btn-logout {
+        padding: 4px 6px !important;
+        min-width: unset !important;
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 11px !important;
+      }
+      .user-avatar-container .avatar {
+        width: 28px !important;
+        height: 28px !important;
+      }
+      .user-avatar-container::after {
+        width: 12px;
+        height: 12px;
+        font-size: 7px;
+        bottom: -2px;
+        right: -2px;
+      }
+    }
   </style>
 </head>
 
@@ -1435,9 +1522,12 @@
   <div id="screen-dashboard" class="screen">
     <header class="app-header">
       <div class="logo">Alabanza <span>IMR4</span></div>
-      <div style="display: flex; gap: 10px; align-items: center;">
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <div class="user-avatar-container" style="position: relative; cursor: pointer;" id="leader-avatar-container" title="Subir foto de perfil">
+          <div id="leader-avatar" class="avatar" style="width: 32px; height: 32px; font-size: 13px; background-size: cover; background-position: center; border: 1.5px solid var(--border2); transition: transform 0.2s;"></div>
+        </div>
         <span class="role-badge" id="display-role">Cargando...</span>
-        <button class="btn-logout" id="btn-logout">Salir</button>
+        <button class="btn-logout" id="btn-logout"><span class="hide-mobile">Salir </span>🚪</button>
       </div>
     </header>
     <script>
@@ -1871,7 +1961,7 @@
           cont.innerHTML = '';
           ensayos.forEach(e => {
             const totalMiembros = e.miembros ? e.miembros.length : 0;
-            const confirmados = Object.values(e.confirmaciones || {}).filter(v => v === true).length;
+            const confirmados = Object.values(e.confirmaciones || {}).filter(v => v === true || v === 'confirmado').length;
             const songNames = (e.canciones || []).map(sid => {
               const s = (window.cacheSongs || []).find(x => x.id === sid);
               const toneStr = (e.tonos && e.tonos[sid]) ? ` (${e.tonos[sid]})` : (s ? ` (${s.tonoBase})` : '');
@@ -1988,10 +2078,18 @@
           miembros.forEach(uid => {
             const m = (window.cacheMembers || []).find(x => x.usuario === uid);
             const nombre = m ? m.nombre : uid;
-            const estado = confs[uid] === true ? '✅ Confirmado' : '❌ Sin confirmar';
+            const statusVal = confs[uid];
+            let estado = '❌ Sin confirmar';
+            if (statusVal === true || statusVal === 'confirmado') {
+              estado = '✅ Confirmado';
+            } else if (statusVal === 'indeciso') {
+              estado = '❓ No sé aún';
+            } else if (statusVal === false || statusVal === 'ausente') {
+              estado = '❌ No puede';
+            }
             lista += `\n  • ${nombre}: ${estado}`;
           });
-          const confirmed = Object.values(confs).filter(v => v === true).length;
+          const confirmed = Object.values(confs).filter(v => v === true || v === 'confirmado').length;
           alert(`Ensayo: ${data.nombre}\nFecha: ${data.fecha}${data.hora ? ' ⏰ ' + data.hora : ''}\nConfirmados: ${confirmed}/${miembros.length}\n${lista}`);
         });
       }
@@ -2027,54 +2125,97 @@
           });
 
           filtered.forEach(e => {
-            const confirmed = e.confirmaciones && e.confirmaciones[musicoId] === true;
+            const statusVal = e.confirmaciones && e.confirmaciones[musicoId];
+            let status = 'pendiente';
+            if (statusVal === true || statusVal === 'confirmado') {
+              status = 'confirmado';
+            } else if (statusVal === 'indeciso') {
+              status = 'indeciso';
+            } else if (statusVal === false || statusVal === 'ausente') {
+              status = 'ausente';
+            }
 
-            // Build songs HTML with YouTube links and keys
+            let statusText = 'Mi asistencia: <span style="color:var(--text3);">Sin confirmar</span>';
+            if (status === 'confirmado') {
+              statusText = 'Mi asistencia: <span style="color:var(--teal); font-weight:bold;">✅ Confirmado</span>';
+            } else if (status === 'indeciso') {
+              statusText = 'Mi asistencia: <span style="color:var(--gold); font-weight:bold;">❓ No sé aún</span>';
+            } else if (status === 'ausente') {
+              statusText = 'Mi asistencia: <span style="color:var(--coral); font-weight:bold;">❌ No puedo asistir</span>';
+            }
+
+            let borderColor = 'var(--border2)';
+            if (status === 'confirmado') borderColor = 'var(--teal)';
+            else if (status === 'indeciso') borderColor = 'var(--gold)';
+            else if (status === 'ausente') borderColor = 'var(--coral)';
+
+            // Build compact songs summary
             const songIds = e.canciones || [];
-            let songsHtml = '';
+            let songsSummaryHtml = '';
             if (songIds.length > 0) {
-              songsHtml = '<div style="margin-top:10px; border-top:1px solid var(--border); padding-top:8px;">';
-              songsHtml += '<div style="font-size:10px; text-transform:uppercase; color:var(--gold); letter-spacing:0.8px; margin-bottom:8px;">🎶 Canciones a ensayar</div>';
-              songIds.forEach((sid, idx) => {
+              const summaryItems = [];
+              songIds.forEach(sid => {
                 const s = (window.cacheSongs || []).find(x => x.id === sid);
                 if (!s) return;
                 const displayTone = (e.tonos && e.tonos[sid]) ? e.tonos[sid] : s.tonoBase;
-                const ytLink = s.youtube && s.youtube.trim()
-                  ? `<a href="${s.youtube}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:4px; background:rgba(255,0,0,0.12); color:#ff4444; border:1px solid rgba(255,0,0,0.25); border-radius:6px; padding:3px 8px; font-size:10px; font-weight:600; text-decoration:none; margin-left:8px;">▶ YouTube</a>`
-                  : '';
-                songsHtml += `<div style="display:flex; align-items:center; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
-                <span style="font-size:18px; color:var(--teal); min-width:28px; text-align:center;">${idx + 1}</span>
-                <div style="flex:1; min-width:0;">
-                  <div style="font-size:13px; font-weight:500; color:var(--text);">${s.nombre} <span style="background:rgba(244,197,66,0.12); color:var(--gold); font-size:11px; padding:1px 5px; border-radius:4px; font-weight:600; border: 1px solid rgba(244,197,66,0.25); margin-left: 6px;">${displayTone}</span></div>
-                  <div style="font-size:11px; color:var(--text3);">${s.artista} · <span class="chip-type chip-${s.tipo}">${s.tipo}</span></div>
-                </div>
-                ${ytLink}
-              </div>`;
+                summaryItems.push(`<span style="white-space:nowrap; color: var(--text2);">${s.nombre} <b style="color:var(--gold); font-size:11px;">(${displayTone})</b></span>`);
               });
-              songsHtml += '</div>';
+              songsSummaryHtml = `
+                <div style="margin-top:10px; font-size:12px; color:var(--text3); border-top:1px solid var(--border); padding-top:8px; display:flex; flex-wrap:wrap; gap:6px 12px; align-items:center;">
+                  <span style="font-weight:600; color:var(--gold); text-transform:uppercase; font-size:10px; letter-spacing:0.5px;">Setlist:</span>
+                  ${summaryItems.join(' • ')}
+                </div>
+              `;
             }
 
             const card = document.createElement('div');
             card.className = 'card';
-            card.style.cssText = `margin-bottom:14px; border-color:${confirmed ? 'var(--gold)' : 'var(--teal)'};`;
+            card.style.cssText = `margin-bottom:14px; border-color:${borderColor};`;
             card.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
-              <div style="flex:1; min-width:0;">
-                <div style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:2px;">🎵 ${e.nombre}</div>
-                <div style="font-size:12px; color:var(--teal);">📅 ${e.fecha}${e.hora ? ' &nbsp;⏰ <b>' + e.hora + '</b>' : ''}</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:2px;">🎵 ${e.nombre}</div>
+                  <div style="font-size:12px; color:var(--teal);">📅 ${e.fecha}${e.hora ? ' &nbsp;⏰ <b>' + e.hora + '</b>' : ''}</div>
+                </div>
               </div>
-              <button class="btn-confirm-ensayo btn-primary" data-id="${e.id}" style="background:${confirmed ? 'var(--gold)' : 'var(--teal)'}; color:#0f0e17; width:auto; padding:8px 14px; margin-top:0; margin-left:10px; flex-shrink:0; font-size:12px;">${confirmed ? '✅ Confirmado' : 'Confirmar'}</button>
-            </div>
-            ${songsHtml}
-          `;
-            card.querySelector('.btn-confirm-ensayo').addEventListener('click', (ev) => {
-              toggleEnsayoConfirm(e.id, musicoId, ev.currentTarget);
+              
+              ${songsSummaryHtml}
+
+              <button class="btn-practice-ensayo btn-primary" style="margin-top: 12px; background: rgba(155, 143, 255, 0.12); border: 1.5px solid rgba(155, 143, 255, 0.3); color: var(--purple); font-weight: 600; font-size: 13px; padding: 12px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                🎸 Entrar a Ensayo / Practicar Letras
+              </button>
+
+              <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--border); padding-top: 10px;">
+                <div id="status-text-${e.id}" style="font-size: 12px; color: var(--text2); font-weight: 500; margin-bottom: 4px;">
+                  ${statusText}
+                </div>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                  <button class="btn-ensayo-status btn-primary" data-status="confirmado" data-id="${e.id}" style="margin-top:0; font-size:11px; padding:8px 10px; flex:1; min-width: 75px; background: var(--teal); color: #0f0e17; opacity: ${status === 'confirmado' ? '1' : '0.35'}; box-shadow: ${status === 'confirmado' ? '0 0 10px rgba(78,205,196,0.3)' : 'none'}; font-weight: 600;">Voy a ir</button>
+                  <button class="btn-ensayo-status btn-primary" data-status="indeciso" data-id="${e.id}" style="margin-top:0; font-size:11px; padding:8px 10px; flex:1; min-width: 75px; background: var(--gold); color: #0f0e17; opacity: ${status === 'indeciso' ? '1' : '0.35'}; box-shadow: ${status === 'indeciso' ? '0 0 10px rgba(244,197,66,0.3)' : 'none'}; font-weight: 600;">No sé aún</button>
+                  <button class="btn-ensayo-status btn-primary" data-status="ausente" data-id="${e.id}" style="margin-top:0; font-size:11px; padding:8px 10px; flex:1; min-width: 75px; background: var(--coral); color: #0f0e17; opacity: ${status === 'ausente' ? '1' : '0.35'}; box-shadow: ${status === 'ausente' ? '0 0 10px rgba(255,107,107,0.3)' : 'none'}; font-weight: 600;">No puedo</button>
+                </div>
+              </div>
+            `;
+
+            card.querySelectorAll('.btn-ensayo-status').forEach(btn => {
+              btn.addEventListener('click', (ev) => {
+                const targetStatus = ev.currentTarget.dataset.status;
+                cambiarEstadoEnsayo(e.id, targetStatus);
+              });
             });
+
+            card.querySelector('.btn-practice-ensayo').addEventListener('click', () => {
+              window.abrirModoEnsayoMusico(e);
+            });
+
             cont.appendChild(card);
           });
 
-          // 🔴 Update tab badge for pending rehearsals
-          const hasUnconfirmed = filtered.some(e => !(e.confirmaciones && e.confirmaciones[musicoId] === true));
+          // 🔴 Update tab badge for pending rehearsals (only if status is undefined/null)
+          const hasUnconfirmed = filtered.some(e => {
+            const v = e.confirmaciones && e.confirmaciones[musicoId];
+            return v === undefined || v === null;
+          });
           const tabBtn = document.getElementById('nav-tab-ensayos-musico');
           if (tabBtn) {
             let dot = tabBtn.querySelector('.red-badge-dot');
@@ -2096,11 +2237,14 @@
           if (futureEnsayos.length > 0) {
             const ensayoToShow = futureEnsayos.find(e => {
               const lastSeenKey = `rehearsal_reminder_${e.id}_${todayStr}`;
-              return localStorage.getItem(lastSeenKey) !== 'true';
+              const v = e.confirmaciones && e.confirmaciones[musicoId];
+              const hasResponded = v !== undefined && v !== null;
+              return !hasResponded && localStorage.getItem(lastSeenKey) !== 'true';
             });
 
             if (ensayoToShow) {
-              const isConfirmed = ensayoToShow.confirmaciones && ensayoToShow.confirmaciones[musicoId] === true;
+              const statusVal = ensayoToShow.confirmaciones && ensayoToShow.confirmaciones[musicoId];
+              const isConfirmed = statusVal === true || statusVal === 'confirmado';
               
               // Calculate remaining days
               const today = new Date();
@@ -2148,7 +2292,7 @@
                     confirmBtn.style.display = 'block';
                     confirmBtn.onclick = () => {
                       const docRef = doc(db, 'ensayos', ensayoToShow.id);
-                      updateDoc(docRef, { [`confirmaciones.${musicoId}`]: true }).then(() => {
+                      updateDoc(docRef, { [`confirmaciones.${musicoId}`]: 'confirmado' }).then(() => {
                         showToast('✅ Asistencia confirmada');
                         reminderModal.classList.remove('active');
                       });
@@ -2173,22 +2317,117 @@
         });
       }
 
-      function toggleEnsayoConfirm(ensayoId, userId, btnElem) {
+      function cambiarEstadoEnsayo(ensayoId, statusVal) {
+        const musicoId = activeSessionUser?.usuario;
+        if (!musicoId) return;
         const docRef = doc(db, 'ensayos', ensayoId);
-        getDoc(docRef).then(snap => {
-          if (!snap.exists()) return;
-          const data = snap.data();
-          const current = !!(data.confirmaciones && data.confirmaciones[userId]);
-          const newVal = !current;
-          updateDoc(docRef, { [`confirmaciones.${userId}`]: newVal }).then(() => {
-            btnElem.textContent = newVal ? '✅ Confirmado' : 'Confirmar';
-            btnElem.style.background = newVal ? 'var(--gold)' : 'var(--teal)';
-            // update card border
-            const parentCard = btnElem.closest('.card');
-            if (parentCard) parentCard.style.borderColor = newVal ? 'var(--gold)' : 'var(--teal)';
-            showToast(newVal ? '✅ Asistencia confirmada' : '❌ Confirmación cancelada');
-          });
+        updateDoc(docRef, { [`confirmaciones.${musicoId}`]: statusVal }).then(() => {
+          showToast(`✅ Asistencia actualizada: ${statusVal === 'confirmado' ? 'Confirmado' : statusVal === 'indeciso' ? 'No sé aún' : 'No puedo'}`);
+        }).catch(err => {
+          console.error("Error al actualizar asistencia:", err);
+          showToast("❌ Error al guardar asistencia");
         });
+      }
+
+      window.abrirModoEnsayoMusico = function (e) {
+        const titleEl = document.getElementById('practice-modal-title');
+        const subtitleEl = document.getElementById('practice-modal-subtitle');
+        if (titleEl) titleEl.textContent = e.nombre || 'Lista de Ensayo';
+        if (subtitleEl) subtitleEl.textContent = `Fecha: ${e.fecha || ''} ${e.hora ? ' | Hora: ' + e.hora : ''}`;
+
+        const rehearsalSongs = [];
+        (e.canciones || []).forEach(sid => {
+          const s = (window.cacheSongs || []).find(x => x.id === sid);
+          if (s) {
+            const tone = (e.tonos && e.tonos[sid]) ? e.tonos[sid] : s.tonoBase;
+            
+            // Setup in lyrics cache
+            window._lyricsCache = window._lyricsCache || {};
+            window._lyricsCache[sid] = {
+              id: s.id,
+              nombre: s.nombre,
+              tonoBase: s.tonoBase,
+              tonoServicio: tone,
+              letra: s.letra || "",
+              youtube: s.youtube || ""
+            };
+
+            rehearsalSongs.push({
+              id: s.id,
+              nombre: s.nombre,
+              artista: s.artista || "",
+              tonoBase: s.tonoBase,
+              tonoServicio: tone,
+              letra: s.letra || "",
+              youtube: s.youtube || ""
+            });
+          }
+        });
+
+        // Overwrite current songs for transposer pagination
+        window._currentServiceSongs = rehearsalSongs;
+
+        const songsCont = document.getElementById('practice-modal-songs');
+        if (!songsCont) return;
+        songsCont.innerHTML = '';
+
+        if (rehearsalSongs.length === 0) {
+          songsCont.innerHTML = `<p style="color:var(--text3); font-size:13px; text-align:center; padding:20px;">Este ensayo no tiene canciones asignadas.</p>`;
+        } else {
+          rehearsalSongs.forEach((s, idx) => {
+            const num = idx + 1;
+            const hasLetra = s.letra && s.letra.trim() !== "";
+            const hasYoutube = s.youtube && s.youtube.trim() !== "";
+            
+            const isAlabanza = (s.tipo || 'alabanza').trim().toLowerCase() === 'alabanza';
+            const cardBorder = isAlabanza 
+              ? 'border-left: 4px solid var(--teal); border-color: rgba(78, 205, 196, 0.25);' 
+              : 'border-left: 4px solid var(--purple); border-color: rgba(155, 143, 255, 0.25);';
+            const numColor = isAlabanza ? 'color: rgba(78, 205, 196, 0.4);' : 'color: rgba(155, 143, 255, 0.4);';
+            const badgeStyle = isAlabanza
+              ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
+              : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
+
+            const songCard = document.createElement('div');
+            songCard.className = 'musico-song-card';
+            songCard.style.cssText = `${cardBorder} display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--bg2); border-radius: var(--radius-sm); margin-bottom: 8px;`;
+            songCard.innerHTML = `
+              <div style="display:flex; align-items:center; gap:12px; flex: 1; min-width: 0;">
+                <div style="font-size: 18px; font-weight: bold; ${numColor}">${num}</div>
+                <div style="min-width: 0; flex: 1;">
+                  <div style="font-size:14px; font-weight:600; color:var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${s.nombre}</div>
+                  <div style="font-size:11px; color:var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${s.artista}</div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; flex-shrink: 0;">
+                <span style="${badgeStyle} font-size:11px; padding:3px 8px; border-radius:4px; font-weight:600;">${s.tonoServicio}</span>
+                ${hasLetra ? `
+                  <button class="btn-ver-letra-modal" data-id="${s.id}" style="background:rgba(155,143,255,0.12); color:var(--purple); border:1.5px solid rgba(155,143,255,0.3); padding:6px 10px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">📄 Letra</button>
+                ` : ''}
+                ${hasYoutube ? `
+                  <a href="${s.youtube}" target="_blank" rel="noopener" style="background:rgba(255,0,0,0.12); color:#ff4444; border:1px solid rgba(255,0,0,0.25); border-radius:6px; padding:5px 8px; font-size:11px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center;">▶ YouTube</a>
+                ` : ''}
+              </div>
+            `;
+            
+            const btnLetra = songCard.querySelector('.btn-ver-letra-modal');
+            if (btnLetra) {
+              btnLetra.addEventListener('click', () => {
+                window.abrirModalLetraGlobal(s.id);
+              });
+            }
+            
+            songsCont.appendChild(songCard);
+          });
+        }
+
+        const overlay = document.getElementById('ensayo-practice-overlay');
+        if (overlay) overlay.classList.add('active');
+      };
+
+      function toggleEnsayoConfirm(ensayoId, userId, btnElem) {
+        // Obsolete toggle function kept for signature safety
+        cambiarEstadoEnsayo(ensayoId, 'confirmado');
       }
     </script>
     <!-- END ENSAYOS LOGIC -->
@@ -2492,11 +2731,14 @@
       <div class="logo">Alabanza <span>IMR4</span></div>
       <div style="display: flex; gap: 8px; align-items: center;">
         <!-- Botón S.O.S estático en cabecera -->
-        <button id="btn-musico-sos" class="sos-btn" title="Pedir Asistencia (S.O.S)">🚨 S.O.S</button>
+        <button id="btn-musico-sos" class="sos-btn" title="Pedir Asistencia (S.O.S)">🚨<span class="hide-mobile"> S.O.S</span></button>
         <!-- Selector de Tema Claro/Oscuro -->
         <button id="btn-musico-theme" class="theme-btn" title="Cambiar Tema">☀️</button>
+        <div class="user-avatar-container" style="position: relative; cursor: pointer;" id="musico-avatar-container" title="Subir foto de perfil">
+          <div id="musico-avatar" class="avatar" style="width: 32px; height: 32px; font-size: 13px; background-size: cover; background-position: center; border: 1.5px solid var(--border2); transition: transform 0.2s;"></div>
+        </div>
         <span id="musico-name-badge" class="role-badge"></span>
-        <button class="btn-logout" id="btn-musico-logout">Salir</button>
+        <button class="btn-logout" id="btn-musico-logout"><span class="hide-mobile">Salir </span>🚪</button>
       </div>
     </header>
 
@@ -2543,13 +2785,13 @@
         <div id="musico-avail-status-card" class="card"
           style="margin-top: 12px; display: none; background: linear-gradient(135deg, rgba(78,205,196,0.08) 0%, rgba(26,24,40,0.8) 100%); border-color: var(--teal);">
           <p id="musico-avail-current" style="font-size: 13px; color: var(--text2); margin-bottom: 14px;"></p>
-          <div style="display: flex; gap: 10px;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button id="btn-musico-confirm" class="btn-primary"
-              style="margin-top:0; background:var(--teal); color:#0f0e17; font-size:14px; padding:12px; flex:1;">Puedo
-              ir</button>
+              style="margin-top:0; background:var(--teal); color:#0f0e17; font-size:13px; padding:12px; flex:1; min-width: 80px;">Voy a ir</button>
+            <button id="btn-musico-maybe" class="btn-primary"
+              style="margin-top:0; background:var(--gold); color:#0f0e17; font-size:13px; padding:12px; flex:1; min-width: 80px;">No sé aún</button>
             <button id="btn-musico-decline" class="btn-primary"
-              style="margin-top:0; background:var(--coral); color:#0f0e17; font-size:14px; padding:12px; flex:1;">No
-              puedo ir</button>
+              style="margin-top:0; background:var(--coral); color:#0f0e17; font-size:13px; padding:12px; flex:1; min-width: 80px;">No puedo</button>
           </div>
         </div>
 
@@ -2688,7 +2930,12 @@
     <div class="lyrics-modal">
       <div class="lyrics-modal-header">
         <div>
-          <h3 id="lyrics-modal-title" class="lyrics-modal-title">Nombre de la Canción</h3>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <h3 id="lyrics-modal-title" class="lyrics-modal-title">Nombre de la Canción</h3>
+            <a id="lyrics-modal-yt-link" href="#" target="_blank" rel="noopener" style="display: none; align-items: center; gap: 4px; background: rgba(255, 68, 68, 0.15); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s;" onmouseover="this.style.background='rgba(255,68,68,0.25)'" onmouseout="this.style.background='rgba(255, 68, 68, 0.15)'">
+              ▶ YouTube
+            </a>
+          </div>
           <div id="lyrics-modal-meta" class="lyrics-modal-meta">Tono Original: C | Tono Actual: D</div>
         </div>
         <button id="lyrics-modal-close" class="lyrics-modal-close">&times;</button>
@@ -2704,6 +2951,22 @@
         <button id="lyrics-modal-next" class="btn-ver-letra" style="margin-top:0; padding: 8px 16px; font-size:12px; background: rgba(244, 197, 66, 0.12); border-color: var(--gold); color: var(--gold); box-shadow: none;">
           Siguiente ▶
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE PRÁCTICA DE ENSAYO (MÚSICO) -->
+  <div id="ensayo-practice-overlay" class="modal-overlay" style="z-index: 9980;">
+    <div class="modal-box" style="max-width: 600px; width: 95%; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; padding: 20px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 10px; flex-shrink: 0;">
+        <div>
+          <h3 id="practice-modal-title" class="modal-title" style="font-size: 20px;">Lista de Ensayo</h3>
+          <div id="practice-modal-subtitle" class="modal-subtitle" style="margin-bottom: 0;">Fecha del ensayo</div>
+        </div>
+        <button id="practice-modal-close" style="background: none; border: none; color: var(--text2); font-size: 28px; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
+      </div>
+      <div id="practice-modal-songs" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
+        <!-- Dinámico -->
       </div>
     </div>
   </div>
@@ -2751,7 +3014,21 @@
         }
       }
     </style>
-    <div style="display:flex; align-items:center; gap:12px; max-width:480px; margin:0 auto;">
+    <!-- Close button cross -->
+    <button id="pwa-close-btn" style="
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text3);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+      z-index: 10000;
+    " title="Cerrar anuncio">✕</button>
+    <div style="display:flex; align-items:center; gap:12px; max-width:480px; margin:0 auto; padding-right: 20px;">
       <img src="logo.png" alt="Alabanza IMR4"
         style="width:48px; height:48px; border-radius:12px; flex-shrink:0; object-fit:cover; box-shadow:0 4px 12px rgba(78,205,196,0.3);">
       <div style="flex:1; min-width:0;">
@@ -2849,7 +3126,6 @@
     serviceDateSelect.value = baseDay.toISOString().split('T')[0];
 
     // Controladores de Pestañas
-    // Controladores de Pestañas
     document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -2857,6 +3133,17 @@
         tab.classList.add('active');
         document.getElementById(tab.dataset.tab).classList.add('active');
         localStorage.setItem('activeLeaderTab', tab.dataset.tab);
+
+        // Refresh views on tab change to prevent empty states
+        if (tab.dataset.tab === 'tab-repertorio' && typeof renderizarMantenimientoCanciones === 'function') {
+          renderizarMantenimientoCanciones();
+        } else if (tab.dataset.tab === 'tab-miembros' && typeof renderizarMantenimientoMiembros === 'function') {
+          renderizarMantenimientoMiembros();
+        } else if (tab.dataset.tab === 'tab-historial' && typeof renderizarHistorialServicios === 'function') {
+          renderizarHistorialServicios();
+        } else if (tab.dataset.tab === 'tab-ensayos' && typeof renderEnsayosAdmin === 'function') {
+          renderEnsayosAdmin();
+        }
       });
     });
     loginForm.addEventListener('submit', async (e) => {
@@ -2903,6 +3190,7 @@
       displayRole.textContent = currentUserRole === 'lider' ? 'Líder' : 'Músico';
 
       screenLogin.classList.remove('active');
+      if (window.intentarMostrarPwaBanner) window.intentarMostrarPwaBanner();
 
       if (currentUserRole === 'lider') {
         // Vista de Líder
@@ -2928,6 +3216,23 @@
           const tabBtn = Array.from(document.querySelectorAll('.nav-tab-musico')).find(t => t.dataset.mtab === lastTab);
           if (tabBtn) tabBtn.click();
         }
+      }
+
+      // Initial header avatar update with initials
+      if (typeof actualizarAvatares === 'function') {
+        actualizarAvatares();
+      }
+
+      // Fetch profile pic from Firestore asynchronously
+      if (db && doc && getDoc && userData.usuario) {
+        getDoc(doc(db, "usuarios", userData.usuario)).then(snap => {
+          if (snap.exists() && snap.data().profilePic) {
+            activeSessionUser.profilePic = snap.data().profilePic;
+            if (typeof actualizarAvatares === 'function') {
+              actualizarAvatares();
+            }
+          }
+        }).catch(err => console.log("Profile pic load error:", err));
       }
 
       // Guardar credenciales en local storage
@@ -2959,6 +3264,7 @@
       screenLogin.classList.add('active');
       screenDashboard.classList.remove('active');
       screenMusico.classList.remove('active');
+      if (window.intentarMostrarPwaBanner) window.intentarMostrarPwaBanner();
       if (unsubscribeService) unsubscribeService();
       if (unsubscribeMusicoService) unsubscribeMusicoService();
       if (window._unsubMusicoServicePlan) { window._unsubMusicoServicePlan(); window._unsubMusicoServicePlan = null; }
@@ -3056,6 +3362,7 @@
         cacheHistorial = [];
         snap.forEach(doc => cacheHistorial.push({ id: doc.id, ...doc.data() }));
         cacheHistorial.sort((a, b) => b.fecha.localeCompare(a.fecha));
+        window.cacheHistorial = cacheHistorial;
         if (currentUserRole === 'lider') renderizarHistorialServicios();
       });
 
@@ -3407,8 +3714,13 @@
             row.style.opacity = "0.5";
           }
 
+          const avatarPicStyle = m.profilePic 
+            ? `background-image: url(${m.profilePic}); background-size: cover; background-position: center; color: transparent;` 
+            : '';
+          const avatarInitials = m.profilePic ? '' : m.nombre.substring(0, 2).toUpperCase();
+
           row.innerHTML = `
-          <div class="avatar ${avatarClass}">${m.nombre.substring(0, 2).toUpperCase()}</div>
+          <div class="avatar ${avatarClass}" style="${avatarPicStyle}">${avatarInitials}</div>
           <div class="member-info">
             <div class="member-name">${m.nombre}</div>
             <div class="member-role">${m.instrumento}</div>
@@ -3693,6 +4005,40 @@
       alert(wasEditing ? "Canción actualizada." : "Canción añadida al catálogo global.");
     });
 
+    function calcularTiempoTranscurrido(fechaStr) {
+      if (!fechaStr) return "Nunca tocada";
+      const partes = fechaStr.split('-');
+      if (partes.length !== 3) return fechaStr;
+      
+      const fechaServicio = new Date(partes[0], partes[1] - 1, partes[2]);
+      const hoy = new Date();
+      hoy.setHours(0,0,0,0);
+      fechaServicio.setHours(0,0,0,0);
+
+      const diffTime = hoy.getTime() - fechaServicio.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays < 0) {
+        return `Próximo: ${partes[2]}/${partes[1]}`;
+      }
+      if (diffDays === 0) return "Hoy";
+      if (diffDays === 1) return "Ayer";
+      if (diffDays < 7) return `Hace ${diffDays} días`;
+      if (diffDays < 30) {
+        const sem = Math.floor(diffDays / 7);
+        return `Hace ${sem} ${sem === 1 ? 'semana' : 'semanas'}`;
+      }
+      const meses = Math.floor(diffDays / 30);
+      return `Hace ${meses} ${meses === 1 ? 'mes' : 'meses'}`;
+    }
+
+    function obtenerUltimaVezCantada(songId) {
+      if (!window.cacheHistorial || window.cacheHistorial.length === 0) return "Nunca tocada";
+      const plan = window.cacheHistorial.find(p => p.cancionesSeleccionadas && p.cancionesSeleccionadas[songId] !== undefined && p.cancionesSeleccionadas[songId] !== false);
+      if (!plan) return "Nunca tocada";
+      return calcularTiempoTranscurrido(plan.fecha);
+    }
+
     function renderizarMantenimientoCanciones() {
       const alabList = document.getElementById('repertorio-alabanzas-list');
       const adorList = document.getElementById('repertorio-adoraciones-list');
@@ -3704,8 +4050,17 @@
       alabList.innerHTML = "";
       adorList.innerHTML = "";
 
-      const alabanzas = cacheSongs.filter(s => s && s.tipo === 'alabanza');
-      const adoraciones = cacheSongs.filter(s => s && (s.tipo === 'adoracion' || s.tipo === 'adoración'));
+      // Safe filtering with case-insensitive trim and alabanza default fallback
+      const alabanzas = cacheSongs.filter(s => {
+        if (!s) return false;
+        const tipoVal = (s.tipo || 'alabanza').trim().toLowerCase();
+        return tipoVal === 'alabanza';
+      });
+      const adoraciones = cacheSongs.filter(s => {
+        if (!s) return false;
+        const tipoVal = (s.tipo || 'alabanza').trim().toLowerCase();
+        return tipoVal === 'adoracion' || tipoVal === 'adoración';
+      });
 
       alabanzas.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
       adoraciones.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
@@ -3720,16 +4075,32 @@
         }
 
         list.forEach(s => {
+          const ultimaVezText = obtenerUltimaVezCantada(s.id);
+          let tagColor = "var(--text3)";
+          if (ultimaVezText.includes("semana") || ultimaVezText.includes("día") || ultimaVezText === "Hoy" || ultimaVezText === "Ayer") {
+            tagColor = "var(--teal)";
+          } else if (ultimaVezText.includes("mes")) {
+            tagColor = "var(--purple)";
+          }
+
           const div = document.createElement('div');
           div.className = "song-item";
           div.style.justifyContent = "space-between";
           div.innerHTML = `
             <div class="song-info">
               <div class="song-name" style="font-weight:600;">${s.nombre}</div>
-              <div class="song-meta" style="color:var(--text2); font-size:11px;">${s.artista} | Tono Base: <b style="color:var(--gold);">${s.tonoBase}</b></div>
+              <div class="song-meta" style="color:var(--text2); font-size:11px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
+                <span>${s.artista}</span>
+                <span>•</span>
+                <span>Tono Base: <b style="color:var(--gold);">${s.tonoBase}</b></span>
+                <span>•</span>
+                <span style="background:rgba(255,255,255,0.05); padding:1px 6px; border-radius:4px; font-size:10px; color:${tagColor}; border:1px solid rgba(255,255,255,0.08); font-weight:500;">
+                  🕒 ${ultimaVezText}
+                </span>
+              </div>
             </div>
             ${currentUserRole === 'lider' ? `
-              <div style="display:flex; gap:6px;">
+              <div style="display:flex; gap:6px; align-items:center;">
                 <button class="chip chip-teal click-edit-song" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Editar">✏️ Editar</button>
                 <button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Eliminar">🗑️</button>
               </div>
@@ -3737,41 +4108,49 @@
           `;
 
           if (currentUserRole === 'lider') {
-            div.querySelector('.click-edit-song').addEventListener('click', () => {
-              editingSongId = s.id;
-              document.getElementById('song-name-input').value = s.nombre;
-              document.getElementById('song-artist-input').value = s.artista;
-              document.getElementById('song-key-input').value = s.tonoBase;
-              document.getElementById('song-type-input').value = s.tipo;
-              document.getElementById('song-youtube-input').value = s.youtube || "";
-              document.getElementById('song-lyrics-input').value = s.letra || "";
+            const editBtn = div.querySelector('.click-edit-song');
+            const delBtn = div.querySelector('.click-del-song');
 
-              const btnSubmit = document.querySelector('#form-add-song button[type="submit"]');
-              if (btnSubmit) {
-                btnSubmit.textContent = "Actualizar Canción";
-                btnSubmit.style.background = "var(--teal)";
-              }
+            if (editBtn) {
+              editBtn.addEventListener('click', () => {
+                editingSongId = s.id;
+                document.getElementById('song-name-input').value = s.nombre;
+                document.getElementById('song-artist-input').value = s.artista;
+                document.getElementById('song-key-input').value = s.tonoBase;
+                document.getElementById('song-type-input').value = s.tipo || "alabanza";
+                document.getElementById('song-youtube-input').value = s.youtube || "";
+                document.getElementById('song-lyrics-input').value = s.letra || "";
 
-              // Open modal
-              const modal = document.getElementById('admin-song-modal');
-              const title = document.getElementById('song-modal-title');
-              if (title) title.textContent = "Editar Canción";
-              if (modal) modal.classList.add('active');
-            });
+                const btnSubmit = document.querySelector('#form-add-song button[type="submit"]');
+                if (btnSubmit) {
+                  btnSubmit.textContent = "Actualizar Canción";
+                  btnSubmit.style.background = "var(--teal)";
+                }
 
-            div.querySelector('.click-del-song').addEventListener('click', async () => {
-              if (confirm(`¿Quieres borrar definitivamente "${s.nombre}" del catálogo?`)) {
-                await deleteDoc(doc(db, "biblioteca_canciones", s.id));
-              }
-            });
+                // Open modal
+                const modal = document.getElementById('admin-song-modal');
+                const title = document.getElementById('song-modal-title');
+                if (title) title.textContent = "Editar Canción";
+                if (modal) modal.classList.add('active');
+              });
+            }
+
+            if (delBtn) {
+              delBtn.addEventListener('click', async () => {
+                if (confirm(`¿Quieres borrar definitivamente "${s.nombre}" del catálogo?`)) {
+                  await deleteDoc(doc(db, "biblioteca_canciones", s.id));
+                }
+              });
+            }
           }
-          listCont.appendChild(div);
+          container.appendChild(div);
         });
       };
 
-      renderGroup('Alabanzas (Rápidas)', '⚡', alabanzas, 'var(--teal)');
-      renderGroup('Adoración (Lentas)', '🙏', adoraciones, 'var(--purple)');
+      populateList(alabanzas, alabList, 'var(--teal)');
+      populateList(adoraciones, adorList, 'var(--purple)');
     }
+
 
     // ====================================================
     // LOGICA PARA DROPDOWN MULTISELECT DE INSTRUMENTOS
@@ -3857,9 +4236,14 @@
         const div = document.createElement('div');
         div.className = "member-row";
         div.style.justifyContent = "space-between";
+        const avatarPicStyle = m.profilePic 
+          ? `background-image: url(${m.profilePic}); background-size: cover; background-position: center; color: transparent;` 
+          : '';
+        const avatarInitials = m.profilePic ? '' : m.nombre.substring(0, 2).toUpperCase();
+
         div.innerHTML = `
         <div style="display:flex; align-items:center; gap:10px;">
-          <div class="avatar av-purple">${m.nombre.substring(0, 2).toUpperCase()}</div>
+          <div class="avatar av-purple" style="${avatarPicStyle}">${avatarInitials}</div>
           <div class="member-info">
             <div class="member-name">${m.nombre} ${m.role === 'lider' ? '<b style="color:var(--gold)">[Líder]</b>' : ''}</div>
             <div class="member-role">User: ${m.usuario} | Clave: ${m.password} | Instrumento: ${m.instrumento}</div>
@@ -3924,6 +4308,7 @@
     let unsubscribeMusicoService = null;
     const btnMusicoConfirm = document.getElementById('btn-musico-confirm');
     const btnMusicoDecline = document.getElementById('btn-musico-decline');
+    const btnMusicoMaybe = document.getElementById('btn-musico-maybe');
 
     function iniciarVistaMusico() {
       // Controladores Pestañas Músico
@@ -3934,6 +4319,13 @@
           tab.classList.add('active');
           document.getElementById(tab.dataset.mtab).classList.add('active');
           localStorage.setItem('activeMusicoTab', tab.dataset.mtab);
+
+          // Refresh views on tab change
+          if (tab.dataset.mtab === 'mtab-ensayos-musico' && typeof renderEnsayosMusico === 'function') {
+            renderEnsayosMusico();
+          } else if (tab.dataset.mtab === 'mtab-repertorio-musico' && typeof renderRepertorioMusico === 'function') {
+            renderRepertorioMusico();
+          }
         });
       });
 
@@ -4221,13 +4613,14 @@
               const num = startNum + i;
               const safeNombre = (s.nombre || "").replace(/"/g, '&quot;');
 
+              const cardBg = type === 'alabanza' ? 'rgba(78, 205, 196, 0.04)' : 'rgba(155, 143, 255, 0.04)';
               const cardBorder = type === 'alabanza' ? 'border-left: 4px solid var(--teal); border-color: rgba(78, 205, 196, 0.25);' : 'border-left: 4px solid var(--purple); border-color: rgba(155, 143, 255, 0.25);';
               const numColor = type === 'alabanza' ? 'color: rgba(78, 205, 196, 0.4);' : 'color: rgba(155, 143, 255, 0.4);';
               const badgeStyle = type === 'alabanza'
                 ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
                 : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
 
-              g += `<div class="musico-song-card" data-song-id="${s.id}" style="${cardBorder}">
+              g += `<div class="musico-song-card" data-song-id="${s.id}" style="${cardBorder} background: ${cardBg};">
               <!-- Extremo Izquierdo: Reordenamiento y Número -->
               <div style="display:flex; align-items:center; gap:8px;">
                 <div class="song-order-btns">
@@ -4344,22 +4737,37 @@
           btnMusicoConfirm.style.boxShadow = '0 0 15px rgba(78,205,196,0.4)';
           btnMusicoDecline.style.opacity = '0.3';
           btnMusicoDecline.style.boxShadow = 'none';
+          btnMusicoMaybe.style.opacity = '0.3';
+          btnMusicoMaybe.style.boxShadow = 'none';
         } else if (myStat === 'ausente') {
           pCur.innerHTML = `Estado actual: <span style="color:var(--coral); font-weight:bold;">❌ No Disponible</span>`;
           btnMusicoDecline.style.opacity = '1';
           btnMusicoDecline.style.boxShadow = '0 0 15px rgba(255,107,107,0.4)';
           btnMusicoConfirm.style.opacity = '0.3';
           btnMusicoConfirm.style.boxShadow = 'none';
+          btnMusicoMaybe.style.opacity = '0.3';
+          btnMusicoMaybe.style.boxShadow = 'none';
+        } else if (myStat === 'indeciso') {
+          pCur.innerHTML = `Estado actual: <span style="color:var(--gold); font-weight:bold;">❓ No estoy seguro aún</span>`;
+          btnMusicoMaybe.style.opacity = '1';
+          btnMusicoMaybe.style.boxShadow = '0 0 15px rgba(244,197,66,0.4)';
+          btnMusicoConfirm.style.opacity = '0.3';
+          btnMusicoConfirm.style.boxShadow = 'none';
+          btnMusicoDecline.style.opacity = '0.3';
+          btnMusicoDecline.style.boxShadow = 'none';
         } else {
           pCur.innerHTML = `Estado actual: <span style="color:var(--text3);">Sin confirmar</span>`;
           btnMusicoConfirm.style.opacity = '1';
           btnMusicoDecline.style.opacity = '1';
+          btnMusicoMaybe.style.opacity = '1';
           btnMusicoConfirm.style.boxShadow = 'none';
           btnMusicoDecline.style.boxShadow = 'none';
+          btnMusicoMaybe.style.boxShadow = 'none';
         }
 
         btnMusicoConfirm.onclick = () => actualizarDisponibilidadMusico(dateStr, 'confirmado');
         btnMusicoDecline.onclick = () => actualizarDisponibilidadMusico(dateStr, 'ausente');
+        btnMusicoMaybe.onclick = () => actualizarDisponibilidadMusico(dateStr, 'indeciso');
 
         const tDiv = document.getElementById('musico-team-status');
         let thtml = `<h4 style="font-size: 13px; text-transform: uppercase; color: var(--gold); margin: 0 0 10px;">Estado de tus compañeros</h4><div class="card">`;
@@ -4369,17 +4777,23 @@
         } else {
           mlist.forEach(m => {
             const st = disp[m.usuario];
-            let badge = `<span class="status-badge status-none">Sin Confir.</span>`;
-            if (st === 'confirmado') badge = `<span class="status-badge status-si">Confirma</span>`;
-            if (st === 'ausente') badge = `<span class="status-badge status-no">No Puede</span>`;
+            let badge = `<span class="status-badge status-none" style="background:rgba(255,255,255,0.05); color:var(--text3); border:1px solid rgba(255,255,255,0.1); font-size:11px; padding:2px 8px; border-radius:12px; font-weight:600; white-space:nowrap;">Sin Confir.</span>`;
+            if (st === 'confirmado') badge = `<span class="status-badge status-si" style="background:rgba(78,205,196,0.15); color:var(--teal); border:1px solid rgba(78,205,196,0.3); font-size:11px; padding:2px 8px; border-radius:12px; font-weight:600; white-space:nowrap;">Confirma</span>`;
+            if (st === 'ausente') badge = `<span class="status-badge status-no" style="background:rgba(255,107,107,0.15); color:var(--coral); border:1px solid rgba(255,107,107,0.3); font-size:11px; padding:2px 8px; border-radius:12px; font-weight:600; white-space:nowrap;">No Puede</span>`;
+            if (st === 'indeciso') badge = `<span class="status-badge status-duda" style="background:rgba(244,197,66,0.15); color:var(--gold); border:1px solid rgba(244,197,66,0.3); font-size:11px; padding:2px 8px; border-radius:12px; font-weight:600; white-space:nowrap;">No Seguro</span>`;
 
             let avatarClass = "av-gold";
             if (m.instrumento.includes('Batería') || m.instrumento.includes('Percusión')) avatarClass = "av-purple";
             else if (m.instrumento.includes('Voz') || m.instrumento.includes('Corista')) avatarClass = "av-teal";
 
+            const avatarPicStyle = m.profilePic 
+              ? `background-image: url(${m.profilePic}); background-size: cover; background-position: center; color: transparent;` 
+              : '';
+            const avatarInitials = m.profilePic ? '' : m.nombre.substring(0, 2).toUpperCase();
+
             thtml += `
           <div class="member-row" style="padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-            <div class="avatar ${avatarClass}" style="width: 28px; height: 28px; font-size: 11px;">${m.nombre.substring(0, 2).toUpperCase()}</div>
+            <div class="avatar ${avatarClass}" style="width: 28px; height: 28px; font-size: 11px; ${avatarPicStyle}">${avatarInitials}</div>
             <div class="member-info">
               <div class="member-name">${m.nombre}</div>
               <div class="member-role">${m.instrumento}</div>
@@ -4528,6 +4942,19 @@
       document.getElementById('lyrics-modal-title').textContent = song.nombre;
       document.getElementById('lyrics-modal-meta').textContent = `Tono Original: ${song.tonoBase} | Tono del Servicio: ${tonoMostrar}`;
       
+      // Enlace de YouTube
+      const ytUrl = song.youtube || (cacheSongs.find(x => x.id === cancionId) || {}).youtube || (window._currentServiceData && window._currentServiceData.customSongsMetadata && window._currentServiceData.customSongsMetadata[cancionId] || {}).youtube;
+      const ytLinkElem = document.getElementById('lyrics-modal-yt-link');
+      if (ytLinkElem) {
+        if (ytUrl && ytUrl.trim() !== "") {
+          ytLinkElem.href = ytUrl;
+          ytLinkElem.style.display = "inline-flex";
+        } else {
+          ytLinkElem.href = "#";
+          ytLinkElem.style.display = "none";
+        }
+      }
+
       const hasLetra = song.letra && song.letra.trim() !== "";
       if (hasLetra) {
         document.getElementById('lyrics-modal-content').innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, tonoMostrar);
@@ -4595,6 +5022,10 @@
 
     document.getElementById('lyrics-modal-close').addEventListener('click', () => {
       document.getElementById('lyrics-modal-overlay').classList.remove('active');
+    });
+
+    document.getElementById('practice-modal-close').addEventListener('click', () => {
+      document.getElementById('ensayo-practice-overlay').classList.remove('active');
     });
 
     // ====================================================
@@ -4818,6 +5249,7 @@
             const num = startNum + i;
             const safeNombre = (s.nombre || "").replace(/"/g, '&quot;');
 
+            const cardBg = type === 'alabanza' ? 'rgba(78, 205, 196, 0.04)' : 'rgba(155, 143, 255, 0.04)';
             const cardBorder = type === 'alabanza' ? 'border-left: 4px solid var(--teal); border-color: rgba(78, 205, 196, 0.25);' : 'border-left: 4px solid var(--purple); border-color: rgba(155, 143, 255, 0.25);';
             const numColor = type === 'alabanza' ? 'color: rgba(78, 205, 196, 0.4);' : 'color: rgba(155, 143, 255, 0.4);';
             const badgeStyle = type === 'alabanza'
@@ -4825,7 +5257,7 @@
               : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
 
             g += `
-            <div class="musico-song-card" style="padding: 10px; margin-bottom: 0; background: var(--bg2); ${cardBorder}">
+            <div class="musico-song-card" style="padding: 10px; margin-bottom: 0; background: ${cardBg}; ${cardBorder}">
               <!-- Extremo Izquierdo: Reordenamiento y Número -->
               <div style="display:flex; align-items:center; gap:8px;">
                 <div class="song-order-btns">
@@ -5108,46 +5540,59 @@
       const banner = document.getElementById('pwa-install-banner');
       const installBtn = document.getElementById('pwa-install-btn');
       const dismissBtn = document.getElementById('pwa-dismiss-btn');
+      const closeBtn = document.getElementById('pwa-close-btn');
       const iosHint = document.getElementById('pwa-ios-hint');
+      const screenLogin = document.getElementById('screen-login');
       if (!banner) return;
-
-      // No mostrar si ya fue descartado hace menos de 7 días
-      const dismissed = localStorage.getItem('pwa-banner-dismissed');
-      if (dismissed && (Date.now() - parseInt(dismissed)) < 7 * 24 * 60 * 60 * 1000) return;
-
-      // No mostrar si ya está instalada (en modo standalone)
-      if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) return;
 
       let deferredPrompt = null;
 
       // Detectar iOS
       const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
 
+      window.intentarMostrarPwaBanner = function() {
+        if (!screenLogin) return;
+        // Solo mostrar si la pantalla de login está activa
+        if (screenLogin.classList.contains('active')) {
+          banner.style.display = 'block';
+        } else {
+          banner.style.display = 'none';
+        }
+      };
+
       if (isIOS) {
         // En iOS no hay evento, mostramos el banner con instrucciones de Safari
         if (iosHint) iosHint.style.display = 'block';
         if (installBtn) installBtn.style.display = 'none'; // ocultar botón instalar en iOS
-        setTimeout(() => { banner.style.display = 'block'; }, 3000);
+        setTimeout(() => {
+          window.intentarMostrarPwaBanner();
+        }, 3000);
       } else {
-        // Android/Chrome: esperar el evento beforeinstallprompt
+        // En otros dispositivos, siempre intentamos mostrar después de 3 segundos
+        setTimeout(() => {
+          window.intentarMostrarPwaBanner();
+        }, 3000);
+
         window.addEventListener('beforeinstallprompt', (e) => {
           e.preventDefault();
           deferredPrompt = e;
-          setTimeout(() => { banner.style.display = 'block'; }, 3000);
+          window.intentarMostrarPwaBanner();
         });
       }
 
       // Botón INSTALAR
       if (installBtn) {
         installBtn.addEventListener('click', async () => {
-          banner.style.display = 'none';
           if (deferredPrompt) {
+            banner.style.display = 'none';
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
             console.log('[PWA] Install outcome:', outcome);
             deferredPrompt = null;
+          } else {
+            // Si no hay prompt nativo disponible, dar un toast amigable
+            showToast("💡 Usa las opciones de tu navegador para instalar la aplicación.");
           }
-          localStorage.setItem('pwa-banner-dismissed', Date.now().toString());
         });
       }
 
@@ -5155,17 +5600,141 @@
       if (dismissBtn) {
         dismissBtn.addEventListener('click', () => {
           banner.style.display = 'none';
-          localStorage.setItem('pwa-banner-dismissed', Date.now().toString());
+        });
+      }
+
+      // Botón de cerrar "✕"
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          banner.style.display = 'none';
         });
       }
 
       // Ocultar si el usuario ya instaló
       window.addEventListener('appinstalled', () => {
         banner.style.display = 'none';
-        localStorage.setItem('pwa-banner-dismissed', Date.now().toString());
         console.log('[PWA] App instalada exitosamente ✅');
       });
     })();
+
+    // ====================================================
+    // LÓGICA DE FOTOS DE PERFIL (AVATARS)
+    // ====================================================
+    window.actualizarAvatares = function() {
+      const user = activeSessionUser;
+      if (!user) return;
+
+      const pic = user.profilePic || "";
+      const initials = user.nombre ? user.nombre.substring(0, 2).toUpperCase() : "US";
+
+      // Actualizar avatares de cabecera
+      const leaderAvatar = document.getElementById('leader-avatar');
+      const musicoAvatar = document.getElementById('musico-avatar');
+
+      [leaderAvatar, musicoAvatar].forEach(avatar => {
+        if (avatar) {
+          if (pic) {
+            avatar.style.backgroundImage = `url(${pic})`;
+            avatar.textContent = "";
+            avatar.style.color = "transparent";
+          } else {
+            avatar.style.backgroundImage = "none";
+            avatar.textContent = initials;
+            avatar.style.color = "";
+          }
+        }
+      });
+
+      // Refrescar vistas activas que muestren avatares
+      if (currentUserRole === 'lider') {
+        const tabMiembros = document.getElementById('tab-miembros');
+        if (tabMiembros && tabMiembros.classList.contains('active') && typeof renderizarMantenimientoMiembros === 'function') {
+          renderizarMantenimientoMiembros();
+        }
+      }
+    };
+
+    function setupProfilePicUpload() {
+      const uploaderInput = document.getElementById('global-profile-pic-input');
+      const leaderAvBtn = document.getElementById('leader-avatar-container');
+      const musicoAvBtn = document.getElementById('musico-avatar-container');
+
+      const triggerUpload = () => {
+        if (uploaderInput) uploaderInput.click();
+      };
+
+      if (leaderAvBtn) leaderAvBtn.addEventListener('click', triggerUpload);
+      if (musicoAvBtn) musicoAvBtn.addEventListener('click', triggerUpload);
+
+      if (uploaderInput) {
+        // Remove existing listener to prevent duplicate binding
+        uploaderInput.replaceWith(uploaderInput.cloneNode(true));
+        const cleanInput = document.getElementById('global-profile-pic-input');
+        
+        cleanInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          if (!file.type.startsWith('image/')) {
+            showToast("❌ Por favor, selecciona una imagen válida.");
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            const img = new Image();
+            img.onload = function () {
+              const canvas = document.createElement('canvas');
+              const maxDim = 120; // 120x120 pixels is plenty for an avatar
+              let width = img.width;
+              let height = img.height;
+
+              if (width > height) {
+                if (width > maxDim) {
+                  height = Math.round(height * maxDim / width);
+                  width = maxDim;
+                }
+              } else {
+                if (height > maxDim) {
+                  width = Math.round(width * maxDim / height);
+                  height = maxDim;
+                }
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+
+              const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
+              
+              if (!db || !doc || !setDoc) return;
+              
+              // Save to Firestore using username document ID
+              const userRef = doc(db, "usuarios", activeSessionUser.usuario);
+              setDoc(userRef, { profilePic: compressedBase64 }, { merge: true }).then(() => {
+                activeSessionUser.profilePic = compressedBase64;
+                window.actualizarAvatares();
+                showToast("📷 Foto de perfil actualizada");
+                
+                // Update in local cacheMembers to propagate changes
+                if (window.cacheMembers) {
+                  const mLocal = window.cacheMembers.find(m => m.usuario === activeSessionUser.usuario);
+                  if (mLocal) mLocal.profilePic = compressedBase64;
+                }
+              }).catch(err => {
+                console.error("Error saving profile pic:", err);
+                showToast("❌ Error al guardar la foto");
+              });
+            };
+            img.src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+    }
+
+    // Call after document load / login init
+    setTimeout(setupProfilePicUpload, 500);
 
     // REGISTRO DE SERVICE WORKER PARA SOPORTE PWA
     if ('serviceWorker' in navigator) {
@@ -5347,4 +5916,7 @@
       </div>
     </div>
   </div>
+
+  <!-- Hidden Profile Pic File Uploader -->
+  <input type="file" id="global-profile-pic-input" accept="image/*" style="display: none;">
 </body>
