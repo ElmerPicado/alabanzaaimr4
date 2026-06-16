@@ -1495,6 +1495,30 @@
         right: -2px;
       }
     }
+
+    /* Mobile overrides for lyrics modal to prevent bottom clipping and make it full screen */
+    @media (max-width: 600px) {
+      .lyrics-modal-overlay {
+        padding: 0 !important;
+      }
+      .lyrics-modal {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        max-height: 100vh !important;
+        max-height: 100dvh !important;
+        border-radius: 0 !important;
+        border: none !important;
+      }
+      .lyrics-modal-body {
+        padding: 16px !important;
+      }
+      .lyrics-modal-footer {
+        padding: 12px 16px !important;
+        min-height: 70px !important;
+      }
+    }
   </style>
 </head>
 
@@ -3142,6 +3166,26 @@
     baseDay.setDate(baseDay.getDate() + (7 - baseDay.getDay()) % 7);
     serviceDateSelect.value = baseDay.toISOString().split('T')[0];
 
+    // Función auxiliar para desplazar y centrar la pestaña activa horizontalmente sin mover la pantalla
+    function scrollActiveTabToCenter(tab) {
+      if (!tab) return;
+      setTimeout(() => {
+        const parent = tab.parentElement;
+        if (!parent) return;
+        const parentRect = parent.getBoundingClientRect();
+        const tabRect = tab.getBoundingClientRect();
+        if (parentRect.width === 0 || tabRect.width === 0) return;
+        
+        const relativeLeft = tabRect.left - parentRect.left + parent.scrollLeft;
+        const targetScrollLeft = relativeLeft - (parentRect.width / 2) + (tabRect.width / 2);
+        
+        parent.scrollTo({
+          left: targetScrollLeft,
+          behavior: 'smooth'
+        });
+      }, 100);
+    }
+
     // Controladores de Pestañas
     document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.addEventListener('click', () => {
@@ -3150,6 +3194,9 @@
         tab.classList.add('active');
         document.getElementById(tab.dataset.tab).classList.add('active');
         localStorage.setItem('activeLeaderTab', tab.dataset.tab);
+        
+        // Autodesplazar pestaña activa para que sea completamente visible en móvil
+        scrollActiveTabToCenter(tab);
 
         // Refresh views on tab change to prevent empty states
         if (tab.dataset.tab === 'tab-repertorio' && typeof renderizarMantenimientoCanciones === 'function') {
@@ -4337,6 +4384,9 @@
           document.getElementById(tab.dataset.mtab).classList.add('active');
           localStorage.setItem('activeMusicoTab', tab.dataset.mtab);
 
+          // Autodesplazar pestaña activa para que sea completamente visible en móvil
+          scrollActiveTabToCenter(tab);
+
           // Refresh views on tab change
           if (tab.dataset.mtab === 'mtab-ensayos-musico' && typeof renderEnsayosMusico === 'function') {
             renderEnsayosMusico();
@@ -5025,7 +5075,7 @@
           if (currentIndex > 0) {
             const prevSong = currentList[currentIndex - 1];
             const prevName = prevSong.nombre || "Anterior";
-            prevBtn.innerHTML = `◀ <div style="display:flex; flex-direction:column; align-items:flex-start; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.6; letter-spacing:0.5px;">Anterior</span><span style="font-size:11px; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700;">${prevName}</span></div>`;
+            prevBtn.innerHTML = `◀ <div style="display:flex; flex-direction:column; align-items:flex-start; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.6; letter-spacing:0.5px;">Anterior</span><span style="font-size:11px; max-width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700;">${prevName}</span></div>`;
             prevBtn.style.opacity = '1';
             prevBtn.style.pointerEvents = 'auto';
             prevBtn.onclick = () => {
@@ -5042,7 +5092,7 @@
           if (currentIndex < currentList.length - 1) {
             const nextSong = currentList[currentIndex + 1];
             const nextName = nextSong.nombre || "Siguiente";
-            nextBtn.innerHTML = `<div style="display:flex; flex-direction:column; align-items:flex-end; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.6; letter-spacing:0.5px;">Siguiente</span><span style="font-size:11px; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700;">${nextName}</span></div> ▶`;
+            nextBtn.innerHTML = `<div style="display:flex; flex-direction:column; align-items:flex-end; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.6; letter-spacing:0.5px;">Siguiente</span><span style="font-size:11px; max-width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700;">${nextName}</span></div> ▶`;
             nextBtn.style.opacity = '1';
             nextBtn.style.pointerEvents = 'auto';
             nextBtn.onclick = () => {
