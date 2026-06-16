@@ -2964,18 +2964,22 @@
             <div id="lyrics-modal-meta" class="lyrics-modal-meta" style="margin-bottom: 0;">Tono Original: C | Tono Actual: D</div>
             <div style="display: inline-flex; align-items: center; gap: 4px;">
               <span style="font-size: 11px; color: var(--text3);">Practicar en:</span>
-              <select id="lyrics-modal-tone-select" style="
+              <button id="lyrics-modal-tone-btn" style="
                 background: var(--bg3);
                 color: var(--gold);
                 border: 1px solid var(--border2);
                 border-radius: 6px;
-                padding: 2px 6px;
+                padding: 4px 10px;
                 font-size: 11px;
                 font-weight: 600;
                 outline: none;
                 cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
               ">
-              </select>
+                <span id="lyrics-modal-tone-display">C</span> ▼
+              </button>
             </div>
           </div>
         </div>
@@ -2984,14 +2988,24 @@
       <div class="lyrics-modal-body">
         <div id="lyrics-modal-content" class="lyrics-content"></div>
       </div>
-      <div class="lyrics-modal-footer" style="padding: 16px 20px; border-top: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(180deg, var(--bg2) 0%, var(--bg3) 100%); flex-shrink: 0; gap: 12px; box-shadow: 0 -4px 20px rgba(0,0,0,0.3);">
-        <button id="lyrics-modal-prev" style="margin-top:0; padding: 8px 14px; font-size:11px; background: rgba(255,255,255,0.04); border: 1.5px solid var(--border2); color: var(--text2); border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: var(--font-body); font-weight: 600; min-height: 42px; text-align: left; transition: all 0.2s;">
-          ◀ Anterior
-        </button>
-        <span id="lyrics-modal-page-indicator" style="font-size:13px; color:var(--text); font-weight:700; font-family:var(--font-body); background: rgba(0, 0, 0, 0.25); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border);">1 de 5</span>
-        <button id="lyrics-modal-next" style="margin-top:0; padding: 8px 14px; font-size:11px; background: rgba(78, 205, 196, 0.12); border: 1.5px solid var(--teal); color: var(--teal); border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: var(--font-body); font-weight: 700; min-height: 42px; text-align: right; justify-content: flex-end; transition: all 0.2s; box-shadow: 0 4px 12px rgba(78,205,196,0.15);">
-          Siguiente ▶
-        </button>
+      <div class="lyrics-modal-footer" style="padding: 16px 20px; border-top: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(180deg, var(--bg2) 0%, var(--bg3) 100%); flex-shrink: 0; gap: 8px; box-shadow: 0 -4px 20px rgba(0,0,0,0.3);">
+        <!-- Bloque Anterior -->
+        <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+          <button id="lyrics-modal-prev" style="margin-top:0; padding: 10px 16px; font-size:12.5px; background: var(--purple); border: none; color: #0f0e17; border-radius: 10px; cursor: pointer; font-family: var(--font-body); font-weight: 700; min-height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 12px rgba(155, 143, 255, 0.25); flex-shrink: 0;">
+            ◀ Anterior
+          </button>
+          <span id="lyrics-modal-prev-name" style="font-size: 14px; color: var(--purple); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; display: none;"></span>
+        </div>
+
+        <span id="lyrics-modal-page-indicator" style="font-size:13px; color:var(--text); font-weight:700; font-family:var(--font-body); background: rgba(0, 0, 0, 0.25); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); flex-shrink: 0; text-align: center; margin: 0 8px;">1 de 5</span>
+
+        <!-- Bloque Siguiente -->
+        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex: 1; min-width: 0;">
+          <span id="lyrics-modal-next-name" style="font-size: 14px; color: var(--teal); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; display: none; text-align: right;"></span>
+          <button id="lyrics-modal-next" style="margin-top:0; padding: 10px 16px; font-size:12.5px; background: var(--teal); border: none; color: #0f0e17; border-radius: 10px; cursor: pointer; font-family: var(--font-body); font-weight: 700; min-height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 12px rgba(78, 205, 196, 0.25); flex-shrink: 0;">
+            Siguiente ▶
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -3024,6 +3038,21 @@
           style="background:none;border:none;color:var(--text2);font-size:26px;cursor:pointer;padding:0;line-height:1;margin-left:12px;flex-shrink:0;">×</button>
       </div>
       <div class="tone-grid" id="tone-picker-grid"></div>
+    </div>
+  </div>
+
+  <!-- PRACTICE TONE PICKER OVERLAY (bottom sheet local) -->
+  <div id="practice-tone-picker-overlay" class="tone-picker-overlay" style="z-index: 100000;">
+    <div class="tone-picker-box">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+        <div style="flex:1;min-width:0;">
+          <div class="tone-picker-title" id="practice-tone-picker-song-name">Tono de Práctica</div>
+          <div class="tone-picker-subtitle">Toca un tono — el cambio es solo para tu pantalla local 🎵</div>
+        </div>
+        <button id="practice-tone-picker-close"
+          style="background:none;border:none;color:var(--text2);font-size:26px;cursor:pointer;padding:0;line-height:1;margin-left:12px;flex-shrink:0;">×</button>
+      </div>
+      <div class="tone-grid" id="practice-tone-picker-grid"></div>
     </div>
   </div>
 
@@ -4769,6 +4798,7 @@
           btn.addEventListener('click', () => {
             const type = btn.dataset.type;
             window._targetAddSongType = type;
+            window._targetAddSongDate = dateStr;
 
             document.getElementById('musico-add-song-title').textContent = `Agregar a ${type === 'adoracion' ? 'Adoración' : 'Alabanza'}`;
             document.getElementById('musico-add-song-search').value = "";
@@ -5009,24 +5039,50 @@
       document.getElementById('lyrics-modal-title').textContent = song.nombre;
       document.getElementById('lyrics-modal-meta').textContent = `Tono Original: ${song.tonoBase} | Tono del Servicio: ${tonoMostrar}`;
 
-      // Selector de Tono en el Modal de Letras para práctica personal
-      const toneSelect = document.getElementById('lyrics-modal-tone-select');
-      if (toneSelect) {
-        const keys = ['C', 'Cm', 'C#', 'C#m', 'D', 'Dm', 'D#', 'D#m', 'E', 'Em', 'F', 'Fm', 'F#', 'F#m', 'G', 'Gm', 'G#', 'G#m', 'A', 'Am', 'A#', 'A#m', 'B', 'Bm'];
-        toneSelect.innerHTML = keys.map(k => `<option value="${k}">${k}</option>`).join('');
-        toneSelect.value = tonoMostrar;
-        
-        toneSelect.onchange = (e) => {
-          const selectedTone = e.target.value;
-          const isSongHasLetra = song.letra && song.letra.trim() !== "";
-          if (isSongHasLetra) {
-            document.getElementById('lyrics-modal-content').innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, selectedTone);
-          }
-          document.getElementById('lyrics-modal-meta').textContent = `Tono Original: ${song.tonoBase} | Tono del Servicio: ${selectedTone}`;
+      // Selector de Tono en el Modal de Letras para práctica personal (bottom-sheet grid picker)
+      const toneBtn = document.getElementById('lyrics-modal-tone-btn');
+      const toneDisplay = document.getElementById('lyrics-modal-tone-display');
+      if (toneDisplay) {
+        toneDisplay.textContent = tonoMostrar;
+      }
+      
+      if (toneBtn) {
+        toneBtn.onclick = () => {
+          const pOverlay = document.getElementById('practice-tone-picker-overlay');
+          const pGrid = document.getElementById('practice-tone-picker-grid');
+          const pTitle = document.getElementById('practice-tone-picker-song-name');
           
-          song.tonoServicio = selectedTone;
-          if (!window._lyricsCache) window._lyricsCache = {};
-          window._lyricsCache[cancionId] = song;
+          if (pTitle) pTitle.textContent = `${song.nombre}`;
+          
+          const keys = ['C', 'Cm', 'C#', 'C#m', 'D', 'Dm', 'D#', 'D#m', 'E', 'Em', 'F', 'Fm', 'F#', 'F#m', 'G', 'Gm', 'G#', 'G#m', 'A', 'Am', 'A#', 'A#m', 'B', 'Bm'];
+          const currentTonoPrac = song.tonoServicio || song.tonoBase;
+          
+          pGrid.innerHTML = keys.map(k =>
+            `<button class="tone-grid-btn ${k === currentTonoPrac ? 'current' : ''}" data-key="${k}">${k}</button>`
+          ).join('');
+          
+          pGrid.querySelectorAll('.tone-grid-btn').forEach(btn => {
+            btn.onclick = () => {
+              const selectedTone = btn.dataset.key;
+              pOverlay.classList.remove('active');
+              
+              if (toneDisplay) {
+                toneDisplay.textContent = selectedTone;
+              }
+              
+              const isSongHasLetra = song.letra && song.letra.trim() !== "";
+              if (isSongHasLetra) {
+                document.getElementById('lyrics-modal-content').innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, selectedTone);
+              }
+              document.getElementById('lyrics-modal-meta').textContent = `Tono Original: ${song.tonoBase} | Tono de Práctica: ${selectedTone}`;
+              
+              song.tonoServicio = selectedTone;
+              if (!window._lyricsCache) window._lyricsCache = {};
+              window._lyricsCache[cancionId] = song;
+            };
+          });
+          
+          pOverlay.classList.add('active');
         };
       }
       
@@ -5064,6 +5120,8 @@
 
       const prevBtn = document.getElementById('lyrics-modal-prev');
       const nextBtn = document.getElementById('lyrics-modal-next');
+      const prevNameLabel = document.getElementById('lyrics-modal-prev-name');
+      const nextNameLabel = document.getElementById('lyrics-modal-next-name');
       const pageIndicator = document.getElementById('lyrics-modal-page-indicator');
 
       if (prevBtn && nextBtn && pageIndicator) {
@@ -5075,14 +5133,22 @@
           if (currentIndex > 0) {
             const prevSong = currentList[currentIndex - 1];
             const prevName = prevSong.nombre || "Anterior";
-            prevBtn.innerHTML = `◀ <div style="display:flex; flex-direction:column; align-items:flex-start; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.6; letter-spacing:0.5px;">Anterior</span><span style="font-size:11px; max-width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700;">${prevName}</span></div>`;
+            prevBtn.innerHTML = `◀ Anterior`;
+            if (prevNameLabel) {
+              prevNameLabel.textContent = prevName;
+              prevNameLabel.style.display = 'block';
+            }
             prevBtn.style.opacity = '1';
             prevBtn.style.pointerEvents = 'auto';
             prevBtn.onclick = () => {
               window.abrirModalLetraGlobal(prevSong.id);
             };
           } else {
-            prevBtn.innerHTML = `◀ <div style="display:flex; flex-direction:column; align-items:flex-start; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.4; letter-spacing:0.5px;">Anterior</span><span style="font-size:11px; opacity:0.4;">Ninguna</span></div>`;
+            prevBtn.innerHTML = `◀ Anterior`;
+            if (prevNameLabel) {
+              prevNameLabel.textContent = '';
+              prevNameLabel.style.display = 'none';
+            }
             prevBtn.style.opacity = '0.3';
             prevBtn.style.pointerEvents = 'none';
             prevBtn.onclick = null;
@@ -5092,28 +5158,46 @@
           if (currentIndex < currentList.length - 1) {
             const nextSong = currentList[currentIndex + 1];
             const nextName = nextSong.nombre || "Siguiente";
-            nextBtn.innerHTML = `<div style="display:flex; flex-direction:column; align-items:flex-end; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.6; letter-spacing:0.5px;">Siguiente</span><span style="font-size:11px; max-width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700;">${nextName}</span></div> ▶`;
+            nextBtn.innerHTML = `Siguiente ▶`;
+            if (nextNameLabel) {
+              nextNameLabel.textContent = nextName;
+              nextNameLabel.style.display = 'block';
+            }
             nextBtn.style.opacity = '1';
             nextBtn.style.pointerEvents = 'auto';
             nextBtn.onclick = () => {
               window.abrirModalLetraGlobal(nextSong.id);
             };
           } else {
-            nextBtn.innerHTML = `<div style="display:flex; flex-direction:column; align-items:flex-end; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.4; letter-spacing:0.5px;">Siguiente</span><span style="font-size:11px; opacity:0.4;">Ninguna</span></div> ▶`;
+            nextBtn.innerHTML = `Siguiente ▶`;
+            if (nextNameLabel) {
+              nextNameLabel.textContent = '';
+              nextNameLabel.style.display = 'none';
+            }
             nextBtn.style.opacity = '0.3';
             nextBtn.style.pointerEvents = 'none';
             nextBtn.onclick = null;
           }
         } else {
           pageIndicator.style.display = 'none';
+          
           prevBtn.style.opacity = '0.3';
           prevBtn.style.pointerEvents = 'none';
           prevBtn.onclick = null;
-          prevBtn.innerHTML = `◀ <div style="display:flex; flex-direction:column; align-items:flex-start; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.4; letter-spacing:0.5px;">Anterior</span><span style="font-size:11px; opacity:0.4;">Ninguna</span></div>`;
+          prevBtn.innerHTML = `◀ Anterior`;
+          if (prevNameLabel) {
+            prevNameLabel.textContent = '';
+            prevNameLabel.style.display = 'none';
+          }
+          
           nextBtn.style.opacity = '0.3';
           nextBtn.style.pointerEvents = 'none';
           nextBtn.onclick = null;
-          nextBtn.innerHTML = `<div style="display:flex; flex-direction:column; align-items:flex-end; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.4; letter-spacing:0.5px;">Siguiente</span><span style="font-size:11px; opacity:0.4;">Ninguna</span></div> ▶`;
+          nextBtn.innerHTML = `Siguiente ▶`;
+          if (nextNameLabel) {
+            nextNameLabel.textContent = '';
+            nextNameLabel.style.display = 'none';
+          }
         }
       }
     };
@@ -5190,6 +5274,10 @@
 
     document.getElementById('tone-picker-close').addEventListener('click', () => {
       document.getElementById('tone-picker-overlay').classList.remove('active');
+    });
+
+    document.getElementById('practice-tone-picker-close').addEventListener('click', () => {
+      document.getElementById('practice-tone-picker-overlay').classList.remove('active');
     });
 
     async function moverCancionOrden(songId, dir, allSelected, currentOrder, dateStr, type) {
@@ -5471,7 +5559,7 @@
       `;
         div.querySelector('.btn-add-song-select').addEventListener('click', async () => {
           const songId = s.id;
-          const dateStr = serviceDateSelect.value || document.getElementById('musico-service-date').value;
+          const dateStr = window._targetAddSongDate || serviceDateSelect.value || document.getElementById('musico-service-date').value;
           const path = `cancionesSeleccionadas.${songId}`;
 
           const docRef = doc(db, "planes_servicio", dateStr);
@@ -5519,7 +5607,7 @@
           return;
         }
 
-        const dateStr = serviceDateSelect.value || document.getElementById('musico-service-date').value;
+        const dateStr = window._targetAddSongDate || serviceDateSelect.value || document.getElementById('musico-service-date').value;
         const customId = 'custom_' + Date.now();
 
         const docRef = doc(db, "planes_servicio", dateStr);
@@ -5547,6 +5635,7 @@
       btn.addEventListener('click', () => {
         const type = btn.dataset.type;
         window._targetAddSongType = type;
+        window._targetAddSongDate = serviceDateSelect.value;
 
         document.getElementById('musico-add-song-title').textContent = `Agregar a ${type === 'adoracion' ? 'Adoración' : 'Alabanza'}`;
         document.getElementById('musico-add-song-search').value = "";

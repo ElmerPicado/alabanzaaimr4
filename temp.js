@@ -1263,6 +1263,7 @@
           btn.addEventListener('click', () => {
             const type = btn.dataset.type;
             window._targetAddSongType = type;
+            window._targetAddSongDate = dateStr;
 
             document.getElementById('musico-add-song-title').textContent = `Agregar a ${type === 'adoracion' ? 'Adoración' : 'Alabanza'}`;
             document.getElementById('musico-add-song-search').value = "";
@@ -1768,7 +1769,7 @@
       `;
         div.querySelector('.btn-add-song-select').addEventListener('click', async () => {
           const songId = s.id;
-          const dateStr = serviceDateSelect.value || document.getElementById('musico-service-date').value;
+          const dateStr = window._targetAddSongDate || serviceDateSelect.value || document.getElementById('musico-service-date').value;
           const path = `cancionesSeleccionadas.${songId}`;
 
           const docRef = doc(db, "planes_servicio", dateStr);
@@ -1816,7 +1817,7 @@
           return;
         }
 
-        const dateStr = serviceDateSelect.value || document.getElementById('musico-service-date').value;
+        const dateStr = window._targetAddSongDate || serviceDateSelect.value || document.getElementById('musico-service-date').value;
         const customId = 'custom_' + Date.now();
 
         const docRef = doc(db, "planes_servicio", dateStr);
@@ -1844,6 +1845,7 @@
       btn.addEventListener('click', () => {
         const type = btn.dataset.type;
         window._targetAddSongType = type;
+        window._targetAddSongDate = serviceDateSelect.value;
 
         document.getElementById('musico-add-song-title').textContent = `Agregar a ${type === 'adoracion' ? 'Adoración' : 'Alabanza'}`;
         document.getElementById('musico-add-song-search').value = "";
