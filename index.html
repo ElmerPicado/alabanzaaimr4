@@ -169,6 +169,13 @@
       transition: border-color 0.2s;
     }
 
+    .field input[type="date"] {
+      -webkit-appearance: none;
+      appearance: none;
+      min-height: 48px;
+      display: block;
+    }
+
     .field input:focus,
     .field select:focus {
       border-color: var(--gold);
@@ -1553,6 +1560,8 @@
     <header class="app-header">
       <div class="logo">AlabanZapp <span>IMR4</span></div>
       <div style="display: flex; gap: 8px; align-items: center;">
+        <!-- Selector de Tema Claro/Oscuro -->
+        <button id="btn-leader-theme" class="theme-btn" title="Cambiar Tema">☀️</button>
         <div class="user-avatar-container" style="position: relative; cursor: pointer;" id="leader-avatar-container" title="Subir foto de perfil">
           <div id="leader-avatar" class="avatar" style="width: 32px; height: 32px; font-size: 13px; background-size: cover; background-position: center; border: 1.5px solid var(--border2); transition: transform 0.2s;"></div>
         </div>
@@ -3288,6 +3297,12 @@
       currentUserRole = userData.role;
       displayRole.textContent = currentUserRole === 'lider' ? 'Líder' : 'Músico';
 
+      // Cargar y aplicar tema individual del usuario
+      if (userData.usuario && typeof window.aplicarTemaPorUsuario === 'function') {
+        const savedTheme = localStorage.getItem('theme-' + userData.usuario) || 'dark';
+        window.aplicarTemaPorUsuario(savedTheme);
+      }
+
       screenLogin.classList.remove('active');
       if (window.intentarMostrarPwaBanner) window.intentarMostrarPwaBanner();
 
@@ -3368,6 +3383,11 @@
       if (unsubscribeMusicoService) unsubscribeMusicoService();
       if (window._unsubMusicoServicePlan) { window._unsubMusicoServicePlan(); window._unsubMusicoServicePlan = null; }
       window._prevCambiosTono = {};
+      
+      // Restablecer el tema por defecto (oscuro) para la pantalla de login
+      if (typeof window.aplicarTemaPorUsuario === 'function') {
+        window.aplicarTemaPorUsuario('dark');
+      }
       activeSessionUser = null;
     }
 
@@ -3399,23 +3419,40 @@
       });
     }
 
-    // === CONTROLADOR DE TEMAS (CLARO / OSCURO) PARA MÚSICOS ===
+    // === CONTROLADOR DE TEMAS (CLARO / OSCURO) INDIVIDUAL POR USUARIO ===
     const btnMusicoTheme = document.getElementById('btn-musico-theme');
-    const themeInit = localStorage.getItem('musico-theme') || 'dark';
-    if (themeInit === 'light') {
-      document.body.classList.add('theme-light');
-      if (btnMusicoTheme) btnMusicoTheme.textContent = '🌙';
-    } else {
-      document.body.classList.remove('theme-light');
-      if (btnMusicoTheme) btnMusicoTheme.textContent = '☀️';
+    const btnLeaderTheme = document.getElementById('btn-leader-theme');
+
+    window.aplicarTemaPorUsuario = function(tema) {
+      const isLight = (tema === 'light');
+      if (isLight) {
+        document.body.classList.add('theme-light');
+      } else {
+        document.body.classList.remove('theme-light');
+      }
+      if (btnMusicoTheme) btnMusicoTheme.textContent = isLight ? '🌙' : '☀️';
+      if (btnLeaderTheme) btnLeaderTheme.textContent = isLight ? '🌙' : '☀️';
+    };
+
+    // Inicialización del tema en base al último usuario con sesión activa o por defecto oscuro
+    const savedUserKey = localStorage.getItem('sessionUserKey');
+    const themeInit = savedUserKey ? (localStorage.getItem('theme-' + savedUserKey) || 'dark') : 'dark';
+    window.aplicarTemaPorUsuario(themeInit);
+
+    function toggleTema() {
+      const isCurrentlyLight = document.body.classList.contains('theme-light');
+      const nextTheme = isCurrentlyLight ? 'dark' : 'light';
+      if (activeSessionUser && activeSessionUser.usuario) {
+        localStorage.setItem('theme-' + activeSessionUser.usuario, nextTheme);
+      }
+      window.aplicarTemaPorUsuario(nextTheme);
     }
+
     if (btnMusicoTheme) {
-      btnMusicoTheme.addEventListener('click', () => {
-        document.body.classList.toggle('theme-light');
-        const isLight = document.body.classList.contains('theme-light');
-        localStorage.setItem('musico-theme', isLight ? 'light' : 'dark');
-        btnMusicoTheme.textContent = isLight ? '🌙' : '☀️';
-      });
+      btnMusicoTheme.addEventListener('click', toggleTema);
+    }
+    if (btnLeaderTheme) {
+      btnLeaderTheme.addEventListener('click', toggleTema);
     }
 
 
@@ -5718,6 +5755,9 @@
           localStorage.removeItem('sessionPassword');
           localStorage.removeItem('activeLeaderTab');
           localStorage.removeItem('activeMusicoTab');
+          if (typeof window.aplicarTemaPorUsuario === 'function') {
+            window.aplicarTemaPorUsuario('dark');
+          }
         }
       } catch (err) {
         console.error("Error al re-autenticar la sesión guardada:", err);
