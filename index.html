@@ -1975,7 +1975,7 @@
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
               <div style="flex:1; min-width:0;">
                 <div style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:4px;">🎵 ${e.nombre}</div>
-                <div style="font-size:12px; color:var(--teal); margin-bottom:4px;">📅 ${e.fecha}${e.hora ? ' &nbsp;⏰ ' + e.hora : ''}</div>
+                <div style="font-size:12px; color:var(--teal); margin-bottom:4px;">📅 ${(e.fecha || '').split('-').reverse().join('/')}${e.hora ? ' &nbsp;⏰ ' + e.hora : ''}</div>
                 <div style="font-size:11px; color:var(--text3); margin-bottom:6px;">👥 ${confirmados}/${totalMiembros} confirmados</div>
                 <div style="font-size:11px; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🎶 ${songNames}</div>
               </div>
@@ -2090,7 +2090,7 @@
             lista += `\n  • ${nombre}: ${estado}`;
           });
           const confirmed = Object.values(confs).filter(v => v === true || v === 'confirmado').length;
-          alert(`Ensayo: ${data.nombre}\nFecha: ${data.fecha}${data.hora ? ' ⏰ ' + data.hora : ''}\nConfirmados: ${confirmed}/${miembros.length}\n${lista}`);
+          alert(`Ensayo: ${data.nombre}\nFecha: ${(data.fecha || '').split('-').reverse().join('/')}${data.hora ? ' ⏰ ' + data.hora : ''}\nConfirmados: ${confirmed}/${miembros.length}\n${lista}`);
         });
       }
 
@@ -2175,7 +2175,7 @@
               <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
                 <div style="flex:1; min-width:0;">
                   <div style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:2px;">🎵 ${e.nombre}</div>
-                  <div style="font-size:12px; color:var(--teal);">📅 ${e.fecha}${e.hora ? ' &nbsp;⏰ <b>' + e.hora + '</b>' : ''}</div>
+                  <div style="font-size:12px; color:var(--teal);">📅 ${(e.fecha || '').split('-').reverse().join('/')}${e.hora ? ' &nbsp;⏰ <b>' + e.hora + '</b>' : ''}</div>
                 </div>
               </div>
               
@@ -2277,14 +2277,14 @@
                 if (isConfirmed) {
                   msgHtml += `Recuerda tu ensayo confirmado:<br><br>`;
                   msgHtml += `🎵 <b>${ensayoToShow.nombre}</b><br>`;
-                  msgHtml += `📅 <b>Fecha:</b> ${ensayoToShow.fecha}<br>`;
+                  msgHtml += `📅 <b>Fecha:</b> ${(ensayoToShow.fecha || '').split('-').reverse().join('/')}<br>`;
                   msgHtml += `⏰ <b>Hora:</b> ${ensayoToShow.hora || 'No especificada'}<br><br>`;
                   msgHtml += `<i>¡Nos vemos pronto!</i>`;
                   if (confirmBtn) confirmBtn.style.display = 'none';
                 } else {
                   msgHtml += `Tienes un ensayo programado pendiente de confirmar:<br><br>`;
                   msgHtml += `🎵 <b>${ensayoToShow.nombre}</b><br>`;
-                  msgHtml += `📅 <b>Fecha:</b> ${ensayoToShow.fecha}<br>`;
+                  msgHtml += `📅 <b>Fecha:</b> ${(ensayoToShow.fecha || '').split('-').reverse().join('/')}<br>`;
                   msgHtml += `⏰ <b>Hora:</b> ${ensayoToShow.hora || 'No especificada'}<br><br>`;
                   msgHtml += `<span style="color:var(--coral); font-weight:bold; font-size:14px;">⏳ ${daysText}</span><br><br>`;
                   msgHtml += `Por favor, confirma tu asistencia para que podamos coordinar.`;
@@ -2333,7 +2333,7 @@
         const titleEl = document.getElementById('practice-modal-title');
         const subtitleEl = document.getElementById('practice-modal-subtitle');
         if (titleEl) titleEl.textContent = e.nombre || 'Lista de Ensayo';
-        if (subtitleEl) subtitleEl.textContent = `Fecha: ${e.fecha || ''} ${e.hora ? ' | Hora: ' + e.hora : ''}`;
+        if (subtitleEl) subtitleEl.textContent = `Fecha: ${(e.fecha || '').split('-').reverse().join('/')} ${e.hora ? ' | Hora: ' + e.hora : ''}`;
 
         const rehearsalSongs = [];
         (e.canciones || []).forEach(sid => {
@@ -2936,19 +2936,36 @@
               ▶ YouTube
             </a>
           </div>
-          <div id="lyrics-modal-meta" class="lyrics-modal-meta">Tono Original: C | Tono Actual: D</div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+            <div id="lyrics-modal-meta" class="lyrics-modal-meta" style="margin-bottom: 0;">Tono Original: C | Tono Actual: D</div>
+            <div style="display: inline-flex; align-items: center; gap: 4px;">
+              <span style="font-size: 11px; color: var(--text3);">Practicar en:</span>
+              <select id="lyrics-modal-tone-select" style="
+                background: var(--bg3);
+                color: var(--gold);
+                border: 1px solid var(--border2);
+                border-radius: 6px;
+                padding: 2px 6px;
+                font-size: 11px;
+                font-weight: 600;
+                outline: none;
+                cursor: pointer;
+              ">
+              </select>
+            </div>
+          </div>
         </div>
         <button id="lyrics-modal-close" class="lyrics-modal-close">&times;</button>
       </div>
       <div class="lyrics-modal-body">
         <div id="lyrics-modal-content" class="lyrics-content"></div>
       </div>
-      <div class="lyrics-modal-footer" style="padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg); flex-shrink: 0; gap: 12px;">
-        <button id="lyrics-modal-prev" class="btn-ver-letra" style="margin-top:0; padding: 8px 16px; font-size:12px; background: rgba(255,255,255,0.05); border-color: var(--border2); color: var(--text2); box-shadow: none;">
+      <div class="lyrics-modal-footer" style="padding: 16px 20px; border-top: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(180deg, var(--bg2) 0%, var(--bg3) 100%); flex-shrink: 0; gap: 12px; box-shadow: 0 -4px 20px rgba(0,0,0,0.3);">
+        <button id="lyrics-modal-prev" style="margin-top:0; padding: 8px 14px; font-size:11px; background: rgba(255,255,255,0.04); border: 1.5px solid var(--border2); color: var(--text2); border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: var(--font-body); font-weight: 600; min-height: 42px; text-align: left; transition: all 0.2s;">
           ◀ Anterior
         </button>
-        <span id="lyrics-modal-page-indicator" style="font-size:13px; color:var(--text2); font-weight:600; font-family:var(--font-body);">1 de 5</span>
-        <button id="lyrics-modal-next" class="btn-ver-letra" style="margin-top:0; padding: 8px 16px; font-size:12px; background: rgba(244, 197, 66, 0.12); border-color: var(--gold); color: var(--gold); box-shadow: none;">
+        <span id="lyrics-modal-page-indicator" style="font-size:13px; color:var(--text); font-weight:700; font-family:var(--font-body); background: rgba(0, 0, 0, 0.25); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border);">1 de 5</span>
+        <button id="lyrics-modal-next" style="margin-top:0; padding: 8px 14px; font-size:11px; background: rgba(78, 205, 196, 0.12); border: 1.5px solid var(--teal); color: var(--teal); border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: var(--font-body); font-weight: 700; min-height: 42px; text-align: right; justify-content: flex-end; transition: all 0.2s; box-shadow: 0 4px 12px rgba(78,205,196,0.15);">
           Siguiente ▶
         </button>
       </div>
@@ -4941,6 +4958,27 @@
       const tonoMostrar = song.tonoServicio || song.tonoBase;
       document.getElementById('lyrics-modal-title').textContent = song.nombre;
       document.getElementById('lyrics-modal-meta').textContent = `Tono Original: ${song.tonoBase} | Tono del Servicio: ${tonoMostrar}`;
+
+      // Selector de Tono en el Modal de Letras para práctica personal
+      const toneSelect = document.getElementById('lyrics-modal-tone-select');
+      if (toneSelect) {
+        const keys = ['C', 'Cm', 'C#', 'C#m', 'D', 'Dm', 'D#', 'D#m', 'E', 'Em', 'F', 'Fm', 'F#', 'F#m', 'G', 'Gm', 'G#', 'G#m', 'A', 'Am', 'A#', 'A#m', 'B', 'Bm'];
+        toneSelect.innerHTML = keys.map(k => `<option value="${k}">${k}</option>`).join('');
+        toneSelect.value = tonoMostrar;
+        
+        toneSelect.onchange = (e) => {
+          const selectedTone = e.target.value;
+          const isSongHasLetra = song.letra && song.letra.trim() !== "";
+          if (isSongHasLetra) {
+            document.getElementById('lyrics-modal-content').innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, selectedTone);
+          }
+          document.getElementById('lyrics-modal-meta').textContent = `Tono Original: ${song.tonoBase} | Tono del Servicio: ${selectedTone}`;
+          
+          song.tonoServicio = selectedTone;
+          if (!window._lyricsCache) window._lyricsCache = {};
+          window._lyricsCache[cancionId] = song;
+        };
+      }
       
       // Enlace de YouTube
       const ytUrl = song.youtube || (cacheSongs.find(x => x.id === cancionId) || {}).youtube || (window._currentServiceData && window._currentServiceData.customSongsMetadata && window._currentServiceData.customSongsMetadata[cancionId] || {}).youtube;
@@ -4985,12 +5023,16 @@
 
           // Botón Anterior
           if (currentIndex > 0) {
+            const prevSong = currentList[currentIndex - 1];
+            const prevName = prevSong.nombre || "Anterior";
+            prevBtn.innerHTML = `◀ <div style="display:flex; flex-direction:column; align-items:flex-start; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.6; letter-spacing:0.5px;">Anterior</span><span style="font-size:11px; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700;">${prevName}</span></div>`;
             prevBtn.style.opacity = '1';
             prevBtn.style.pointerEvents = 'auto';
             prevBtn.onclick = () => {
-              window.abrirModalLetraGlobal(currentList[currentIndex - 1].id);
+              window.abrirModalLetraGlobal(prevSong.id);
             };
           } else {
+            prevBtn.innerHTML = `◀ <div style="display:flex; flex-direction:column; align-items:flex-start; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.4; letter-spacing:0.5px;">Anterior</span><span style="font-size:11px; opacity:0.4;">Ninguna</span></div>`;
             prevBtn.style.opacity = '0.3';
             prevBtn.style.pointerEvents = 'none';
             prevBtn.onclick = null;
@@ -4998,12 +5040,16 @@
 
           // Botón Siguiente
           if (currentIndex < currentList.length - 1) {
+            const nextSong = currentList[currentIndex + 1];
+            const nextName = nextSong.nombre || "Siguiente";
+            nextBtn.innerHTML = `<div style="display:flex; flex-direction:column; align-items:flex-end; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.6; letter-spacing:0.5px;">Siguiente</span><span style="font-size:11px; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700;">${nextName}</span></div> ▶`;
             nextBtn.style.opacity = '1';
             nextBtn.style.pointerEvents = 'auto';
             nextBtn.onclick = () => {
-              window.abrirModalLetraGlobal(currentList[currentIndex + 1].id);
+              window.abrirModalLetraGlobal(nextSong.id);
             };
           } else {
+            nextBtn.innerHTML = `<div style="display:flex; flex-direction:column; align-items:flex-end; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.4; letter-spacing:0.5px;">Siguiente</span><span style="font-size:11px; opacity:0.4;">Ninguna</span></div> ▶`;
             nextBtn.style.opacity = '0.3';
             nextBtn.style.pointerEvents = 'none';
             nextBtn.onclick = null;
@@ -5013,9 +5059,11 @@
           prevBtn.style.opacity = '0.3';
           prevBtn.style.pointerEvents = 'none';
           prevBtn.onclick = null;
+          prevBtn.innerHTML = `◀ <div style="display:flex; flex-direction:column; align-items:flex-start; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.4; letter-spacing:0.5px;">Anterior</span><span style="font-size:11px; opacity:0.4;">Ninguna</span></div>`;
           nextBtn.style.opacity = '0.3';
           nextBtn.style.pointerEvents = 'none';
           nextBtn.onclick = null;
+          nextBtn.innerHTML = `<div style="display:flex; flex-direction:column; align-items:flex-end; line-height:1.2;"><span style="font-size:9px; text-transform:uppercase; opacity:0.4; letter-spacing:0.5px;">Siguiente</span><span style="font-size:11px; opacity:0.4;">Ninguna</span></div> ▶`;
         }
       }
     };
@@ -5656,81 +5704,77 @@
 
     function setupProfilePicUpload() {
       const uploaderInput = document.getElementById('global-profile-pic-input');
+      if (!uploaderInput) return;
+
       const leaderAvBtn = document.getElementById('leader-avatar-container');
       const musicoAvBtn = document.getElementById('musico-avatar-container');
 
       const triggerUpload = () => {
-        if (uploaderInput) uploaderInput.click();
+        uploaderInput.click();
       };
 
-      if (leaderAvBtn) leaderAvBtn.addEventListener('click', triggerUpload);
-      if (musicoAvBtn) musicoAvBtn.addEventListener('click', triggerUpload);
+      if (leaderAvBtn) leaderAvBtn.onclick = triggerUpload;
+      if (musicoAvBtn) musicoAvBtn.onclick = triggerUpload;
 
-      if (uploaderInput) {
-        // Remove existing listener to prevent duplicate binding
-        uploaderInput.replaceWith(uploaderInput.cloneNode(true));
-        const cleanInput = document.getElementById('global-profile-pic-input');
-        
-        cleanInput.addEventListener('change', (e) => {
-          const file = e.target.files[0];
-          if (!file) return;
-          if (!file.type.startsWith('image/')) {
-            showToast("❌ Por favor, selecciona una imagen válida.");
-            return;
-          }
+      uploaderInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+          showToast("❌ Por favor, selecciona una imagen válida.");
+          return;
+        }
 
-          const reader = new FileReader();
-          reader.onload = function (event) {
-            const img = new Image();
-            img.onload = function () {
-              const canvas = document.createElement('canvas');
-              const maxDim = 120; // 120x120 pixels is plenty for an avatar
-              let width = img.width;
-              let height = img.height;
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          const img = new Image();
+          img.onload = function () {
+            const canvas = document.createElement('canvas');
+            const maxDim = 120; // 120x120 pixels is plenty for an avatar
+            let width = img.width;
+            let height = img.height;
 
-              if (width > height) {
-                if (width > maxDim) {
-                  height = Math.round(height * maxDim / width);
-                  width = maxDim;
-                }
-              } else {
-                if (height > maxDim) {
-                  width = Math.round(width * maxDim / height);
-                  height = maxDim;
-                }
+            if (width > height) {
+              if (width > maxDim) {
+                height = Math.round(height * maxDim / width);
+                width = maxDim;
               }
+            } else {
+              if (height > maxDim) {
+                width = Math.round(width * maxDim / height);
+                height = maxDim;
+              }
+            }
 
-              canvas.width = width;
-              canvas.height = height;
-              const ctx = canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, width, height);
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
 
-              const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
+            
+            if (!db || !doc || !setDoc) return;
+            
+            // Save to Firestore using username document ID
+            const userRef = doc(db, "usuarios", activeSessionUser.usuario);
+            setDoc(userRef, { profilePic: compressedBase64 }, { merge: true }).then(() => {
+              activeSessionUser.profilePic = compressedBase64;
+              window.actualizarAvatares();
+              showToast("📷 Foto de perfil actualizada");
               
-              if (!db || !doc || !setDoc) return;
-              
-              // Save to Firestore using username document ID
-              const userRef = doc(db, "usuarios", activeSessionUser.usuario);
-              setDoc(userRef, { profilePic: compressedBase64 }, { merge: true }).then(() => {
-                activeSessionUser.profilePic = compressedBase64;
-                window.actualizarAvatares();
-                showToast("📷 Foto de perfil actualizada");
-                
-                // Update in local cacheMembers to propagate changes
-                if (window.cacheMembers) {
-                  const mLocal = window.cacheMembers.find(m => m.usuario === activeSessionUser.usuario);
-                  if (mLocal) mLocal.profilePic = compressedBase64;
-                }
-              }).catch(err => {
-                console.error("Error saving profile pic:", err);
-                showToast("❌ Error al guardar la foto");
-              });
-            };
-            img.src = event.target.result;
+              // Update in local cacheMembers to propagate changes
+              if (window.cacheMembers) {
+                const mLocal = window.cacheMembers.find(m => m.usuario === activeSessionUser.usuario);
+                if (mLocal) mLocal.profilePic = compressedBase64;
+              }
+            }).catch(err => {
+              console.error("Error saving profile pic:", err);
+              showToast("❌ Error al guardar la foto");
+            });
           };
-          reader.readAsDataURL(file);
-        });
-      }
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      };
     }
 
     // Call after document load / login init
