@@ -1476,12 +1476,18 @@
         padding: 4px 8px !important;
         font-size: 11px !important;
       }
-      .theme-btn, .sos-btn, .btn-logout {
+      .theme-btn {
         padding: 4px 6px !important;
         min-width: unset !important;
         width: 30px !important;
         height: 30px !important;
         font-size: 11px !important;
+      }
+      .sos-btn, .btn-logout {
+        padding: 4px 10px !important;
+        font-size: 11px !important;
+        height: 30px !important;
+        width: auto !important;
       }
       .user-avatar-container .avatar {
         width: 28px !important;
@@ -1551,7 +1557,7 @@
           <div id="leader-avatar" class="avatar" style="width: 32px; height: 32px; font-size: 13px; background-size: cover; background-position: center; border: 1.5px solid var(--border2); transition: transform 0.2s;"></div>
         </div>
         <span class="role-badge" id="display-role">Cargando...</span>
-        <button class="btn-logout" id="btn-logout"><span class="hide-mobile">Salir </span>🚪</button>
+        <button class="btn-logout" id="btn-logout">Salir</button>
       </div>
     </header>
     <script>
@@ -2755,14 +2761,14 @@
       <div class="logo">AlabanZapp <span>IMR4</span></div>
       <div style="display: flex; gap: 8px; align-items: center;">
         <!-- Botón S.O.S estático en cabecera -->
-        <button id="btn-musico-sos" class="sos-btn" title="Pedir Asistencia (S.O.S)">🚨<span class="hide-mobile"> S.O.S</span></button>
+        <button id="btn-musico-sos" class="sos-btn" title="Pedir Asistencia (S.O.S)">🚨 S.O.S</button>
         <!-- Selector de Tema Claro/Oscuro -->
         <button id="btn-musico-theme" class="theme-btn" title="Cambiar Tema">☀️</button>
         <div class="user-avatar-container" style="position: relative; cursor: pointer;" id="musico-avatar-container" title="Subir foto de perfil">
           <div id="musico-avatar" class="avatar" style="width: 32px; height: 32px; font-size: 13px; background-size: cover; background-position: center; border: 1.5px solid var(--border2); transition: transform 0.2s;"></div>
         </div>
         <span id="musico-name-badge" class="role-badge"></span>
-        <button class="btn-logout" id="btn-musico-logout"><span class="hide-mobile">Salir </span>🚪</button>
+        <button class="btn-logout" id="btn-musico-logout">Salir</button>
       </div>
     </header>
 
