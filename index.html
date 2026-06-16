@@ -1242,6 +1242,28 @@
       background: rgba(255, 107, 107, 0.12);
     }
 
+    .btn-remove-song-inline {
+      background: none;
+      border: none;
+      color: var(--text3);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      transition: all 0.15s;
+      line-height: 1;
+    }
+
+    .btn-remove-song-inline:hover {
+      color: var(--coral);
+      background: rgba(255, 107, 107, 0.12);
+    }
+
     .btn-add-song-musico {
       transition: all 0.2s ease;
     }
@@ -1450,9 +1472,12 @@
         const btnCancelEnsayo = document.getElementById('btn-cancel-ensayo');
         const btnSaveEnsayo = document.getElementById('btn-save-ensayo');
 
-        if (btnAddEnsayo) {
+        if (btnAddEnsayo && !btnAddEnsayo.dataset.hasListener) {
+          btnAddEnsayo.dataset.hasListener = "true";
           btnAddEnsayo.addEventListener('click', () => {
             editingEnsayoId = null; // Reset editing mode
+            window._tempSelectedSongs = [];
+            window._tempSelectedTones = {};
             
             try {
               if (window.renderEnsayoMembers) {
@@ -1462,9 +1487,13 @@
               console.error("Error al renderizar miembros para el ensayo:", e);
             }
 
+            // Clear search input
+            const searchInput = document.getElementById('search-ensayo-songs');
+            if (searchInput) searchInput.value = '';
+
             try {
               if (typeof renderEnsayoCancionesModal === 'function') {
-                renderEnsayoCancionesModal([]);
+                renderEnsayoCancionesModal(window._tempSelectedSongs, window._tempSelectedTones);
               }
             } catch (e) {
               console.error("Error al renderizar canciones para el ensayo:", e);
@@ -1494,14 +1523,31 @@
           });
         }
 
-        if (btnCancelEnsayo) {
+        if (btnCancelEnsayo && !btnCancelEnsayo.dataset.hasListener) {
+          btnCancelEnsayo.dataset.hasListener = "true";
           btnCancelEnsayo.addEventListener('click', () => {
             if (modalEnsayo) modalEnsayo.classList.remove('active');
           });
         }
 
-        if (btnSaveEnsayo) {
+        // Search input keyup/input handler
+        const searchInput = document.getElementById('search-ensayo-songs');
+        if (searchInput && !searchInput.dataset.hasListener) {
+          searchInput.dataset.hasListener = "true";
+          searchInput.addEventListener('input', () => {
+            renderEnsayoCancionesModal(window._tempSelectedSongs || [], window._tempSelectedTones || {});
+          });
+        }
+
+        if (btnSaveEnsayo && !btnSaveEnsayo.dataset.hasListener) {
+          btnSaveEnsayo.dataset.hasListener = "true";
           btnSaveEnsayo.addEventListener('click', async () => {
+            // Prevent double submission
+            if (btnSaveEnsayo.disabled) return;
+            btnSaveEnsayo.disabled = true;
+            const originalText = btnSaveEnsayo.textContent;
+            btnSaveEnsayo.textContent = 'Guardando...';
+
             const ensayoMiembrosList = document.getElementById('ensayo-miembros-list');
             const nombreInput = document.getElementById('ensayo-nombre');
             const fechaInput = document.getElementById('ensayo-fecha');
@@ -1520,7 +1566,12 @@
               hora = `${hh}:${mm} ${ampm}`;
             }
 
-            if (!fecha) { alert('Selecciona una fecha para el ensayo.'); return; }
+            if (!fecha) {
+              alert('Selecciona una fecha para el ensayo.');
+              btnSaveEnsayo.disabled = false;
+              btnSaveEnsayo.textContent = originalText;
+              return;
+            }
             const defaultLabel = `Ensayo ${fecha}${hora ? ' ' + hora : ''}`;
             const etiqueta = nombre || defaultLabel;
 
@@ -1532,17 +1583,16 @@
                 if (id) selectedIds.push(id);
               });
             }
-            if (selectedIds.length === 0) { alert('Selecciona al menos un integrante.'); return; }
+            if (selectedIds.length === 0) {
+              alert('Selecciona al menos un integrante.');
+              btnSaveEnsayo.disabled = false;
+              btnSaveEnsayo.textContent = originalText;
+              return;
+            }
 
             // Songs
-            const selectedSongIds = [];
-            const cancionesListEl = document.getElementById('ensayo-canciones-list');
-            if (cancionesListEl) {
-              cancionesListEl.querySelectorAll('.assign-check.on').forEach(el => {
-                const sid = el.getAttribute('data-song-id');
-                if (sid) selectedSongIds.push(sid);
-              });
-            }
+            const selectedSongIds = window._tempSelectedSongs || [];
+            const tonos = window._tempSelectedTones || {};
 
             // Read notify mode
             const notifyVal = document.querySelector('input[name="ensayo-notify-mode"]:checked')?.value || 'app';
@@ -1555,7 +1605,8 @@
                   fecha: fecha,
                   hora: hora,
                   miembros: selectedIds,
-                  canciones: selectedSongIds
+                  canciones: selectedSongIds,
+                  tonos: tonos
                 });
                 showToast(`✅ Ensayo "${etiqueta}" actualizado`);
               } else {
@@ -1566,6 +1617,7 @@
                   hora: hora,
                   miembros: selectedIds,
                   canciones: selectedSongIds,
+                  tonos: tonos,
                   confirmaciones: {}
                 });
                 showToast(`✅ Ensayo "${etiqueta}" creado`);
@@ -1612,7 +1664,8 @@
                   selectedSongIds.forEach((sid, idx) => {
                     const s = (window.cacheSongs || []).find(x => x.id === sid);
                     if (s) {
-                      msg += `  ${idx + 1}. *${s.nombre}* (${s.artista})`;
+                      const toneStr = tonos[sid] ? ` (Tono: ${tonos[sid]})` : ` (Tono: ${s.tonoBase})`;
+                      msg += `  ${idx + 1}. *${s.nombre}* (${s.artista})${toneStr}`;
                       if (s.youtube && s.youtube.trim()) {
                         msg += `\n     Link: ${s.youtube}`;
                       }
@@ -1645,6 +1698,9 @@
             } catch (err) {
               console.error('Error procesando ensayo', err);
               alert('Error al procesar el ensayo: ' + err.message);
+            } finally {
+              btnSaveEnsayo.disabled = false;
+              btnSaveEnsayo.textContent = originalText;
             }
           });
         }
@@ -1662,8 +1718,8 @@
       // ENSAYO HELPERS
       // ==============================
 
-      // Populate song checkboxes inside the modal
-      function renderEnsayoCancionesModal(selectedSongIds = []) {
+      // Populate song checkboxes inside the modal (with search and key selection)
+      function renderEnsayoCancionesModal(selectedSongIds = [], selectedTones = {}) {
         const cont = document.getElementById('ensayo-canciones-list');
         if (!cont) return;
         cont.innerHTML = '';
@@ -1671,28 +1727,73 @@
           cont.innerHTML = `<p style='color:var(--text3);font-size:12px;text-align:center;'>No hay canciones en la biblioteca aún.</p>`;
           return;
         }
+        const filterVal = (document.getElementById('search-ensayo-songs')?.value || "").toLowerCase().trim();
+
         window.cacheSongs.forEach(s => {
           if (!s) return;
-          const div = document.createElement('div');
-          div.className = 'member-row';
-          div.style.padding = '6px 0';
           const nameVal = s.nombre || 'Canción sin título';
           const artistVal = s.artista || 'Artista Desconocido';
           const typeVal = s.tipo || 'alabanza';
+
+          if (filterVal && !nameVal.toLowerCase().includes(filterVal) && !artistVal.toLowerCase().includes(filterVal)) {
+            return;
+          }
+
+          const div = document.createElement('div');
+          div.className = 'member-row';
+          div.style.padding = '6px 0';
           const isSelected = selectedSongIds.includes(s.id);
+          const displayTone = selectedTones[s.id] || s.tonoBase || 'C';
+          const keysOptions = ['C', 'Cm', 'C#', 'C#m', 'D', 'Dm', 'D#', 'D#m', 'E', 'Em', 'F', 'Fm', 'F#', 'F#m', 'G', 'Gm', 'G#', 'G#m', 'A', 'Am', 'A#', 'A#m', 'B', 'Bm'];
+
           div.innerHTML = `
             <div class="assign-check ${isSelected ? 'on' : ''}" data-song-id="${s.id}"></div>
-            <div class="member-info">
-              <div class="member-name" style="font-size:13px; font-weight:500;">${nameVal}</div>
-              <div class="member-role">${artistVal} | <span class="chip-type chip-${typeVal}">${typeVal}</span></div>
+            <div class="member-info" style="flex:1; min-width:0; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <div>
+                <div class="member-name" style="font-size:13px; font-weight:500;">${nameVal}</div>
+                <div class="member-role">${artistVal} | <span class="chip-type chip-${typeVal}">${typeVal}</span></div>
+              </div>
+              <div class="ensayo-tone-selector-container" style="display: ${isSelected ? 'inline-flex' : 'none'}; align-items: center; gap: 4px;">
+                <span style="font-size: 11px; color: var(--gold);">Tono:</span>
+                <select class="select-ensayo-tone" style="background:var(--bg3); border:1px solid rgba(244,197,66,0.5); color:var(--gold); border-radius:4px; padding:1px 4px; font-size:11px; font-family:var(--font-body); outline:none; cursor:pointer;">
+                  ${keysOptions.map(t => `<option value="${t}" ${t === displayTone ? 'selected' : ''}>${t}</option>`).join('')}
+                </select>
+              </div>
             </div>
           `;
+
           div.querySelector('.assign-check').addEventListener('click', e => {
             e.stopPropagation();
-            e.currentTarget.classList.toggle('on');
+            const checkbox = e.currentTarget;
+            checkbox.classList.toggle('on');
+            const isChecked = checkbox.classList.contains('on');
+            const toneContainer = div.querySelector('.ensayo-tone-selector-container');
+            
+            if (isChecked) {
+              if (!selectedSongIds.includes(s.id)) selectedSongIds.push(s.id);
+              if (!selectedTones[s.id]) selectedTones[s.id] = s.tonoBase || 'C';
+              if (toneContainer) toneContainer.style.display = 'inline-flex';
+            } else {
+              const idx = selectedSongIds.indexOf(s.id);
+              if (idx > -1) selectedSongIds.splice(idx, 1);
+              delete selectedTones[s.id];
+              if (toneContainer) toneContainer.style.display = 'none';
+            }
           });
+
+          const selectTone = div.querySelector('.select-ensayo-tone');
+          if (selectTone) {
+            selectTone.addEventListener('change', e => {
+              selectedTones[s.id] = e.target.value;
+            });
+          }
+
           cont.appendChild(div);
         });
+
+        if (cont.children.length === 0) {
+          cont.innerHTML = `<p style='color:var(--text3);font-size:12px;text-align:center;padding:10px;'>No se encontraron canciones.</p>`;
+        }
       }
 
       // Render member checkboxes for ensayo selection (categorized as Musicians & Voices)
@@ -1773,7 +1874,8 @@
             const confirmados = Object.values(e.confirmaciones || {}).filter(v => v === true).length;
             const songNames = (e.canciones || []).map(sid => {
               const s = (window.cacheSongs || []).find(x => x.id === sid);
-              return s ? s.nombre : sid;
+              const toneStr = (e.tonos && e.tonos[sid]) ? ` (${e.tonos[sid]})` : (s ? ` (${s.tonoBase})` : '');
+              return s ? `${s.nombre}${toneStr}` : sid;
             }).join(', ') || 'Sin canciones';
 
             const card = document.createElement('div');
@@ -1797,6 +1899,8 @@
             card.querySelector('.btn-ver-conf').addEventListener('click', () => openEnsayoAdmin(e.id));
             card.querySelector('.btn-edit-ensayo').addEventListener('click', () => {
               editingEnsayoId = e.id;
+              window._tempSelectedSongs = [...(e.canciones || [])];
+              window._tempSelectedTones = {...(e.tonos || {})};
               
               const nameEl = document.getElementById('ensayo-nombre');
               const dateEl = document.getElementById('ensayo-fecha');
@@ -1844,9 +1948,13 @@
                 window.renderEnsayoMembers(e.miembros || []);
               }
 
+              // Reset search input
+              const searchInput = document.getElementById('search-ensayo-songs');
+              if (searchInput) searchInput.value = '';
+
               // Render songs with current pre-selected ones
               if (typeof renderEnsayoCancionesModal === 'function') {
-                renderEnsayoCancionesModal(e.canciones || []);
+                renderEnsayoCancionesModal(window._tempSelectedSongs, window._tempSelectedTones);
               }
 
               // Reset notify radio to default
@@ -1921,7 +2029,7 @@
           filtered.forEach(e => {
             const confirmed = e.confirmaciones && e.confirmaciones[musicoId] === true;
 
-            // Build songs HTML with YouTube links
+            // Build songs HTML with YouTube links and keys
             const songIds = e.canciones || [];
             let songsHtml = '';
             if (songIds.length > 0) {
@@ -1930,13 +2038,14 @@
               songIds.forEach((sid, idx) => {
                 const s = (window.cacheSongs || []).find(x => x.id === sid);
                 if (!s) return;
+                const displayTone = (e.tonos && e.tonos[sid]) ? e.tonos[sid] : s.tonoBase;
                 const ytLink = s.youtube && s.youtube.trim()
                   ? `<a href="${s.youtube}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:4px; background:rgba(255,0,0,0.12); color:#ff4444; border:1px solid rgba(255,0,0,0.25); border-radius:6px; padding:3px 8px; font-size:10px; font-weight:600; text-decoration:none; margin-left:8px;">▶ YouTube</a>`
                   : '';
                 songsHtml += `<div style="display:flex; align-items:center; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
                 <span style="font-size:18px; color:var(--teal); min-width:28px; text-align:center;">${idx + 1}</span>
                 <div style="flex:1; min-width:0;">
-                  <div style="font-size:13px; font-weight:500; color:var(--text);">${s.nombre}</div>
+                  <div style="font-size:13px; font-weight:500; color:var(--text);">${s.nombre} <span style="background:rgba(244,197,66,0.12); color:var(--gold); font-size:11px; padding:1px 5px; border-radius:4px; font-weight:600; border: 1px solid rgba(244,197,66,0.25); margin-left: 6px;">${displayTone}</span></div>
                   <div style="font-size:11px; color:var(--text3);">${s.artista} · <span class="chip-type chip-${s.tipo}">${s.tipo}</span></div>
                 </div>
                 ${ytLink}
@@ -1963,6 +2072,104 @@
             });
             cont.appendChild(card);
           });
+
+          // 🔴 Update tab badge for pending rehearsals
+          const hasUnconfirmed = filtered.some(e => !(e.confirmaciones && e.confirmaciones[musicoId] === true));
+          const tabBtn = document.getElementById('nav-tab-ensayos-musico');
+          if (tabBtn) {
+            let dot = tabBtn.querySelector('.red-badge-dot');
+            if (hasUnconfirmed) {
+              if (!dot) {
+                dot = document.createElement('span');
+                dot.className = 'red-badge-dot';
+                dot.style.cssText = 'position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background-color: var(--coral); border-radius: 50%; box-shadow: 0 0 6px var(--coral);';
+                tabBtn.appendChild(dot);
+              }
+            } else {
+              if (dot) dot.remove();
+            }
+          }
+
+          // 🔔 Show modal popup reminder once-per-day
+          const todayStr = new Date().toISOString().split('T')[0];
+          const futureEnsayos = filtered.filter(e => e.fecha >= todayStr);
+          if (futureEnsayos.length > 0) {
+            const ensayoToShow = futureEnsayos.find(e => {
+              const lastSeenKey = `rehearsal_reminder_${e.id}_${todayStr}`;
+              return localStorage.getItem(lastSeenKey) !== 'true';
+            });
+
+            if (ensayoToShow) {
+              const isConfirmed = ensayoToShow.confirmaciones && ensayoToShow.confirmaciones[musicoId] === true;
+              
+              // Calculate remaining days
+              const today = new Date();
+              today.setHours(0,0,0,0);
+              const rDate = new Date(ensayoToShow.fecha + 'T00:00:00');
+              const diffTime = rDate - today;
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              
+              let daysText = '';
+              if (diffDays === 0) {
+                daysText = '¡Hoy es el ensayo!';
+              } else if (diffDays === 1) {
+                daysText = '¡Mañana es el ensayo!';
+              } else {
+                daysText = `Quedan ${diffDays} días para el ensayo.`;
+              }
+
+              const reminderModal = document.getElementById('ensayo-reminder-modal');
+              const titleEl = document.getElementById('ensayo-reminder-title');
+              const textEl = document.getElementById('ensayo-reminder-text');
+              const confirmBtn = document.getElementById('btn-ensayo-reminder-confirm');
+              const closeBtn = document.getElementById('btn-ensayo-reminder-close');
+
+              if (reminderModal && titleEl && textEl) {
+                titleEl.textContent = isConfirmed ? '🎵 Ensayo Confirmado' : '🚨 Ensayo Programado';
+                titleEl.style.color = isConfirmed ? 'var(--gold)' : 'var(--teal)';
+                reminderModal.querySelector('.modal-box').style.borderColor = isConfirmed ? 'var(--gold)' : 'var(--teal)';
+
+                let msgHtml = `Hola <b>${activeSessionUser.nombre}</b>,<br><br>`;
+                if (isConfirmed) {
+                  msgHtml += `Recuerda tu ensayo confirmado:<br><br>`;
+                  msgHtml += `🎵 <b>${ensayoToShow.nombre}</b><br>`;
+                  msgHtml += `📅 <b>Fecha:</b> ${ensayoToShow.fecha}<br>`;
+                  msgHtml += `⏰ <b>Hora:</b> ${ensayoToShow.hora || 'No especificada'}<br><br>`;
+                  msgHtml += `<i>¡Nos vemos pronto!</i>`;
+                  if (confirmBtn) confirmBtn.style.display = 'none';
+                } else {
+                  msgHtml += `Tienes un ensayo programado pendiente de confirmar:<br><br>`;
+                  msgHtml += `🎵 <b>${ensayoToShow.nombre}</b><br>`;
+                  msgHtml += `📅 <b>Fecha:</b> ${ensayoToShow.fecha}<br>`;
+                  msgHtml += `⏰ <b>Hora:</b> ${ensayoToShow.hora || 'No especificada'}<br><br>`;
+                  msgHtml += `<span style="color:var(--coral); font-weight:bold; font-size:14px;">⏳ ${daysText}</span><br><br>`;
+                  msgHtml += `Por favor, confirma tu asistencia para que podamos coordinar.`;
+                  if (confirmBtn) {
+                    confirmBtn.style.display = 'block';
+                    confirmBtn.onclick = () => {
+                      const docRef = doc(db, 'ensayos', ensayoToShow.id);
+                      updateDoc(docRef, { [`confirmaciones.${musicoId}`]: true }).then(() => {
+                        showToast('✅ Asistencia confirmada');
+                        reminderModal.classList.remove('active');
+                      });
+                    };
+                  }
+                }
+
+                textEl.innerHTML = msgHtml;
+                reminderModal.classList.add('active');
+
+                // Mark seen for today
+                localStorage.setItem(`rehearsal_reminder_${ensayoToShow.id}_${todayStr}`, 'true');
+
+                if (closeBtn) {
+                  closeBtn.onclick = () => {
+                    reminderModal.classList.remove('active');
+                  };
+                }
+              }
+            }
+          }
         });
       }
 
@@ -1991,7 +2198,7 @@
     <nav class="nav-tabs">
       <button class="nav-tab active" data-tab="tab-servicios">🗓️ Servicios</button>
       <button class="nav-tab" data-tab="tab-historial">📜 Historial</button>
-      <button class="nav-tab" data-tab="tab-repertorio">🎵 Biblioteca</button>
+      <button class="nav-tab" data-tab="tab-repertorio">🎵 Repertorio</button>
       <button class="nav-tab" data-tab="tab-ensayos">📅 Ensayos</button>
       <button class="nav-tab" data-tab="tab-miembros">👥 Miembros</button>
       <button class="nav-tab" data-tab="tab-ajustes">⚙️ Ajustes</button>
@@ -2063,7 +2270,7 @@
             style="background:none; border:none; color:var(--teal); font-size:12px; font-weight:600; cursor:pointer; display:none;">➕
             Agregar Alabanza</button>
         </div>
-        <div class="card song-list-scroll" id="songs-alabanza-container"></div>
+        <div class="card song-list-scroll" id="songs-alabanza-container" style="background: rgba(78, 205, 196, 0.04); border-color: rgba(78, 205, 196, 0.2); padding: 12px; margin-bottom: 16px;"></div>
 
         <!-- Lista dividida por Adoración -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0 8px;">
@@ -2074,15 +2281,14 @@
             style="background:none; border:none; color:var(--purple); font-size:12px; font-weight:600; cursor:pointer; display:none;">➕
             Agregar Adoración</button>
         </div>
-        <div class="card song-list-scroll" id="songs-adoracion-container"></div>
+        <div class="card song-list-scroll" id="songs-adoracion-container" style="background: rgba(155, 143, 255, 0.04); border-color: rgba(155, 143, 255, 0.2); padding: 12px; margin-bottom: 16px;"></div>
 
         <!-- ORDEN DEL REPERTORIO SELECCIONADO (Líder) -->
         <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin: 24px 0 10px;">📋 Orden
           del Repertorio</h3>
         <p class="section-sub">Usa las flechas ▲ y ▼ para ordenar las canciones y cambia el tono de cada una.</p>
-        <div class="card" id="admin-selected-songs-container" style="margin-bottom: 24px;">
-          <p style="color: var(--text3); font-size: 13px; text-align: center; padding: 10px;">No hay canciones
-            seleccionadas aún.</p>
+        <div id="admin-selected-songs-container" style="margin-bottom: 24px;">
+          <p style="color: var(--text3); font-size: 13px; text-align: center; padding: 20px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); margin: 0;">No hay canciones seleccionadas aún.</p>
         </div>
 
         <!-- NOTA ADICIONAL DEL LÍDER (Solo visible para líderes) -->
@@ -2170,70 +2376,31 @@
 
       <!-- 2. PANEL: MANTENIMIENTO DE REPERTORIO -->
       <div id="tab-repertorio" class="tab-panel">
-        <div class="card admin-only" id="panel-add-song" style="border-color: var(--teal); margin-bottom: 24px;">
-          <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--teal); margin-bottom: 12px;">
-            Agregar
-            Nueva Canción a la Biblioteca</h3>
-          <form id="form-add-song">
-            <div class="field"><label>Nombre de la Canción</label><input type="text" id="song-name-input" required
-                placeholder="Ej: Grande y Fuerte"></div>
-            <div class="field"><label>Artista / Ministerio</label><input type="text" id="song-artist-input" required
-                placeholder="Ej: Miel San Marcos"></div>
-            <div class="field">
-              <label>Tonalidad Base sugerida</label>
-              <select id="song-key-input" required>
-                <option value="" disabled selected>Selecciona un tono...</option>
-                <option value="C">C (Do)</option>
-                <option value="Cm">Cm (Do menor)</option>
-                <option value="C#">C# (Do#)</option>
-                <option value="C#m">C#m (Do# menor)</option>
-                <option value="D">D (Re)</option>
-                <option value="Dm">Dm (Re menor)</option>
-                <option value="D#">D# (Re#)</option>
-                <option value="D#m">D#m (Re# menor)</option>
-                <option value="E">E (Mi)</option>
-                <option value="Em">Em (Mi menor)</option>
-                <option value="F">F (Fa)</option>
-                <option value="Fm">Fm (Fa menor)</option>
-                <option value="F#">F# (Fa#)</option>
-                <option value="F#m">F#m (Fa# menor)</option>
-                <option value="G">G (Sol)</option>
-                <option value="Gm">Gm (Sol menor)</option>
-                <option value="G#">G# (Sol#)</option>
-                <option value="G#m">G#m (Sol# menor)</option>
-                <option value="A">A (La)</option>
-                <option value="Am">Am (La menor)</option>
-                <option value="A#">A# (La#)</option>
-                <option value="A#m">A#m (La# menor)</option>
-                <option value="B">B (Si)</option>
-                <option value="Bm">Bm (Si menor)</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Tipo de Canción</label>
-              <select id="song-type-input">
-                <option value="alabanza">Alabanza (Rápida)</option>
-                <option value="adoracion">Adoración (Lenta)</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Enlace de YouTube <span style="color: var(--text3); font-weight: 400;">(Opcional)</span></label>
-              <input type="url" id="song-youtube-input" placeholder="Ej: https://www.youtube.com/watch?v=...">
-            </div>
-            <div class="field">
-              <label>Letra y Acordes <span style="color: var(--text3); font-weight: 400;">(Opcional. Pega formato tipo
-                  LaCuerda.net)</span></label>
-              <textarea id="song-lyrics-input" placeholder="Pegar aquí la letra con los acordes arriba..."
-                style="width:100%; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px; color:var(--text); font-family:'Courier New', Courier, monospace; font-size:13px; resize:vertical; min-height:120px; white-space: pre; outline:none;"></textarea>
-            </div>
-            <button type="submit" class="btn-primary" style="background: var(--teal); color: #0f0e17;">Guardar en
-              Biblioteca</button>
-          </form>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div>
+            <h2 class="section-title">Repertorio Global de Canciones</h2>
+            <p class="section-sub" style="margin-bottom: 0;">Lista total de canciones registradas para alabanza y adoración.</p>
+          </div>
+          <button id="btn-add-song-global" class="btn-primary admin-only" style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">➕ Nueva Canción</button>
         </div>
 
-        <h2 class="section-title">Biblioteca Global de Canciones</h2>
-        <p class="section-sub">Lista total de canciones registradas en la iglesia.</p>
-        <div class="card song-list-scroll" id="global-songs-list" style="max-height: 400px;"></div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px;">
+          <!-- Card de Alabanzas -->
+          <div class="card" style="background: rgba(78, 205, 196, 0.04); border-color: rgba(78, 205, 196, 0.2); padding: 16px; margin-bottom: 0; display: flex; flex-direction: column;">
+            <h4 style="font-size: 13px; text-transform: uppercase; color: var(--teal); letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid rgba(78,205,196,0.15); padding-bottom: 6px;">
+              🔥 Alabanza (Rápidas) <span id="repertorio-alabanza-count" style="font-size: 11px; font-weight: normal; color: var(--text3); margin-left: auto;">(0)</span>
+            </h4>
+            <div class="song-list-scroll" id="repertorio-alabanzas-list" style="max-height: 400px; overflow-y: auto;"></div>
+          </div>
+
+          <!-- Card de Adoración -->
+          <div class="card" style="background: rgba(155, 143, 255, 0.04); border-color: rgba(155, 143, 255, 0.2); padding: 16px; margin-bottom: 0; display: flex; flex-direction: column;">
+            <h4 style="font-size: 13px; text-transform: uppercase; color: var(--purple); letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid rgba(155,143,255,0.15); padding-bottom: 6px;">
+              🙏 Adoración (Lentas) <span id="repertorio-adoracion-count" style="font-size: 11px; font-weight: normal; color: var(--text3); margin-left: auto;">(0)</span>
+            </h4>
+            <div class="song-list-scroll" id="repertorio-adoraciones-list" style="max-height: 400px; overflow-y: auto;"></div>
+          </div>
+        </div>
       </div>
 
       <!-- 3. PANEL: MANTENIMIENTO DE MIEMBROS -->
@@ -2336,7 +2503,7 @@
     <nav class="nav-tabs">
       <button class="nav-tab-musico active" data-mtab="mtab-servicio">Servicio</button>
       <button class="nav-tab-musico" data-mtab="mtab-asistencia">Mi Asistencia</button>
-      <button class="nav-tab-musico" data-mtab="mtab-ensayos-musico">📅 Ensayos</button>
+      <button id="nav-tab-ensayos-musico" class="nav-tab-musico" data-mtab="mtab-ensayos-musico" style="position: relative;">📅 Ensayos</button>
       <button class="nav-tab-musico" data-mtab="mtab-repertorio-musico">🎵 Repertorio</button>
     </nav>
 
@@ -2528,6 +2695,15 @@
       </div>
       <div class="lyrics-modal-body">
         <div id="lyrics-modal-content" class="lyrics-content"></div>
+      </div>
+      <div class="lyrics-modal-footer" style="padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg); flex-shrink: 0; gap: 12px;">
+        <button id="lyrics-modal-prev" class="btn-ver-letra" style="margin-top:0; padding: 8px 16px; font-size:12px; background: rgba(255,255,255,0.05); border-color: var(--border2); color: var(--text2); box-shadow: none;">
+          ◀ Anterior
+        </button>
+        <span id="lyrics-modal-page-indicator" style="font-size:13px; color:var(--text2); font-weight:600; font-family:var(--font-body);">1 de 5</span>
+        <button id="lyrics-modal-next" class="btn-ver-letra" style="margin-top:0; padding: 8px 16px; font-size:12px; background: rgba(244, 197, 66, 0.12); border-color: var(--gold); color: var(--gold); box-shadow: none;">
+          Siguiente ▶
+        </button>
       </div>
     </div>
   </div>
@@ -2792,6 +2968,31 @@
 
     btnLogout.addEventListener('click', cerrarSesion);
     document.getElementById('btn-musico-logout').addEventListener('click', cerrarSesion);
+
+    const btnAddSongGlobal = document.getElementById('btn-add-song-global');
+    if (btnAddSongGlobal) {
+      btnAddSongGlobal.addEventListener('click', () => {
+        editingSongId = null;
+        document.getElementById('form-add-song').reset();
+        const btnSubmit = document.querySelector('#form-add-song button[type="submit"]');
+        if (btnSubmit) {
+          btnSubmit.textContent = "Guardar en Repertorio";
+          btnSubmit.style.background = "var(--teal)";
+        }
+        const title = document.getElementById('song-modal-title');
+        if (title) title.textContent = "Agregar Nueva Canción";
+        
+        const modal = document.getElementById('admin-song-modal');
+        if (modal) modal.classList.add('active');
+      });
+    }
+
+    const btnCancelSongModal = document.getElementById('btn-cancel-song-modal');
+    if (btnCancelSongModal) {
+      btnCancelSongModal.addEventListener('click', () => {
+        resetSongForm();
+      });
+    }
 
     // === CONTROLADOR DE TEMAS (CLARO / OSCURO) PARA MÚSICOS ===
     const btnMusicoTheme = document.getElementById('btn-musico-theme');
@@ -3098,7 +3299,7 @@
 
       // --- 0. MOSTRAR U OCULTAR CARD DE DISPONIBILIDAD PERSONAL ---
       const availCard = document.getElementById('my-availability-card');
-      if (activeSessionUser && activeSessionUser.usuario !== 'admin') {
+      if (activeSessionUser && currentUserRole !== 'lider' && activeSessionUser.usuario !== 'admin') {
         availCard.style.display = 'block';
         const userAvail = dataServicio.disponibilidad ? dataServicio.disponibilidad[activeSessionUser.usuario] : null;
         const statusText = document.getElementById('my-avail-status');
@@ -3464,10 +3665,12 @@
       editingSongId = null;
       document.getElementById('form-add-song').reset();
       const btnSubmit = document.querySelector('#form-add-song button[type="submit"]');
-      btnSubmit.textContent = "Guardar Canción";
-      btnSubmit.style.background = "var(--gold)";
-      const cancelBtn = document.getElementById('btn-cancel-song-edit');
-      if (cancelBtn) cancelBtn.style.display = 'none';
+      if (btnSubmit) {
+        btnSubmit.textContent = "Guardar Canción";
+        btnSubmit.style.background = "var(--teal)";
+      }
+      const modal = document.getElementById('admin-song-modal');
+      if (modal) modal.classList.remove('active');
     }
 
     // ====================================================
@@ -3491,31 +3694,28 @@
     });
 
     function renderizarMantenimientoCanciones() {
-      const listCont = document.getElementById('global-songs-list');
-      listCont.innerHTML = "";
-      if (cacheSongs.length === 0) {
-        listCont.innerHTML = "<p style='color:var(--text3);font-size:12px;text-align:center;'>Biblioteca vacía.</p>";
-        return;
-      }
+      const alabList = document.getElementById('repertorio-alabanzas-list');
+      const adorList = document.getElementById('repertorio-adoraciones-list');
+      const alabCount = document.getElementById('repertorio-alabanza-count');
+      const adorCount = document.getElementById('repertorio-adoracion-count');
 
-      // Group and sort
+      if (!alabList || !adorList) return;
+
+      alabList.innerHTML = "";
+      adorList.innerHTML = "";
+
       const alabanzas = cacheSongs.filter(s => s && s.tipo === 'alabanza');
       const adoraciones = cacheSongs.filter(s => s && (s.tipo === 'adoracion' || s.tipo === 'adoración'));
 
       alabanzas.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
       adoraciones.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
 
-      const renderGroup = (title, icon, list, colorVar) => {
-        const header = document.createElement('div');
-        header.style.cssText = `font-weight:700; font-size:14px; color:${colorVar}; margin: 16px 0 8px 0; border-bottom: 1px solid var(--border); padding-bottom: 6px; display: flex; align-items: center; gap: 8px;`;
-        header.innerHTML = `<span>${icon}</span> ${title} <span style="font-size: 11px; font-weight: normal; color: var(--text3); margin-left: auto;">(${list.length})</span>`;
-        listCont.appendChild(header);
+      if (alabCount) alabCount.textContent = `(${alabanzas.length})`;
+      if (adorCount) adorCount.textContent = `(${adoraciones.length})`;
 
+      const populateList = (list, container, colorClass) => {
         if (list.length === 0) {
-          const empty = document.createElement('p');
-          empty.style.cssText = 'color:var(--text3); font-size:12px; text-align:center; padding: 12px;';
-          empty.textContent = 'No hay canciones en esta categoría.';
-          listCont.appendChild(empty);
+          container.innerHTML = "<p style='color:var(--text3);font-size:12px;text-align:center;padding:15px;'>Lista vacía.</p>";
           return;
         }
 
@@ -3525,13 +3725,13 @@
           div.style.justifyContent = "space-between";
           div.innerHTML = `
             <div class="song-info">
-              <div class="song-name">${s.nombre} <span class="chip ${s.tipo === 'alabanza' ? 'chip-teal' : 'chip-purple'}" style="font-size:9px; padding:2px 6px;">${s.tipo}</span></div>
-              <div class="song-meta">${s.artista} | Tono Base: <b>${s.tonoBase}</b></div>
+              <div class="song-name" style="font-weight:600;">${s.nombre}</div>
+              <div class="song-meta" style="color:var(--text2); font-size:11px;">${s.artista} | Tono Base: <b style="color:var(--gold);">${s.tonoBase}</b></div>
             </div>
             ${currentUserRole === 'lider' ? `
               <div style="display:flex; gap:6px;">
                 <button class="chip chip-teal click-edit-song" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Editar">✏️ Editar</button>
-                <button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Eliminar">🗑️ Eliminar</button>
+                <button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Eliminar">🗑️</button>
               </div>
             ` : ''}
           `;
@@ -3547,24 +3747,16 @@
               document.getElementById('song-lyrics-input').value = s.letra || "";
 
               const btnSubmit = document.querySelector('#form-add-song button[type="submit"]');
-              btnSubmit.textContent = "Actualizar Canción";
-              btnSubmit.style.background = "var(--teal)";
-
-              let cancelBtn = document.getElementById('btn-cancel-song-edit');
-              if (!cancelBtn) {
-                cancelBtn = document.createElement('button');
-                cancelBtn.id = 'btn-cancel-song-edit';
-                cancelBtn.type = 'button';
-                cancelBtn.className = 'btn-primary';
-                cancelBtn.style.background = 'var(--coral)';
-                cancelBtn.style.marginTop = '8px';
-                cancelBtn.textContent = 'Cancelar Edición';
-                cancelBtn.onclick = () => resetSongForm();
-                document.getElementById('form-add-song').appendChild(cancelBtn);
+              if (btnSubmit) {
+                btnSubmit.textContent = "Actualizar Canción";
+                btnSubmit.style.background = "var(--teal)";
               }
-              cancelBtn.style.display = 'block';
 
-              document.getElementById('form-add-song').scrollIntoView({ behavior: 'smooth' });
+              // Open modal
+              const modal = document.getElementById('admin-song-modal');
+              const title = document.getElementById('song-modal-title');
+              if (title) title.textContent = "Editar Canción";
+              if (modal) modal.classList.add('active');
             });
 
             div.querySelector('.click-del-song').addEventListener('click', async () => {
@@ -3997,10 +4189,27 @@
         const adoraciones = allSelected.filter(s => s.tipo === 'adoracion');
         const alabanzas = allSelected.filter(s => s.tipo === 'alabanza');
 
+        // Guardar la lista ordenada globalmente para la paginación de letras
+        window._currentServiceSongs = [...adoraciones, ...alabanzas];
+
         const renderGroup = (songs, titulo, color, emoji, startNum, type) => {
-          let g = `<h4 style="font-size:11px;text-transform:uppercase;color:var(--${color});letter-spacing:0.8px;margin:20px 0 10px;">${emoji} ${titulo}</h4>`;
+          const sectionColorVar = color === 'teal' ? 'var(--teal)' : 'var(--purple)';
+          const sectionBg = color === 'teal'
+            ? 'linear-gradient(180deg, rgba(78, 205, 196, 0.06) 0%, rgba(78, 205, 196, 0.01) 100%)'
+            : 'linear-gradient(180deg, rgba(155, 143, 255, 0.06) 0%, rgba(155, 143, 255, 0.01) 100%)';
+          const sectionBorder = color === 'teal' ? '1.5px solid rgba(78, 205, 196, 0.35)' : '1.5px solid rgba(155, 143, 255, 0.35)';
+          const sectionGlow = color === 'teal' ? '0 8px 32px rgba(78, 205, 196, 0.08)' : '0 8px 32px rgba(155, 143, 255, 0.08)';
+
+          let g = `
+          <div class="section-group-card" style="background: ${sectionBg}; border: ${sectionBorder}; border-radius: var(--radius); padding: 16px; margin-bottom: 20px; box-shadow: ${sectionGlow};">
+            <h4 style="font-size:12px; font-weight: 700; text-transform:uppercase; color:${sectionColorVar}; letter-spacing:1px; margin: 0 0 12px; display: flex; align-items: center; gap: 6px;">
+              <span>${emoji}</span> ${titulo}
+            </h4>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+          `;
+
           if (songs.length === 0) {
-            g += `<p style="color:var(--text3); font-size:12px; padding:12px; text-align:center; background:rgba(255,255,255,0.02); border-radius:10px;">Ninguna canción seleccionada en esta sección.</p>`;
+            g += `<p style="color:var(--text3); font-size:12px; padding:12px; text-align:center; background:rgba(0,0,0,0.2); border-radius:10px; margin: 0;">Ninguna canción seleccionada en esta sección.</p>`;
           } else {
             songs.forEach((s, i) => {
               const tone = cancionesSeleccionadas[s.id];
@@ -4041,13 +4250,11 @@
                 ` : ''}
               </div>
               
-              <!-- Extremo Derecho: Tono -->
-              <div style="display:flex; align-items:center;">
-                <div class="song-tone-badge" data-song-id="${s.id}" data-current-tone="${tone}" data-song-name="${safeNombre}" data-date="${dateStr}" style="${badgeStyle}">${tone}</div>
+              <!-- Extremo Derecho: Tono y Quitar inline -->
+              <div style="display:flex; align-items:center; gap: 14px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
+                <div class="song-tone-badge" data-song-id="${s.id}" data-current-tone="${tone}" data-song-name="${safeNombre}" data-date="${dateStr}" style="${badgeStyle}; cursor: pointer; margin: 0;">${tone}</div>
+                <button class="btn-remove-song-musico btn-remove-song-inline" data-song-id="${s.id}" title="Quitar canción">✕</button>
               </div>
-              
-              <!-- Botón Quitar en Esquina Superior Derecha -->
-              <button class="btn-remove-song-musico btn-remove-song" data-song-id="${s.id}" title="Quitar canción">✕</button>
             </div>`;
             });
           }
@@ -4303,14 +4510,87 @@
             tonoServicio: found.tonoBase,
             letra: found.letra
           };
+        } else if (cancionId.startsWith('custom_') && window._currentServiceData && window._currentServiceData.customSongsMetadata) {
+          const meta = window._currentServiceData.customSongsMetadata[cancionId];
+          if (meta) {
+            song = {
+              nombre: meta.nombre,
+              tonoBase: meta.tonoBase,
+              tonoServicio: meta.tonoBase,
+              letra: meta.letra
+            };
+          }
         }
       }
       if (!song) return;
+
       const tonoMostrar = song.tonoServicio || song.tonoBase;
       document.getElementById('lyrics-modal-title').textContent = song.nombre;
       document.getElementById('lyrics-modal-meta').textContent = `Tono Original: ${song.tonoBase} | Tono del Servicio: ${tonoMostrar}`;
-      document.getElementById('lyrics-modal-content').innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, tonoMostrar);
+      
+      const hasLetra = song.letra && song.letra.trim() !== "";
+      if (hasLetra) {
+        document.getElementById('lyrics-modal-content').innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, tonoMostrar);
+      } else {
+        document.getElementById('lyrics-modal-content').innerHTML = `
+          <div style="text-align:center; padding: 60px 20px; color: var(--text3);">
+            <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
+            <h4 style="color: var(--text2); margin-bottom: 8px; font-family: var(--font-display); font-size: 22px;">Letra no disponible</h4>
+            <p style="font-size: 13px; max-width: 280px; margin: 0 auto; line-height: 1.5;">Esta canción aún no tiene la letra registrada en el repertorio global.</p>
+          </div>
+        `;
+      }
+      
       document.getElementById('lyrics-modal-overlay').classList.add('active');
+
+      // Configurar Paginación
+      const currentList = window._currentServiceSongs || [];
+      const currentIndex = currentList.findIndex(s => s.id === cancionId);
+
+      const prevBtn = document.getElementById('lyrics-modal-prev');
+      const nextBtn = document.getElementById('lyrics-modal-next');
+      const pageIndicator = document.getElementById('lyrics-modal-page-indicator');
+
+      if (prevBtn && nextBtn && pageIndicator) {
+        if (currentIndex !== -1 && currentList.length > 1) {
+          pageIndicator.style.display = 'block';
+          pageIndicator.textContent = `${currentIndex + 1} de ${currentList.length}`;
+
+          // Botón Anterior
+          if (currentIndex > 0) {
+            prevBtn.style.opacity = '1';
+            prevBtn.style.pointerEvents = 'auto';
+            prevBtn.onclick = () => {
+              window.abrirModalLetraGlobal(currentList[currentIndex - 1].id);
+            };
+          } else {
+            prevBtn.style.opacity = '0.3';
+            prevBtn.style.pointerEvents = 'none';
+            prevBtn.onclick = null;
+          }
+
+          // Botón Siguiente
+          if (currentIndex < currentList.length - 1) {
+            nextBtn.style.opacity = '1';
+            nextBtn.style.pointerEvents = 'auto';
+            nextBtn.onclick = () => {
+              window.abrirModalLetraGlobal(currentList[currentIndex + 1].id);
+            };
+          } else {
+            nextBtn.style.opacity = '0.3';
+            nextBtn.style.pointerEvents = 'none';
+            nextBtn.onclick = null;
+          }
+        } else {
+          pageIndicator.style.display = 'none';
+          prevBtn.style.opacity = '0.3';
+          prevBtn.style.pointerEvents = 'none';
+          prevBtn.onclick = null;
+          nextBtn.style.opacity = '0.3';
+          nextBtn.style.pointerEvents = 'none';
+          nextBtn.onclick = null;
+        }
+      }
     };
 
     document.getElementById('lyrics-modal-close').addEventListener('click', () => {
@@ -4496,56 +4776,91 @@
         return ia - ib;
       });
 
-      if (allSelected.length === 0) {
-        cont.innerHTML = `<p style="color: var(--text3); font-size: 13px; text-align: center; padding: 10px;">No hay canciones seleccionadas aún.</p>`;
-        return;
-      }
-
       const adoraciones = allSelected.filter(s => s.tipo === 'adoracion');
       const alabanzas = allSelected.filter(s => s.tipo === 'alabanza');
+
+      // Guardar la lista ordenada globalmente para la paginación de letras
+      window._currentServiceSongs = [...adoraciones, ...alabanzas];
+
+      if (allSelected.length === 0) {
+        cont.innerHTML = `<p style="color: var(--text3); font-size: 13px; text-align: center; padding: 20px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); margin: 0;">No hay canciones seleccionadas aún.</p>`;
+        return;
+      }
 
       let html = "";
 
       const renderAdminGroup = (songs, titulo, color, emoji, startNum, type) => {
-        if (songs.length === 0) return "";
-        let g = `<h4 style="font-size:11px;text-transform:uppercase;color:var(--${color});letter-spacing:0.8px;margin:12px 0 6px;">${emoji} ${titulo}</h4>`;
-        songs.forEach((s, i) => {
-          const tone = cancionesSeleccionadas[s.id];
-          const num = startNum + i;
+        const sectionColorVar = color === 'teal' ? 'var(--teal)' : 'var(--purple)';
+        const sectionBg = color === 'teal'
+          ? 'linear-gradient(180deg, rgba(78, 205, 196, 0.06) 0%, rgba(78, 205, 196, 0.01) 100%)'
+          : 'linear-gradient(180deg, rgba(155, 143, 255, 0.06) 0%, rgba(155, 143, 255, 0.01) 100%)';
+        const sectionBorder = color === 'teal' ? '1.5px solid rgba(78, 205, 196, 0.35)' : '1.5px solid rgba(155, 143, 255, 0.35)';
+        const sectionGlow = color === 'teal' ? '0 8px 32px rgba(78, 205, 196, 0.08)' : '0 8px 32px rgba(155, 143, 255, 0.08)';
 
-          const cardBorder = type === 'alabanza' ? 'border-left: 4px solid var(--teal); border-color: rgba(78, 205, 196, 0.25);' : 'border-left: 4px solid var(--purple); border-color: rgba(155, 143, 255, 0.25);';
-          const numColor = type === 'alabanza' ? 'color: rgba(78, 205, 196, 0.4);' : 'color: rgba(155, 143, 255, 0.4);';
-          const indicatorStyle = type === 'alabanza'
-            ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
-            : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
-
-          g += `
-          <div class="musico-song-card" style="padding: 10px; margin-bottom: 6px; background: var(--bg2); ${cardBorder}">
-            <!-- Extremo Izquierdo: Reordenamiento y Número -->
-            <div style="display:flex; align-items:center; gap:8px;">
-              <div class="song-order-btns">
-                <button class="order-btn btn-admin-order-up" data-song-id="${s.id}" data-type="${type}">▲</button>
-                <button class="order-btn btn-admin-order-down" data-song-id="${s.id}" data-type="${type}">▼</button>
-              </div>
-              <div class="song-num" style="font-size:24px; min-width: 24px; ${numColor}">${num}</div>
-            </div>
-            
-            <!-- Centro: Info -->
-            <div class="song-card-info" style="margin-left: 4px;">
-              <div class="song-card-name" style="font-size:14px; font-weight: 600;">${s.nombre}</div>
-              <div class="song-card-artist" style="font-size:11px; color: var(--text2);">${s.artista}</div>
-            </div>
-            
-            <!-- Extremo Derecho: Tono -->
-            <div style="display:flex; align-items:center;">
-              <div class="tone-indicator" style="font-size:12px; margin-left:auto; margin-right:10px; padding: 4px 10px; cursor:pointer; ${indicatorStyle}" onclick="window.abrirTonePickerAdmin('${s.id}', '${tone}', '${s.nombre.replace(/'/g, "\\'")}', '${dateStr}')">${tone}</div>
-            </div>
-            
-            <!-- Botón Quitar en Esquina Superior Derecha -->
-            <button class="btn-delete-selected-admin btn-remove-song" data-song-id="${s.id}" title="Quitar canción">✕</button>
-          </div>
+        let g = `
+        <div class="section-group-card" style="background: ${sectionBg}; border: ${sectionBorder}; border-radius: var(--radius); padding: 16px; margin-bottom: 20px; box-shadow: ${sectionGlow};">
+          <h4 style="font-size:12px; font-weight: 700; text-transform:uppercase; color:${sectionColorVar}; letter-spacing:1px; margin: 0 0 12px; display: flex; align-items: center; gap: 6px;">
+            <span>${emoji}</span> ${titulo}
+          </h4>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
         `;
-        });
+
+        if (songs.length === 0) {
+          g += `<p style="color:var(--text3); font-size:12px; padding:12px; text-align:center; background:rgba(0,0,0,0.2); border-radius:10px; margin: 0;">Ninguna canción seleccionada en esta sección.</p>`;
+        } else {
+          songs.forEach((s, i) => {
+            const tone = cancionesSeleccionadas[s.id];
+            const hasLetra = s.letra && s.letra.trim() !== "";
+            if (hasLetra) {
+              window._lyricsCache = window._lyricsCache || {};
+              window._lyricsCache[s.id] = { nombre: s.nombre, tonoBase: s.tonoBase, tonoServicio: tone, letra: s.letra };
+            }
+            const num = startNum + i;
+            const safeNombre = (s.nombre || "").replace(/"/g, '&quot;');
+
+            const cardBorder = type === 'alabanza' ? 'border-left: 4px solid var(--teal); border-color: rgba(78, 205, 196, 0.25);' : 'border-left: 4px solid var(--purple); border-color: rgba(155, 143, 255, 0.25);';
+            const numColor = type === 'alabanza' ? 'color: rgba(78, 205, 196, 0.4);' : 'color: rgba(155, 143, 255, 0.4);';
+            const badgeStyle = type === 'alabanza'
+              ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
+              : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
+
+            g += `
+            <div class="musico-song-card" style="padding: 10px; margin-bottom: 0; background: var(--bg2); ${cardBorder}">
+              <!-- Extremo Izquierdo: Reordenamiento y Número -->
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div class="song-order-btns">
+                  <button class="order-btn btn-admin-order-up" data-song-id="${s.id}" data-type="${type}">▲</button>
+                  <button class="order-btn btn-admin-order-down" data-song-id="${s.id}" data-type="${type}">▼</button>
+                </div>
+                <div class="song-num" style="min-width: 24px; ${numColor}">${num}</div>
+              </div>
+              
+              <!-- Centro: Info -->
+              <div class="song-card-info" style="margin-left: 4px;">
+                <div class="song-card-name" style="font-size:14px; font-weight: 600;">${s.nombre}</div>
+                <div class="song-card-artist" style="font-size:11px; color: var(--text2);">${s.artista}</div>
+                ${hasLetra ? `
+                  <div style="margin-top: 4px;">
+                    <button class="btn-ver-letra" onclick="window.abrirModalLetraGlobal('${s.id}')">
+                      📄 Ver Letra
+                    </button>
+                  </div>
+                ` : ''}
+              </div>
+              
+              <!-- Extremo Derecho: Tono y Quitar inline -->
+              <div style="display:flex; align-items:center; gap: 14px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
+                <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:pointer; margin: 0; ${badgeStyle}" onclick="window.abrirTonePickerAdmin('${s.id}', '${tone}', '${s.nombre.replace(/'/g, "\\'")}', '${dateStr}')">${tone}</div>
+                <button class="btn-delete-selected-admin btn-remove-song-inline" data-song-id="${s.id}" title="Quitar canción">✕</button>
+              </div>
+            </div>
+            `;
+          });
+        }
+        g += `
+          </div>
+        </div>
+        `;
         return g;
       };
 
@@ -4933,6 +5248,10 @@
         style="max-height:150px; overflow-y:auto; border:1px solid var(--border2); border-radius:var(--radius-sm); padding:8px; background:var(--bg2); margin-bottom: 12px;">
       </div>
       <p class="modal-subtitle" style="margin-top:8px;">Selecciona las canciones para ensayar</p>
+      <div class="field" style="margin-bottom: 8px;">
+        <input type="text" id="search-ensayo-songs" placeholder="🔍 Buscar canción por nombre o artista..."
+          style="width:100%; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-size: 13px; outline: none;">
+      </div>
       <div id="ensayo-canciones-list"
         style="max-height:150px; overflow-y:auto; border:1px solid var(--border2); border-radius:var(--radius-sm); padding:8px; background:var(--bg2); margin-bottom: 12px;">
         <!-- Las canciones de la biblioteca se cargarán aquí con checkboxes -->
@@ -4952,6 +5271,80 @@
         style="background: var(--teal); color:#0f0e17; margin-top:0;">Guardar Ensayo</button>
       <button class="btn-primary" id="btn-cancel-ensayo"
         style="background: var(--coral); color:#0f0e17; margin-left:8px;">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Modal de Administración de Canción -->
+  <div class="modal-overlay" id="admin-song-modal">
+    <div class="modal-box" style="max-width: 480px; max-height: 90vh; overflow-y: auto;">
+      <h2 class="modal-title" id="song-modal-title" style="color: var(--teal);">Agregar Nueva Canción</h2>
+      <p class="modal-subtitle" style="margin-bottom: 16px;">Completa los datos de la canción para guardarla en el repertorio global.</p>
+      <form id="form-add-song">
+        <div class="field"><label>Nombre de la Canción</label><input type="text" id="song-name-input" required
+            placeholder="Ej: Grande y Fuerte"></div>
+        <div class="field"><label>Artista / Ministerio</label><input type="text" id="song-artist-input" required
+            placeholder="Ej: Miel San Marcos"></div>
+        <div class="field">
+          <label>Tonalidad Base sugerida</label>
+          <select id="song-key-input" required>
+            <option value="" disabled selected>Selecciona un tono...</option>
+            <option value="C">C (Do)</option>
+            <option value="Cm">Cm (Do menor)</option>
+            <option value="C#">C# (Do#)</option>
+            <option value="C#m">C#m (Do# menor)</option>
+            <option value="D">D (Re)</option>
+            <option value="Dm">Dm (Re menor)</option>
+            <option value="D#">D# (Re#)</option>
+            <option value="D#m">D#m (Re# menor)</option>
+            <option value="E">E (Mi)</option>
+            <option value="Em">Em (Mi menor)</option>
+            <option value="F">F (Fa)</option>
+            <option value="Fm">Fm (Fa menor)</option>
+            <option value="F#">F# (Fa#)</option>
+            <option value="F#m">F#m (Fa# menor)</option>
+            <option value="G">G (Sol)</option>
+            <option value="Gm">Gm (Sol menor)</option>
+            <option value="G#">G# (Sol#)</option>
+            <option value="G#m">G#m (Sol# menor)</option>
+            <option value="A">A (La)</option>
+            <option value="Am">Am (La menor)</option>
+            <option value="A#">A# (La#)</option>
+            <option value="A#m">A#m (La# menor)</option>
+            <option value="B">B (Si)</option>
+            <option value="Bm">Bm (Si menor)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de Canción</label>
+          <select id="song-type-input">
+            <option value="alabanza">Alabanza (Rápida)</option>
+            <option value="adoracion">Adoración (Lenta)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Enlace de YouTube <span style="color: var(--text3); font-weight: 400;">(Opcional)</span></label>
+          <input type="url" id="song-youtube-input" placeholder="Ej: https://www.youtube.com/watch?v=...">
+        </div>
+        <div class="field">
+          <label>Letra y Acordes <span style="color: var(--text3); font-weight: 400;">(Opcional. Pega formato tipo LaCuerda.net)</span></label>
+          <textarea id="song-lyrics-input" placeholder="Pegar aquí la letra con los acordes arriba..."
+            style="width:100%; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px; color:var(--text); font-family:'Courier New', Courier, monospace; font-size:13px; resize:vertical; min-height:120px; white-space: pre; outline:none;"></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="background: var(--teal); color: #0f0e17; margin-top: 10px;">Guardar Canción</button>
+        <button type="button" class="btn-primary" id="btn-cancel-song-modal" style="background: var(--coral); color: #0f0e17; margin-top: 8px;">Cancelar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Recordatorio de Ensayo -->
+  <div class="modal-overlay" id="ensayo-reminder-modal">
+    <div class="modal-box" style="text-align: center; border-color: var(--gold); max-width: 380px;">
+      <h2 class="modal-title" id="ensayo-reminder-title" style="margin-bottom: 8px;">Recordatorio de Ensayo</h2>
+      <p id="ensayo-reminder-text" style="font-size:14px; color:var(--text); margin-bottom:20px; line-height:1.6; text-align: left;"></p>
+      <div id="ensayo-reminder-actions" style="display: flex; flex-direction: column; gap: 8px;">
+        <button class="btn-primary" id="btn-ensayo-reminder-confirm" style="margin-top: 0; background: var(--teal); color: #0f0e17; display: none;">Confirmar Asistencia</button>
+        <button class="btn-primary" id="btn-ensayo-reminder-close" style="margin-top: 0; background: var(--bg3); border: 1px solid var(--border2); color: var(--text); padding: 10px 16px;">Entendido</button>
+      </div>
     </div>
   </div>
 </body>
