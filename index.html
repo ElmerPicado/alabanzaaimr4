@@ -5965,12 +5965,51 @@
     // Call after document load / login init
     setTimeout(setupProfilePicUpload, 500);
 
-    // REGISTRO DE SERVICE WORKER PARA SOPORTE PWA
+    // REGISTRO DE SERVICE WORKER PARA SOPORTE PWA CON NOTIFICACIÓN DE ACTUALIZACIÓN
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
+        let newWorker;
+
         navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('PWA Service Worker registrado:', reg.scope))
+          .then(reg => {
+            console.log('PWA Service Worker registrado:', reg.scope);
+
+            // Escuchar si se encuentra una nueva versión instalando en segundo plano
+            reg.addEventListener('updatefound', () => {
+              newWorker = reg.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  // Si el nuevo service worker terminó de instalarse y ya está esperando para activarse
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    mostrarBannerActualizacion(newWorker);
+                  }
+                });
+              }
+            });
+          })
           .catch(err => console.error('Error de registro de Service Worker:', err));
+
+        // Detectar si el nuevo service worker tomó control ( skipWaiting() ) y recargar para refrescar la app
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
+        });
+
+        function mostrarBannerActualizacion(worker) {
+          const banner = document.getElementById('pwa-update-banner');
+          const btn = document.getElementById('pwa-update-btn');
+          if (banner && btn) {
+            // Mostrar la ventana emergente animándola desde abajo
+            banner.style.transform = 'translateX(-50%) translateY(0)';
+            btn.addEventListener('click', () => {
+              // Notificar al worker para que active la nueva versión llamando skipWaiting()
+              worker.postMessage({ type: 'SKIP_WAITING' });
+            });
+          }
+        }
       });
     }
   </script>
@@ -6148,4 +6187,14 @@
 
   <!-- Hidden Profile Pic File Uploader -->
   <input type="file" id="global-profile-pic-input" accept="image/*" style="display: none;">
+
+  <!-- Alerta de Actualización Disponible -->
+  <div id="pwa-update-banner" style="position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120px); background: rgba(26, 24, 40, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.5px solid var(--teal); border-radius: var(--radius); padding: 16px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 16px; z-index: 200000; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto; max-width: 90%; width: 380px; box-sizing: border-box;">
+    <div style="font-size: 24px;">✨</div>
+    <div style="flex-grow: 1;">
+      <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text);">Actualización disponible</h4>
+      <p style="margin: 2px 0 0 0; font-size: 12px; color: var(--text2);">Nueva versión lista para instalar</p>
+    </div>
+    <button id="pwa-update-btn" style="background: var(--teal); border: none; color: #0f0e17; padding: 8px 14px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; transition: transform 0.2s; white-space: nowrap;">Actualizar</button>
+  </div>
 </body>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'alabanza-imr4-v5';
+const CACHE_NAME = 'alabanza-imr4-v6';
 const ASSETS = [
   './index.html',
   './manifest.json',
@@ -13,7 +13,12 @@ self.addEventListener('install', (e) => {
       });
     })
   );
-  self.skipWaiting();
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('activate', (e) => {
