@@ -608,6 +608,60 @@
       margin-left: 8px;
     }
 
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      font-family: var(--font-body);
+      border: 1px solid transparent;
+      user-select: none;
+    }
+
+    .chip-teal {
+      background: rgba(78, 205, 196, 0.12);
+      color: var(--teal);
+      border-color: rgba(78, 205, 196, 0.25);
+    }
+
+    .chip-teal:active {
+      background: rgba(78, 205, 196, 0.25);
+    }
+
+    .chip-coral {
+      background: rgba(255, 107, 107, 0.12);
+      color: var(--coral);
+      border-color: rgba(255, 107, 107, 0.25);
+    }
+
+    .chip-coral:active {
+      background: rgba(255, 107, 107, 0.25);
+    }
+
+    .chip-gold {
+      background: rgba(244, 197, 66, 0.12);
+      color: var(--gold);
+      border-color: rgba(244, 197, 66, 0.25);
+    }
+
+    .chip-gold:active {
+      background: rgba(244, 197, 66, 0.25);
+    }
+
+    .chip-purple {
+      background: rgba(155, 143, 255, 0.12);
+      color: var(--purple);
+      border-color: rgba(155, 143, 255, 0.25);
+    }
+
+    .chip-purple:active {
+      background: rgba(155, 143, 255, 0.25);
+    }
+
     .chip-alabanza {
       background: rgba(78, 205, 196, 0.15);
       color: var(--teal);
@@ -1376,6 +1430,7 @@
       let onSnapshot = null;
       let showToast = null;
       let activeSessionUser = null;
+      let editingEnsayoId = null;
 
       // Define function to setup rehearsal listeners and logic once Firebase is ready
       window.initRehearsalsLogic = function (firebaseRefs) {
@@ -1397,9 +1452,11 @@
 
         if (btnAddEnsayo) {
           btnAddEnsayo.addEventListener('click', () => {
+            editingEnsayoId = null; // Reset editing mode
+            
             try {
               if (window.renderEnsayoMembers) {
-                window.renderEnsayoMembers();
+                window.renderEnsayoMembers([]);
               }
             } catch (e) {
               console.error("Error al renderizar miembros para el ensayo:", e);
@@ -1407,7 +1464,7 @@
 
             try {
               if (typeof renderEnsayoCancionesModal === 'function') {
-                renderEnsayoCancionesModal();
+                renderEnsayoCancionesModal([]);
               }
             } catch (e) {
               console.error("Error al renderizar canciones para el ensayo:", e);
@@ -1416,10 +1473,14 @@
             // Reset fields safely
             const nameEl = document.getElementById('ensayo-nombre');
             const dateEl = document.getElementById('ensayo-fecha');
-            const horaEl = document.getElementById('ensayo-hora');
+            const hhEl = document.getElementById('ensayo-hora-hh');
+            const mmEl = document.getElementById('ensayo-hora-mm');
+            const ampmEl = document.getElementById('ensayo-hora-ampm');
             if (nameEl) nameEl.value = '';
             if (dateEl) dateEl.value = '';
-            if (horaEl) horaEl.value = '';
+            if (hhEl) hhEl.value = '';
+            if (mmEl) mmEl.value = '';
+            if (ampmEl) ampmEl.value = 'PM';
 
             // Reset notify radio
             const defaultNotify = document.querySelector('input[name="ensayo-notify-mode"][value="app"]');
@@ -1444,11 +1505,20 @@
             const ensayoMiembrosList = document.getElementById('ensayo-miembros-list');
             const nombreInput = document.getElementById('ensayo-nombre');
             const fechaInput = document.getElementById('ensayo-fecha');
-            const horaInput = document.getElementById('ensayo-hora');
+            const hhInput = document.getElementById('ensayo-hora-hh');
+            const mmInput = document.getElementById('ensayo-hora-mm');
+            const ampmInput = document.getElementById('ensayo-hora-ampm');
 
             const nombre = nombreInput ? nombreInput.value.trim() : '';
             const fecha = fechaInput ? fechaInput.value : '';
-            const hora = horaInput ? horaInput.value : '';
+            const hh = hhInput ? hhInput.value : '';
+            const mm = mmInput ? mmInput.value : '';
+            const ampm = ampmInput ? ampmInput.value : 'PM';
+
+            let hora = '';
+            if (hh && mm) {
+              hora = `${hh}:${mm} ${ampm}`;
+            }
 
             if (!fecha) { alert('Selecciona una fecha para el ensayo.'); return; }
             const defaultLabel = `Ensayo ${fecha}${hora ? ' ' + hora : ''}`;
@@ -1478,20 +1548,35 @@
             const notifyVal = document.querySelector('input[name="ensayo-notify-mode"]:checked')?.value || 'app';
 
             try {
-              await addDoc(collection(db, 'ensayos'), {
-                nombre: etiqueta,
-                fecha: fecha,
-                hora: hora,
-                miembros: selectedIds,
-                canciones: selectedSongIds,
-                confirmaciones: {}
-              });
+              if (editingEnsayoId) {
+                // UPDATE
+                await updateDoc(doc(db, 'ensayos', editingEnsayoId), {
+                  nombre: etiqueta,
+                  fecha: fecha,
+                  hora: hora,
+                  miembros: selectedIds,
+                  canciones: selectedSongIds
+                });
+                showToast(`✅ Ensayo "${etiqueta}" actualizado`);
+              } else {
+                // CREATE
+                await addDoc(collection(db, 'ensayos'), {
+                  nombre: etiqueta,
+                  fecha: fecha,
+                  hora: hora,
+                  miembros: selectedIds,
+                  canciones: selectedSongIds,
+                  confirmaciones: {}
+                });
+                showToast(`✅ Ensayo "${etiqueta}" creado`);
+              }
 
               if (modalEnsayo) modalEnsayo.classList.remove('active');
               if (nombreInput) nombreInput.value = '';
               if (fechaInput) fechaInput.value = '';
-              if (horaInput) horaInput.value = '';
-              showToast(`✅ Ensayo "${etiqueta}" creado`);
+              if (hhInput) hhInput.value = '';
+              if (mmInput) mmInput.value = '';
+              if (ampmInput) ampmInput.value = 'PM';
 
               if (window.renderEnsayosAdmin) window.renderEnsayosAdmin();
 
@@ -1558,8 +1643,8 @@
                 document.body.removeChild(a);
               }
             } catch (err) {
-              console.error('Error creando ensayo', err);
-              alert('Error al crear el ensayo: ' + err.message);
+              console.error('Error procesando ensayo', err);
+              alert('Error al procesar el ensayo: ' + err.message);
             }
           });
         }
@@ -1578,7 +1663,7 @@
       // ==============================
 
       // Populate song checkboxes inside the modal
-      function renderEnsayoCancionesModal() {
+      function renderEnsayoCancionesModal(selectedSongIds = []) {
         const cont = document.getElementById('ensayo-canciones-list');
         if (!cont) return;
         cont.innerHTML = '';
@@ -1594,8 +1679,9 @@
           const nameVal = s.nombre || 'Canción sin título';
           const artistVal = s.artista || 'Artista Desconocido';
           const typeVal = s.tipo || 'alabanza';
+          const isSelected = selectedSongIds.includes(s.id);
           div.innerHTML = `
-            <div class="assign-check" data-song-id="${s.id}"></div>
+            <div class="assign-check ${isSelected ? 'on' : ''}" data-song-id="${s.id}"></div>
             <div class="member-info">
               <div class="member-name" style="font-size:13px; font-weight:500;">${nameVal}</div>
               <div class="member-role">${artistVal} | <span class="chip-type chip-${typeVal}">${typeVal}</span></div>
@@ -1610,7 +1696,7 @@
       }
 
       // Render member checkboxes for ensayo selection (categorized as Musicians & Voices)
-      window.renderEnsayoMembers = function () {
+      window.renderEnsayoMembers = function (selectedIds = []) {
         const ensayoMiembrosList = document.getElementById('ensayo-miembros-list');
         if (!ensayoMiembrosList) return;
         ensayoMiembrosList.innerHTML = '';
@@ -1633,8 +1719,9 @@
             const instVal = member.instrumento || (member.type === 'corista' ? 'Voz' : '');
             const div = document.createElement('div');
             div.className = 'member-row';
+            const isSelected = selectedIds.includes(idVal);
             div.innerHTML = `
-              <div class="assign-check" data-id="${idVal}"></div>
+              <div class="assign-check ${isSelected ? 'on' : ''}" data-id="${idVal}"></div>
               <div class="member-info">
                 <div class="member-name">${nombreVal}</div>
                 <div class="member-role">${instVal}</div>
@@ -1702,11 +1789,73 @@
               </div>
               <div style="display:flex; flex-direction:column; gap:6px; margin-left:10px; flex-shrink:0;">
                 <button class="btn-ver-conf chip chip-teal" style="cursor:pointer; border:none; padding:6px 12px; font-weight:600; white-space:nowrap;">👁 Confirmaciones</button>
+                <button class="btn-edit-ensayo chip chip-gold" style="cursor:pointer; border:none; padding:6px 12px; font-weight:600; white-space:nowrap;">✏️ Editar</button>
                 <button class="btn-del-ensayo chip chip-coral" style="cursor:pointer; border:none; padding:6px 12px; font-weight:600;" data-id="${e.id}">🗑 Eliminar</button>
               </div>
             </div>
           `;
             card.querySelector('.btn-ver-conf').addEventListener('click', () => openEnsayoAdmin(e.id));
+            card.querySelector('.btn-edit-ensayo').addEventListener('click', () => {
+              editingEnsayoId = e.id;
+              
+              const nameEl = document.getElementById('ensayo-nombre');
+              const dateEl = document.getElementById('ensayo-fecha');
+              if (nameEl) nameEl.value = e.nombre || '';
+              if (dateEl) dateEl.value = e.fecha || '';
+
+              // Parse and populate custom 12-hour selectors
+              let hh = '';
+              let mm = '';
+              let ampm = 'PM';
+              if (e.hora) {
+                const parts = e.hora.split(' ');
+                if (parts.length === 2) {
+                  const timeParts = parts[0].split(':');
+                  hh = timeParts[0];
+                  mm = timeParts[1];
+                  ampm = parts[1];
+                } else if (e.hora.includes(':')) {
+                  const timeParts = e.hora.split(':');
+                  let hour24 = parseInt(timeParts[0], 10);
+                  let min = timeParts[1];
+                  if (!isNaN(hour24)) {
+                    if (hour24 >= 12) {
+                      ampm = 'PM';
+                      let h12 = hour24 % 12;
+                      hh = (h12 === 0 ? 12 : h12).toString().padStart(2, '0');
+                    } else {
+                      ampm = 'AM';
+                      let h12 = hour24;
+                      hh = (h12 === 0 ? 12 : h12).toString().padStart(2, '0');
+                    }
+                    mm = min;
+                  }
+                }
+              }
+              const hhEl = document.getElementById('ensayo-hora-hh');
+              const mmEl = document.getElementById('ensayo-hora-mm');
+              const ampmEl = document.getElementById('ensayo-hora-ampm');
+              if (hhEl) hhEl.value = hh;
+              if (mmEl) mmEl.value = mm;
+              if (ampmEl) ampmEl.value = ampm;
+
+              // Render members with current pre-selected ones
+              if (window.renderEnsayoMembers) {
+                window.renderEnsayoMembers(e.miembros || []);
+              }
+
+              // Render songs with current pre-selected ones
+              if (typeof renderEnsayoCancionesModal === 'function') {
+                renderEnsayoCancionesModal(e.canciones || []);
+              }
+
+              // Reset notify radio to default
+              const defaultNotify = document.querySelector('input[name="ensayo-notify-mode"][value="app"]');
+              if (defaultNotify) defaultNotify.checked = true;
+
+              const modalEnsayo = document.getElementById('admin-ensayo-modal');
+              if (modalEnsayo) modalEnsayo.classList.add('active');
+            });
             card.querySelector('.btn-del-ensayo').addEventListener('click', async () => {
               if (confirm(`¿Eliminar el ensayo "${e.nombre}"?`)) {
                 await deleteDoc(doc(db, 'ensayos', e.id));
@@ -3348,61 +3497,88 @@
         listCont.innerHTML = "<p style='color:var(--text3);font-size:12px;text-align:center;'>Biblioteca vacía.</p>";
         return;
       }
-      cacheSongs.forEach(s => {
-        const div = document.createElement('div');
-        div.className = "song-item";
-        div.style.justifyContent = "space-between";
-        div.innerHTML = `
-        <div class="song-info">
-          <div class="song-name">${s.nombre} <span class="chip ${s.tipo === 'alabanza' ? 'chip-teal' : 'chip-purple'}" style="font-size:9px; padding:2px 6px;">${s.tipo}</span></div>
-          <div class="song-meta">${s.artista} | Tono Base: ${s.tonoBase}</div>
-        </div>
-        ${currentUserRole === 'lider' ? `
-          <div style="display:flex; gap:6px;">
-            <button class="chip chip-teal click-edit-song" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Editar">✏️ Editar</button>
-            <button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Eliminar">🗑️ Eliminar</button>
-          </div>
-        ` : ''}
-      `;
-        if (currentUserRole === 'lider') {
-          div.querySelector('.click-edit-song').addEventListener('click', () => {
-            editingSongId = s.id;
-            document.getElementById('song-name-input').value = s.nombre;
-            document.getElementById('song-artist-input').value = s.artista;
-            document.getElementById('song-key-input').value = s.tonoBase;
-            document.getElementById('song-type-input').value = s.tipo;
-            document.getElementById('song-youtube-input').value = s.youtube || "";
-            document.getElementById('song-lyrics-input').value = s.letra || "";
 
-            const btnSubmit = document.querySelector('#form-add-song button[type="submit"]');
-            btnSubmit.textContent = "Actualizar Canción";
-            btnSubmit.style.background = "var(--teal)";
+      // Group and sort
+      const alabanzas = cacheSongs.filter(s => s && s.tipo === 'alabanza');
+      const adoraciones = cacheSongs.filter(s => s && (s.tipo === 'adoracion' || s.tipo === 'adoración'));
 
-            let cancelBtn = document.getElementById('btn-cancel-song-edit');
-            if (!cancelBtn) {
-              cancelBtn = document.createElement('button');
-              cancelBtn.id = 'btn-cancel-song-edit';
-              cancelBtn.type = 'button';
-              cancelBtn.className = 'btn-primary';
-              cancelBtn.style.background = 'var(--coral)';
-              cancelBtn.style.marginTop = '8px';
-              cancelBtn.textContent = 'Cancelar Edición';
-              cancelBtn.onclick = () => resetSongForm();
-              document.getElementById('form-add-song').appendChild(cancelBtn);
-            }
-            cancelBtn.style.display = 'block';
+      alabanzas.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+      adoraciones.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
 
-            document.getElementById('form-add-song').scrollIntoView({ behavior: 'smooth' });
-          });
+      const renderGroup = (title, icon, list, colorVar) => {
+        const header = document.createElement('div');
+        header.style.cssText = `font-weight:700; font-size:14px; color:${colorVar}; margin: 16px 0 8px 0; border-bottom: 1px solid var(--border); padding-bottom: 6px; display: flex; align-items: center; gap: 8px;`;
+        header.innerHTML = `<span>${icon}</span> ${title} <span style="font-size: 11px; font-weight: normal; color: var(--text3); margin-left: auto;">(${list.length})</span>`;
+        listCont.appendChild(header);
 
-          div.querySelector('.click-del-song').addEventListener('click', async () => {
-            if (confirm(`¿Quieres borrar definitivamente "${s.nombre}" del catálogo?`)) {
-              await deleteDoc(doc(db, "biblioteca_canciones", s.id));
-            }
-          });
+        if (list.length === 0) {
+          const empty = document.createElement('p');
+          empty.style.cssText = 'color:var(--text3); font-size:12px; text-align:center; padding: 12px;';
+          empty.textContent = 'No hay canciones en esta categoría.';
+          listCont.appendChild(empty);
+          return;
         }
-        listCont.appendChild(div);
-      });
+
+        list.forEach(s => {
+          const div = document.createElement('div');
+          div.className = "song-item";
+          div.style.justifyContent = "space-between";
+          div.innerHTML = `
+            <div class="song-info">
+              <div class="song-name">${s.nombre} <span class="chip ${s.tipo === 'alabanza' ? 'chip-teal' : 'chip-purple'}" style="font-size:9px; padding:2px 6px;">${s.tipo}</span></div>
+              <div class="song-meta">${s.artista} | Tono Base: <b>${s.tonoBase}</b></div>
+            </div>
+            ${currentUserRole === 'lider' ? `
+              <div style="display:flex; gap:6px;">
+                <button class="chip chip-teal click-edit-song" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Editar">✏️ Editar</button>
+                <button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Eliminar">🗑️ Eliminar</button>
+              </div>
+            ` : ''}
+          `;
+
+          if (currentUserRole === 'lider') {
+            div.querySelector('.click-edit-song').addEventListener('click', () => {
+              editingSongId = s.id;
+              document.getElementById('song-name-input').value = s.nombre;
+              document.getElementById('song-artist-input').value = s.artista;
+              document.getElementById('song-key-input').value = s.tonoBase;
+              document.getElementById('song-type-input').value = s.tipo;
+              document.getElementById('song-youtube-input').value = s.youtube || "";
+              document.getElementById('song-lyrics-input').value = s.letra || "";
+
+              const btnSubmit = document.querySelector('#form-add-song button[type="submit"]');
+              btnSubmit.textContent = "Actualizar Canción";
+              btnSubmit.style.background = "var(--teal)";
+
+              let cancelBtn = document.getElementById('btn-cancel-song-edit');
+              if (!cancelBtn) {
+                cancelBtn = document.createElement('button');
+                cancelBtn.id = 'btn-cancel-song-edit';
+                cancelBtn.type = 'button';
+                cancelBtn.className = 'btn-primary';
+                cancelBtn.style.background = 'var(--coral)';
+                cancelBtn.style.marginTop = '8px';
+                cancelBtn.textContent = 'Cancelar Edición';
+                cancelBtn.onclick = () => resetSongForm();
+                document.getElementById('form-add-song').appendChild(cancelBtn);
+              }
+              cancelBtn.style.display = 'block';
+
+              document.getElementById('form-add-song').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            div.querySelector('.click-del-song').addEventListener('click', async () => {
+              if (confirm(`¿Quieres borrar definitivamente "${s.nombre}" del catálogo?`)) {
+                await deleteDoc(doc(db, "biblioteca_canciones", s.id));
+              }
+            });
+          }
+          listCont.appendChild(div);
+        });
+      };
+
+      renderGroup('Alabanzas (Rápidas)', '⚡', alabanzas, 'var(--teal)');
+      renderGroup('Adoración (Lentas)', '🙏', adoraciones, 'var(--purple)');
     }
 
     // ====================================================
@@ -3836,22 +4012,28 @@
               const num = startNum + i;
               const safeNombre = (s.nombre || "").replace(/"/g, '&quot;');
 
-              g += `<div class="musico-song-card" data-song-id="${s.id}">
+              const cardBorder = type === 'alabanza' ? 'border-left: 4px solid var(--teal); border-color: rgba(78, 205, 196, 0.25);' : 'border-left: 4px solid var(--purple); border-color: rgba(155, 143, 255, 0.25);';
+              const numColor = type === 'alabanza' ? 'color: rgba(78, 205, 196, 0.4);' : 'color: rgba(155, 143, 255, 0.4);';
+              const badgeStyle = type === 'alabanza'
+                ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
+                : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
+
+              g += `<div class="musico-song-card" data-song-id="${s.id}" style="${cardBorder}">
               <!-- Extremo Izquierdo: Reordenamiento y Número -->
               <div style="display:flex; align-items:center; gap:8px;">
                 <div class="song-order-btns">
                   <button class="order-btn btn-order-up" data-song-id="${s.id}" data-type="${type}">▲</button>
                   <button class="order-btn btn-order-down" data-song-id="${s.id}" data-type="${type}">▼</button>
                 </div>
-                <div class="song-num" style="min-width: 24px;">${num}</div>
+                <div class="song-num" style="min-width: 24px; ${numColor}">${num}</div>
               </div>
               
               <!-- Centro: Info e icono letra -->
               <div class="song-card-info" style="margin-left: 4px;">
-                <div class="song-card-name">${s.nombre}</div>
-                <div class="song-card-artist">${s.artista}</div>
+                <div class="song-card-name" style="font-weight: 600;">${s.nombre}</div>
+                <div class="song-card-artist" style="color: var(--text2); font-size: 12px;">${s.artista}</div>
                 ${hasLetra ? `
-                  <div>
+                  <div style="margin-top: 4px;">
                     <button class="btn-ver-letra" onclick="window.abrirModalLetraGlobal('${s.id}')">
                       📄 Ver Letra
                     </button>
@@ -3861,7 +4043,7 @@
               
               <!-- Extremo Derecho: Tono -->
               <div style="display:flex; align-items:center;">
-                <div class="song-tone-badge" data-song-id="${s.id}" data-current-tone="${tone}" data-song-name="${safeNombre}" data-date="${dateStr}">${tone}</div>
+                <div class="song-tone-badge" data-song-id="${s.id}" data-current-tone="${tone}" data-song-name="${safeNombre}" data-date="${dateStr}" style="${badgeStyle}">${tone}</div>
               </div>
               
               <!-- Botón Quitar en Esquina Superior Derecha -->
@@ -4330,26 +4512,33 @@
         songs.forEach((s, i) => {
           const tone = cancionesSeleccionadas[s.id];
           const num = startNum + i;
+
+          const cardBorder = type === 'alabanza' ? 'border-left: 4px solid var(--teal); border-color: rgba(78, 205, 196, 0.25);' : 'border-left: 4px solid var(--purple); border-color: rgba(155, 143, 255, 0.25);';
+          const numColor = type === 'alabanza' ? 'color: rgba(78, 205, 196, 0.4);' : 'color: rgba(155, 143, 255, 0.4);';
+          const indicatorStyle = type === 'alabanza'
+            ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
+            : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
+
           g += `
-          <div class="musico-song-card" style="padding: 10px; margin-bottom: 6px; background: var(--bg2);">
+          <div class="musico-song-card" style="padding: 10px; margin-bottom: 6px; background: var(--bg2); ${cardBorder}">
             <!-- Extremo Izquierdo: Reordenamiento y Número -->
             <div style="display:flex; align-items:center; gap:8px;">
               <div class="song-order-btns">
                 <button class="order-btn btn-admin-order-up" data-song-id="${s.id}" data-type="${type}">▲</button>
                 <button class="order-btn btn-admin-order-down" data-song-id="${s.id}" data-type="${type}">▼</button>
               </div>
-              <div class="song-num" style="font-size:24px; min-width: 24px;">${num}</div>
+              <div class="song-num" style="font-size:24px; min-width: 24px; ${numColor}">${num}</div>
             </div>
             
             <!-- Centro: Info -->
             <div class="song-card-info" style="margin-left: 4px;">
-              <div class="song-card-name" style="font-size:14px;">${s.nombre}</div>
-              <div class="song-card-artist" style="font-size:11px;">${s.artista}</div>
+              <div class="song-card-name" style="font-size:14px; font-weight: 600;">${s.nombre}</div>
+              <div class="song-card-artist" style="font-size:11px; color: var(--text2);">${s.artista}</div>
             </div>
             
             <!-- Extremo Derecho: Tono -->
             <div style="display:flex; align-items:center;">
-              <div class="tone-indicator" style="font-size:12px; margin-left:auto; margin-right:10px; padding: 4px 10px; cursor:pointer;" onclick="window.abrirTonePickerAdmin('${s.id}', '${tone}', '${s.nombre.replace(/'/g, "\\'")}', '${dateStr}')">${tone}</div>
+              <div class="tone-indicator" style="font-size:12px; margin-left:auto; margin-right:10px; padding: 4px 10px; cursor:pointer; ${indicatorStyle}" onclick="window.abrirTonePickerAdmin('${s.id}', '${tone}', '${s.nombre.replace(/'/g, "\\'")}', '${dateStr}')">${tone}</div>
             </div>
             
             <!-- Botón Quitar en Esquina Superior Derecha -->
@@ -4698,10 +4887,44 @@
           <input type="date" id="ensayo-fecha"
             style="width:100%; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text);">
         </div>
-        <div style="width: 120px;">
-          <label for="ensayo-hora" style="font-size:12px; margin-bottom:4px; display:block;">Hora</label>
-          <input type="time" id="ensayo-hora"
-            style="width:100%; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text);">
+        <div style="flex: 1.2; min-width: 180px;">
+          <label style="font-size:12px; margin-bottom:4px; display:block;">Hora</label>
+          <div style="display: flex; gap: 4px;">
+            <select id="ensayo-hora-hh" style="flex: 1; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); outline:none; height: 38px;">
+              <option value="">Hora</option>
+              <option value="01">01</option>
+              <option value="02">02</option>
+              <option value="03">03</option>
+              <option value="04">04</option>
+              <option value="05">05</option>
+              <option value="06">06</option>
+              <option value="07">07</option>
+              <option value="08">08</option>
+              <option value="09">09</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+            </select>
+            <select id="ensayo-hora-mm" style="flex: 1; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); outline:none; height: 38px;">
+              <option value="">Min</option>
+              <option value="00">00</option>
+              <option value="05">05</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="25">25</option>
+              <option value="30">30</option>
+              <option value="35">35</option>
+              <option value="40">40</option>
+              <option value="45">45</option>
+              <option value="50">50</option>
+              <option value="55">55</option>
+            </select>
+            <select id="ensayo-hora-ampm" style="width: 70px; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); outline:none; height: 38px;">
+              <option value="PM">PM</option>
+              <option value="AM">AM</option>
+            </select>
+          </div>
         </div>
       </div>
       <p class="modal-subtitle" style="margin-top:8px;">Selecciona los integrantes invitados (todos los miembros de la
