@@ -1046,26 +1046,27 @@
 
     /* === MUSICIAN SONG CARD === */
     .musico-song-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 14px 16px;
-      margin-bottom: 8px;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      border-radius: 0;
+      padding: 14px 4px;
+      margin-bottom: 0;
       display: flex;
       align-items: center;
       gap: 12px;
       transition: background-color 0.2s ease, border-color 0.2s ease;
       position: relative;
       cursor: pointer;
+      box-shadow: none !important;
     }
 
     .musico-song-card:hover {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: var(--border2);
+      background: rgba(255, 255, 255, 0.02) !important;
     }
 
     .musico-song-card:active {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04) !important;
     }
 
     .section-group-card {
@@ -1486,16 +1487,16 @@
     }
 
     body.theme-light .musico-song-card {
-      background: rgba(0, 0, 0, 0.02);
-      border-color: rgba(0, 0, 0, 0.08);
+      background: transparent !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
       box-shadow: none !important;
     }
     body.theme-light .musico-song-card:hover {
-      background: rgba(0, 0, 0, 0.04);
-      border-color: rgba(0, 0, 0, 0.15);
+      background: rgba(0, 0, 0, 0.02) !important;
     }
     body.theme-light .musico-song-card:active {
-      background: rgba(0, 0, 0, 0.06);
+      background: rgba(0, 0, 0, 0.04) !important;
     }
 
     body.theme-light .song-num {
@@ -1827,7 +1828,9 @@
 
       /* Song list items and card scaling */
       .musico-song-card {
-        padding: 22px 24px !important;
+        padding: 20px 8px !important;
+        border-radius: 0 !important;
+        margin-bottom: 0 !important;
       }
       .song-card-name {
         font-size: 18px !important;
@@ -3139,8 +3142,8 @@
             
             const isAlabanza = (s.tipo || 'alabanza').trim().toLowerCase() === 'alabanza';
             const cardBorder = isAlabanza 
-              ? 'border-left: 4px solid var(--teal); border-color: rgba(78, 205, 196, 0.25);' 
-              : 'border-left: 4px solid var(--purple); border-color: rgba(155, 143, 255, 0.25);';
+              ? 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;' 
+              : 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;';
             const numColor = isAlabanza ? 'color: rgba(78, 205, 196, 0.4);' : 'color: rgba(155, 143, 255, 0.4);';
             const badgeStyle = isAlabanza
               ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
@@ -3148,7 +3151,7 @@
 
             const songCard = document.createElement('div');
             songCard.className = 'musico-song-card';
-            songCard.style.cssText = `background: ${isAlabanza ? 'rgba(78, 205, 196, 0.04)' : 'rgba(155, 143, 255, 0.04)'} !important; ${cardBorder}`;
+            songCard.style.cssText = `background: transparent !important; border: none !important; border-radius: 0 !important; margin-bottom: 0 !important; padding: 14px 4px !important; box-shadow: none !important; ${cardBorder} cursor: pointer;`;
             songCard.innerHTML = `
               <!-- Extremo Izquierdo: Número -->
               <div style="display:flex; align-items:center; gap:8px;">
@@ -3164,21 +3167,16 @@
               <!-- Extremo Derecho: Tono y Acciones -->
               <div style="display:flex; align-items:center; gap: 8px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
                 <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; ${badgeStyle}">${s.tonoServicio}</div>
-                ${hasLetra ? `
-                  <button class="btn-ver-letra-modal btn-ver-letra" data-id="${s.id}" style="margin: 0; padding: 6px 12px; font-size: 11px;">📄 Letra</button>
-                ` : ''}
                 ${hasYoutube ? `
                   <a href="${s.youtube}" target="_blank" rel="noopener" class="repertorio-action-btn repertorio-btn-youtube" style="font-size: 11px; min-height: unset; padding: 6px 10px; margin: 0;">▶ YouTube</a>
                 ` : ''}
               </div>
             `;
             
-            const btnLetra = songCard.querySelector('.btn-ver-letra-modal');
-            if (btnLetra) {
-              btnLetra.addEventListener('click', () => {
-                window.abrirModalLetraGlobal(s.id, rehearsalSongs);
-              });
-            }
+            songCard.onclick = (e) => {
+              if (e.target.closest('.repertorio-btn-youtube')) return;
+              window.abrirModalLetraGlobal(s.id, rehearsalSongs);
+            };
             
             songsCont.appendChild(songCard);
           });
@@ -5361,12 +5359,11 @@
     window._adminSelectedArtist = null;
 
     function crearCartaCancionAdmin(s, playlistContext) {
-      const cardBg = s.tipo === 'adoracion' ? 'rgba(155, 143, 255, 0.04)' : 'rgba(78, 205, 196, 0.04)';
       const cardBorder = s.oficial 
-        ? 'border-left: 4px solid var(--gold) !important; border-color: rgba(244,197,66, 0.3) !important;' 
+        ? 'border-bottom: 1.5px solid rgba(244,197,66, 0.4) !important;' 
         : (s.tipo === 'adoracion' 
-            ? 'border-left: 4px solid var(--purple) !important; border-color: rgba(155, 143, 255, 0.25) !important;' 
-            : 'border-left: 4px solid var(--teal) !important; border-color: rgba(78, 205, 196, 0.25) !important;');
+            ? 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;' 
+            : 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;');
 
       const keysOptions = ['C','Cm','C#','C#m','D','Dm','D#','D#m','E','Em','F','Fm','F#','F#m','G','Gm','G#','G#m','A','Am','A#','A#m','B','Bm'];
       const ultimaVezText = obtenerUltimaVezCantada(s.id);
@@ -5379,7 +5376,7 @@
 
       const div = document.createElement('div');
       div.className = "musico-song-card";
-      div.style.cssText = `${cardBorder} background: ${cardBg};`;
+      div.style.cssText = `background: transparent !important; border: none !important; border-radius: 0 !important; margin-bottom: 0 !important; padding: 14px 4px !important; box-shadow: none !important; ${cardBorder}`;
 
       div.innerHTML = `
         <div class="song-card-info" style="margin-left: 4px; flex:1; min-width:0;">
@@ -5900,12 +5897,11 @@
 
     function crearCartaCancionMusico(s, playlistContext) {
       const isFav = window.misFavoritos && window.misFavoritos.includes(s.id);
-      const cardBg = s.tipo === 'adoracion' ? 'rgba(155, 143, 255, 0.04)' : 'rgba(78, 205, 196, 0.04)';
       const cardBorder = s.oficial 
-        ? 'border-left: 4px solid var(--gold) !important; border-color: rgba(244,197,66, 0.3) !important;' 
+        ? 'border-bottom: 1.5px solid rgba(244,197,66, 0.4) !important;' 
         : (s.tipo === 'adoracion' 
-            ? 'border-left: 4px solid var(--purple) !important; border-color: rgba(155, 143, 255, 0.25) !important;' 
-            : 'border-left: 4px solid var(--teal) !important; border-color: rgba(78, 205, 196, 0.25) !important;');
+            ? 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;' 
+            : 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;');
 
       const toneStyle = s.tipo === 'adoracion'
         ? 'background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);'
@@ -5917,7 +5913,7 @@
 
       const card = document.createElement('div');
       card.className = 'musico-song-card';
-      card.style.cssText = `${cardBorder} background: ${cardBg};`;
+      card.style.cssText = `background: transparent !important; border: none !important; border-radius: 0 !important; margin-bottom: 0 !important; padding: 14px 4px !important; box-shadow: none !important; ${cardBorder}`;
 
       card.innerHTML = `
         <!-- Favorito btn -->
@@ -6258,14 +6254,15 @@
               const num = startNum + i;
               const safeNombre = (s.nombre || "").replace(/"/g, '&quot;');
 
-              const cardBg = type === 'alabanza' ? 'rgba(78, 205, 196, 0.04)' : 'rgba(155, 143, 255, 0.04)';
-              const cardBorder = type === 'alabanza' ? 'border-left: 4px solid var(--teal); border-color: rgba(78, 205, 196, 0.25);' : 'border-left: 4px solid var(--purple); border-color: rgba(155, 143, 255, 0.25);';
+              const cardBorder = type === 'alabanza' 
+                ? 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;' 
+                : 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;';
               const numColor = type === 'alabanza' ? 'color: rgba(78, 205, 196, 0.4);' : 'color: rgba(155, 143, 255, 0.4);';
               const badgeStyle = type === 'alabanza'
                 ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
                 : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
 
-              g += `<div class="musico-song-card musico-service-song-card" data-song-id="${s.id}" style="${cardBorder} background: ${cardBg}; cursor: pointer;">
+              g += `<div class="musico-song-card musico-service-song-card" data-song-id="${s.id}" style="background: transparent !important; border: none !important; border-radius: 0 !important; margin-bottom: 0 !important; padding: 14px 4px !important; box-shadow: none !important; ${cardBorder} cursor: pointer;">
               <!-- Extremo Izquierdo: Reordenamiento y Número -->
               <div style="display:flex; align-items:center; gap:8px;">
                 <div class="song-order-btns">
@@ -7202,15 +7199,16 @@
             const num = startNum + i;
             const safeNombre = (s.nombre || "").replace(/"/g, '&quot;');
 
-            const cardBg = type === 'alabanza' ? 'rgba(78, 205, 196, 0.04)' : 'rgba(155, 143, 255, 0.04)';
-            const cardBorder = type === 'alabanza' ? 'border-left: 4px solid var(--teal); border-color: rgba(78, 205, 196, 0.25);' : 'border-left: 4px solid var(--purple); border-color: rgba(155, 143, 255, 0.25);';
+            const cardBorder = type === 'alabanza' 
+              ? 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;' 
+              : 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;';
             const numColor = type === 'alabanza' ? 'color: rgba(78, 205, 196, 0.4);' : 'color: rgba(155, 143, 255, 0.4);';
             const badgeStyle = type === 'alabanza'
               ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
               : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
 
             g += `
-            <div class="musico-song-card admin-service-song-card" data-song-id="${s.id}" style="padding: 10px; margin-bottom: 8px; background: ${cardBg}; ${cardBorder} cursor: pointer;">
+            <div class="musico-song-card admin-service-song-card" data-song-id="${s.id}" style="background: transparent !important; border: none !important; border-radius: 0 !important; margin-bottom: 0 !important; padding: 14px 4px !important; box-shadow: none !important; ${cardBorder} cursor: pointer;">
               <!-- Extremo Izquierdo: Reordenamiento y Número -->
               <div style="display:flex; align-items:center; gap:8px;">
                 <div class="song-order-btns">
@@ -7323,17 +7321,16 @@
 
       filtered.forEach(s => {
         const isAlabanza = type === 'alabanza';
-        const cardBg = isAlabanza ? 'rgba(78, 205, 196, 0.04)' : 'rgba(155, 143, 255, 0.04)';
         const cardBorder = isAlabanza 
-          ? 'border-left: 4px solid var(--teal) !important; border-color: rgba(78, 205, 196, 0.25) !important;' 
-          : 'border-left: 4px solid var(--purple) !important; border-color: rgba(155, 143, 255, 0.25) !important;';
+          ? 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;' 
+          : 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;';
         const badgeStyle = isAlabanza
           ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
           : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
 
         const div = document.createElement('div');
         div.className = "musico-song-card";
-        div.style.cssText = `${cardBorder} background: ${cardBg}; margin-bottom: 8px !important; border-radius: var(--radius-sm) !important; border-bottom: 1px solid var(--border) !important;`;
+        div.style.cssText = `background: transparent !important; border: none !important; border-radius: 0 !important; margin-bottom: 0 !important; padding: 14px 4px !important; box-shadow: none !important; ${cardBorder}`;
         div.innerHTML = `
           <!-- Centro: Info -->
           <div class="song-card-info" style="margin-left: 4px;">
