@@ -6254,6 +6254,11 @@
           .then(reg => {
             console.log('PWA Service Worker registrado:', reg.scope);
 
+            // Si ya hay un service worker esperando (el usuario recargó antes de actualizar)
+            if (reg.waiting) {
+              mostrarBannerActualizacion(reg.waiting);
+            }
+
             // Escuchar si se encuentra una nueva versión instalando en segundo plano
             reg.addEventListener('updatefound', () => {
               newWorker = reg.installing;
