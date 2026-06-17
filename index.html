@@ -2202,7 +2202,10 @@
         flex-wrap: wrap !important;
         align-items: center !important;
         gap: 6px !important;
-        font-size: 14px !important;
+        font-size: 16px !important;
+      }
+      .musico-song-card .song-card-artist {
+        font-size: 13px !important;
       }
       
       /* Target the actions/buttons container (which has margin-left auto style inline) */
@@ -3160,7 +3163,7 @@
               
               <!-- Centro: Info -->
               <div class="song-card-info" style="margin-left: 4px;">
-                <div class="song-card-name" style="font-size:14px; font-weight: 600;">${s.nombre}</div>
+                <div class="song-card-name" style="font-weight: 600;">${s.nombre}</div>
                 <div class="song-card-artist" style="font-size:11px; color: var(--text2);">${s.artista}</div>
               </div>
               
@@ -4991,7 +4994,7 @@
           
           <!-- Centro: Info -->
           <div class="song-card-info" style="margin-left: 4px;">
-            <div class="song-card-name" style="font-size:14px; font-weight: 600;">${s.nombre}</div>
+            <div class="song-card-name" style="font-weight: 600;">${s.nombre}</div>
             <div class="song-card-artist" style="font-size:11px; color: var(--text2); display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
               <span>${s.artista}</span>
               <span>•</span>
@@ -5380,7 +5383,7 @@
 
       div.innerHTML = `
         <div class="song-card-info" style="margin-left: 4px; flex:1; min-width:0;">
-          <div class="song-card-name" style="font-size:14px; font-weight: 600;">${s.nombre}</div>
+          <div class="song-card-name" style="font-weight: 600;">${s.nombre}</div>
           <div class="song-card-artist" style="font-size:11px; color: var(--text2); display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
             <span>${s.artista}</span>
             <span>•</span>
@@ -5922,7 +5925,7 @@
         </div>
         <!-- Centro: Info -->
         <div class="song-card-info" style="margin-left: 4px; flex:1; min-width:0;">
-          <div class="song-card-name" style="font-weight: 600; font-size:14px; display:flex; align-items:center; gap:6px;">
+          <div class="song-card-name" style="font-weight: 600; display:flex; align-items:center; gap:6px;">
             ${s.nombre} ${s.oficial ? '<span class="badge-oficial">OFICIAL</span>' : ''}
           </div>
           <div class="song-card-artist" style="color: var(--text2); font-size: 11px; margin-top: 2px;">${s.artista}</div>
@@ -6747,7 +6750,7 @@
 
       const cache = window._lyricsCache || {};
       let song = cache[cancionId];
-      if (!song) {
+      if (!song || (!song.letra && !cancionId.startsWith('custom_'))) {
         // Buscar en la lista global de canciones
         const found = (cacheSongs || []).find(x => x.id === cancionId);
         if (found) {
@@ -6765,13 +6768,17 @@
             console.error("Error cargando acordes:", e);
             letra = found.letra || '';
           }
-          song = {
-            nombre: found.nombre,
-            tonoBase: found.tonoBase,
-            tonoServicio: found.tonoBase,
-            youtube: found.youtube || '',
-            letra: letra
-          };
+          if (song) {
+            song.letra = letra;
+          } else {
+            song = {
+              nombre: found.nombre,
+              tonoBase: found.tonoBase,
+              tonoServicio: found.tonoBase,
+              youtube: found.youtube || '',
+              letra: letra
+            };
+          }
         } else if (cancionId.startsWith('custom_') && window._currentServiceData && window._currentServiceData.customSongsMetadata) {
           const meta = window._currentServiceData.customSongsMetadata[cancionId];
           if (meta) {
@@ -6794,7 +6801,8 @@
       const tonoMostrar = song.tonoServicio || song.tonoBase;
       const mtabRep = document.getElementById('mtab-repertorio-musico');
       const isRepActive = mtabRep && mtabRep.classList.contains('active');
-      const isSplitView = window.innerWidth >= 768 && isRepActive;
+      const ensayoActive = document.getElementById('ensayo-practice-overlay')?.classList.contains('active');
+      const isSplitView = window.innerWidth >= 768 && isRepActive && !ensayoActive;
 
       // Elementos de destino dependiendo de la vista
       const destPrefix = isSplitView ? 'panel-' : 'lyrics-modal-';
@@ -7220,7 +7228,7 @@
               
               <!-- Centro: Info -->
               <div class="song-card-info" style="margin-left: 4px; flex:1; min-width:0;">
-                <div class="song-card-name" style="font-size:14px; font-weight: 600;">${s.nombre}</div>
+                <div class="song-card-name" style="font-weight: 600;">${s.nombre}</div>
                 <div class="song-card-artist" style="font-size:11px; color: var(--text2); margin-top:2px;">${s.artista}</div>
               </div>
               
