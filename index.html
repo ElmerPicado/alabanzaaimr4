@@ -1583,6 +1583,14 @@
       }
       .app-header {
         padding: 12px 12px 0 !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+      }
+      .app-header > div:not(.logo) {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: space-between !important;
       }
       .logo {
         font-size: 19px !important;
