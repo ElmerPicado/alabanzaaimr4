@@ -1644,8 +1644,9 @@
         background: #0f0e15 !important;
         border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
         border-bottom: none !important;
-        padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 8px)) !important;
-        height: 72px !important;
+        padding: 8px 12px calc(20px + env(safe-area-inset-bottom, 12px)) !important;
+        height: auto !important;
+        min-height: 80px !important;
         gap: 0 !important;
         display: flex !important;
         justify-content: space-around !important;
@@ -1660,7 +1661,7 @@
       }
 
       .content {
-        padding-bottom: calc(90px + env(safe-area-inset-bottom, 8px)) !important;
+        padding-bottom: calc(115px + env(safe-area-inset-bottom, 12px)) !important;
       }
 
       .nav-tab, .nav-tab-musico {
