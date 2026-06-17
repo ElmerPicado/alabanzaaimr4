@@ -3896,7 +3896,9 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
 
     import {
-      getFirestore,
+      initializeFirestore,
+      persistentLocalCache,
+      persistentMultipleTabManager,
       doc,
       setDoc,
       getDoc,
@@ -3918,7 +3920,11 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = initializeFirestore(app, {
+      localCache: persistentLocalCache({
+        tabManager: persistentMultipleTabManager()
+      })
+    });
 
     // Nodos DOM globales
     const screenLogin = document.getElementById('screen-login');
@@ -4286,30 +4292,59 @@
       if (currentUserRole !== 'lider') return;
       
       const conLetra = (cacheSongs || []).filter(s => s.letra !== undefined && s.letra !== null && s.letra.trim() !== '');
-      if (conLetra.length === 0) return;
+      const cancionesSucias = (cacheSongs || []).filter(s => {
+        const nombre = s.nombre || '';
+        const limpio = nombre.replace(/\s*[\(,\-]?\s*(acordes|letra|letras|tab|tabs)\s*\)?$/gi, '').trim();
+        return limpio !== nombre;
+      });
+
+      if (conLetra.length === 0 && cancionesSucias.length === 0) return;
       
       _migrationInProgress = true;
-      console.log(`[MIGRACIÓN] Se encontraron ${conLetra.length} canciones con letra en biblioteca_canciones. Migrando...`);
-      if (typeof showToast === 'function') {
-        showToast(`📦 Optimizando base de datos: Migrando ${conLetra.length} letras...`);
+
+      // 1. Migrar letras si hay pendientes
+      if (conLetra.length > 0) {
+        console.log(`[MIGRACIÓN] Se encontraron ${conLetra.length} canciones con letra en biblioteca_canciones. Migrando...`);
+        if (typeof showToast === 'function') {
+          showToast(`📦 Optimizando base de datos: Migrando ${conLetra.length} letras...`);
+        }
+        let migrados = 0;
+        for (const s of conLetra) {
+          try {
+            const letra = s.letra;
+            await setDoc(doc(db, "letras_canciones", s.id), { letra: letra });
+            await updateDoc(doc(db, "biblioteca_canciones", s.id), { letra: deleteField() });
+            migrados++;
+          } catch (err) {
+            console.error(`Error migrando "${s.nombre}":`, err);
+          }
+        }
+        console.log(`[MIGRACIÓN] Proceso terminado. Se migraron exitosamente ${migrados} canciones.`);
       }
-      
-      let migrados = 0;
-      for (const s of conLetra) {
-        try {
-          const letra = s.letra;
-          await setDoc(doc(db, "letras_canciones", s.id), { letra: letra });
-          await updateDoc(doc(db, "biblioteca_canciones", s.id), { letra: deleteField() });
-          migrados++;
-        } catch (err) {
-          console.error(`Error migrando "${s.nombre}":`, err);
+
+      // 2. Limpiar nombres sucios si los hay
+      if (cancionesSucias.length > 0) {
+        console.log(`[LIMPIEZA NOMBRES] Se encontraron ${cancionesSucias.length} canciones con nombre sucio. Corrigiendo...`);
+        if (typeof showToast === 'function') {
+          showToast(`🧹 Limpiando nombres de ${cancionesSucias.length} canciones...`);
+        }
+        let corregidos = 0;
+        for (const s of cancionesSucias) {
+          const nombreLimpio = s.nombre.replace(/\s*[\(,\-]?\s*(acordes|letra|letras|tab|tabs)\s*\)?$/gi, '').trim();
+          try {
+            await updateDoc(doc(db, "biblioteca_canciones", s.id), { nombre: nombreLimpio });
+            corregidos++;
+          } catch(err) {
+            console.error(`Error corrigiendo nombre de "${s.nombre}":`, err);
+          }
+        }
+        console.log(`[LIMPIEZA NOMBRES] Proceso terminado. Se corrigieron ${corregidos} nombres.`);
+        if (typeof showToast === 'function') {
+          showToast(`✅ Nombres de canciones corregidos (${corregidos} procesadas).`);
         }
       }
+
       _migrationInProgress = false;
-      console.log(`[MIGRACIÓN] Proceso terminado. Se migraron exitosamente ${migrados} canciones.`);
-      if (typeof showToast === 'function') {
-        showToast(`✅ Optimización finalizada. ${migrados} letras migradas.`);
-      }
     }
 
     // ====================================================
