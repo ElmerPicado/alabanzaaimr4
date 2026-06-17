@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="AlabanZapp IMR4">
-  <meta name="theme-color" content="#4ecdc4">
+  <meta name="theme-color" content="#33b3a6">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
@@ -20,11 +20,11 @@
       --bg3: #23213a;
       --border: rgba(255, 255, 255, 0.08);
       --border2: rgba(255, 255, 255, 0.14);
-      --gold: #f4c542;
-      --gold2: #e8a820;
-      --teal: #4ecdc4;
-      --coral: #ff6b6b;
-      --purple: #9b8fff;
+      --gold: #e5b43c;
+      --gold2: #c8931b;
+      --teal: #33b3a6;
+      --coral: #f43f5e;
+      --purple: #818cf8;
       --text: #f0eeff;
       --text2: #a09cc0;
       --text3: #6b6890;
@@ -1618,6 +1618,106 @@
         padding: 12px 16px !important;
         min-height: 70px !important;
       }
+
+      /* Fixed bottom navigation bar for mobile */
+      .nav-tabs {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 9990 !important;
+        background: rgba(15, 14, 23, 0.88) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-top: 1.5px solid rgba(255, 255, 255, 0.06) !important;
+        border-bottom: none !important;
+        padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 8px)) !important;
+        height: auto !important;
+        gap: 0 !important;
+        display: flex !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4) !important;
+      }
+
+      body.theme-light .nav-tabs {
+        background: rgba(255, 255, 255, 0.88) !important;
+        border-top-color: rgba(0, 0, 0, 0.08) !important;
+        box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.06) !important;
+      }
+
+      .content {
+        padding-bottom: calc(85px + env(safe-area-inset-bottom, 8px)) !important;
+      }
+
+      .nav-tab, .nav-tab-musico {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 3px !important;
+        background: none !important;
+        border: none !important;
+        padding: 4px 0 !important;
+        font-size: 9.5px !important;
+        font-weight: 700 !important;
+        color: var(--text3) !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
+        flex: 1 !important;
+        text-align: center !important;
+        min-width: 0 !important;
+        height: 100% !important;
+        text-transform: none !important;
+        letter-spacing: normal !important;
+      }
+
+      .nav-tab.active {
+        color: var(--gold) !important;
+        background: none !important;
+        border: none !important;
+      }
+
+      .nav-tab-musico.active {
+        color: var(--teal) !important;
+        background: none !important;
+        border: none !important;
+      }
+
+      .nav-tab .nav-icon, .nav-tab-musico .nav-icon {
+        font-size: 20px !important;
+        display: block !important;
+        line-height: 1 !important;
+        margin-bottom: 2px !important;
+        transition: transform 0.2s ease !important;
+      }
+
+      .nav-tab.active .nav-icon, .nav-tab-musico.active .nav-icon {
+        transform: scale(1.1) !important;
+      }
+
+      .nav-tab .nav-label, .nav-tab-musico .nav-label {
+        font-size: 9.5px !important;
+        font-weight: 700 !important;
+        display: block !important;
+        line-height: 1.1 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: 100% !important;
+        color: inherit !important;
+      }
+
+      .nav-tab.active::after, .nav-tab-musico.active::after {
+        content: '' !important;
+        display: block !important;
+        width: 4px !important;
+        height: 4px !important;
+        background: currentColor !important;
+        border-radius: 50% !important;
+        margin-top: 2px !important;
+        box-shadow: 0 0 6px currentColor !important;
+      }
     }
   </style>
 </head>
@@ -2561,12 +2661,12 @@
 
     <!-- NAVEGACIÓN PRINCIPAL -->
     <nav class="nav-tabs">
-      <button class="nav-tab active" data-tab="tab-servicios">🗓️ Servicios</button>
-      <button class="nav-tab" data-tab="tab-historial">📜 Historial</button>
-      <button class="nav-tab" data-tab="tab-repertorio">🎵 Repertorio</button>
-      <button class="nav-tab" data-tab="tab-ensayos">📅 Ensayos</button>
-      <button class="nav-tab" data-tab="tab-miembros">👥 Miembros</button>
-      <button class="nav-tab" data-tab="tab-ajustes">⚙️ Ajustes</button>
+      <button class="nav-tab active" data-tab="tab-servicios"><span class="nav-icon">🗓️</span><span class="nav-label">Servicios</span></button>
+      <button class="nav-tab" data-tab="tab-historial"><span class="nav-icon">📜</span><span class="nav-label">Historial</span></button>
+      <button class="nav-tab" data-tab="tab-repertorio"><span class="nav-icon">🎵</span><span class="nav-label">Repertorio</span></button>
+      <button class="nav-tab" data-tab="tab-ensayos"><span class="nav-icon">📅</span><span class="nav-label">Ensayos</span></button>
+      <button class="nav-tab" data-tab="tab-miembros"><span class="nav-icon">👥</span><span class="nav-label">Miembros</span></button>
+      <button class="nav-tab" data-tab="tab-ajustes"><span class="nav-icon">⚙️</span><span class="nav-label">Ajustes</span></button>
     </nav>
 
     <!-- CONTENIDO DE PANELES -->
@@ -2869,10 +2969,10 @@
     </header>
 
     <nav class="nav-tabs">
-      <button class="nav-tab-musico active" data-mtab="mtab-servicio">Servicio</button>
-      <button class="nav-tab-musico" data-mtab="mtab-asistencia">Mi Asistencia</button>
-      <button id="nav-tab-ensayos-musico" class="nav-tab-musico" data-mtab="mtab-ensayos-musico" style="position: relative;">📅 Ensayos</button>
-      <button class="nav-tab-musico" data-mtab="mtab-repertorio-musico">🎵 Repertorio</button>
+      <button class="nav-tab-musico active" data-mtab="mtab-servicio"><span class="nav-icon">🗓️</span><span class="nav-label">Servicio</span></button>
+      <button class="nav-tab-musico" data-mtab="mtab-asistencia"><span class="nav-icon">✅</span><span class="nav-label">Asistencia</span></button>
+      <button id="nav-tab-ensayos-musico" class="nav-tab-musico" data-mtab="mtab-ensayos-musico" style="position: relative;"><span class="nav-icon">📅</span><span class="nav-label">Ensayos</span></button>
+      <button class="nav-tab-musico" data-mtab="mtab-repertorio-musico"><span class="nav-icon">🎵</span><span class="nav-label">Repertorio</span></button>
     </nav>
 
     <main class="content">
@@ -3058,7 +3158,7 @@
         <div>
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <h3 id="lyrics-modal-title" class="lyrics-modal-title">Nombre de la Canción</h3>
-            <a id="lyrics-modal-yt-link" href="#" target="_blank" rel="noopener" style="display: none; align-items: center; gap: 4px; background: rgba(255, 68, 68, 0.15); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s;" onmouseover="this.style.background='rgba(255,68,68,0.25)'" onmouseout="this.style.background='rgba(255, 68, 68, 0.15)'">
+            <a id="lyrics-modal-yt-link" href="#" target="_blank" rel="noopener" style="display: none; align-items: center; gap: 4px; background: rgba(244, 63, 94, 0.12); color: var(--coral); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s;" onmouseover="this.style.background='rgba(244, 63, 94, 0.2)'" onmouseout="this.style.background='rgba(244, 63, 94, 0.12)'">
               ▶ YouTube
             </a>
           </div>
