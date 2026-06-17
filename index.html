@@ -590,11 +590,12 @@
       inset: 0;
       background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(4px);
-      z-index: 2000;
+      z-index: 100000 !important;
       display: none;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      padding: 20px;
+      padding: 40px 20px;
+      overflow-y: auto;
     }
 
     .modal-overlay.active {
@@ -609,6 +610,7 @@
       width: 100%;
       max-width: 340px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      margin: auto 0; /* Centers vertically when short, scrolls from top when tall */
     }
 
     .modal-title {
@@ -925,7 +927,7 @@
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.85);
-      z-index: 9990;
+      z-index: 100000 !important;
       display: none;
       align-items: center;
       justify-content: center;
