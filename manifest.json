@@ -1,6 +1,6 @@
 {
-  "name": "AlabanZapp IMR4",
-  "short_name": "AlabanZapp",
+  "name": "AlabanApp IMR4",
+  "short_name": "AlabanApp",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1a1828",

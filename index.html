@@ -4,10 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AlabanZapp — Panel de Equipo IMR4</title>
+  <title>AlabanApp — Panel de Equipo IMR4</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="AlabanZapp IMR4">
+  <meta name="apple-mobile-web-app-title" content="AlabanApp IMR4">
   <meta name="theme-color" content="#33b3a6">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" href="logo.png">
@@ -83,6 +83,9 @@
       font-size: 24px;
       color: var(--gold);
       letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
     }
 
     .logo span {
@@ -272,7 +275,7 @@
     }
 
     .nav-tab-musico.active {
-      color: var(--teal);
+      color: var(--gold);
       background: var(--bg);
       border: 1px solid var(--border);
       border-bottom: 1px solid var(--bg);
@@ -983,21 +986,47 @@
 
     /* === MUSICIAN SONG CARD === */
     .musico-song-card {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 12px;
-      margin-bottom: 10px;
+      background: none !important;
+      border-top: none !important;
+      border-right: none !important;
+      border-bottom: 1px solid var(--border) !important;
+      border-radius: 0 !important;
+      padding: 14px 16px !important;
+      margin-bottom: 0 !important;
       display: flex;
       align-items: center;
       gap: 12px;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: background-color 0.2s;
       position: relative;
     }
 
     .musico-song-card:active {
-      border-color: var(--border2);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.04) !important;
+      box-shadow: none !important;
+      border-color: transparent !important;
+    }
+
+    .section-group-card {
+      background: none !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      padding: 16px 0 !important;
+      margin-bottom: 12px !important;
+    }
+
+    .section-group-card > h4 {
+      padding: 0 16px !important;
+    }
+
+    .section-group-card > div {
+      gap: 0 !important;
+    }
+
+    .section-group-card .btn-add-song-musico {
+      margin-left: 16px !important;
+      margin-right: 16px !important;
+      width: calc(100% - 32px) !important;
     }
 
     .song-num {
@@ -1437,7 +1466,9 @@
     }
 
     body.theme-light .musico-song-card {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+      background: none !important;
+      box-shadow: none !important;
+      border-bottom-color: rgba(0, 0, 0, 0.08) !important;
     }
 
     body.theme-light .song-num {
@@ -1611,6 +1642,37 @@
         border-radius: 0 !important;
         border: none !important;
       }
+
+      /* Rehearsal practice modal full screen override */
+      #ensayo-practice-overlay {
+        padding: 0 !important;
+      }
+      #ensayo-practice-overlay .modal-box {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        max-height: 100vh !important;
+        max-height: 100dvh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        padding: 20px 0 !important;
+        box-sizing: border-box !important;
+        background: var(--bg) !important;
+      }
+      #ensayo-practice-overlay .modal-box > div:first-child {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
+      #practice-modal-songs {
+        gap: 0 !important;
+      }
+
+      /* Edge-to-edge list styling inside active tab contents */
+      .section-group-card {
+        margin-left: -16px !important;
+        margin-right: -16px !important;
+      }
       .lyrics-modal-body {
         padding: 16px !important;
         display: flex !important;
@@ -1693,7 +1755,7 @@
       }
 
       .nav-tab-musico.active {
-        color: var(--teal) !important;
+        color: var(--gold) !important;
         opacity: 1 !important;
         background: none !important;
         border: none !important;
@@ -1734,7 +1796,13 @@
   <!-- PANTALLA DE ACCESO -->
   <div id="screen-login" class="screen active">
     <div class="login-card">
-      <h1 class="login-title">AlabanZapp</h1>
+      <h1 class="login-title" style="display: flex; align-items: center; justify-content: center; gap: 2px;">
+        <span>Alaban</span>
+        <svg viewBox="0 0 512 512" fill="currentColor" style="width: 1em; height: 1em; display: inline-block; transform: translateY(-0.05em);">
+          <path d="M285.48,462.46c-20.91-2.92-38.38-16.71-44.62-36.21-3.6-11.16-3.76-26.47,0.37-37.45,4.72-12.55,14.54-21.65,26.48-25.59,9.45-3.08,19.34-2.88,28.84-0.66,24.87,5.84,41.97,29.98,38.19,55.15-2.29,15.17-10.87,28.63-23.75,36.42-7.55,4.58-16.76,6.34-25.51,8.34z M256,0c-11.36,36.96-18.11,74.92-20.35,113.06-0.96,16.57-0.78,33.24,0.36,49.8,1.25,18.43,5.1,36.73,11.53,54.17,4.02,10.88,8.81,21.57,14.61,31.76,2.15,3.81,5.26,7.18,7.9,10.77,5.43,7.36,11.32,14.47,16.78,21.91,6.56,8.96,12.56,18.24,18.52,27.53,5.01,7.77,9.39,15.82,13.78,23.85,5.55,10.19,10.66,20.55,15.34,31.05,3.67,8.23,6.72,16.66,9.52,25.13,3.95,11.96,6.55,24.34,7.84,36.87,1.86,17.95,0.76,36.03-3.21,53.79-3.79,17.15-11.19,33.09-21.72,46.74-12.87,16.8-31.5,27.27-52.19,27.95-17.72,0.57-35.13-4.6-49.88-14.77-16.03-10.97-27.18-27.46-31.42-46.3-4.3-19.12-3.17-39.26,3.06-57.73,6.29-18.66,17.37-34.99,31.84-47.53,15.54-13.43,35.25-20.39,55.57-19.66,23.1,0.82,45.47,10.58,61.94,27.86,15.42,16.14,23.77,37.89,23.18,60.28-0.65,24.63-11.45,47.78-29.07,64.71-15.58,15.02-36.56,22.18-57.5,21.08-16.79-0.88-33.3-7.55-46.06-18.77-13.88-12.06-23.01-28.75-26.68-46.72-3.95-19.26-2.5-39.4,3.77-58.07,6.88-20.66,19.22-38.65,34.8-54.34,14.43-14.54,31.43-26.17,49.85-35.21,11.33-5.54,23.08-10.15,34.88-14.43,8.75-3.16,17.65-6,26.54-8.85-6.84-25.07-13.68-50.14-20.52-75.22C240.23,103.55,249.27,51.81,256,0Z"></path>
+        </svg>
+        <span>app</span>
+      </h1>
       <p class="login-sub">Panel de Coordinación IMR4</p>
       <form id="login-form">
         <div class="field">
@@ -1752,7 +1820,14 @@
 
   <div id="screen-dashboard" class="screen">
     <header class="app-header">
-      <div class="logo">AlabanZapp <span>IMR4</span></div>
+      <div class="logo">
+        <span>Alaban</span>
+        <svg viewBox="0 0 512 512" fill="currentColor" style="width: 1.15em; height: 1.15em; display: inline-block; transform: translateY(-0.05em);">
+          <path d="M285.48,462.46c-20.91-2.92-38.38-16.71-44.62-36.21-3.6-11.16-3.76-26.47,0.37-37.45,4.72-12.55,14.54-21.65,26.48-25.59,9.45-3.08,19.34-2.88,28.84-0.66,24.87,5.84,41.97,29.98,38.19,55.15-2.29,15.17-10.87,28.63-23.75,36.42-7.55,4.58-16.76,6.34-25.51,8.34z M256,0c-11.36,36.96-18.11,74.92-20.35,113.06-0.96,16.57-0.78,33.24,0.36,49.8,1.25,18.43,5.1,36.73,11.53,54.17,4.02,10.88,8.81,21.57,14.61,31.76,2.15,3.81,5.26,7.18,7.9,10.77,5.43,7.36,11.32,14.47,16.78,21.91,6.56,8.96,12.56,18.24,18.52,27.53,5.01,7.77,9.39,15.82,13.78,23.85,5.55,10.19,10.66,20.55,15.34,31.05,3.67,8.23,6.72,16.66,9.52,25.13,3.95,11.96,6.55,24.34,7.84,36.87,1.86,17.95,0.76,36.03-3.21,53.79-3.79,17.15-11.19,33.09-21.72,46.74-12.87,16.8-31.5,27.27-52.19,27.95-17.72,0.57-35.13-4.6-49.88-14.77-16.03-10.97-27.18-27.46-31.42-46.3-4.3-19.12-3.17-39.26,3.06-57.73,6.29-18.66,17.37-34.99,31.84-47.53,15.54-13.43,35.25-20.39,55.57-19.66,23.1,0.82,45.47,10.58,61.94,27.86,15.42,16.14,23.77,37.89,23.18,60.28-0.65,24.63-11.45,47.78-29.07,64.71-15.58,15.02-36.56,22.18-57.5,21.08-16.79-0.88-33.3-7.55-46.06-18.77-13.88-12.06-23.01-28.75-26.68-46.72-3.95-19.26-2.5-39.4,3.77-58.07,6.88-20.66,19.22-38.65,34.8-54.34,14.43-14.54,31.43-26.17,49.85-35.21,11.33-5.54,23.08-10.15,34.88-14.43,8.75-3.16,17.65-6,26.54-8.85-6.84-25.07-13.68-50.14-20.52-75.22C240.23,103.55,249.27,51.81,256,0Z"></path>
+        </svg>
+        <span>app</span>
+        <span>IMR4</span>
+      </div>
       <div style="display: flex; gap: 8px; align-items: center;">
         <!-- Selector de Tema Claro/Oscuro -->
         <button id="btn-leader-theme" class="theme-btn" title="Cambiar Tema">☀️</button>
@@ -2333,6 +2408,7 @@
       window.renderEnsayosMusico = function () {
         const musicoId = activeSessionUser?.usuario;
         if (!musicoId) return;
+        if (activeSessionUser?.role === 'lider') return; // Admins do not need musician rehearsal logic/popups
         const cont = document.getElementById('ensayo-list-musico');
         if (!cont) return;
         cont.innerHTML = '';
@@ -2970,7 +3046,7 @@
       <!-- 4. PANEL: AJUSTES -->
       <div id="tab-ajustes" class="tab-panel">
         <h2 class="section-title">Configuración</h2>
-        <p class="section-sub">Ajustes generales del sistema de AlabanZapp IMR4.</p>
+        <p class="section-sub">Ajustes generales del sistema de AlabanApp IMR4.</p>
 
         <div class="card" style="border-color: var(--teal); margin-bottom: 20px;">
           <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--teal); margin-bottom: 6px;">📲
@@ -3003,7 +3079,14 @@
   <!-- ========================================================= -->
   <div id="screen-musico" class="screen">
     <header class="app-header">
-      <div class="logo">AlabanZapp <span>IMR4</span></div>
+      <div class="logo">
+        <span>Alaban</span>
+        <svg viewBox="0 0 512 512" fill="currentColor" style="width: 1.15em; height: 1.15em; display: inline-block; transform: translateY(-0.05em);">
+          <path d="M285.48,462.46c-20.91-2.92-38.38-16.71-44.62-36.21-3.6-11.16-3.76-26.47,0.37-37.45,4.72-12.55,14.54-21.65,26.48-25.59,9.45-3.08,19.34-2.88,28.84-0.66,24.87,5.84,41.97,29.98,38.19,55.15-2.29,15.17-10.87,28.63-23.75,36.42-7.55,4.58-16.76,6.34-25.51,8.34z M256,0c-11.36,36.96-18.11,74.92-20.35,113.06-0.96,16.57-0.78,33.24,0.36,49.8,1.25,18.43,5.1,36.73,11.53,54.17,4.02,10.88,8.81,21.57,14.61,31.76,2.15,3.81,5.26,7.18,7.9,10.77,5.43,7.36,11.32,14.47,16.78,21.91,6.56,8.96,12.56,18.24,18.52,27.53,5.01,7.77,9.39,15.82,13.78,23.85,5.55,10.19,10.66,20.55,15.34,31.05,3.67,8.23,6.72,16.66,9.52,25.13,3.95,11.96,6.55,24.34,7.84,36.87,1.86,17.95,0.76,36.03-3.21,53.79-3.79,17.15-11.19,33.09-21.72,46.74-12.87,16.8-31.5,27.27-52.19,27.95-17.72,0.57-35.13-4.6-49.88-14.77-16.03-10.97-27.18-27.46-31.42-46.3-4.3-19.12-3.17-39.26,3.06-57.73,6.29-18.66,17.37-34.99,31.84-47.53,15.54-13.43,35.25-20.39,55.57-19.66,23.1,0.82,45.47,10.58,61.94,27.86,15.42,16.14,23.77,37.89,23.18,60.28-0.65,24.63-11.45,47.78-29.07,64.71-15.58,15.02-36.56,22.18-57.5,21.08-16.79-0.88-33.3-7.55-46.06-18.77-13.88-12.06-23.01-28.75-26.68-46.72-3.95-19.26-2.5-39.4,3.77-58.07,6.88-20.66,19.22-38.65,34.8-54.34,14.43-14.54,31.43-26.17,49.85-35.21,11.33-5.54,23.08-10.15,34.88-14.43,8.75-3.16,17.65-6,26.54-8.85-6.84-25.07-13.68-50.14-20.52-75.22C240.23,103.55,249.27,51.81,256,0Z"></path>
+        </svg>
+        <span>app</span>
+        <span>IMR4</span>
+      </div>
       <div style="display: flex; gap: 8px; align-items: center;">
         <!-- Botón S.O.S estático en cabecera -->
         <button id="btn-musico-sos" class="sos-btn" title="Pedir Asistencia (S.O.S)">🚨 S.O.S</button>
@@ -3377,10 +3460,10 @@
       z-index: 10000;
     " title="Cerrar anuncio">✕</button>
     <div style="display:flex; align-items:center; gap:12px; max-width:480px; margin:0 auto; padding-right: 20px;">
-      <img src="logo.png" alt="AlabanZapp IMR4"
+      <img src="logo.png" alt="AlabanApp IMR4"
         style="width:48px; height:48px; border-radius:12px; flex-shrink:0; object-fit:cover; box-shadow:0 4px 12px rgba(78,205,196,0.3);">
       <div style="flex:1; min-width:0;">
-        <div style="font-weight:700; font-size:14px; color:var(--teal); margin-bottom:2px;">Instalar AlabanZapp IMR4</div>
+        <div style="font-weight:700; font-size:14px; color:var(--teal); margin-bottom:2px;">Instalar AlabanApp IMR4</div>
         <div style="font-size:12px; color:var(--text2); line-height:1.4;">Agrégala a tu pantalla de inicio y úsala como
           una app nativa 📱</div>
       </div>
