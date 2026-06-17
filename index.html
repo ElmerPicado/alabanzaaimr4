@@ -5148,7 +5148,14 @@
     // ====================================================
     document.getElementById('form-add-song').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const nombre = document.getElementById('song-name-input').value.trim();
+      let nombre = document.getElementById('song-name-input').value.trim();
+      
+      // Limpiar automáticamente sufijos molestos en el nombre de la canción
+      nombre = nombre
+        .replace(/\s*[\(,\-]?\s*(acordes|letra|letras|tab|tabs|chords|lyric|lyrics|acordes\s+y\s+letra|letra\s+y\s+acordes)\s*\)?/gi, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
       const artista = document.getElementById('song-artist-input').value.trim();
 
       // Verificar duplicado solo al AGREGAR (no al editar)
