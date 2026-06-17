@@ -1052,7 +1052,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      transition: all 0.2s;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
       position: relative;
       cursor: pointer;
     }
@@ -2124,7 +2124,7 @@
       border-radius: var(--radius-sm);
       margin-bottom: 6px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
     }
     .artist-row-item:hover {
       background: rgba(255, 255, 255, 0.07);
@@ -5543,6 +5543,9 @@
           artistGroup.style.marginBottom = '6px';
 
           const isExpanded = window._adminSelectedArtist === art;
+          if (isExpanded) {
+            artistGroup.classList.add('expanded');
+          }
 
           const header = document.createElement('div');
           header.className = 'artist-row-item';
@@ -5568,13 +5571,51 @@
             });
           }
 
-          header.onclick = () => {
-            if (window._adminSelectedArtist === art) {
-              window._adminSelectedArtist = null;
-            } else {
-              window._adminSelectedArtist = art;
+          header.onclick = (e) => {
+            e.stopPropagation();
+            const container = todasList;
+            const currentlyExpanded = container.querySelector('.artist-accordion-group.expanded');
+            
+            const groupEl = artistGroup;
+            const isNowExpanding = !groupEl.classList.contains('expanded');
+            
+            if (currentlyExpanded && currentlyExpanded !== groupEl) {
+              currentlyExpanded.classList.remove('expanded');
+              const prevHeader = currentlyExpanded.querySelector('.artist-row-item');
+              if (prevHeader) {
+                prevHeader.style.borderColor = '';
+                prevHeader.style.background = '';
+              }
+              const prevCollapse = currentlyExpanded.querySelector('.artist-songs-collapse');
+              if (prevCollapse) {
+                prevCollapse.style.display = 'none';
+                prevCollapse.innerHTML = '';
+              }
             }
-            renderizarMantenimientoCanciones();
+            
+            if (isNowExpanding) {
+              groupEl.classList.add('expanded');
+              header.style.borderColor = 'var(--teal)';
+              header.style.background = 'rgba(78, 205, 196, 0.08)';
+              collapseDiv.style.display = 'block';
+              
+              collapseDiv.innerHTML = '';
+              const artistSongs = todas.filter(s => (s.artista || 'Desconocido') === art);
+              artistSongs.forEach(s => {
+                const card = crearCartaCancionAdmin(s, artistSongs);
+                collapseDiv.appendChild(card);
+              });
+              
+              window._adminSelectedArtist = art;
+            } else {
+              groupEl.classList.remove('expanded');
+              header.style.borderColor = '';
+              header.style.background = '';
+              collapseDiv.style.display = 'none';
+              collapseDiv.innerHTML = '';
+              
+              window._adminSelectedArtist = null;
+            }
           };
 
           artistGroup.appendChild(header);
@@ -5969,6 +6010,9 @@
             artistGroup.style.marginBottom = '6px';
             
             const isExpanded = window._musicoSelectedArtist === art;
+            if (isExpanded) {
+              artistGroup.classList.add('expanded');
+            }
 
             const header = document.createElement('div');
             header.className = 'artist-row-item';
@@ -5994,13 +6038,51 @@
               });
             }
 
-            header.onclick = () => {
-              if (window._musicoSelectedArtist === art) {
-                window._musicoSelectedArtist = null;
-              } else {
-                window._musicoSelectedArtist = art;
+            header.onclick = (e) => {
+              e.stopPropagation();
+              const container = listCont;
+              const currentlyExpanded = container.querySelector('.artist-accordion-group.expanded');
+              
+              const groupEl = artistGroup;
+              const isNowExpanding = !groupEl.classList.contains('expanded');
+              
+              if (currentlyExpanded && currentlyExpanded !== groupEl) {
+                currentlyExpanded.classList.remove('expanded');
+                const prevHeader = currentlyExpanded.querySelector('.artist-row-item');
+                if (prevHeader) {
+                  prevHeader.style.borderColor = '';
+                  prevHeader.style.background = '';
+                }
+                const prevCollapse = currentlyExpanded.querySelector('.artist-songs-collapse');
+                if (prevCollapse) {
+                  prevCollapse.style.display = 'none';
+                  prevCollapse.innerHTML = '';
+                }
               }
-              renderRepertorioMusico();
+              
+              if (isNowExpanding) {
+                groupEl.classList.add('expanded');
+                header.style.borderColor = 'var(--teal)';
+                header.style.background = 'rgba(78, 205, 196, 0.08)';
+                collapseDiv.style.display = 'block';
+                
+                collapseDiv.innerHTML = '';
+                const artistSongs = allSongs.filter(s => (s.artista || 'Desconocido') === art);
+                artistSongs.forEach(s => {
+                  const card = crearCartaCancionMusico(s, artistSongs);
+                  collapseDiv.appendChild(card);
+                });
+                
+                window._musicoSelectedArtist = art;
+              } else {
+                groupEl.classList.remove('expanded');
+                header.style.borderColor = '';
+                header.style.background = '';
+                collapseDiv.style.display = 'none';
+                collapseDiv.innerHTML = '';
+                
+                window._musicoSelectedArtist = null;
+              }
             };
 
             artistGroup.appendChild(header);
