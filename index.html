@@ -1710,7 +1710,7 @@
     /* Practice song cards styled via global .musico-song-card styles */
 
     /* --- RESPONSIVE FLUID SCALING (Tablets & Wider) --- */
-    @media (min-width: 768px) {
+    @media (min-width: 600px) {
       /* Fluid scale: larger padding, larger fonts on tablet */
       .card {
         padding: 24px !important;
@@ -1842,10 +1842,8 @@
       .section-sub {
         font-size: 16px !important;
       }
-
-      /* Lyrics scaling to adjust to the width of the screen */
       .lyrics-content {
-        font-size: 18px !important;
+        font-size: 20px !important;
         line-height: 1.8 !important;
         width: 100% !important;
         max-width: 900px !important;
@@ -1895,17 +1893,17 @@
     }
     .lyrics-modal-body {
       padding: 16px !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
+      display: block !important;
+      overflow-y: auto !important;
       overflow-x: auto !important;
     }
     .lyrics-content {
-      display: inline-block !important;
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
       text-align: left !important;
       margin: 0 auto !important;
-      max-width: 100% !important;
-      font-size: 13px !important;
+      font-size: 14px !important;
       line-height: 1.6 !important;
       word-break: normal !important;
       word-wrap: break-word !important;
@@ -4504,14 +4502,26 @@
         const displayTone = isSelected ? selectedTone : s.tonoBase;
         const keysOptions = ['C', 'Cm', 'C#', 'C#m', 'D', 'Dm', 'D#', 'D#m', 'E', 'Em', 'F', 'Fm', 'F#', 'F#m', 'G', 'Gm', 'G#', 'G#m', 'A', 'Am', 'A#', 'A#m', 'B', 'Bm'];
 
+        const isAlabanza = s.tipo === 'alabanza';
+        const cardBorder = isAlabanza 
+          ? 'border-left: 4px solid var(--teal) !important; border-color: rgba(78, 205, 196, 0.25) !important;' 
+          : 'border-left: 4px solid var(--purple) !important; border-color: rgba(155, 143, 255, 0.25) !important;';
+        const cardBg = isAlabanza 
+          ? 'background: rgba(78, 205, 196, 0.04) !important;' 
+          : 'background: rgba(155, 143, 255, 0.04) !important;';
+        const badgeStyle = isAlabanza
+          ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
+          : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
+
         const item = document.createElement('div');
-        item.className = "song-item";
+        item.className = "musico-song-card";
+        item.style.cssText = `${cardBg} ${cardBorder} margin-bottom: 8px !important; border-radius: var(--radius-sm) !important; border-bottom: 1px solid var(--border) !important;`;
 
         let keySelectionMarkup = "";
         if (isSelected) {
           if (currentUserRole === 'lider') {
             keySelectionMarkup = `
-            <div style="margin-top:5px; display:inline-flex; align-items:center; gap:6px;">
+            <div style="display:inline-flex; align-items:center; gap:6px;">
               <span style="font-size:11px; color:var(--gold);">Tono en uso:</span>
               <select class="select-change-tone" style="background:var(--bg3); border:1px solid rgba(244,197,66,0.5); color:var(--gold); border-radius:4px; padding:2px 6px; font-size:11px; font-family:var(--font-body); outline:none; cursor:pointer;">
                 ${keysOptions.map(t => `<option value="${t}" ${t === displayTone ? 'selected' : ''}>${t}</option>`).join('')}
@@ -4520,7 +4530,7 @@
           `;
           } else {
             keySelectionMarkup = `
-            <div style="margin-top:5px; display:inline-flex; align-items:center; gap:6px;">
+            <div style="display:inline-flex; align-items:center; gap:6px;">
               <span style="font-size:11px; color:var(--gold);">Tono en uso:</span>
               <span style="background:rgba(244,197,66,0.15); color:var(--gold); border:1px solid rgba(244,197,66,0.3); padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600;">${displayTone}</span>
             </div>
@@ -4529,13 +4539,26 @@
         }
 
         item.innerHTML = `
-        <div class="song-check ${isSelected ? 'checked' : ''} ${currentUserRole !== 'lider' ? 'song-locked' : ''}"></div>
-        <div class="song-info">
-          <div class="song-name">${s.nombre}</div>
-          <div class="song-meta">${s.artista} | Tono Base: <b>${s.tonoBase}</b></div>
-          ${keySelectionMarkup}
-        </div>
-      `;
+          <!-- Extremo Izquierdo: Checkbox -->
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div class="song-check ${isSelected ? 'checked' : ''} ${currentUserRole !== 'lider' ? 'song-locked' : ''}" style="margin: 0;"></div>
+          </div>
+          
+          <!-- Centro: Info -->
+          <div class="song-card-info" style="margin-left: 4px;">
+            <div class="song-card-name" style="font-size:14px; font-weight: 600;">${s.nombre}</div>
+            <div class="song-card-artist" style="font-size:11px; color: var(--text2); display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
+              <span>${s.artista}</span>
+              <span>•</span>
+              <span>Base: <b style="color:var(--gold);">${s.tonoBase}</b></span>
+            </div>
+          </div>
+          
+          <!-- Extremo Derecho: Tono si está seleccionado -->
+          <div style="display:flex; align-items:center; gap: 8px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
+            ${keySelectionMarkup}
+          </div>
+        `;
 
         if (currentUserRole === 'lider') {
           item.querySelector('.song-check').addEventListener('click', async () => {
@@ -4773,28 +4796,42 @@
             tagColor = "var(--purple)";
           }
 
+          const isAlabanza = s.tipo === 'alabanza';
+          const cardBorder = isAlabanza 
+            ? 'border-left: 4px solid var(--teal) !important; border-color: rgba(78, 205, 196, 0.25) !important;' 
+            : 'border-left: 4px solid var(--purple) !important; border-color: rgba(155, 143, 255, 0.25) !important;';
+          const cardBg = isAlabanza 
+            ? 'background: rgba(78, 205, 196, 0.04) !important;' 
+            : 'background: rgba(155, 143, 255, 0.04) !important;';
+          const badgeStyle = isAlabanza
+            ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
+            : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
+
           const div = document.createElement('div');
-          div.className = "song-item";
-          div.style.justifyContent = "space-between";
+          div.className = "musico-song-card";
+          div.style.cssText = `${cardBg} ${cardBorder} margin-bottom: 8px !important; border-radius: var(--radius-sm) !important; border-bottom: 1px solid var(--border) !important;`;
+          
           div.innerHTML = `
-            <div class="song-info">
-              <div class="song-name" style="font-weight:600;">${s.nombre}</div>
-              <div class="song-meta" style="color:var(--text2); font-size:11px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
+            <!-- Centro: Info -->
+            <div class="song-card-info" style="margin-left: 4px;">
+              <div class="song-card-name" style="font-size:14px; font-weight: 600;">${s.nombre}</div>
+              <div class="song-card-artist" style="font-size:11px; color: var(--text2); display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
                 <span>${s.artista}</span>
-                <span>•</span>
-                <span>Tono Base: <b style="color:var(--gold);">${s.tonoBase}</b></span>
                 <span>•</span>
                 <span style="background:rgba(255,255,255,0.05); padding:1px 6px; border-radius:4px; font-size:10px; color:${tagColor}; border:1px solid rgba(255,255,255,0.08); font-weight:500;">
                   🕒 ${ultimaVezText}
                 </span>
               </div>
             </div>
-            ${currentUserRole === 'lider' ? `
-              <div style="display:flex; gap:6px; align-items:center;">
-                <button class="chip chip-teal click-edit-song" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Editar">✏️ Editar</button>
-                <button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Eliminar">🗑️</button>
-              </div>
-            ` : ''}
+            
+            <!-- Extremo Derecho: Tono y Acciones -->
+            <div style="display:flex; align-items:center; gap: 8px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
+              <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; ${badgeStyle}">Base: ${s.tonoBase}</div>
+              ${currentUserRole === 'lider' ? `
+                <button class="chip chip-teal click-edit-song" style="cursor:pointer; border:none; padding: 6px 12px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Editar">✏️ Editar</button>
+                <button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 6px 12px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Eliminar">🗑️</button>
+              ` : ''}
+            </div>
           `;
 
           if (currentUserRole === 'lider') {
@@ -5121,24 +5158,33 @@
         listRapidas.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:12px;">Ninguna canción encontrada.</p>`;
       } else {
         filteredRapidas.forEach(s => {
+          const cardBg = 'rgba(78, 205, 196, 0.04)';
+          const cardBorder = 'border-left: 4px solid var(--teal) !important; border-color: rgba(78, 205, 196, 0.25) !important;';
+          const badgeStyle = `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`;
+
           const row = document.createElement('div');
-          row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04);';
+          row.className = 'musico-song-card';
+          row.style.cssText = `${cardBorder} background: ${cardBg}; margin-bottom: 8px !important; border-radius: var(--radius-sm) !important; border-bottom: 1px solid var(--border) !important;`;
 
           const youtubeBtn = s.youtube && s.youtube.trim()
-            ? `<a href="${s.youtube}" target="_blank" class="repertorio-action-btn repertorio-btn-youtube">▶ YouTube</a>`
+            ? `<a href="${s.youtube}" target="_blank" class="repertorio-action-btn repertorio-btn-youtube" style="font-size: 11px; min-height: unset; padding: 6px 10px; margin: 0; display: inline-flex; align-items: center; gap: 4px;">▶ YouTube</a>`
             : '';
           const lyricsBtn = s.letra && s.letra.trim()
-            ? `<button class="repertorio-action-btn repertorio-btn-letra view-lyrics-btn" data-id="${s.id}">📖 Letra</button>`
+            ? `<button class="btn-ver-letra view-lyrics-btn" data-id="${s.id}" style="margin: 0; padding: 6px 12px; font-size: 11px;">📄 Letra</button>`
             : '';
 
           row.innerHTML = `
-            <div style="flex:1; min-width:0; margin-right:8px;">
-              <div style="font-weight:500; font-size:13.5px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.nombre}</div>
-              <div style="font-size:11px; color:var(--text3);">${s.artista} · <span style="color:var(--gold); font-weight:600;">${s.tonoBase}</span></div>
+            <!-- Centro: Info -->
+            <div class="song-card-info" style="margin-left: 4px;">
+              <div class="song-card-name" style="font-weight: 600;">${s.nombre}</div>
+              <div class="song-card-artist" style="color: var(--text2); font-size: 12px; margin-top: 2px;">${s.artista}</div>
             </div>
-            <div style="display:flex; gap:6px; flex-shrink:0;">
-              ${youtubeBtn}
+            
+            <!-- Extremo Derecho: Tono y Acciones -->
+            <div style="display:flex; align-items:center; gap: 8px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
+              <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; ${badgeStyle}">Base: ${s.tonoBase}</div>
               ${lyricsBtn}
+              ${youtubeBtn}
             </div>
           `;
 
@@ -5160,24 +5206,33 @@
         listLentas.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:12px;">Ninguna canción encontrada.</p>`;
       } else {
         filteredLentas.forEach(s => {
+          const cardBg = 'rgba(155, 143, 255, 0.04)';
+          const cardBorder = 'border-left: 4px solid var(--purple) !important; border-color: rgba(155, 143, 255, 0.25) !important;';
+          const badgeStyle = `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
+
           const row = document.createElement('div');
-          row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04);';
+          row.className = 'musico-song-card';
+          row.style.cssText = `${cardBorder} background: ${cardBg}; margin-bottom: 8px !important; border-radius: var(--radius-sm) !important; border-bottom: 1px solid var(--border) !important;`;
 
           const youtubeBtn = s.youtube && s.youtube.trim()
-            ? `<a href="${s.youtube}" target="_blank" class="repertorio-action-btn repertorio-btn-youtube">▶ YouTube</a>`
+            ? `<a href="${s.youtube}" target="_blank" class="repertorio-action-btn repertorio-btn-youtube" style="font-size: 11px; min-height: unset; padding: 6px 10px; margin: 0; display: inline-flex; align-items: center; gap: 4px;">▶ YouTube</a>`
             : '';
           const lyricsBtn = s.letra && s.letra.trim()
-            ? `<button class="repertorio-action-btn repertorio-btn-letra view-lyrics-btn" data-id="${s.id}">📖 Letra</button>`
+            ? `<button class="btn-ver-letra view-lyrics-btn" data-id="${s.id}" style="margin: 0; padding: 6px 12px; font-size: 11px;">📄 Letra</button>`
             : '';
 
           row.innerHTML = `
-            <div style="flex:1; min-width:0; margin-right:8px;">
-              <div style="font-weight:500; font-size:13.5px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.nombre}</div>
-              <div style="font-size:11px; color:var(--text3);">${s.artista} · <span style="color:var(--gold); font-weight:600;">${s.tonoBase}</span></div>
+            <!-- Centro: Info -->
+            <div class="song-card-info" style="margin-left: 4px;">
+              <div class="song-card-name" style="font-weight: 600;">${s.nombre}</div>
+              <div class="song-card-artist" style="color: var(--text2); font-size: 12px; margin-top: 2px;">${s.artista}</div>
             </div>
-            <div style="display:flex; gap:6px; flex-shrink:0;">
-              ${youtubeBtn}
+            
+            <!-- Extremo Derecho: Tono y Acciones -->
+            <div style="display:flex; align-items:center; gap: 8px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
+              <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; ${badgeStyle}">Base: ${s.tonoBase}</div>
               ${lyricsBtn}
+              ${youtubeBtn}
             </div>
           `;
 
@@ -6141,19 +6196,33 @@
       }
 
       filtered.forEach(s => {
+        const isAlabanza = type === 'alabanza';
+        const cardBg = isAlabanza ? 'rgba(78, 205, 196, 0.04)' : 'rgba(155, 143, 255, 0.04)';
+        const cardBorder = isAlabanza 
+          ? 'border-left: 4px solid var(--teal) !important; border-color: rgba(78, 205, 196, 0.25) !important;' 
+          : 'border-left: 4px solid var(--purple) !important; border-color: rgba(155, 143, 255, 0.25) !important;';
+        const badgeStyle = isAlabanza
+          ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
+          : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
+
         const div = document.createElement('div');
-        div.className = "member-row";
-        div.style.justifyContent = "space-between";
-        div.style.padding = "8px 0";
+        div.className = "musico-song-card";
+        div.style.cssText = `${cardBorder} background: ${cardBg}; margin-bottom: 8px !important; border-radius: var(--radius-sm) !important; border-bottom: 1px solid var(--border) !important;`;
         div.innerHTML = `
-        <div class="member-info">
-          <div class="member-name" style="font-size:13px;">${s.nombre}</div>
-          <div class="member-role" style="font-size:11px;">${s.artista} | Tono sugerido: <b>${s.tonoBase}</b></div>
-        </div>
-        <button class="chip chip-teal btn-add-song-select" style="cursor:pointer; border:none; padding:6px 12px; font-weight:600;" data-id="${s.id}">
-          ➕ Agregar
-        </button>
-      `;
+          <!-- Centro: Info -->
+          <div class="song-card-info" style="margin-left: 4px;">
+            <div class="song-card-name" style="font-weight: 600;">${s.nombre}</div>
+            <div class="song-card-artist" style="color: var(--text2); font-size: 12px; margin-top: 2px;">${s.artista}</div>
+          </div>
+          
+          <!-- Extremo Derecho: Tono y Botón Agregar -->
+          <div style="display:flex; align-items:center; gap: 8px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
+            <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; ${badgeStyle}">Base: ${s.tonoBase}</div>
+            <button class="chip chip-teal btn-add-song-select" style="cursor:pointer; border:none; padding:6px 12px; font-weight:600; margin:0;" data-id="${s.id}">
+              ➕ Agregar
+            </button>
+          </div>
+        `;
         div.querySelector('.btn-add-song-select').addEventListener('click', async () => {
           const songId = s.id;
           const dateStr = window._targetAddSongDate || serviceDateSelect.value || document.getElementById('musico-service-date').value;
