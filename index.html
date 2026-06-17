@@ -1582,6 +1582,7 @@
     /* Unified mobile layout for all screen sizes (phones & tablets) */
     .lyrics-modal-overlay {
       padding: 0 !important;
+      overscroll-behavior: contain !important;
     }
     .lyrics-modal {
       width: 100% !important;
@@ -1592,6 +1593,274 @@
       max-height: 100dvh !important;
       border-radius: 0 !important;
       border: none !important;
+      overscroll-behavior: contain !important;
+    }
+
+    #ensayo-practice-overlay {
+      overscroll-behavior: contain !important;
+    }
+
+    /* --- ENSAYO CARDS STYLING --- */
+    .ensayo-card-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .ensayo-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .ensayo-card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .ensayo-card-date {
+      font-size: 12px;
+      color: var(--teal);
+      margin-bottom: 4px;
+    }
+    .ensayo-card-confirmations {
+      font-size: 11px;
+      color: var(--text3);
+      margin-bottom: 6px;
+    }
+    .ensayo-card-songs {
+      font-size: 11px;
+      color: var(--text2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ensayo-card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-left: 10px;
+      flex-shrink: 0;
+    }
+    .ensayo-card-actions .chip {
+      cursor: pointer;
+      border: none;
+      padding: 6px 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Musician Rehearsal styling */
+    .musico-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 4px;
+    }
+    .musico-ensayo-practice-btn {
+      margin-top: 12px;
+      background: rgba(155, 143, 255, 0.12);
+      border: 1.5px solid rgba(155, 143, 255, 0.3);
+      color: var(--purple);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 12px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .musico-card-attendance-section {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+    }
+    .musico-attendance-status-text {
+      font-size: 12px;
+      color: var(--text2);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .musico-attendance-buttons {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .musico-attendance-buttons .attendance-btn {
+      margin-top: 0;
+      font-size: 11px;
+      padding: 8px 10px;
+      flex: 1;
+      min-width: 75px;
+      color: #0f0e17;
+      font-weight: 600;
+    }
+    .attendance-btn-yes {
+      background: var(--teal) !important;
+    }
+    .attendance-btn-maybe {
+      background: var(--gold) !important;
+    }
+    .attendance-btn-no {
+      background: var(--coral) !important;
+    }
+
+    /* Practice song cards styled via global .musico-song-card styles */
+
+    /* --- RESPONSIVE FLUID SCALING (Tablets & Wider) --- */
+    @media (min-width: 768px) {
+      /* Fluid scale: larger padding, larger fonts on tablet */
+      .card {
+        padding: 24px !important;
+        margin-bottom: 18px !important;
+        border-radius: var(--radius-lg) !important;
+      }
+      .ensayo-card-title {
+        font-size: 20px !important;
+      }
+      .ensayo-card-date {
+        font-size: 15px !important;
+      }
+      .ensayo-card-confirmations {
+        font-size: 14px !important;
+        margin-bottom: 8px !important;
+      }
+      .ensayo-card-songs {
+        font-size: 14px !important;
+      }
+      .ensayo-card-actions {
+        gap: 8px !important;
+        margin-left: 16px !important;
+      }
+      .ensayo-card-actions .chip {
+        padding: 10px 18px !important;
+        font-size: 13px !important;
+        border-radius: 8px !important;
+      }
+      .musico-ensayo-practice-btn {
+        padding: 16px !important;
+        font-size: 15px !important;
+        border-radius: var(--radius-sm) !important;
+      }
+      .musico-attendance-status-text {
+        font-size: 15px !important;
+      }
+      .musico-attendance-buttons .attendance-btn {
+        padding: 12px 16px !important;
+        font-size: 13px !important;
+        border-radius: 8px !important;
+      }
+
+      /* Song list items and card scaling */
+      .musico-song-card {
+        padding: 22px 24px !important;
+      }
+      .song-card-name {
+        font-size: 18px !important;
+      }
+      .song-card-artist {
+        font-size: 14px !important;
+      }
+      .song-num {
+        font-size: 26px !important;
+        min-width: 36px !important;
+      }
+      .tone-indicator {
+        font-size: 14px !important;
+        padding: 8px 16px !important;
+        border-radius: 8px !important;
+      }
+      .btn-ver-letra, .btn-ver-letra-modal {
+        padding: 10px 18px !important;
+        font-size: 13px !important;
+        border-radius: 8px !important;
+      }
+      .repertorio-btn-youtube {
+        padding: 10px 18px !important;
+        font-size: 13px !important;
+        border-radius: 8px !important;
+      }
+      .btn-remove-song-inline {
+        font-size: 22px !important;
+        width: 36px !important;
+        height: 36px !important;
+      }
+
+      .song-item {
+        padding: 18px 12px !important;
+        gap: 16px !important;
+      }
+      .song-name {
+        font-size: 18px !important;
+      }
+      .song-meta {
+        font-size: 14px !important;
+        margin-top: 4px !important;
+      }
+      .song-check {
+        width: 26px !important;
+        height: 26px !important;
+        border-radius: 8px !important;
+      }
+      .song-check.checked::after {
+        font-size: 16px !important;
+      }
+      .select-change-tone {
+        font-size: 13px !important;
+        padding: 4px 10px !important;
+      }
+      .click-edit-song, .click-del-song {
+        padding: 8px 16px !important;
+        font-size: 13px !important;
+        border-radius: 6px !important;
+      }
+
+      /* Form Elements & General Typography Scaling */
+      .field label {
+        font-size: 14px !important;
+      }
+      .field input, .field select {
+        padding: 15px 18px !important;
+        font-size: 17px !important;
+      }
+      .btn-primary {
+        padding: 18px !important;
+        font-size: 17px !important;
+      }
+      .login-card {
+        max-width: 460px !important;
+        padding: 44px 36px !important;
+      }
+      .login-title {
+        font-size: 38px !important;
+      }
+      .section-title {
+        font-size: 28px !important;
+      }
+      .section-sub {
+        font-size: 16px !important;
+      }
+
+      /* Lyrics scaling to adjust to the width of the screen */
+      .lyrics-content {
+        font-size: 18px !important;
+        line-height: 1.8 !important;
+        width: 100% !important;
+        max-width: 900px !important;
+        margin: 0 auto !important;
+      }
+      .lyrics-modal-body {
+        padding: 32px 40px !important;
+        overscroll-behavior-y: contain !important;
+      }
+      .lyrics-modal-title {
+        font-size: 26px !important;
+      }
+      .lyrics-modal-meta {
+        font-size: 16px !important;
+      }
     }
 
     /* Rehearsal practice modal full screen override */
@@ -2220,17 +2489,17 @@
             card.className = 'card';
             card.style.cssText = 'margin-bottom:12px; border-color: var(--teal);';
             card.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-              <div style="flex:1; min-width:0;">
-                <div style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:4px;">🎵 ${e.nombre}</div>
-                <div style="font-size:12px; color:var(--teal); margin-bottom:4px;">📅 ${(e.fecha || '').split('-').reverse().join('/')}${e.hora ? ' &nbsp;⏰ ' + e.hora : ''}</div>
-                <div style="font-size:11px; color:var(--text3); margin-bottom:6px;">👥 ${confirmados}/${totalMiembros} confirmados</div>
-                <div style="font-size:11px; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🎶 ${songNames}</div>
+            <div class="ensayo-card-wrapper">
+              <div class="ensayo-card-info">
+                <div class="ensayo-card-title">🎵 ${e.nombre}</div>
+                <div class="ensayo-card-date">📅 ${(e.fecha || '').split('-').reverse().join('/')}${e.hora ? ' &nbsp;⏰ ' + e.hora : ''}</div>
+                <div class="ensayo-card-confirmations">👥 ${confirmados}/${totalMiembros} confirmados</div>
+                <div class="ensayo-card-songs">🎶 ${songNames}</div>
               </div>
-              <div style="display:flex; flex-direction:column; gap:6px; margin-left:10px; flex-shrink:0;">
-                <button class="btn-ver-conf chip chip-teal" style="cursor:pointer; border:none; padding:6px 12px; font-weight:600; white-space:nowrap;">👁 Confirmaciones</button>
-                <button class="btn-edit-ensayo chip chip-gold" style="cursor:pointer; border:none; padding:6px 12px; font-weight:600; white-space:nowrap;">✏️ Editar</button>
-                <button class="btn-del-ensayo chip chip-coral" style="cursor:pointer; border:none; padding:6px 12px; font-weight:600;" data-id="${e.id}">🗑 Eliminar</button>
+              <div class="ensayo-card-actions">
+                <button class="btn-ver-conf chip chip-teal">👁 Confirmaciones</button>
+                <button class="btn-edit-ensayo chip chip-gold">✏️ Editar</button>
+                <button class="btn-del-ensayo chip chip-coral" data-id="${e.id}">🗑 Eliminar</button>
               </div>
             </div>
           `;
@@ -2421,27 +2690,27 @@
             card.className = 'card';
             card.style.cssText = `margin-bottom:14px; border-color:${borderColor};`;
             card.innerHTML = `
-              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
-                <div style="flex:1; min-width:0;">
-                  <div style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:2px;">🎵 ${e.nombre}</div>
-                  <div style="font-size:12px; color:var(--teal);">📅 ${(e.fecha || '').split('-').reverse().join('/')}${e.hora ? ' &nbsp;⏰ <b>' + e.hora + '</b>' : ''}</div>
+              <div class="musico-card-header">
+                <div class="ensayo-card-info">
+                  <div class="ensayo-card-title">🎵 ${e.nombre}</div>
+                  <div class="ensayo-card-date">📅 ${(e.fecha || '').split('-').reverse().join('/')}${e.hora ? ' &nbsp;⏰ <b>' + e.hora + '</b>' : ''}</div>
                 </div>
               </div>
               
               ${songsSummaryHtml}
 
-              <button class="btn-practice-ensayo btn-primary" style="margin-top: 12px; background: rgba(155, 143, 255, 0.12); border: 1.5px solid rgba(155, 143, 255, 0.3); color: var(--purple); font-weight: 600; font-size: 13px; padding: 12px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <button class="btn-practice-ensayo btn-primary musico-ensayo-practice-btn">
                 🎸 Entrar a Ensayo / Practicar Letras
               </button>
 
-              <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--border); padding-top: 10px;">
-                <div id="status-text-${e.id}" style="font-size: 12px; color: var(--text2); font-weight: 500; margin-bottom: 4px;">
+              <div class="musico-card-attendance-section">
+                <div id="status-text-${e.id}" class="musico-attendance-status-text">
                   ${statusText}
                 </div>
-                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                  <button class="btn-ensayo-status btn-primary" data-status="confirmado" data-id="${e.id}" style="margin-top:0; font-size:11px; padding:8px 10px; flex:1; min-width: 75px; background: var(--teal); color: #0f0e17; opacity: ${status === 'confirmado' ? '1' : '0.35'}; box-shadow: ${status === 'confirmado' ? '0 0 10px rgba(78,205,196,0.3)' : 'none'}; font-weight: 600;">Voy a ir</button>
-                  <button class="btn-ensayo-status btn-primary" data-status="indeciso" data-id="${e.id}" style="margin-top:0; font-size:11px; padding:8px 10px; flex:1; min-width: 75px; background: var(--gold); color: #0f0e17; opacity: ${status === 'indeciso' ? '1' : '0.35'}; box-shadow: ${status === 'indeciso' ? '0 0 10px rgba(244,197,66,0.3)' : 'none'}; font-weight: 600;">No sé aún</button>
-                  <button class="btn-ensayo-status btn-primary" data-status="ausente" data-id="${e.id}" style="margin-top:0; font-size:11px; padding:8px 10px; flex:1; min-width: 75px; background: var(--coral); color: #0f0e17; opacity: ${status === 'ausente' ? '1' : '0.35'}; box-shadow: ${status === 'ausente' ? '0 0 10px rgba(255,107,107,0.3)' : 'none'}; font-weight: 600;">No puedo</button>
+                <div class="musico-attendance-buttons">
+                  <button class="btn-ensayo-status btn-primary attendance-btn attendance-btn-yes" data-status="confirmado" data-id="${e.id}" style="opacity: ${status === 'confirmado' ? '1' : '0.35'}; box-shadow: ${status === 'confirmado' ? '0 0 10px rgba(78,205,196,0.3)' : 'none'};">Voy a ir</button>
+                  <button class="btn-ensayo-status btn-primary attendance-btn attendance-btn-maybe" data-status="indeciso" data-id="${e.id}" style="opacity: ${status === 'indeciso' ? '1' : '0.35'}; box-shadow: ${status === 'indeciso' ? '0 0 10px rgba(244,197,66,0.3)' : 'none'};">No sé aún</button>
+                  <button class="btn-ensayo-status btn-primary attendance-btn attendance-btn-no" data-status="ausente" data-id="${e.id}" style="opacity: ${status === 'ausente' ? '1' : '0.35'}; box-shadow: ${status === 'ausente' ? '0 0 10px rgba(255,107,107,0.3)' : 'none'};">No puedo</button>
                 </div>
               </div>
             `;
@@ -2639,22 +2908,27 @@
 
             const songCard = document.createElement('div');
             songCard.className = 'musico-song-card';
-            songCard.style.cssText = `${cardBorder} display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--bg2); border-radius: var(--radius-sm); margin-bottom: 8px;`;
+            songCard.style.cssText = `background: ${isAlabanza ? 'rgba(78, 205, 196, 0.04)' : 'rgba(155, 143, 255, 0.04)'} !important; ${cardBorder}`;
             songCard.innerHTML = `
-              <div style="display:flex; align-items:center; gap:12px; flex: 1; min-width: 0;">
-                <div style="font-size: 18px; font-weight: bold; ${numColor}">${num}</div>
-                <div style="min-width: 0; flex: 1;">
-                  <div style="font-size:14px; font-weight:600; color:var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${s.nombre}</div>
-                  <div style="font-size:11px; color:var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${s.artista}</div>
-                </div>
+              <!-- Extremo Izquierdo: Número -->
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div class="song-num" style="min-width: 24px; ${numColor}">${num}</div>
               </div>
-              <div style="display:flex; align-items:center; gap:8px; flex-shrink: 0;">
-                <span style="${badgeStyle} font-size:11px; padding:3px 8px; border-radius:4px; font-weight:600;">${s.tonoServicio}</span>
+              
+              <!-- Centro: Info -->
+              <div class="song-card-info" style="margin-left: 4px;">
+                <div class="song-card-name" style="font-size:14px; font-weight: 600;">${s.nombre}</div>
+                <div class="song-card-artist" style="font-size:11px; color: var(--text2);">${s.artista}</div>
+              </div>
+              
+              <!-- Extremo Derecho: Tono y Acciones -->
+              <div style="display:flex; align-items:center; gap: 8px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
+                <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; ${badgeStyle}">${s.tonoServicio}</div>
                 ${hasLetra ? `
-                  <button class="btn-ver-letra-modal" data-id="${s.id}" style="background:rgba(155,143,255,0.12); color:var(--purple); border:1.5px solid rgba(155,143,255,0.3); padding:6px 10px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">📄 Letra</button>
+                  <button class="btn-ver-letra-modal btn-ver-letra" data-id="${s.id}" style="margin: 0; padding: 6px 12px; font-size: 11px;">📄 Letra</button>
                 ` : ''}
                 ${hasYoutube ? `
-                  <a href="${s.youtube}" target="_blank" rel="noopener" style="background:rgba(255,0,0,0.12); color:#ff4444; border:1px solid rgba(255,0,0,0.25); border-radius:6px; padding:5px 8px; font-size:11px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center;">▶ YouTube</a>
+                  <a href="${s.youtube}" target="_blank" rel="noopener" class="repertorio-action-btn repertorio-btn-youtube" style="font-size: 11px; min-height: unset; padding: 6px 10px; margin: 0;">▶ YouTube</a>
                 ` : ''}
               </div>
             `;
