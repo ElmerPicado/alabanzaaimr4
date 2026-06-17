@@ -207,6 +207,9 @@
       border-radius: 8px 8px 0 0;
       transition: color 0.2s, background 0.2s;
       font-family: var(--font-body);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .nav-tab.active {
@@ -254,6 +257,18 @@
       border-radius: 8px 8px 0 0;
       transition: color 0.2s, background 0.2s;
       font-family: var(--font-body);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-icon {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      display: inline-block;
     }
 
     .nav-tab-musico.active {
@@ -1626,28 +1641,26 @@
         left: 0 !important;
         right: 0 !important;
         z-index: 9990 !important;
-        background: rgba(15, 14, 23, 0.88) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border-top: 1.5px solid rgba(255, 255, 255, 0.06) !important;
+        background: #0f0e15 !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
         border-bottom: none !important;
-        padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 8px)) !important;
-        height: auto !important;
+        padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 8px)) !important;
+        height: 72px !important;
         gap: 0 !important;
         display: flex !important;
         justify-content: space-around !important;
         align-items: center !important;
-        box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4) !important;
+        box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.5) !important;
       }
 
       body.theme-light .nav-tabs {
-        background: rgba(255, 255, 255, 0.88) !important;
+        background: #fdfdfd !important;
         border-top-color: rgba(0, 0, 0, 0.08) !important;
-        box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.06) !important;
+        box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.06) !important;
       }
 
       .content {
-        padding-bottom: calc(85px + env(safe-area-inset-bottom, 8px)) !important;
+        padding-bottom: calc(90px + env(safe-area-inset-bottom, 8px)) !important;
       }
 
       .nav-tab, .nav-tab-musico {
@@ -1655,15 +1668,14 @@
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 3px !important;
+        gap: 4px !important;
         background: none !important;
         border: none !important;
-        padding: 4px 0 !important;
-        font-size: 9.5px !important;
-        font-weight: 700 !important;
-        color: var(--text3) !important;
+        padding: 6px 0 !important;
+        color: #7b7899 !important;
+        opacity: 0.65 !important;
         border-radius: 8px !important;
-        transition: all 0.2s ease !important;
+        transition: all 0.25s ease !important;
         flex: 1 !important;
         text-align: center !important;
         min-width: 0 !important;
@@ -1674,49 +1686,43 @@
 
       .nav-tab.active {
         color: var(--gold) !important;
+        opacity: 1 !important;
         background: none !important;
         border: none !important;
       }
 
       .nav-tab-musico.active {
         color: var(--teal) !important;
+        opacity: 1 !important;
         background: none !important;
         border: none !important;
       }
 
       .nav-tab .nav-icon, .nav-tab-musico .nav-icon {
-        font-size: 20px !important;
+        width: 23px !important;
+        height: 23px !important;
         display: block !important;
-        line-height: 1 !important;
-        margin-bottom: 2px !important;
-        transition: transform 0.2s ease !important;
+        stroke: currentColor !important;
+        stroke-width: 1.8px !important;
+        fill: none !important;
+        margin-bottom: 3px !important;
+        transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
       }
 
       .nav-tab.active .nav-icon, .nav-tab-musico.active .nav-icon {
-        transform: scale(1.1) !important;
+        transform: translateY(-2px) scale(1.06) !important;
       }
 
       .nav-tab .nav-label, .nav-tab-musico .nav-label {
-        font-size: 9.5px !important;
-        font-weight: 700 !important;
+        font-size: 10.5px !important;
+        font-weight: 500 !important;
         display: block !important;
-        line-height: 1.1 !important;
+        line-height: 1.2 !important;
         white-space: nowrap !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
         max-width: 100% !important;
         color: inherit !important;
-      }
-
-      .nav-tab.active::after, .nav-tab-musico.active::after {
-        content: '' !important;
-        display: block !important;
-        width: 4px !important;
-        height: 4px !important;
-        background: currentColor !important;
-        border-radius: 50% !important;
-        margin-top: 2px !important;
-        box-shadow: 0 0 6px currentColor !important;
       }
     }
   </style>
@@ -2661,12 +2667,54 @@
 
     <!-- NAVEGACIÓN PRINCIPAL -->
     <nav class="nav-tabs">
-      <button class="nav-tab active" data-tab="tab-servicios"><span class="nav-icon">🗓️</span><span class="nav-label">Servicios</span></button>
-      <button class="nav-tab" data-tab="tab-historial"><span class="nav-icon">📜</span><span class="nav-label">Historial</span></button>
-      <button class="nav-tab" data-tab="tab-repertorio"><span class="nav-icon">🎵</span><span class="nav-label">Repertorio</span></button>
-      <button class="nav-tab" data-tab="tab-ensayos"><span class="nav-icon">📅</span><span class="nav-label">Ensayos</span></button>
-      <button class="nav-tab" data-tab="tab-miembros"><span class="nav-icon">👥</span><span class="nav-label">Miembros</span></button>
-      <button class="nav-tab" data-tab="tab-ajustes"><span class="nav-icon">⚙️</span><span class="nav-label">Ajustes</span></button>
+      <button class="nav-tab active" data-tab="tab-servicios">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span class="nav-label">Servicios</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-historial">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span class="nav-label">Historial</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-repertorio">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18V5l12-2v13"></path>
+          <circle cx="6" cy="18" r="3"></circle>
+          <circle cx="18" cy="16" r="3"></circle>
+        </svg>
+        <span class="nav-label">Repertorio</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-ensayos">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 22h20L12 2z"></path>
+          <path d="M12 18v-8"></path>
+          <circle cx="12" cy="18" r="1"></circle>
+        </svg>
+        <span class="nav-label">Ensayos</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-miembros">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        <span class="nav-label">Miembros</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-ajustes">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span class="nav-label">Ajustes</span>
+      </button>
     </nav>
 
     <!-- CONTENIDO DE PANELES -->
@@ -2969,10 +3017,37 @@
     </header>
 
     <nav class="nav-tabs">
-      <button class="nav-tab-musico active" data-mtab="mtab-servicio"><span class="nav-icon">🗓️</span><span class="nav-label">Servicio</span></button>
-      <button class="nav-tab-musico" data-mtab="mtab-asistencia"><span class="nav-icon">✅</span><span class="nav-label">Asistencia</span></button>
-      <button id="nav-tab-ensayos-musico" class="nav-tab-musico" data-mtab="mtab-ensayos-musico" style="position: relative;"><span class="nav-icon">📅</span><span class="nav-label">Ensayos</span></button>
-      <button class="nav-tab-musico" data-mtab="mtab-repertorio-musico"><span class="nav-icon">🎵</span><span class="nav-label">Repertorio</span></button>
+      <button class="nav-tab-musico active" data-mtab="mtab-servicio">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span class="nav-label">Servicio</span>
+      </button>
+      <button class="nav-tab-musico" data-mtab="mtab-asistencia">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <span class="nav-label">Asistencia</span>
+      </button>
+      <button id="nav-tab-ensayos-musico" class="nav-tab-musico" data-mtab="mtab-ensayos-musico" style="position: relative;">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+        </svg>
+        <span class="nav-label">Ensayos</span>
+      </button>
+      <button class="nav-tab-musico" data-mtab="mtab-repertorio-musico">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18V5l12-2v13"></path>
+          <circle cx="6" cy="18" r="3"></circle>
+          <circle cx="18" cy="16" r="3"></circle>
+        </svg>
+        <span class="nav-label">Repertorio</span>
+      </button>
     </nav>
 
     <main class="content">
