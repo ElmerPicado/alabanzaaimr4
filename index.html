@@ -3183,7 +3183,11 @@
             <h2 class="section-title">Repertorio Global de Canciones</h2>
             <p class="section-sub" style="margin-bottom: 0;">Lista total de canciones registradas para alabanza y adoración.</p>
           </div>
-          <button id="btn-add-song-global" class="btn-primary admin-only" style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">➕ Nueva Canción</button>
+          <div style="display: flex; gap: 8px;">
+            <button id="btn-add-song-global" class="btn-primary admin-only" style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">➕ Nueva Canción</button>
+            <button id="btn-import-songs" class="btn-primary admin-only" style="background: var(--purple); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">📥 Importar JSON</button>
+            <input type="file" id="import-songs-file" accept=".json" style="display:none;">
+          </div>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px;">
@@ -3961,6 +3965,66 @@
         
         const modal = document.getElementById('admin-song-modal');
         if (modal) modal.classList.add('active');
+      });
+    }
+
+    const btnImportSongs = document.getElementById('btn-import-songs');
+    const importSongsFile = document.getElementById('import-songs-file');
+    if (btnImportSongs && importSongsFile) {
+      btnImportSongs.addEventListener('click', () => {
+        importSongsFile.click();
+      });
+
+      importSongsFile.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          try {
+            const data = JSON.parse(event.target.result);
+            const songsArray = Array.isArray(data) ? data : (data.canciones || data.songs || []);
+            if (!Array.isArray(songsArray) || songsArray.length === 0) {
+              alert("El archivo JSON debe contener un arreglo de canciones.");
+              return;
+            }
+
+            if (!confirm(`¿Estás seguro de que quieres importar ${songsArray.length} canciones al repertorio?`)) {
+              importSongsFile.value = "";
+              return;
+            }
+
+            // Mostrar un indicador básico de carga
+            btnImportSongs.textContent = "⏳ Importando...";
+            btnImportSongs.disabled = true;
+
+            let importedCount = 0;
+            for (const item of songsArray) {
+              const idUnico = "song_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
+              const payload = {
+                nombre: (item.nombre || item.title || item.titulo || "").trim(),
+                artista: (item.artista || item.artist || "").trim() || "Desconocido",
+                tonoBase: (item.tonoBase || item.key || item.tono || "C").trim(),
+                tipo: ((item.tipo || item.type || "alabanza").toLowerCase().includes("adora") ? "adoracion" : "alabanza"),
+                youtube: (item.youtube || item.url || "").trim(),
+                letra: item.letra || item.lyrics || item.content || ""
+              };
+
+              if (payload.nombre) {
+                await setDoc(doc(db, "biblioteca_canciones", idUnico), payload);
+                importedCount++;
+              }
+            }
+            alert(`¡Éxito! Se importaron ${importedCount} canciones al repertorio.`);
+          } catch(err) {
+            alert("Error al procesar el archivo JSON: " + err.message);
+          } finally {
+            importSongsFile.value = "";
+            btnImportSongs.textContent = "📥 Importar JSON";
+            btnImportSongs.disabled = false;
+          }
+        };
+        reader.readAsText(file);
       });
     }
 
