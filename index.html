@@ -278,6 +278,62 @@
       border-bottom: 1px solid var(--bg);
     }
 
+    /* Sub-tabs de repertorio músico */
+    .musico-subtabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      padding: 4px;
+      background: var(--bg3);
+      border-radius: 10px;
+    }
+    .musico-subtab {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font-body);
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      color: var(--text2);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .musico-subtab.active {
+      background: var(--bg2);
+      color: var(--gold);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    }
+    .btn-fav-song {
+      background: none;
+      border: 1.5px solid rgba(255,200,60,0.3);
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 14px;
+      cursor: pointer;
+      line-height: 1;
+      color: var(--text3);
+      transition: all 0.18s;
+      margin: 0;
+    }
+    .btn-fav-song.es-fav {
+      color: #f5c518;
+      border-color: rgba(245,197,24,0.5);
+      background: rgba(245,197,24,0.08);
+    }
+    .badge-oficial {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(78,205,196,0.12);
+      color: var(--teal);
+      border: 1px solid rgba(78,205,196,0.3);
+      white-space: nowrap;
+    }
+
     .content {
       flex: 1;
       padding: 20px 16px 90px;
@@ -3396,44 +3452,26 @@
 
       <!-- PESTAÑA 4: REPERTORIO MÚSICO -->
       <div id="mtab-repertorio-musico" class="tab-panel">
-        <h2 class="section-title">Repertorio General</h2>
-        <p class="section-sub">Explora la biblioteca completa de canciones rápidas (Alabanzas) y lentas (Adoración).</p>
+        <h2 class="section-title">Repertorio</h2>
+        <p class="section-sub" style="margin-bottom:14px;">Explora la biblioteca, guarda tus favoritas y consulta el repertorio oficial del grupo.</p>
 
-        <!-- Caja para Rápidas (Alabanza) -->
-        <div class="card" style="margin-bottom: 16px; border-color: var(--teal); padding: 16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;"
-            id="head-rapidas">
-            <h3 style="font-size:16px; color:var(--teal); margin:0; display:flex; align-items:center; gap:8px;">
-              ⚡ Alabanzas (Rápidas) <span id="count-rapidas"
-                style="font-size:12px; color:var(--text3); font-weight:normal;"></span>
-            </h3>
-            <span id="arrow-rapidas" style="font-size:14px; color:var(--text2);">▼</span>
-          </div>
-          <div id="body-rapidas" style="margin-top: 14px; display: none;">
-            <input type="text" id="search-rapidas" placeholder="🔍 Buscar alabanza..."
-              style="width:100%; padding:8px 12px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); margin-bottom:12px; font-size:13px;">
-            <div id="list-rapidas"
-              style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;"></div>
-          </div>
+        <!-- Sub-tabs -->
+        <div class="musico-subtabs">
+          <button class="musico-subtab active" data-subtab="todas">Todas</button>
+          <button class="musico-subtab" data-subtab="favoritos">Favoritas</button>
+          <button class="musico-subtab" data-subtab="oficial">Repertorio Oficial</button>
         </div>
 
-        <!-- Caja para Lentas (Adoración) -->
-        <div class="card" style="margin-bottom: 16px; border-color: var(--purple); padding: 16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;"
-            id="head-lentas">
-            <h3 style="font-size:16px; color:var(--purple); margin:0; display:flex; align-items:center; gap:8px;">
-              🙏 Adoración (Lentas) <span id="count-lentas"
-                style="font-size:12px; color:var(--text3); font-weight:normal;"></span>
-            </h3>
-            <span id="arrow-lentas" style="font-size:14px; color:var(--text2);">▼</span>
-          </div>
-          <div id="body-lentas" style="margin-top: 14px; display: none;">
-            <input type="text" id="search-lentas" placeholder="🔍 Buscar adoración..."
-              style="width:100%; padding:8px 12px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); margin-bottom:12px; font-size:13px;">
-            <div id="list-lentas"
-              style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;"></div>
-          </div>
-        </div>
+        <!-- Buscador unificado -->
+        <input type="text" id="search-repertorio-musico"
+          placeholder="🔍 Buscar por nombre o artista..."
+          style="width:100%; padding:9px 13px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; margin-bottom:12px; outline:none;">
+
+        <!-- Contador -->
+        <p id="count-repertorio-musico" style="font-size:11px; color:var(--text3); margin-bottom:10px;"></p>
+
+        <!-- Lista -->
+        <div id="list-repertorio-musico" style="display:flex; flex-direction:column; gap:6px; padding-bottom: 30px;"></div>
       </div>
 
     </main>
@@ -3449,6 +3487,12 @@
         <h3 class="modal-title" id="musico-add-song-title" style="font-size:22px;">Agregar Canción</h3>
         <button id="musico-add-song-close"
           style="background:none; border:none; color:var(--text2); font-size:26px; cursor:pointer; padding:0; line-height:1;">&times;</button>
+      </div>
+
+      <!-- Filtro: Todas / Oficial -->
+      <div style="display:flex; gap:6px; margin-bottom:10px; padding:4px; background:var(--bg3); border-radius:8px;">
+        <button id="filter-picker-todas" style="flex:1; padding:7px; font-size:12px; font-weight:700; font-family:var(--font-body); background:var(--bg2); border:none; border-radius:6px; color:var(--gold); cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,0.2);">Todas</button>
+        <button id="filter-picker-oficial" style="flex:1; padding:7px; font-size:12px; font-weight:700; font-family:var(--font-body); background:transparent; border:none; border-radius:6px; color:var(--text2); cursor:pointer;">Oficial</button>
       </div>
 
       <!-- Buscador -->
@@ -3885,16 +3929,26 @@
         actualizarAvatares();
       }
 
-      // Fetch profile pic from Firestore asynchronously
+      // Fetch profile pic and favoritos from Firestore asynchronously
+      window.misFavoritos = [];
       if (db && doc && getDoc && userData.usuario) {
         getDoc(doc(db, "usuarios", userData.usuario)).then(snap => {
-          if (snap.exists() && snap.data().profilePic) {
-            activeSessionUser.profilePic = snap.data().profilePic;
-            if (typeof actualizarAvatares === 'function') {
-              actualizarAvatares();
+          if (snap.exists()) {
+            const data = snap.data();
+            if (data.profilePic) {
+              activeSessionUser.profilePic = data.profilePic;
+              if (typeof actualizarAvatares === 'function') {
+                actualizarAvatares();
+              }
+            }
+            if (data.favoritos && Array.isArray(data.favoritos)) {
+              window.misFavoritos = data.favoritos;
+              if (typeof renderRepertorioMusico === 'function') {
+                renderRepertorioMusico();
+              }
             }
           }
-        }).catch(err => console.log("Profile pic load error:", err));
+        }).catch(err => console.log("User data load error:", err));
       }
 
       // Guardar credenciales en local storage
@@ -5009,10 +5063,13 @@
               <select class="select-admin-tone" title="Cambiar tono base" style="background:var(--bg3); border:1px solid rgba(244,197,66,0.4); color:var(--gold); border-radius:6px; padding:4px 6px; font-size:11px; font-family:var(--font-body); outline:none; cursor:pointer; font-weight:600;">
                 ${keysOptions.map(t => `<option value="${t}" ${t === s.tonoBase ? 'selected' : ''}>${t}</option>`).join('')}
               </select>
-              ${hasLetra ? `<button class="btn-ver-letra admin-ver-letra" style="margin: 0; padding: 5px 10px; font-size: 11px;">📄 Ver Letra</button>` : ''}
+              ${hasLetra ? `<button class="btn-ver-letra admin-ver-letra" style="margin: 0; padding: 5px 10px; font-size: 11px;">Ver Letra</button>` : ''}
               ${currentUserRole === 'lider' ? `
-                <button class="chip chip-teal click-edit-song" style="cursor:pointer; border:none; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Editar">✏️ Editar</button>
-                <button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Eliminar">🗑️</button>
+                <button class="chip btn-toggle-oficial" style="cursor:pointer; border:1px solid ${s.oficial ? 'rgba(78,205,196,0.5)' : 'rgba(255,255,255,0.1)'}; background:${s.oficial ? 'rgba(78,205,196,0.15)' : 'transparent'}; color:${s.oficial ? 'var(--teal)' : 'var(--text3)'}; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Marcar como oficial">
+                  ${s.oficial ? 'Oficial' : 'Hacer Oficial'}
+                </button>
+                <button class="chip chip-teal click-edit-song" style="cursor:pointer; border:none; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Editar">Editar</button>
+                <button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Eliminar">Eliminar</button>
               ` : ''}
             </div>
           `;
@@ -5038,6 +5095,15 @@
           if (currentUserRole === 'lider') {
             const editBtn = div.querySelector('.click-edit-song');
             const delBtn = div.querySelector('.click-del-song');
+            const oficialBtn = div.querySelector('.btn-toggle-oficial');
+
+            if (oficialBtn) {
+              oficialBtn.addEventListener('click', async () => {
+                const isOficialNow = !s.oficial;
+                await setDoc(doc(db, "biblioteca_canciones", s.id), { ...s, oficial: isOficialNow });
+                showToast(isOficialNow ? `🎯 "${s.nombre}" ahora es Oficial` : `○ "${s.nombre}" ya no es Oficial`);
+              });
+            }
 
             if (editBtn) {
               editBtn.addEventListener('click', () => {
@@ -5323,134 +5389,122 @@
     }
 
     function renderRepertorioMusico() {
-      const listRapidas = document.getElementById('list-rapidas');
-      const listLentas = document.getElementById('list-lentas');
-      const countRapidas = document.getElementById('count-rapidas');
-      const countLentas = document.getElementById('count-lentas');
+      const listCont = document.getElementById('list-repertorio-musico');
+      const countEl = document.getElementById('count-repertorio-musico');
+      const searchInput = document.getElementById('search-repertorio-musico');
+      
+      if (!listCont) return;
 
-      if (!listRapidas || !listLentas) return;
+      const query = (searchInput?.value || '').toLowerCase().trim();
+      const activeTabBtn = document.querySelector('.musico-subtab.active');
+      const currentSubtab = activeTabBtn ? activeTabBtn.dataset.subtab : 'todas';
 
-      const queryRapidas = (document.getElementById('search-rapidas')?.value || '').toLowerCase().trim();
-      const queryLentas = (document.getElementById('search-lentas')?.value || '').toLowerCase().trim();
+      const allSongs = [...(cacheSongs || [])].sort((a,b) => (a.nombre||'').localeCompare(b.nombre||''));
 
-      const allSongs = cacheSongs || [];
-
-      // Filtrar Alabanzas (Rápidas)
-      const rapidas = allSongs.filter(s => s && s.tipo === 'alabanza');
-      const filteredRapidas = rapidas.filter(s => {
+      let filtered = allSongs.filter(s => {
         const name = (s.nombre || '').toLowerCase();
         const artist = (s.artista || '').toLowerCase();
-        return name.includes(queryRapidas) || artist.includes(queryRapidas);
+        return name.includes(query) || artist.includes(query);
       });
 
-      // Filtrar Adoraciones (Lentas)
-      const lentas = allSongs.filter(s => s && s.tipo === 'adoracion');
-      const filteredLentas = lentas.filter(s => {
-        const name = (s.nombre || '').toLowerCase();
-        const artist = (s.artista || '').toLowerCase();
-        return name.includes(queryLentas) || artist.includes(queryLentas);
+      if (currentSubtab === 'favoritos') {
+        filtered = filtered.filter(s => window.misFavoritos && window.misFavoritos.includes(s.id));
+      } else if (currentSubtab === 'oficial') {
+        filtered = filtered.filter(s => s.oficial === true);
+      }
+
+      if (countEl) {
+        countEl.textContent = `${filtered.length} canciones`;
+      }
+
+      listCont.innerHTML = '';
+      if (filtered.length === 0) {
+        listCont.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:20px;">No se encontraron canciones en esta vista.</p>`;
+        return;
+      }
+
+      filtered.forEach(s => {
+        const isFav = window.misFavoritos && window.misFavoritos.includes(s.id);
+        const cardBg = 'rgba(78, 205, 196, 0.04)';
+        const cardBorder = s.oficial ? 'border-left: 4px solid var(--gold) !important; border-color: rgba(244,197,66, 0.3) !important;' : 'border-left: 4px solid var(--teal) !important; border-color: rgba(78, 205, 196, 0.25) !important;';
+
+        const row = document.createElement('div');
+        row.className = 'musico-song-card';
+        row.style.cssText = `${cardBorder} background: ${cardBg}; margin-bottom: 8px !important; border-radius: var(--radius-sm) !important; border-bottom: 1px solid var(--border) !important;`;
+
+        const youtubeBtn = s.youtube && s.youtube.trim()
+          ? `<a href="${s.youtube}" target="_blank" class="repertorio-action-btn repertorio-btn-youtube" style="font-size: 11px; min-height: unset; padding: 6px 10px; margin: 0; display: inline-flex; align-items: center; gap: 4px;">YouTube</a>`
+          : '';
+        const lyricsBtn = s.letra && s.letra.trim()
+          ? `<button class="btn-ver-letra view-lyrics-btn" data-id="${s.id}" style="margin: 0; padding: 6px 12px; font-size: 11px;">Letra</button>`
+          : '';
+
+        row.innerHTML = `
+          <!-- Favorito btn -->
+          <div style="padding-left:10px; display:flex; align-items:center;">
+            <button class="btn-fav-song ${isFav ? 'es-fav' : ''}" data-id="${s.id}">★</button>
+          </div>
+          <!-- Centro: Info -->
+          <div class="song-card-info" style="margin-left: 10px; flex:1; min-width:0;">
+            <div class="song-card-name" style="font-weight: 600; font-size:14px; display:flex; align-items:center; gap:6px;">
+              ${s.nombre} ${s.oficial ? '<span class="badge-oficial">OFICIAL</span>' : ''}
+            </div>
+            <div class="song-card-artist" style="color: var(--text2); font-size: 12px; margin-top: 2px;">${s.artista}</div>
+          </div>
+          
+          <!-- Extremo Derecho: Tono y Acciones -->
+          <div style="display:flex; align-items:center; gap: 8px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
+            <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);">Base: ${s.tonoBase}</div>
+            ${lyricsBtn}
+            ${youtubeBtn}
+          </div>
+        `;
+
+        // Lógica Ver Letra
+        const btnLy = row.querySelector('.view-lyrics-btn');
+        if (btnLy) {
+          btnLy.onclick = () => {
+            if (window.abrirModalLetraGlobal) window.abrirModalLetraGlobal(s.id, filtered);
+          };
+        }
+
+        // Lógica Favorito
+        const btnFav = row.querySelector('.btn-fav-song');
+        if (btnFav) {
+          btnFav.addEventListener('click', async () => {
+            if (!activeSessionUser || !activeSessionUser.usuario) return;
+            const uid = activeSessionUser.usuario;
+            const refDoc = doc(db, "usuarios", uid);
+            if (isFav) {
+              await updateDoc(refDoc, { favoritos: arrayRemove(s.id) });
+              window.misFavoritos = window.misFavoritos.filter(id => id !== s.id);
+            } else {
+              await updateDoc(refDoc, { favoritos: arrayUnion(s.id) });
+              if (!window.misFavoritos) window.misFavoritos = [];
+              window.misFavoritos.push(s.id);
+            }
+            renderRepertorioMusico();
+          });
+        }
+
+        listCont.appendChild(row);
       });
-
-      // Actualizar contadores
-      if (countRapidas) countRapidas.textContent = `(${filteredRapidas.length})`;
-      if (countLentas) countLentas.textContent = `(${filteredLentas.length})`;
-
-      // Renderizar Alabanzas (Rápidas)
-      listRapidas.innerHTML = '';
-      if (filteredRapidas.length === 0) {
-        listRapidas.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:12px;">Ninguna canción encontrada.</p>`;
-      } else {
-        filteredRapidas.forEach(s => {
-          const cardBg = 'rgba(78, 205, 196, 0.04)';
-          const cardBorder = 'border-left: 4px solid var(--teal) !important; border-color: rgba(78, 205, 196, 0.25) !important;';
-          const badgeStyle = `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`;
-
-          const row = document.createElement('div');
-          row.className = 'musico-song-card';
-          row.style.cssText = `${cardBorder} background: ${cardBg}; margin-bottom: 8px !important; border-radius: var(--radius-sm) !important; border-bottom: 1px solid var(--border) !important;`;
-
-          const youtubeBtn = s.youtube && s.youtube.trim()
-            ? `<a href="${s.youtube}" target="_blank" class="repertorio-action-btn repertorio-btn-youtube" style="font-size: 11px; min-height: unset; padding: 6px 10px; margin: 0; display: inline-flex; align-items: center; gap: 4px;">▶ YouTube</a>`
-            : '';
-          const lyricsBtn = s.letra && s.letra.trim()
-            ? `<button class="btn-ver-letra view-lyrics-btn" data-id="${s.id}" style="margin: 0; padding: 6px 12px; font-size: 11px;">📄 Letra</button>`
-            : '';
-
-          row.innerHTML = `
-            <!-- Centro: Info -->
-            <div class="song-card-info" style="margin-left: 4px;">
-              <div class="song-card-name" style="font-weight: 600;">${s.nombre}</div>
-              <div class="song-card-artist" style="color: var(--text2); font-size: 12px; margin-top: 2px;">${s.artista}</div>
-            </div>
-            
-            <!-- Extremo Derecho: Tono y Acciones -->
-            <div style="display:flex; align-items:center; gap: 8px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
-              <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; ${badgeStyle}">Base: ${s.tonoBase}</div>
-              ${lyricsBtn}
-              ${youtubeBtn}
-            </div>
-          `;
-
-          const btnLy = row.querySelector('.view-lyrics-btn');
-          if (btnLy) {
-            btnLy.onclick = () => {
-              if (window.abrirModalLetraGlobal) {
-                window.abrirModalLetraGlobal(s.id, filteredRapidas);
-              }
-            };
-          }
-          listRapidas.appendChild(row);
-        });
-      }
-
-      // Renderizar Adoraciones (Lentas)
-      listLentas.innerHTML = '';
-      if (filteredLentas.length === 0) {
-        listLentas.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:12px;">Ninguna canción encontrada.</p>`;
-      } else {
-        filteredLentas.forEach(s => {
-          const cardBg = 'rgba(155, 143, 255, 0.04)';
-          const cardBorder = 'border-left: 4px solid var(--purple) !important; border-color: rgba(155, 143, 255, 0.25) !important;';
-          const badgeStyle = `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
-
-          const row = document.createElement('div');
-          row.className = 'musico-song-card';
-          row.style.cssText = `${cardBorder} background: ${cardBg}; margin-bottom: 8px !important; border-radius: var(--radius-sm) !important; border-bottom: 1px solid var(--border) !important;`;
-
-          const youtubeBtn = s.youtube && s.youtube.trim()
-            ? `<a href="${s.youtube}" target="_blank" class="repertorio-action-btn repertorio-btn-youtube" style="font-size: 11px; min-height: unset; padding: 6px 10px; margin: 0; display: inline-flex; align-items: center; gap: 4px;">▶ YouTube</a>`
-            : '';
-          const lyricsBtn = s.letra && s.letra.trim()
-            ? `<button class="btn-ver-letra view-lyrics-btn" data-id="${s.id}" style="margin: 0; padding: 6px 12px; font-size: 11px;">📄 Letra</button>`
-            : '';
-
-          row.innerHTML = `
-            <!-- Centro: Info -->
-            <div class="song-card-info" style="margin-left: 4px;">
-              <div class="song-card-name" style="font-weight: 600;">${s.nombre}</div>
-              <div class="song-card-artist" style="color: var(--text2); font-size: 12px; margin-top: 2px;">${s.artista}</div>
-            </div>
-            
-            <!-- Extremo Derecho: Tono y Acciones -->
-            <div style="display:flex; align-items:center; gap: 8px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
-              <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; ${badgeStyle}">Base: ${s.tonoBase}</div>
-              ${lyricsBtn}
-              ${youtubeBtn}
-            </div>
-          `;
-
-          const btnLy = row.querySelector('.view-lyrics-btn');
-          if (btnLy) {
-            btnLy.onclick = () => {
-              if (window.abrirModalLetraGlobal) {
-                window.abrirModalLetraGlobal(s.id, filteredLentas);
-              }
-            };
-          }
-          listLentas.appendChild(row);
-        });
-      }
     }
+
+    // Inicializar listeners del repertorio musico
+    const searchInputMusico = document.getElementById('search-repertorio-musico');
+    if (searchInputMusico && !searchInputMusico.dataset.bound) {
+      searchInputMusico.dataset.bound = 'true';
+      searchInputMusico.addEventListener('input', () => renderRepertorioMusico());
+    }
+
+    document.querySelectorAll('.musico-subtab').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.musico-subtab').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        renderRepertorioMusico();
+      });
+    });
 
     function cargarServicioMusico(dateStr) {
       if (!dateStr) return;
@@ -6373,6 +6427,8 @@
     // ====================================================
     // MODAL DE BÚSQUEDA Y ADICIÓN DE CANCIONES
     // ====================================================
+    let currentPickerFilter = 'todas';
+
     function renderAddSongResults(type, filterText) {
       const resultsCont = document.getElementById('musico-add-song-results');
       if (!resultsCont) return;
@@ -6383,18 +6439,19 @@
       const cancionesSeleccionadas = dataServicio.cancionesSeleccionadas || {};
       const selectedIds = Object.keys(cancionesSeleccionadas).filter(k => cancionesSeleccionadas[k] !== false);
 
-      // Filtrar canciones del tipo correcto que coincidan y no estén ya agregadas
+      // Filtrar canciones por búsqueda, selección previa, y filtro oficial
       const filtered = cacheSongs.filter(s => {
-        const matchType = (s.tipo || "").toLowerCase() === (type || "").toLowerCase();
         const sNombre = s.nombre || "";
         const sArtista = s.artista || "";
         const matchSearch = sNombre.toLowerCase().includes(filterText) || sArtista.toLowerCase().includes(filterText);
         const notAlreadySelected = !selectedIds.includes(s.id);
-        return matchType && matchSearch && notAlreadySelected;
+        const matchOficial = currentPickerFilter === 'todas' || s.oficial === true;
+        
+        return matchSearch && notAlreadySelected && matchOficial;
       });
 
       if (filtered.length === 0) {
-        resultsCont.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:15px;">No se encontraron canciones disponibles en la biblioteca.</p>`;
+        resultsCont.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:15px;">No se encontraron canciones disponibles.</p>`;
         return;
       }
 
@@ -6414,7 +6471,9 @@
         div.innerHTML = `
           <!-- Centro: Info -->
           <div class="song-card-info" style="margin-left: 4px;">
-            <div class="song-card-name" style="font-weight: 600;">${s.nombre}</div>
+            <div class="song-card-name" style="font-weight: 600; display:flex; align-items:center; gap:6px;">
+              ${s.nombre} ${s.oficial ? '<span class="badge-oficial">OFICIAL</span>' : ''}
+            </div>
             <div class="song-card-artist" style="color: var(--text2); font-size: 12px; margin-top: 2px;">${s.artista}</div>
           </div>
           
@@ -6422,7 +6481,7 @@
           <div style="display:flex; align-items:center; gap: 8px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
             <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; ${badgeStyle}">Base: ${s.tonoBase}</div>
             <button class="chip chip-teal btn-add-song-select" style="cursor:pointer; border:none; padding:6px 12px; font-weight:600; margin:0;" data-id="${s.id}">
-              ➕ Agregar
+              Agregar
             </button>
           </div>
         `;
@@ -6435,6 +6494,8 @@
           const currentOrder = dataServicio.ordenCanciones || [];
           await updateDoc(docRef, {
             [path]: s.tonoBase,
+            // Guardamos el tipo de la canción para este servicio específico
+            [`cancionesSeleccionadasTipos.${songId}`]: type,
             ordenCanciones: [...currentOrder, songId]
           });
 
@@ -6445,9 +6506,38 @@
       });
     }
 
+    // Toggle de filtros en modal
+    const btnFilterTodas = document.getElementById('filter-picker-todas');
+    const btnFilterOficial = document.getElementById('filter-picker-oficial');
+    if (btnFilterTodas && btnFilterOficial) {
+      btnFilterTodas.addEventListener('click', () => {
+        currentPickerFilter = 'todas';
+        btnFilterTodas.style.background = 'var(--bg2)';
+        btnFilterTodas.style.color = 'var(--gold)';
+        btnFilterTodas.style.boxShadow = '0 1px 4px rgba(0,0,0,0.2)';
+        btnFilterOficial.style.background = 'transparent';
+        btnFilterOficial.style.color = 'var(--text2)';
+        btnFilterOficial.style.boxShadow = 'none';
+        const filterText = document.getElementById('musico-add-song-search')?.value.toLowerCase().trim() || '';
+        renderAddSongResults(window._targetAddSongType, filterText);
+      });
+      btnFilterOficial.addEventListener('click', () => {
+        currentPickerFilter = 'oficial';
+        btnFilterOficial.style.background = 'var(--bg2)';
+        btnFilterOficial.style.color = 'var(--gold)';
+        btnFilterOficial.style.boxShadow = '0 1px 4px rgba(0,0,0,0.2)';
+        btnFilterTodas.style.background = 'transparent';
+        btnFilterTodas.style.color = 'var(--text2)';
+        btnFilterTodas.style.boxShadow = 'none';
+        const filterText = document.getElementById('musico-add-song-search')?.value.toLowerCase().trim() || '';
+        renderAddSongResults(window._targetAddSongType, filterText);
+      });
+    }
+
     // Listener para el buscador en tiempo real del modal
     const modalSearchInput = document.getElementById('musico-add-song-search');
-    if (modalSearchInput) {
+    if (modalSearchInput && !modalSearchInput.dataset.bound) {
+      modalSearchInput.dataset.bound = 'true';
       modalSearchInput.addEventListener('input', () => {
         const filterText = modalSearchInput.value.toLowerCase().trim();
         renderAddSongResults(window._targetAddSongType, filterText);
