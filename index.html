@@ -2172,6 +2172,79 @@
         flex: 0 0 380px; /* Fixed width for left list on wide screens */
       }
     }
+
+    /* --- MOBILE STACKED SONG CARDS (max-width: 767px) --- */
+    @media (max-width: 767px) {
+      .musico-song-card {
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        gap: 8px 12px !important;
+        padding: 12px 14px !important;
+      }
+      
+      .musico-song-card .song-card-info {
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+        width: auto !important;
+      }
+      
+      .musico-song-card .song-card-name {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        word-break: break-word !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        gap: 6px !important;
+        font-size: 14px !important;
+      }
+      
+      /* Target the actions/buttons container (which has margin-left auto style inline) */
+      .musico-song-card > div[style*="margin-left"] {
+        flex: 0 0 100% !important;
+        margin-left: 0 !important;
+        margin-top: 4px !important;
+        width: 100% !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 6px 8px !important;
+        justify-content: flex-start !important;
+        padding-right: 0 !important;
+      }
+      
+      /* Make sure buttons/selectors in the action row have unified sizing and touch support */
+      .musico-song-card > div[style*="margin-left"] select,
+      .musico-song-card > div[style*="margin-left"] .chip,
+      .musico-song-card > div[style*="margin-left"] .tone-indicator,
+      .musico-song-card > div[style*="margin-left"] .song-tone-badge,
+      .musico-song-card > div[style*="margin-left"] a.repertorio-action-btn,
+      .musico-song-card > div[style*="margin-left"] button {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+        min-height: 32px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        border-radius: 6px !important;
+      }
+      
+      /* Special tweak for checkbox and fav btn sizes on mobile to align nicely with the multi-line card */
+      .musico-song-card .song-check {
+        width: 24px !important;
+        height: 24px !important;
+      }
+      .musico-song-card .btn-fav-song {
+        width: 38px !important;
+        height: 38px !important;
+      }
+
+      /* Increase results list height slightly on mobile for better visibility */
+      #musico-add-song-results {
+        max-height: 260px !important;
+      }
+    }
   </style>
 </head>
 
@@ -3602,31 +3675,39 @@
                       ▶ YouTube
                     </a>
                   </div>
-                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
-                    <div id="panel-lyrics-meta" class="lyrics-modal-meta" style="margin-bottom: 0;">Tono Original: C | Tono Actual: D</div>
+                  <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
+                    <div id="panel-lyrics-meta" class="lyrics-modal-meta" style="margin-bottom: 0; display: none;">Tono Original: C | Tono Actual: D</div>
+                    
+                    <!-- Tono -->
                     <div style="display: inline-flex; align-items: center; gap: 4px;">
-                      <span style="font-size: 11px; color: var(--text3);">Practicar en:</span>
-                      <button id="panel-lyrics-tone-btn" style="
-                        background: var(--bg3);
-                        color: var(--gold);
-                        border: 1px solid var(--border2);
-                        border-radius: 6px;
-                        padding: 4px 10px;
-                        font-size: 11px;
-                        font-weight: 600;
-                        outline: none;
-                        cursor: pointer;
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 4px;
-                      ">
+                      <span style="font-size: 11px; color: var(--text3);">Tono:</span>
+                      <button id="panel-lyrics-tone-btn" style="background: var(--bg3); color: var(--gold); border: 1px solid var(--border2); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; outline: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
                         <span id="panel-lyrics-tone-display">C</span> ▼
                       </button>
+                    </div>
+
+                    <!-- AutoScroll -->
+                    <div style="display: inline-flex; align-items: center; gap: 4px;">
+                      <button id="panel-lyrics-autoscroll-btn" style="background: var(--bg3); color: var(--teal); border: 1px solid var(--border2); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; outline: none; cursor: pointer;">
+                        ▶ AutoScroll
+                      </button>
+                      <div id="panel-lyrics-speed-ctrl" style="display: none; align-items: center; gap: 4px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 2px 6px; font-size: 11px;">
+                        <button id="panel-lyrics-speed-down" style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">-</button>
+                        <span id="panel-lyrics-speed-val" style="color:var(--teal); font-weight:700; min-width: 14px; text-align:center;">2</span>
+                        <button id="panel-lyrics-speed-up" style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">+</button>
+                      </div>
+                    </div>
+
+                    <!-- Zoom Tamaño Letra -->
+                    <div style="display: inline-flex; align-items: center; gap: 2px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 2px 4px;">
+                      <button id="panel-lyrics-zoom-down" style="background:none; border:none; color:var(--text3); font-weight:bold; cursor:pointer; padding: 0 6px; font-size: 11px;" title="Reducir letra">A-</button>
+                      <span id="panel-lyrics-zoom-val" style="font-size: 10px; color: var(--text2); font-weight: 600;">14</span>
+                      <button id="panel-lyrics-zoom-up" style="background:none; border:none; color:var(--text3); font-weight:bold; cursor:pointer; padding: 0 6px; font-size: 11px;" title="Agrandar letra">A+</button>
                     </div>
                   </div>
                 </div>
               </div>
-              <div style="flex: 1; overflow-y: auto;">
+              <div id="panel-lyrics-body" style="flex: 1; overflow-y: auto;">
                 <div id="panel-lyrics-content" class="lyrics-content"></div>
               </div>
             </div>
@@ -3727,32 +3808,40 @@
               ▶ YouTube
             </a>
           </div>
-          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
-            <div id="lyrics-modal-meta" class="lyrics-modal-meta" style="margin-bottom: 0;">Tono Original: C | Tono Actual: D</div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
+            <div id="lyrics-modal-meta" class="lyrics-modal-meta" style="margin-bottom: 0; display: none;">Tono Original: C | Tono Actual: D</div>
+            
+            <!-- Tono -->
             <div style="display: inline-flex; align-items: center; gap: 4px;">
-              <span style="font-size: 11px; color: var(--text3);">Practicar en:</span>
-              <button id="lyrics-modal-tone-btn" style="
-                background: var(--bg3);
-                color: var(--gold);
-                border: 1px solid var(--border2);
-                border-radius: 6px;
-                padding: 4px 10px;
-                font-size: 11px;
-                font-weight: 600;
-                outline: none;
-                cursor: pointer;
-                display: inline-flex;
-                align-items: center;
-                gap: 4px;
-              ">
+              <span style="font-size: 11px; color: var(--text3);">Tono:</span>
+              <button id="lyrics-modal-tone-btn" style="background: var(--bg3); color: var(--gold); border: 1px solid var(--border2); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; outline: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
                 <span id="lyrics-modal-tone-display">C</span> ▼
               </button>
+            </div>
+
+            <!-- AutoScroll -->
+            <div style="display: inline-flex; align-items: center; gap: 4px;">
+              <button id="lyrics-modal-autoscroll-btn" style="background: var(--bg3); color: var(--teal); border: 1px solid var(--border2); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; outline: none; cursor: pointer;">
+                ▶ AutoScroll
+              </button>
+              <div id="lyrics-modal-speed-ctrl" style="display: none; align-items: center; gap: 4px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 2px 6px; font-size: 11px;">
+                <button id="lyrics-modal-speed-down" style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">-</button>
+                <span id="lyrics-modal-speed-val" style="color:var(--teal); font-weight:700; min-width: 14px; text-align:center;">2</span>
+                <button id="lyrics-modal-speed-up" style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">+</button>
+              </div>
+            </div>
+
+            <!-- Zoom Tamaño Letra -->
+            <div style="display: inline-flex; align-items: center; gap: 2px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 2px 4px;">
+              <button id="lyrics-modal-zoom-down" style="background:none; border:none; color:var(--text3); font-weight:bold; cursor:pointer; padding: 0 6px; font-size: 11px;" title="Reducir letra">A-</button>
+              <span id="lyrics-modal-zoom-val" style="font-size: 10px; color: var(--text2); font-weight: 600;">14</span>
+              <button id="lyrics-modal-zoom-up" style="background:none; border:none; color:var(--text3); font-weight:bold; cursor:pointer; padding: 0 6px; font-size: 11px;" title="Agrandar letra">A+</button>
             </div>
           </div>
         </div>
         <button id="lyrics-modal-close" class="lyrics-modal-close">&times;</button>
       </div>
-      <div class="lyrics-modal-body">
+      <div id="lyrics-modal-body" class="lyrics-modal-body">
         <div id="lyrics-modal-content" class="lyrics-content"></div>
       </div>
       <div class="lyrics-modal-footer" style="padding: 16px 20px; border-top: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(180deg, var(--bg2) 0%, var(--bg3) 100%); flex-shrink: 0; gap: 8px; box-shadow: 0 -4px 20px rgba(0,0,0,0.3);">
@@ -6386,7 +6475,189 @@
       }).join('\n');
     }
 
+    // ====================================================
+    // WAKE LOCK & AUTOSCROLL & ZOOM MANAGER
+    // ====================================================
+    let wakeLock = null;
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+          console.log("[WAKE LOCK] Pantalla activa forzada.");
+        }
+      } catch (err) {
+        console.warn("[WAKE LOCK] Error al solicitar o no soportado:", err);
+      }
+    }
+
+    function releaseWakeLock() {
+      if (wakeLock) {
+        wakeLock.release().then(() => {
+          wakeLock = null;
+          console.log("[WAKE LOCK] Pantalla liberada.");
+        });
+      }
+    }
+
+    let _scrollInterval = null;
+    let _scrollSpeed = 2; // 1 a 5
+    let _currentZoom = 14; // default
+
+    function detenerAutoscroll() {
+      if (_scrollInterval) {
+        clearInterval(_scrollInterval);
+        _scrollInterval = null;
+      }
+      
+      const mobBtn = document.getElementById('lyrics-modal-autoscroll-btn');
+      if (mobBtn) {
+        mobBtn.innerHTML = '▶ AutoScroll';
+        mobBtn.style.color = 'var(--teal)';
+      }
+      const mobCtrl = document.getElementById('lyrics-modal-speed-ctrl');
+      if (mobCtrl) mobCtrl.style.display = 'none';
+
+      const panBtn = document.getElementById('panel-lyrics-autoscroll-btn');
+      if (panBtn) {
+        panBtn.innerHTML = '▶ AutoScroll';
+        panBtn.style.color = 'var(--teal)';
+      }
+      const panCtrl = document.getElementById('panel-lyrics-speed-ctrl');
+      if (panCtrl) panCtrl.style.display = 'none';
+    }
+
+    function toggleAutoscroll(containerId, btnId, ctrlId, speedValId) {
+      const container = document.getElementById(containerId);
+      const btn = document.getElementById(btnId);
+      const ctrl = document.getElementById(ctrlId);
+      const speedVal = document.getElementById(speedValId);
+
+      if (!container || !btn) return;
+
+      if (_scrollInterval) {
+        detenerAutoscroll();
+      } else {
+        btn.innerHTML = '⏸ Pausa';
+        btn.style.color = 'var(--coral)';
+        if (ctrl) ctrl.style.display = 'inline-flex';
+        if (speedVal) speedVal.textContent = _scrollSpeed;
+
+        const msMap = { 1: 65, 2: 45, 3: 30, 4: 20, 5: 12 };
+        const intervalMs = msMap[_scrollSpeed] || 45;
+
+        _scrollInterval = setInterval(() => {
+          container.scrollTop += 1;
+          if (container.scrollHeight - container.scrollTop <= container.clientHeight + 2) {
+            detenerAutoscroll();
+          }
+        }, intervalMs);
+      }
+    }
+
+    function cambiarVelocidadAutoscroll(dir, speedValId, containerId, btnId, ctrlId) {
+      if (dir === 'up') {
+        _scrollSpeed = Math.min(_scrollSpeed + 1, 5);
+      } else {
+        _scrollSpeed = Math.max(_scrollSpeed - 1, 1);
+      }
+      const speedVal = document.getElementById(speedValId);
+      if (speedVal) speedVal.textContent = _scrollSpeed;
+
+      if (_scrollInterval) {
+        detenerAutoscroll();
+        toggleAutoscroll(containerId, btnId, ctrlId, speedValId);
+      }
+    }
+
+    function aplicarZoomLetra(dir, contentId, zoomValId) {
+      if (dir === 'up') {
+        _currentZoom = Math.min(_currentZoom + 1, 28);
+      } else {
+        _currentZoom = Math.max(_currentZoom - 1, 10);
+      }
+      const el = document.getElementById(contentId);
+      if (el) el.style.fontSize = _currentZoom + 'px';
+
+      const zoomVal = document.getElementById(zoomValId);
+      if (zoomVal) zoomVal.textContent = _currentZoom;
+    }
+
+    function inicializarControlesLetra() {
+      // --- Controles de Móvil (Modal) ---
+      const mobBtn = document.getElementById('lyrics-modal-autoscroll-btn');
+      if (mobBtn && !mobBtn.dataset.bound) {
+        mobBtn.dataset.bound = 'true';
+        mobBtn.onclick = () => toggleAutoscroll('lyrics-modal-body', 'lyrics-modal-autoscroll-btn', 'lyrics-modal-speed-ctrl', 'lyrics-modal-speed-val');
+      }
+      const mobUp = document.getElementById('lyrics-modal-speed-up');
+      if (mobUp && !mobUp.dataset.bound) {
+        mobUp.dataset.bound = 'true';
+        mobUp.onclick = () => cambiarVelocidadAutoscroll('up', 'lyrics-modal-speed-val', 'lyrics-modal-body', 'lyrics-modal-autoscroll-btn', 'lyrics-modal-speed-ctrl');
+      }
+      const mobDown = document.getElementById('lyrics-modal-speed-down');
+      if (mobDown && !mobDown.dataset.bound) {
+        mobDown.dataset.bound = 'true';
+        mobDown.onclick = () => cambiarVelocidadAutoscroll('down', 'lyrics-modal-speed-val', 'lyrics-modal-body', 'lyrics-modal-autoscroll-btn', 'lyrics-modal-speed-ctrl');
+      }
+      const mobZoomUp = document.getElementById('lyrics-modal-zoom-up');
+      if (mobZoomUp && !mobZoomUp.dataset.bound) {
+        mobZoomUp.dataset.bound = 'true';
+        mobZoomUp.onclick = () => aplicarZoomLetra('up', 'lyrics-modal-content', 'lyrics-modal-zoom-val');
+      }
+      const mobZoomDown = document.getElementById('lyrics-modal-zoom-down');
+      if (mobZoomDown && !mobZoomDown.dataset.bound) {
+        mobZoomDown.dataset.bound = 'true';
+        mobZoomDown.onclick = () => aplicarZoomLetra('down', 'lyrics-modal-content', 'lyrics-modal-zoom-val');
+      }
+
+      // --- Controles de PC/Tablet (Split Panel) ---
+      const panBtn = document.getElementById('panel-lyrics-autoscroll-btn');
+      if (panBtn && !panBtn.dataset.bound) {
+        panBtn.dataset.bound = 'true';
+        panBtn.onclick = () => toggleAutoscroll('panel-lyrics-body', 'panel-lyrics-autoscroll-btn', 'panel-lyrics-speed-ctrl', 'panel-lyrics-speed-val');
+      }
+      const panUp = document.getElementById('panel-lyrics-speed-up');
+      if (panUp && !panUp.dataset.bound) {
+        panUp.dataset.bound = 'true';
+        panUp.onclick = () => cambiarVelocidadAutoscroll('up', 'panel-lyrics-speed-val', 'panel-lyrics-body', 'panel-lyrics-autoscroll-btn', 'panel-lyrics-speed-ctrl');
+      }
+      const panDown = document.getElementById('panel-lyrics-speed-down');
+      if (panDown && !panDown.dataset.bound) {
+        panDown.dataset.bound = 'true';
+        panDown.onclick = () => cambiarVelocidadAutoscroll('down', 'panel-lyrics-speed-val', 'panel-lyrics-body', 'panel-lyrics-autoscroll-btn', 'panel-lyrics-speed-ctrl');
+      }
+      const panZoomUp = document.getElementById('panel-lyrics-zoom-up');
+      if (panZoomUp && !panZoomUp.dataset.bound) {
+        panZoomUp.dataset.bound = 'true';
+        panZoomUp.onclick = () => aplicarZoomLetra('up', 'panel-lyrics-content', 'panel-lyrics-zoom-val');
+      }
+      const panZoomDown = document.getElementById('panel-lyrics-zoom-down');
+      if (panZoomDown && !panZoomDown.dataset.bound) {
+        panZoomDown.dataset.bound = 'true';
+        panZoomDown.onclick = () => aplicarZoomLetra('down', 'panel-lyrics-content', 'panel-lyrics-zoom-val');
+      }
+    }
+
     window.abrirModalLetraGlobal = async function (cancionId, playlistContext) {
+      detenerAutoscroll();
+      inicializarControlesLetra();
+      requestWakeLock();
+
+      const mobBody = document.getElementById('lyrics-modal-body');
+      if (mobBody) mobBody.scrollTop = 0;
+      const panBody = document.getElementById('panel-lyrics-body');
+      if (panBody) panBody.scrollTop = 0;
+
+      const mobContent = document.getElementById('lyrics-modal-content');
+      if (mobContent) mobContent.style.fontSize = _currentZoom + 'px';
+      const panContent = document.getElementById('panel-lyrics-content');
+      if (panContent) panContent.style.fontSize = _currentZoom + 'px';
+
+      const mobZoomVal = document.getElementById('lyrics-modal-zoom-val');
+      if (mobZoomVal) mobZoomVal.textContent = _currentZoom;
+      const panZoomVal = document.getElementById('panel-lyrics-zoom-val');
+      if (panZoomVal) panZoomVal.textContent = _currentZoom;
+
       const cache = window._lyricsCache || {};
       let song = cache[cancionId];
       if (!song) {
@@ -6608,6 +6879,8 @@
 
     document.getElementById('lyrics-modal-close').addEventListener('click', () => {
       document.getElementById('lyrics-modal-overlay').classList.remove('active');
+      releaseWakeLock();
+      detenerAutoscroll();
     });
 
     document.getElementById('practice-modal-close').addEventListener('click', () => {
