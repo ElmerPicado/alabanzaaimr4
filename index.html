@@ -2061,6 +2061,103 @@
       max-width: 100% !important;
       color: inherit !important;
     }
+
+    /* Split Screen Layout for Repertorio */
+    .split-repertorio-container {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      width: 100%;
+      align-items: stretch;
+    }
+    .split-left-panel {
+      flex: 1;
+      min-width: 0;
+    }
+    .split-right-panel {
+      display: none; /* Hidden on mobile by default */
+      flex: 1.2;
+      min-width: 0;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      flex-direction: column;
+      align-self: flex-start;
+      position: sticky;
+      top: 10px;
+      max-height: calc(100vh - 120px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    .lyrics-detail-content-area {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .panel-lyrics-body {
+      flex: 1;
+      overflow-y: auto;
+      margin-top: 15px;
+      padding-right: 5px;
+    }
+    .artist-row-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .artist-row-item:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: var(--teal);
+    }
+    .artist-row-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .artist-row-count {
+      font-size: 11px;
+      color: var(--teal);
+      background: rgba(78, 205, 196, 0.1);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+    .back-btn-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--teal);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: rgba(78, 205, 196, 0.05);
+      border: 1.5px dashed rgba(78, 205, 196, 0.2);
+      width: fit-content;
+      transition: all 0.2s;
+    }
+    .back-btn-header:hover {
+      background: rgba(78, 205, 196, 0.12);
+      border-style: solid;
+    }
+
+    @media (min-width: 768px) {
+      .split-right-panel {
+        display: flex; /* Visible on tablet/desktop */
+      }
+      .split-left-panel {
+        flex: 0 0 380px; /* Fixed width for left list on wide screens */
+      }
+    }
   </style>
 </head>
 
@@ -3452,26 +3549,75 @@
 
       <!-- PESTAÑA 4: REPERTORIO MÚSICO -->
       <div id="mtab-repertorio-musico" class="tab-panel">
-        <h2 class="section-title">Repertorio</h2>
-        <p class="section-sub" style="margin-bottom:14px;">Explora la biblioteca, guarda tus favoritas y consulta el repertorio oficial del grupo.</p>
+        <div class="split-repertorio-container">
+          <div class="split-left-panel">
+            <h2 class="section-title">Repertorio</h2>
+            <p class="section-sub" style="margin-bottom:14px;">Explora la biblioteca, guarda tus favoritas y consulta el repertorio oficial del grupo.</p>
 
-        <!-- Sub-tabs -->
-        <div class="musico-subtabs">
-          <button class="musico-subtab active" data-subtab="todas">Todas</button>
-          <button class="musico-subtab" data-subtab="favoritos">Favoritas</button>
-          <button class="musico-subtab" data-subtab="oficial">Repertorio Oficial</button>
+            <!-- Sub-tabs -->
+            <div class="musico-subtabs">
+              <button class="musico-subtab active" data-subtab="todas">Todas</button>
+              <button class="musico-subtab" data-subtab="favoritos">Favoritas</button>
+              <button class="musico-subtab" data-subtab="oficial">Repertorio Oficial</button>
+            </div>
+
+            <!-- Buscador unificado -->
+            <input type="text" id="search-repertorio-musico"
+              placeholder="🔍 Buscar por nombre o artista..."
+              style="width:100%; padding:9px 13px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; margin-bottom:12px; outline:none;">
+
+            <!-- Contador -->
+            <p id="count-repertorio-musico" style="font-size:11px; color:var(--text3); margin-bottom:10px;"></p>
+
+            <!-- Lista -->
+            <div id="list-repertorio-musico" style="display:flex; flex-direction:column; gap:6px; padding-bottom: 30px;"></div>
+          </div>
+
+          <div class="split-right-panel" id="musico-lyrics-detail-panel">
+            <div class="lyrics-detail-placeholder" style="text-align:center; padding: 60px 20px; color: var(--text3); margin: auto;">
+              <div style="font-size: 64px; margin-bottom: 20px;">🎵</div>
+              <h3 style="color: var(--text); font-family: var(--font-display); font-size: 20px; margin-bottom: 8px;">Bienvenido al Repertorio</h3>
+              <p style="font-size: 13px; max-width: 300px; margin: 0 auto; line-height: 1.5; color: var(--text2);">Selecciona una canción de la lista para ver su letra y acordes aquí.</p>
+            </div>
+            <div class="lyrics-detail-content-area" style="display: none; height: 100%; flex-direction: column;">
+              <div class="lyrics-modal-header" style="border-bottom: 1px solid var(--border2); padding-bottom: 16px; margin-bottom: 16px;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <h3 id="panel-lyrics-title" class="lyrics-modal-title" style="margin: 0; font-size: 22px;">Nombre de la Canción</h3>
+                    <a id="panel-lyrics-yt-link" href="#" target="_blank" rel="noopener" style="display: none; align-items: center; gap: 4px; background: rgba(244, 63, 94, 0.12); color: var(--coral); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s;">
+                      ▶ YouTube
+                    </a>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+                    <div id="panel-lyrics-meta" class="lyrics-modal-meta" style="margin-bottom: 0;">Tono Original: C | Tono Actual: D</div>
+                    <div style="display: inline-flex; align-items: center; gap: 4px;">
+                      <span style="font-size: 11px; color: var(--text3);">Practicar en:</span>
+                      <button id="panel-lyrics-tone-btn" style="
+                        background: var(--bg3);
+                        color: var(--gold);
+                        border: 1px solid var(--border2);
+                        border-radius: 6px;
+                        padding: 4px 10px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        outline: none;
+                        cursor: pointer;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 4px;
+                      ">
+                        <span id="panel-lyrics-tone-display">C</span> ▼
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="flex: 1; overflow-y: auto;">
+                <div id="panel-lyrics-content" class="lyrics-content"></div>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <!-- Buscador unificado -->
-        <input type="text" id="search-repertorio-musico"
-          placeholder="🔍 Buscar por nombre o artista..."
-          style="width:100%; padding:9px 13px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; margin-bottom:12px; outline:none;">
-
-        <!-- Contador -->
-        <p id="count-repertorio-musico" style="font-size:11px; color:var(--text3); margin-bottom:10px;"></p>
-
-        <!-- Lista -->
-        <div id="list-repertorio-musico" style="display:flex; flex-direction:column; gap:6px; padding-bottom: 30px;"></div>
       </div>
 
     </main>
@@ -4134,7 +4280,37 @@
     if (btnLeaderTheme) {
       btnLeaderTheme.addEventListener('click', toggleTema);
     }
-
+    let _migrationInProgress = false;
+    async function migrarBaseDatosLetras() {
+      if (_migrationInProgress) return;
+      if (currentUserRole !== 'lider') return;
+      
+      const conLetra = (cacheSongs || []).filter(s => s.letra !== undefined && s.letra !== null && s.letra.trim() !== '');
+      if (conLetra.length === 0) return;
+      
+      _migrationInProgress = true;
+      console.log(`[MIGRACIÓN] Se encontraron ${conLetra.length} canciones con letra en biblioteca_canciones. Migrando...`);
+      if (typeof showToast === 'function') {
+        showToast(`📦 Optimizando base de datos: Migrando ${conLetra.length} letras...`);
+      }
+      
+      let migrados = 0;
+      for (const s of conLetra) {
+        try {
+          const letra = s.letra;
+          await setDoc(doc(db, "letras_canciones", s.id), { letra: letra });
+          await updateDoc(doc(db, "biblioteca_canciones", s.id), { letra: deleteField() });
+          migrados++;
+        } catch (err) {
+          console.error(`Error migrando "${s.nombre}":`, err);
+        }
+      }
+      _migrationInProgress = false;
+      console.log(`[MIGRACIÓN] Proceso terminado. Se migraron exitosamente ${migrados} canciones.`);
+      if (typeof showToast === 'function') {
+        showToast(`✅ Optimización finalizada. ${migrados} letras migradas.`);
+      }
+    }
 
     // ====================================================
     // ESCUCHA DE DATOS BASE Y ENLACE DE EVENTOS
@@ -4147,6 +4323,7 @@
         if (currentUserRole === 'lider') {
           renderizarMantenimientoCanciones();
           sincronizarPanelArmado();
+          migrarBaseDatosLetras();
         } else if (currentUserRole === 'musico') {
           const msDate = document.getElementById('musico-service-date').value;
           if (msDate) cargarServicioMusico(msDate);
@@ -4847,15 +5024,42 @@
       }
 
       const idUnico = editingSongId || ("song_" + Date.now());
-      const payload = {
+      const letra = document.getElementById('song-lyrics-input').value;
+      
+      const payloadMetadata = {
         nombre,
         artista,
         tonoBase: document.getElementById('song-key-input').value.trim(),
         tipo: document.getElementById('song-type-input').value,
-        youtube: document.getElementById('song-youtube-input').value.trim(),
-        letra: document.getElementById('song-lyrics-input').value
+        youtube: document.getElementById('song-youtube-input').value.trim()
       };
-      await setDoc(doc(db, "biblioteca_canciones", idUnico), payload);
+
+      // Si estamos editando, conservar el campo 'oficial' anterior
+      if (editingSongId) {
+        const prevSong = (cacheSongs || []).find(x => x.id === editingSongId);
+        if (prevSong && prevSong.oficial !== undefined) {
+          payloadMetadata.oficial = prevSong.oficial;
+        }
+      } else {
+        payloadMetadata.oficial = false;
+      }
+
+      // 1. Guardar metadata en biblioteca_canciones
+      await setDoc(doc(db, "biblioteca_canciones", idUnico), payloadMetadata);
+
+      // 2. Guardar letra en letras_canciones
+      await setDoc(doc(db, "letras_canciones", idUnico), { letra });
+
+      // 3. Guardar en cache local de letras
+      if (!window._lyricsCache) window._lyricsCache = {};
+      window._lyricsCache[idUnico] = {
+        nombre,
+        tonoBase: payloadMetadata.tonoBase,
+        tonoServicio: payloadMetadata.tonoBase,
+        youtube: payloadMetadata.youtube,
+        letra
+      };
+
       const wasEditing = !!editingSongId;
       resetSongForm();
       showToast(wasEditing ? "✅ Canción actualizada." : "✅ Canción añadida al catálogo.");
@@ -4907,6 +5111,12 @@
             .split('-')[0]
             .replace(/acordes/i, '')
             .replace(/tabs/i, '')
+            .trim();
+        }
+        if (nombre) {
+          nombre = nombre
+            .replace(/\s*[\(,\-]?\s*(acordes|letra|letras|tab|tabs|chords|lyric|lyrics|acordes\s+y\s+letra|letra\s+y\s+acordes)\s*\)?/gi, '')
+            .replace(/\s+/g, ' ')
             .trim();
         }
 
@@ -4999,6 +5209,8 @@
       return calcularTiempoTranscurrido(plan.fecha);
     }
 
+    window._adminSelectedArtist = null;
+
     function renderizarMantenimientoCanciones() {
       const todasList = document.getElementById('repertorio-todas-list');
       const totalCount = document.getElementById('repertorio-total-count');
@@ -5014,17 +5226,73 @@
         (a.nombre || '').localeCompare(b.nombre || '')
       );
 
-      // Aplicar filtro de búsqueda
-      const filtradas = todas.filter(s =>
-        !query ||
-        (s.nombre || '').toLowerCase().includes(query) ||
-        (s.artista || '').toLowerCase().includes(query)
-      );
+      // Búsqueda por palabras clave sin importar el orden
+      const queryWords = query.split(/\s+/).filter(Boolean);
+      let filtradas = todas;
+
+      if (queryWords.length > 0) {
+        filtradas = todas.filter(s => {
+          const searchStr = `${s.nombre || ''} ${s.artista || ''}`.toLowerCase();
+          return queryWords.every(word => searchStr.includes(word));
+        });
+        window._adminSelectedArtist = null; // Reset filter
+      }
+
+      if (queryWords.length === 0) {
+        if (!window._adminSelectedArtist) {
+          // Renderizar lista de artistas
+          const artistCounts = {};
+          todas.forEach(s => {
+            const art = s.artista || 'Desconocido';
+            artistCounts[art] = (artistCounts[art] || 0) + 1;
+          });
+          const sortedArtists = Object.keys(artistCounts).sort((a,b) => a.localeCompare(b));
+
+          if (totalCount) {
+            totalCount.textContent = `${sortedArtists.length} artistas`;
+          }
+
+          if (sortedArtists.length === 0) {
+            todasList.innerHTML = "<p style='color:var(--text3);font-size:12px;text-align:center;padding:20px;'>No se encontraron canciones.</p>";
+            return;
+          }
+
+          sortedArtists.forEach(art => {
+            const row = document.createElement('div');
+            row.className = 'artist-row-item';
+            row.innerHTML = `
+              <span class="artist-row-name">${art}</span>
+              <span class="artist-row-count">${artistCounts[art]} ${artistCounts[art] === 1 ? 'canción' : 'canciones'}</span>
+            `;
+            row.onclick = () => {
+              window._adminSelectedArtist = art;
+              renderizarMantenimientoCanciones();
+            };
+            todasList.appendChild(row);
+          });
+          return;
+        } else {
+          // Mostrar canciones del artista seleccionado
+          filtradas = todas.filter(s => (s.artista || 'Desconocido') === window._adminSelectedArtist);
+        }
+      }
 
       if (totalCount) {
         totalCount.textContent = query
           ? `${filtradas.length} de ${todas.length} canciones`
-          : `${todas.length} canciones`;
+          : `${filtradas.length} canciones`;
+      }
+
+      // Agregar botón para volver a la lista de artistas si no hay búsqueda
+      if (queryWords.length === 0 && window._adminSelectedArtist) {
+        const backBtn = document.createElement('div');
+        backBtn.className = 'back-btn-header';
+        backBtn.innerHTML = `← Volver a Artistas (${window._adminSelectedArtist})`;
+        backBtn.onclick = () => {
+          window._adminSelectedArtist = null;
+          renderizarMantenimientoCanciones();
+        };
+        todasList.appendChild(backBtn);
       }
 
       if (filtradas.length === 0) {
@@ -5041,7 +5309,7 @@
             tagColor = "var(--purple)";
           }
 
-          const hasLetra = s.letra && s.letra.trim() !== '';
+          const hasLetra = true;
 
           const div = document.createElement('div');
           div.className = "musico-song-card";
@@ -5079,7 +5347,7 @@
           if (toneSelect) {
             toneSelect.addEventListener('change', async (ev) => {
               const nuevoTono = ev.target.value;
-              await setDoc(doc(db, "biblioteca_canciones", s.id), { ...s, tonoBase: nuevoTono });
+              await updateDoc(doc(db, "biblioteca_canciones", s.id), { tonoBase: nuevoTono });
               showToast(`🎵 Tono de "${s.nombre}" → ${nuevoTono}`);
             });
           }
@@ -5100,20 +5368,43 @@
             if (oficialBtn) {
               oficialBtn.addEventListener('click', async () => {
                 const isOficialNow = !s.oficial;
-                await setDoc(doc(db, "biblioteca_canciones", s.id), { ...s, oficial: isOficialNow });
+                await updateDoc(doc(db, "biblioteca_canciones", s.id), { oficial: isOficialNow });
                 showToast(isOficialNow ? `🎯 "${s.nombre}" ahora es Oficial` : `○ "${s.nombre}" ya no es Oficial`);
               });
             }
 
             if (editBtn) {
-              editBtn.addEventListener('click', () => {
+              editBtn.addEventListener('click', async () => {
                 editingSongId = s.id;
                 document.getElementById('song-name-input').value = s.nombre;
                 document.getElementById('song-artist-input').value = s.artista;
                 document.getElementById('song-key-input').value = s.tonoBase;
                 document.getElementById('song-type-input').value = s.tipo || "alabanza";
                 document.getElementById('song-youtube-input').value = s.youtube || "";
-                document.getElementById('song-lyrics-input').value = s.letra || "";
+                
+                // Cargar letra asíncronamente
+                document.getElementById('song-lyrics-input').value = "Cargando letra...";
+                try {
+                  const cached = window._lyricsCache && window._lyricsCache[s.id];
+                  if (cached && cached.letra) {
+                    document.getElementById('song-lyrics-input').value = cached.letra;
+                  } else {
+                    const snap = await getDoc(doc(db, "letras_canciones", s.id));
+                    const letra = snap.exists() ? (snap.data().letra || '') : '';
+                    document.getElementById('song-lyrics-input').value = letra;
+                    if (!window._lyricsCache) window._lyricsCache = {};
+                    window._lyricsCache[s.id] = {
+                      nombre: s.nombre,
+                      tonoBase: s.tonoBase,
+                      tonoServicio: s.tonoBase,
+                      youtube: s.youtube || '',
+                      letra: letra
+                    };
+                  }
+                } catch(err) {
+                  console.error("Error cargando letra para editar:", err);
+                  document.getElementById('song-lyrics-input').value = "";
+                }
 
                 const btnSubmit = document.querySelector('#form-add-song button[type="submit"]');
                 if (btnSubmit) {
@@ -5131,6 +5422,8 @@
               delBtn.addEventListener('click', async () => {
                 if (confirm(`¿Quieres borrar definitivamente "${s.nombre}" del catálogo?`)) {
                   await deleteDoc(doc(db, "biblioteca_canciones", s.id));
+                  await deleteDoc(doc(db, "letras_canciones", s.id));
+                  if (window._lyricsCache) delete window._lyricsCache[s.id];
                 }
               });
             }
@@ -5138,13 +5431,13 @@
           todasList.appendChild(div);
         });
       }
+    }
 
-      // Listener de búsqueda en tiempo real
-      const searchInput = document.getElementById('search-admin-canciones');
-      if (searchInput && !searchInput.dataset.listenerAdded) {
-        searchInput.dataset.listenerAdded = '1';
-        searchInput.addEventListener('input', () => renderizarMantenimientoCanciones());
-      }
+    // Listener de búsqueda en tiempo real
+    const searchInput = document.getElementById('search-admin-canciones');
+    if (searchInput && !searchInput.dataset.listenerAdded) {
+      searchInput.dataset.listenerAdded = '1';
+      searchInput.addEventListener('input', () => renderizarMantenimientoCanciones());
     }
 
 
@@ -5388,6 +5681,8 @@
       renderRepertorioMusico();
     }
 
+    window._musicoSelectedArtist = null;
+
     function renderRepertorioMusico() {
       const listCont = document.getElementById('list-repertorio-musico');
       const countEl = document.getElementById('count-repertorio-musico');
@@ -5401,16 +5696,69 @@
 
       const allSongs = [...(cacheSongs || [])].sort((a,b) => (a.nombre||'').localeCompare(b.nombre||''));
 
-      let filtered = allSongs.filter(s => {
-        const name = (s.nombre || '').toLowerCase();
-        const artist = (s.artista || '').toLowerCase();
-        return name.includes(query) || artist.includes(query);
-      });
+      // Búsqueda por palabras clave sin importar el orden
+      const queryWords = query.split(/\s+/).filter(Boolean);
+      let filtered = allSongs;
 
-      if (currentSubtab === 'favoritos') {
-        filtered = filtered.filter(s => window.misFavoritos && window.misFavoritos.includes(s.id));
-      } else if (currentSubtab === 'oficial') {
-        filtered = filtered.filter(s => s.oficial === true);
+      if (queryWords.length > 0) {
+        filtered = allSongs.filter(s => {
+          const searchStr = `${s.nombre || ''} ${s.artista || ''}`.toLowerCase();
+          return queryWords.every(word => searchStr.includes(word));
+        });
+        window._musicoSelectedArtist = null; // Reset filter
+      }
+
+      if (queryWords.length === 0) {
+        if (currentSubtab === 'todas') {
+          if (!window._musicoSelectedArtist) {
+            // Renderizar lista de artistas para optimizar DOM
+            const artistCounts = {};
+            allSongs.forEach(s => {
+              const art = s.artista || 'Desconocido';
+              artistCounts[art] = (artistCounts[art] || 0) + 1;
+            });
+            const sortedArtists = Object.keys(artistCounts).sort((a,b) => a.localeCompare(b));
+
+            if (countEl) {
+              countEl.textContent = `${sortedArtists.length} artistas`;
+            }
+
+            listCont.innerHTML = '';
+            if (sortedArtists.length === 0) {
+              listCont.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:20px;">No hay canciones registradas.</p>`;
+              return;
+            }
+
+            sortedArtists.forEach(art => {
+              const row = document.createElement('div');
+              row.className = 'artist-row-item';
+              row.innerHTML = `
+                <span class="artist-row-name">${art}</span>
+                <span class="artist-row-count">${artistCounts[art]} ${artistCounts[art] === 1 ? 'canción' : 'canciones'}</span>
+              `;
+              row.onclick = () => {
+                window._musicoSelectedArtist = art;
+                renderRepertorioMusico();
+              };
+              listCont.appendChild(row);
+            });
+            return;
+          } else {
+            // Mostrar canciones del artista seleccionado
+            filtered = allSongs.filter(s => (s.artista || 'Desconocido') === window._musicoSelectedArtist);
+          }
+        } else if (currentSubtab === 'favoritos') {
+          filtered = allSongs.filter(s => window.misFavoritos && window.misFavoritos.includes(s.id));
+        } else if (currentSubtab === 'oficial') {
+          filtered = allSongs.filter(s => s.oficial === true);
+        }
+      } else {
+        // Con búsqueda, filtrar según la pestaña activa
+        if (currentSubtab === 'favoritos') {
+          filtered = filtered.filter(s => window.misFavoritos && window.misFavoritos.includes(s.id));
+        } else if (currentSubtab === 'oficial') {
+          filtered = filtered.filter(s => s.oficial === true);
+        }
       }
 
       if (countEl) {
@@ -5418,6 +5766,19 @@
       }
 
       listCont.innerHTML = '';
+
+      // Agregar botón para volver a la lista de artistas si no hay búsqueda
+      if (queryWords.length === 0 && currentSubtab === 'todas' && window._musicoSelectedArtist) {
+        const backBtn = document.createElement('div');
+        backBtn.className = 'back-btn-header';
+        backBtn.innerHTML = `← Volver a Artistas (${window._musicoSelectedArtist})`;
+        backBtn.onclick = () => {
+          window._musicoSelectedArtist = null;
+          renderRepertorioMusico();
+        };
+        listCont.appendChild(backBtn);
+      }
+
       if (filtered.length === 0) {
         listCont.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:20px;">No se encontraron canciones en esta vista.</p>`;
         return;
@@ -5430,14 +5791,12 @@
 
         const row = document.createElement('div');
         row.className = 'musico-song-card';
-        row.style.cssText = `${cardBorder} background: ${cardBg}; margin-bottom: 8px !important; border-radius: var(--radius-sm) !important; border-bottom: 1px solid var(--border) !important;`;
+        row.style.cssText = `${cardBorder} background: ${cardBg}; margin-bottom: 8px !important; border-radius: var(--radius-sm) !important; border-bottom: 1px solid var(--border) !important; cursor: pointer;`;
 
         const youtubeBtn = s.youtube && s.youtube.trim()
           ? `<a href="${s.youtube}" target="_blank" class="repertorio-action-btn repertorio-btn-youtube" style="font-size: 11px; min-height: unset; padding: 6px 10px; margin: 0; display: inline-flex; align-items: center; gap: 4px;">YouTube</a>`
           : '';
-        const lyricsBtn = s.letra && s.letra.trim()
-          ? `<button class="btn-ver-letra view-lyrics-btn" data-id="${s.id}" style="margin: 0; padding: 6px 12px; font-size: 11px;">Letra</button>`
-          : '';
+        const lyricsBtn = `<button class="btn-ver-letra view-lyrics-btn" data-id="${s.id}" style="margin: 0; padding: 6px 12px; font-size: 11px;">Letra</button>`;
 
         row.innerHTML = `
           <!-- Favorito btn -->
@@ -5460,18 +5819,19 @@
           </div>
         `;
 
-        // Lógica Ver Letra
-        const btnLy = row.querySelector('.view-lyrics-btn');
-        if (btnLy) {
-          btnLy.onclick = () => {
-            if (window.abrirModalLetraGlobal) window.abrirModalLetraGlobal(s.id, filtered);
-          };
-        }
+        // Lógica de click en toda la fila para cargar letra/acordes
+        row.onclick = (e) => {
+          if (e.target.classList.contains('btn-fav-song') || e.target.closest('.repertorio-btn-youtube')) {
+            return; // No disparar si hace click en favorito o youtube
+          }
+          if (window.abrirModalLetraGlobal) window.abrirModalLetraGlobal(s.id, filtered);
+        };
 
         // Lógica Favorito
         const btnFav = row.querySelector('.btn-fav-song');
         if (btnFav) {
-          btnFav.addEventListener('click', async () => {
+          btnFav.addEventListener('click', async (e) => {
+            e.stopPropagation();
             if (!activeSessionUser || !activeSessionUser.usuario) return;
             const uid = activeSessionUser.usuario;
             const refDoc = doc(db, "usuarios", uid);
@@ -5502,6 +5862,7 @@
       btn.addEventListener('click', (e) => {
         document.querySelectorAll('.musico-subtab').forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
+        window._musicoSelectedArtist = null; // Reset filter
         renderRepertorioMusico();
       });
     });
@@ -5900,7 +6261,7 @@
         }
       }
 
-      const lineas = texto.split('\\n');
+      const lineas = texto.split('\n');
       return lineas.map(linea => {
         return linea.replace(/([A-G][b#]?(?:m|min|maj|dim|aug|sus|add)?\d?(?:\/[A-G][b#]?)?)/g, (match, p1, offset, fullStr) => {
           const prevChar = offset > 0 ? fullStr[offset - 1] : ' ';
@@ -5914,21 +6275,36 @@
           let trans = transponerAcordeUnico(match, diff);
           return `<span class="chord-highlight">${trans}</span>`;
         });
-      }).join('\\n');
+      }).join('\n');
     }
 
-    window.abrirModalLetraGlobal = function (cancionId, playlistContext) {
+    window.abrirModalLetraGlobal = async function (cancionId, playlistContext) {
       const cache = window._lyricsCache || {};
       let song = cache[cancionId];
       if (!song) {
         // Buscar en la lista global de canciones
         const found = (cacheSongs || []).find(x => x.id === cancionId);
         if (found) {
+          // Cargar letra asíncronamente desde letras_canciones
+          let letra = '';
+          try {
+            const snap = await getDoc(doc(db, "letras_canciones", cancionId));
+            if (snap.exists()) {
+              letra = snap.data().letra || '';
+            } else {
+              // Fallback si no se ha migrado aún
+              letra = found.letra || '';
+            }
+          } catch (e) {
+            console.error("Error cargando acordes:", e);
+            letra = found.letra || '';
+          }
           song = {
             nombre: found.nombre,
             tonoBase: found.tonoBase,
             tonoServicio: found.tonoBase,
-            letra: found.letra
+            youtube: found.youtube || '',
+            letra: letra
           };
         } else if (cancionId.startsWith('custom_') && window._currentServiceData && window._currentServiceData.customSongsMetadata) {
           const meta = window._currentServiceData.customSongsMetadata[cancionId];
@@ -5937,6 +6313,7 @@
               nombre: meta.nombre,
               tonoBase: meta.tonoBase,
               tonoServicio: meta.tonoBase,
+              youtube: meta.youtube || '',
               letra: meta.letra
             };
           }
@@ -5944,13 +6321,24 @@
       }
       if (!song) return;
 
-      const tonoMostrar = song.tonoServicio || song.tonoBase;
-      document.getElementById('lyrics-modal-title').textContent = song.nombre;
-      document.getElementById('lyrics-modal-meta').textContent = `Tono Original: ${song.tonoBase} | Tono del Servicio: ${tonoMostrar}`;
+      // Actualizar cache local
+      if (!window._lyricsCache) window._lyricsCache = {};
+      window._lyricsCache[cancionId] = song;
 
-      // Selector de Tono en el Modal de Letras para práctica personal (bottom-sheet grid picker)
-      const toneBtn = document.getElementById('lyrics-modal-tone-btn');
-      const toneDisplay = document.getElementById('lyrics-modal-tone-display');
+      const tonoMostrar = song.tonoServicio || song.tonoBase;
+      const mtabRep = document.getElementById('mtab-repertorio-musico');
+      const isRepActive = mtabRep && mtabRep.classList.contains('active');
+      const isSplitView = window.innerWidth >= 768 && isRepActive;
+
+      // Elementos de destino dependiendo de la vista
+      const destPrefix = isSplitView ? 'panel-' : 'lyrics-modal-';
+
+      document.getElementById(destPrefix + 'title').textContent = song.nombre;
+      document.getElementById(destPrefix + 'meta').textContent = `Tono Original: ${song.tonoBase} | Tono del Servicio: ${tonoMostrar}`;
+
+      // Configurar selector de tono
+      const toneBtn = document.getElementById(destPrefix + 'tone-btn');
+      const toneDisplay = document.getElementById(destPrefix + 'tone-display');
       if (toneDisplay) {
         toneDisplay.textContent = tonoMostrar;
       }
@@ -5980,13 +6368,13 @@
               }
               
               const isSongHasLetra = song.letra && song.letra.trim() !== "";
-              if (isSongHasLetra) {
-                document.getElementById('lyrics-modal-content').innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, selectedTone);
+              const lyricsContentContainer = document.getElementById(destPrefix + 'content');
+              if (isSongHasLetra && lyricsContentContainer) {
+                lyricsContentContainer.innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, selectedTone);
               }
-              document.getElementById('lyrics-modal-meta').textContent = `Tono Original: ${song.tonoBase} | Tono de Práctica: ${selectedTone}`;
+              document.getElementById(destPrefix + 'meta').textContent = `Tono Original: ${song.tonoBase} | Tono de Práctica: ${selectedTone}`;
               
               song.tonoServicio = selectedTone;
-              if (!window._lyricsCache) window._lyricsCache = {};
               window._lyricsCache[cancionId] = song;
             };
           });
@@ -5994,10 +6382,10 @@
           pOverlay.classList.add('active');
         };
       }
-      
-      // Enlace de YouTube
-      const ytUrl = song.youtube || (cacheSongs.find(x => x.id === cancionId) || {}).youtube || (window._currentServiceData && window._currentServiceData.customSongsMetadata && window._currentServiceData.customSongsMetadata[cancionId] || {}).youtube;
-      const ytLinkElem = document.getElementById('lyrics-modal-yt-link');
+
+      // YouTube Link
+      const ytUrl = song.youtube || (cacheSongs.find(x => x.id === cancionId) || {}).youtube;
+      const ytLinkElem = document.getElementById(destPrefix + 'yt-link');
       if (ytLinkElem) {
         if (ytUrl && ytUrl.trim() !== "") {
           ytLinkElem.href = ytUrl;
@@ -6009,103 +6397,102 @@
       }
 
       const hasLetra = song.letra && song.letra.trim() !== "";
-      if (hasLetra) {
-        document.getElementById('lyrics-modal-content').innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, tonoMostrar);
-      } else {
-        document.getElementById('lyrics-modal-content').innerHTML = `
-          <div style="text-align:center; padding: 60px 20px; color: var(--text3);">
-            <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
-            <h4 style="color: var(--text2); margin-bottom: 8px; font-family: var(--font-display); font-size: 22px;">Letra no disponible</h4>
-            <p style="font-size: 13px; max-width: 280px; margin: 0 auto; line-height: 1.5;">Esta canción aún no tiene la letra registrada en el repertorio global.</p>
-          </div>
-        `;
+      const lyricsContentContainer = document.getElementById(destPrefix + 'content');
+      if (lyricsContentContainer) {
+        if (hasLetra) {
+          lyricsContentContainer.innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, tonoMostrar);
+        } else {
+          lyricsContentContainer.innerHTML = `
+            <div style="text-align:center; padding: 60px 20px; color: var(--text3);">
+              <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
+              <h4 style="color: var(--text2); margin-bottom: 8px; font-family: var(--font-display); font-size: 22px;">Letra no disponible</h4>
+              <p style="font-size: 13px; max-width: 280px; margin: 0 auto; line-height: 1.5;">Esta canción aún no tiene la letra registrada en el repertorio global.</p>
+            </div>
+          `;
+        }
       }
-      
-      document.getElementById('lyrics-modal-overlay').classList.add('active');
 
-      // Configurar Paginación
-      const currentList = playlistContext || window._currentServiceSongs || [];
-      const currentIndex = currentList.findIndex(s => s.id === cancionId);
+      if (isSplitView) {
+        // Mostrar panel, ocultar placeholder
+        document.querySelector('#musico-lyrics-detail-panel .lyrics-detail-placeholder').style.display = 'none';
+        document.querySelector('#musico-lyrics-detail-panel .lyrics-detail-content-area').style.display = 'flex';
+      } else {
+        document.getElementById('lyrics-modal-overlay').classList.add('active');
 
-      const prevBtn = document.getElementById('lyrics-modal-prev');
-      const nextBtn = document.getElementById('lyrics-modal-next');
-      const prevNameLabel = document.getElementById('lyrics-modal-prev-name');
-      const nextNameLabel = document.getElementById('lyrics-modal-next-name');
-      const pageIndicator = document.getElementById('lyrics-modal-page-indicator');
+        // Configurar Paginación (solo para el Modal, ya que en Split-View navegas haciendo click en la lista)
+        const currentList = playlistContext || window._currentServiceSongs || [];
+        const currentIndex = currentList.findIndex(s => s.id === cancionId);
 
-      if (prevBtn && nextBtn && pageIndicator) {
-        if (currentIndex !== -1 && currentList.length > 1) {
-          pageIndicator.style.display = 'block';
-          pageIndicator.textContent = `${currentIndex + 1} de ${currentList.length}`;
+        const prevBtn = document.getElementById('lyrics-modal-prev');
+        const nextBtn = document.getElementById('lyrics-modal-next');
+        const prevNameLabel = document.getElementById('lyrics-modal-prev-name');
+        const nextNameLabel = document.getElementById('lyrics-modal-next-name');
+        const pageIndicator = document.getElementById('lyrics-modal-page-indicator');
 
-          // Botón Anterior
-          if (currentIndex > 0) {
-            const prevSong = currentList[currentIndex - 1];
-            const prevName = prevSong.nombre || "Anterior";
-            prevBtn.innerHTML = `◀ Anterior`;
-            if (prevNameLabel) {
-              prevNameLabel.textContent = prevName;
-              prevNameLabel.style.display = 'block';
+        if (prevBtn && nextBtn && pageIndicator) {
+          if (currentIndex !== -1 && currentList.length > 1) {
+            pageIndicator.style.display = 'block';
+            pageIndicator.textContent = `${currentIndex + 1} de ${currentList.length}`;
+
+            // Botón Anterior
+            if (currentIndex > 0) {
+              const prevSong = currentList[currentIndex - 1];
+              const prevName = prevSong.nombre || "Anterior";
+              prevBtn.innerHTML = `◀ Anterior`;
+              if (prevNameLabel) {
+                prevNameLabel.textContent = prevName;
+                prevNameLabel.style.display = 'block';
+              }
+              prevBtn.style.opacity = '1';
+              prevBtn.style.pointerEvents = 'auto';
+              prevBtn.onclick = () => {
+                window.abrirModalLetraGlobal(prevSong.id, currentList);
+              };
+            } else {
+              prevBtn.innerHTML = `◀ Anterior`;
+              if (prevNameLabel) {
+                prevNameLabel.textContent = '';
+                prevNameLabel.style.display = 'none';
+              }
+              prevBtn.style.opacity = '0.3';
+              prevBtn.style.pointerEvents = 'none';
+              prevBtn.onclick = null;
             }
-            prevBtn.style.opacity = '1';
-            prevBtn.style.pointerEvents = 'auto';
-            prevBtn.onclick = () => {
-              window.abrirModalLetraGlobal(prevSong.id, currentList);
-            };
+
+            // Botón Siguiente
+            if (currentIndex < currentList.length - 1) {
+              const nextSong = currentList[currentIndex + 1];
+              const nextName = nextSong.nombre || "Siguiente";
+              nextBtn.innerHTML = `Siguiente ▶`;
+              if (nextNameLabel) {
+                nextNameLabel.textContent = nextName;
+                nextNameLabel.style.display = 'block';
+              }
+              nextBtn.style.opacity = '1';
+              nextBtn.style.pointerEvents = 'auto';
+              nextBtn.onclick = () => {
+                window.abrirModalLetraGlobal(nextSong.id, currentList);
+              };
+            } else {
+              nextBtn.innerHTML = `Siguiente ▶`;
+              if (nextNameLabel) {
+                nextNameLabel.textContent = '';
+                nextNameLabel.style.display = 'none';
+              }
+              nextBtn.style.opacity = '0.3';
+              nextBtn.style.pointerEvents = 'none';
+              nextBtn.onclick = null;
+            }
           } else {
-            prevBtn.innerHTML = `◀ Anterior`;
-            if (prevNameLabel) {
-              prevNameLabel.textContent = '';
-              prevNameLabel.style.display = 'none';
-            }
+            pageIndicator.style.display = 'none';
             prevBtn.style.opacity = '0.3';
             prevBtn.style.pointerEvents = 'none';
             prevBtn.onclick = null;
-          }
-
-          // Botón Siguiente
-          if (currentIndex < currentList.length - 1) {
-            const nextSong = currentList[currentIndex + 1];
-            const nextName = nextSong.nombre || "Siguiente";
-            nextBtn.innerHTML = `Siguiente ▶`;
-            if (nextNameLabel) {
-              nextNameLabel.textContent = nextName;
-              nextNameLabel.style.display = 'block';
-            }
-            nextBtn.style.opacity = '1';
-            nextBtn.style.pointerEvents = 'auto';
-            nextBtn.onclick = () => {
-              window.abrirModalLetraGlobal(nextSong.id, currentList);
-            };
-          } else {
-            nextBtn.innerHTML = `Siguiente ▶`;
-            if (nextNameLabel) {
-              nextNameLabel.textContent = '';
-              nextNameLabel.style.display = 'none';
-            }
+            if (prevNameLabel) prevNameLabel.style.display = 'none';
             nextBtn.style.opacity = '0.3';
             nextBtn.style.pointerEvents = 'none';
             nextBtn.onclick = null;
-          }
-        } else {
-          pageIndicator.style.display = 'none';
-          
-          prevBtn.style.opacity = '0.3';
-          prevBtn.style.pointerEvents = 'none';
-          prevBtn.onclick = null;
-          prevBtn.innerHTML = `◀ Anterior`;
-          if (prevNameLabel) {
-            prevNameLabel.textContent = '';
-            prevNameLabel.style.display = 'none';
-          }
-          
-          nextBtn.style.opacity = '0.3';
-          nextBtn.style.pointerEvents = 'none';
-          nextBtn.onclick = null;
-          nextBtn.innerHTML = `Siguiente ▶`;
-          if (nextNameLabel) {
-            nextNameLabel.textContent = '';
-            nextNameLabel.style.display = 'none';
+            if (nextNameLabel) nextNameLabel.style.display = 'none';
           }
         }
       }
