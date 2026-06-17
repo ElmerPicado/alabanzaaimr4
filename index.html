@@ -1195,48 +1195,6 @@
       transform: scale(0.93);
     }
 
-    /* === TABLET MEDIA QUERIES === */
-    @media (min-width: 600px) {
-      .lyrics-modal {
-        max-width: 95vw !important;
-        width: 95vw !important;
-        max-height: 94vh !important;
-        height: 94vh !important;
-      }
-
-      .lyrics-modal-body {
-        padding: 24px 32px;
-      }
-
-      .lyrics-content {
-        font-size: 15px;
-        line-height: 1.7;
-      }
-
-      .modal-box {
-        max-width: 460px !important;
-      }
-
-      .tone-picker-box {
-        border-radius: 20px;
-        margin: 20px;
-      }
-
-      .musico-song-card {
-        padding: 16px 18px;
-      }
-
-      .song-card-name {
-        font-size: 18px;
-      }
-
-      .song-tone-badge {
-        font-size: 22px;
-        padding: 10px 12px;
-        min-width: 58px;
-      }
-    }
-
     /* === NUEVOS ESTILOS REORDENAMIENTO, SOS Y MODAL === */
     .btn-ver-letra {
       background: rgba(244, 197, 66, 0.08);
@@ -1531,17 +1489,6 @@
       background: rgba(0, 0, 0, 0.05);
     }
 
-    /* Responsive adjustment for top tabs menu centering and overflow */
-    .nav-tabs {
-      justify-content: center;
-    }
-
-    @media (max-width: 650px) {
-      .nav-tabs {
-        justify-content: flex-start !important;
-      }
-    }
-
     /* Avatar styling and upload indicators */
     .user-avatar-container {
       position: relative;
@@ -1632,166 +1579,164 @@
       }
     }
 
-    /* Mobile overrides for lyrics modal to prevent bottom clipping and make it full screen */
-    @media (max-width: 600px) {
-      .lyrics-modal-overlay {
-        padding: 0 !important;
-      }
-      .lyrics-modal {
-        width: 100% !important;
-        max-width: 100% !important;
-        height: 100vh !important;
-        height: 100dvh !important;
-        max-height: 100vh !important;
-        max-height: 100dvh !important;
-        border-radius: 0 !important;
-        border: none !important;
-      }
+    /* Unified mobile layout for all screen sizes (phones & tablets) */
+    .lyrics-modal-overlay {
+      padding: 0 !important;
+    }
+    .lyrics-modal {
+      width: 100% !important;
+      max-width: 100% !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      border-radius: 0 !important;
+      border: none !important;
+    }
 
-      /* Rehearsal practice modal full screen override */
-      #ensayo-practice-overlay {
-        padding: 0 !important;
-      }
-      #ensayo-practice-overlay .modal-box {
-        width: 100% !important;
-        max-width: 100% !important;
-        height: 100vh !important;
-        height: 100dvh !important;
-        max-height: 100vh !important;
-        max-height: 100dvh !important;
-        border-radius: 0 !important;
-        border: none !important;
-        padding: 20px 0 !important;
-        box-sizing: border-box !important;
-        background: var(--bg) !important;
-      }
-      #ensayo-practice-overlay .modal-box > div:first-child {
-        padding-left: 16px !important;
-        padding-right: 16px !important;
-      }
-      #practice-modal-songs {
-        gap: 0 !important;
-      }
+    /* Rehearsal practice modal full screen override */
+    #ensayo-practice-overlay {
+      padding: 0 !important;
+    }
+    #ensayo-practice-overlay .modal-box {
+      width: 100% !important;
+      max-width: 100% !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      border-radius: 0 !important;
+      border: none !important;
+      padding: 20px 0 !important;
+      box-sizing: border-box !important;
+      background: var(--bg) !important;
+    }
+    #ensayo-practice-overlay .modal-box > div:first-child {
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+    }
+    #practice-modal-songs {
+      gap: 0 !important;
+    }
 
-      /* Edge-to-edge list styling inside active tab contents */
-      .section-group-card {
-        margin-left: -16px !important;
-        margin-right: -16px !important;
-      }
-      .lyrics-modal-body {
-        padding: 16px !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        overflow-x: auto !important;
-      }
-      .lyrics-content {
-        display: inline-block !important;
-        text-align: left !important;
-        margin: 0 auto !important;
-        max-width: 100% !important;
-        font-size: 13px !important;
-        line-height: 1.6 !important;
-        word-break: normal !important;
-        word-wrap: break-word !important;
-        white-space: pre-wrap !important;
-      }
-      .lyrics-modal-footer {
-        padding: 12px 16px !important;
-        min-height: 70px !important;
-      }
+    /* Edge-to-edge list styling inside active tab contents */
+    .section-group-card {
+      margin-left: -16px !important;
+      margin-right: -16px !important;
+    }
+    .lyrics-modal-body {
+      padding: 16px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      overflow-x: auto !important;
+    }
+    .lyrics-content {
+      display: inline-block !important;
+      text-align: left !important;
+      margin: 0 auto !important;
+      max-width: 100% !important;
+      font-size: 13px !important;
+      line-height: 1.6 !important;
+      word-break: normal !important;
+      word-wrap: break-word !important;
+      white-space: pre-wrap !important;
+    }
+    .lyrics-modal-footer {
+      padding: 12px 16px !important;
+      min-height: 70px !important;
+    }
 
-      /* Fixed bottom navigation bar for mobile */
-      .nav-tabs {
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        z-index: 9990 !important;
-        background: #0f0e15 !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
-        border-bottom: none !important;
-        padding: 8px 12px calc(26px + env(safe-area-inset-bottom, 16px)) !important;
-        height: auto !important;
-        min-height: 80px !important;
-        gap: 0 !important;
-        display: flex !important;
-        justify-content: space-around !important;
-        align-items: center !important;
-        box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.5) !important;
-      }
+    /* Fixed bottom navigation bar */
+    .nav-tabs {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 9990 !important;
+      background: #0f0e15 !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+      border-bottom: none !important;
+      padding: 8px 12px calc(26px + env(safe-area-inset-bottom, 16px)) !important;
+      height: auto !important;
+      min-height: 80px !important;
+      gap: 0 !important;
+      display: flex !important;
+      justify-content: space-around !important;
+      align-items: center !important;
+      box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.5) !important;
+    }
 
-      body.theme-light .nav-tabs {
-        background: #fdfdfd !important;
-        border-top-color: rgba(0, 0, 0, 0.08) !important;
-        box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.06) !important;
-      }
+    body.theme-light .nav-tabs {
+      background: #fdfdfd !important;
+      border-top-color: rgba(0, 0, 0, 0.08) !important;
+      box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.06) !important;
+    }
 
-      .content {
-        padding-bottom: calc(125px + env(safe-area-inset-bottom, 16px)) !important;
-      }
+    .content {
+      padding-bottom: calc(125px + env(safe-area-inset-bottom, 16px)) !important;
+    }
 
-      .nav-tab, .nav-tab-musico {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 4px !important;
-        background: none !important;
-        border: none !important;
-        padding: 6px 0 !important;
-        color: #7b7899 !important;
-        opacity: 0.65 !important;
-        border-radius: 8px !important;
-        transition: all 0.25s ease !important;
-        flex: 1 !important;
-        text-align: center !important;
-        min-width: 0 !important;
-        height: 100% !important;
-        text-transform: none !important;
-        letter-spacing: normal !important;
-      }
+    .nav-tab, .nav-tab-musico {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 4px !important;
+      background: none !important;
+      border: none !important;
+      padding: 6px 0 !important;
+      color: #7b7899 !important;
+      opacity: 0.65 !important;
+      border-radius: 8px !important;
+      transition: all 0.25s ease !important;
+      flex: 1 !important;
+      text-align: center !important;
+      min-width: 0 !important;
+      height: 100% !important;
+      text-transform: none !important;
+      letter-spacing: normal !important;
+    }
 
-      .nav-tab.active {
-        color: var(--gold) !important;
-        opacity: 1 !important;
-        background: none !important;
-        border: none !important;
-      }
+    .nav-tab.active {
+      color: var(--gold) !important;
+      opacity: 1 !important;
+      background: none !important;
+      border: none !important;
+    }
 
-      .nav-tab-musico.active {
-        color: var(--gold) !important;
-        opacity: 1 !important;
-        background: none !important;
-        border: none !important;
-      }
+    .nav-tab-musico.active {
+      color: var(--gold) !important;
+      opacity: 1 !important;
+      background: none !important;
+      border: none !important;
+    }
 
-      .nav-tab .nav-icon, .nav-tab-musico .nav-icon {
-        width: 23px !important;
-        height: 23px !important;
-        display: block !important;
-        stroke: currentColor !important;
-        stroke-width: 1.8px !important;
-        fill: none !important;
-        margin-bottom: 3px !important;
-        transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-      }
+    .nav-tab .nav-icon, .nav-tab-musico .nav-icon {
+      width: 23px !important;
+      height: 23px !important;
+      display: block !important;
+      stroke: currentColor !important;
+      stroke-width: 1.8px !important;
+      fill: none !important;
+      margin-bottom: 3px !important;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    }
 
-      .nav-tab.active .nav-icon, .nav-tab-musico.active .nav-icon {
-        transform: translateY(-2px) scale(1.06) !important;
-      }
+    .nav-tab.active .nav-icon, .nav-tab-musico.active .nav-icon {
+      transform: translateY(-2px) scale(1.06) !important;
+    }
 
-      .nav-tab .nav-label, .nav-tab-musico .nav-label {
-        font-size: 10.5px !important;
-        font-weight: 500 !important;
-        display: block !important;
-        line-height: 1.2 !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        max-width: 100% !important;
-        color: inherit !important;
-      }
+    .nav-tab .nav-label, .nav-tab-musico .nav-label {
+      font-size: 10.5px !important;
+      font-weight: 500 !important;
+      display: block !important;
+      line-height: 1.2 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      max-width: 100% !important;
+      color: inherit !important;
     }
   </style>
 </head>
