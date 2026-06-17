@@ -3190,22 +3190,14 @@
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px;">
-          <!-- Card de Alabanzas -->
-          <div class="card" style="background: rgba(78, 205, 196, 0.04); border-color: rgba(78, 205, 196, 0.2); padding: 16px; margin-bottom: 0; display: flex; flex-direction: column;">
-            <h4 style="font-size: 13px; text-transform: uppercase; color: var(--teal); letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid rgba(78,205,196,0.15); padding-bottom: 6px;">
-              🔥 Alabanza (Rápidas) <span id="repertorio-alabanza-count" style="font-size: 11px; font-weight: normal; color: var(--text3); margin-left: auto;">(0)</span>
-            </h4>
-            <div class="song-list-scroll" id="repertorio-alabanzas-list" style="max-height: 400px; overflow-y: auto;"></div>
+        <!-- Lista unificada de canciones -->
+        <div class="card" style="padding: 16px; margin-top: 16px; margin-bottom: 0; display: flex; flex-direction: column;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:8px;">
+            <span style="font-size:13px; text-transform:uppercase; font-weight:700; letter-spacing:0.5px; color:var(--text2);">📚 Todas las canciones</span>
+            <span id="repertorio-total-count" style="font-size:11px; color:var(--text3); margin-left:auto;">0 canciones</span>
           </div>
-
-          <!-- Card de Adoración -->
-          <div class="card" style="background: rgba(155, 143, 255, 0.04); border-color: rgba(155, 143, 255, 0.2); padding: 16px; margin-bottom: 0; display: flex; flex-direction: column;">
-            <h4 style="font-size: 13px; text-transform: uppercase; color: var(--purple); letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid rgba(155,143,255,0.15); padding-bottom: 6px;">
-              🙏 Adoración (Lentas) <span id="repertorio-adoracion-count" style="font-size: 11px; font-weight: normal; color: var(--text3); margin-left: auto;">(0)</span>
-            </h4>
-            <div class="song-list-scroll" id="repertorio-adoraciones-list" style="max-height: 400px; overflow-y: auto;"></div>
-          </div>
+          <input type="text" id="search-admin-canciones" placeholder="🔍 Buscar por nombre o artista..." style="width:100%; padding:8px 12px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; margin-bottom:10px; outline:none;">
+          <div class="song-list-scroll" id="repertorio-todas-list" style="max-height: 560px; overflow-y: auto;"></div>
         </div>
       </div>
 
@@ -3994,28 +3986,46 @@
               return;
             }
 
-            // Mostrar un indicador básico de carga
             btnImportSongs.textContent = "⏳ Importando...";
             btnImportSongs.disabled = true;
 
+            // Construir set de canciones existentes (nombre+artista en minúsculas) para evitar duplicados
+            const existingKeys = new Set(
+              (cacheSongs || []).map(s =>
+                `${(s.nombre || '').toLowerCase().trim()}||${(s.artista || '').toLowerCase().trim()}`
+              )
+            );
+
             let importedCount = 0;
+            let skippedCount = 0;
+
             for (const item of songsArray) {
+              const nombre = (item.nombre || item.title || item.titulo || "").trim();
+              const artista = (item.artista || item.artist || "").trim() || "Desconocido";
+              if (!nombre) continue;
+
+              // Verificar duplicado
+              const key = `${nombre.toLowerCase()}||${artista.toLowerCase()}`;
+              if (existingKeys.has(key)) {
+                skippedCount++;
+                continue;
+              }
+              existingKeys.add(key); // Agregar al set para evitar duplicados dentro del mismo JSON
+
               const idUnico = "song_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
               const payload = {
-                nombre: (item.nombre || item.title || item.titulo || "").trim(),
-                artista: (item.artista || item.artist || "").trim() || "Desconocido",
+                nombre,
+                artista,
                 tonoBase: (item.tonoBase || item.key || item.tono || "C").trim(),
                 tipo: ((item.tipo || item.type || "alabanza").toLowerCase().includes("adora") ? "adoracion" : "alabanza"),
                 youtube: (item.youtube || item.url || "").trim(),
                 letra: item.letra || item.lyrics || item.content || ""
               };
 
-              if (payload.nombre) {
-                await setDoc(doc(db, "biblioteca_canciones", idUnico), payload);
-                importedCount++;
-              }
+              await setDoc(doc(db, "biblioteca_canciones", idUnico), payload);
+              importedCount++;
             }
-            alert(`¡Éxito! Se importaron ${importedCount} canciones al repertorio.`);
+            alert(`¡Éxito!\n\n✅ Importadas: ${importedCount} canciones.\n⚠️ Omitidas (duplicadas): ${skippedCount}.`);
           } catch(err) {
             alert("Error al procesar el archivo JSON: " + err.message);
           } finally {
@@ -4767,10 +4777,25 @@
     // ====================================================
     document.getElementById('form-add-song').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const nombre = document.getElementById('song-name-input').value.trim();
+      const artista = document.getElementById('song-artist-input').value.trim();
+
+      // Verificar duplicado solo al AGREGAR (no al editar)
+      if (!editingSongId) {
+        const key = `${nombre.toLowerCase()}||${artista.toLowerCase()}`;
+        const existe = (cacheSongs || []).some(s =>
+          `${(s.nombre || '').toLowerCase()}||${(s.artista || '').toLowerCase()}` === key
+        );
+        if (existe) {
+          alert(`⚠️ Ya existe "${nombre}" de ${artista} en el catálogo.\n\nNo se puede agregar duplicado.`);
+          return;
+        }
+      }
+
       const idUnico = editingSongId || ("song_" + Date.now());
       const payload = {
-        nombre: document.getElementById('song-name-input').value.trim(),
-        artista: document.getElementById('song-artist-input').value.trim(),
+        nombre,
+        artista,
         tonoBase: document.getElementById('song-key-input').value.trim(),
         tipo: document.getElementById('song-type-input').value,
         youtube: document.getElementById('song-youtube-input').value.trim(),
@@ -4779,8 +4804,112 @@
       await setDoc(doc(db, "biblioteca_canciones", idUnico), payload);
       const wasEditing = !!editingSongId;
       resetSongForm();
-      alert(wasEditing ? "Canción actualizada." : "Canción añadida al catálogo global.");
+      showToast(wasEditing ? "✅ Canción actualizada." : "✅ Canción añadida al catálogo.");
     });
+
+    // ====================================================
+    // IMPORTAR DESDE LACUERDA — fetch por URL
+    // ====================================================
+    document.getElementById('btn-fetch-lacuerda').addEventListener('click', async () => {
+      const urlInput = document.getElementById('lacuerda-url-input');
+      const statusEl = document.getElementById('lacuerda-fetch-status');
+      const url = (urlInput.value || '').trim();
+
+      if (!url) {
+        statusEl.textContent = '⚠️ Pega el link de la canción primero.';
+        statusEl.style.color = 'var(--gold)';
+        return;
+      }
+      if (!url.includes('lacuerda.net')) {
+        statusEl.textContent = '⚠️ El link debe ser de lacuerda.net';
+        statusEl.style.color = 'var(--gold)';
+        return;
+      }
+
+      statusEl.textContent = '⏳ Buscando canción...';
+      statusEl.style.color = 'var(--text3)';
+      document.getElementById('btn-fetch-lacuerda').disabled = true;
+
+      try {
+        // Usar proxy CORS para poder hacer el fetch desde el navegador
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+        const resp = await fetch(proxyUrl);
+        if (!resp.ok) throw new Error('No se pudo cargar la página.');
+        const html = await resp.text();
+        const doc2 = new DOMParser().parseFromString(html, 'text/html');
+
+        // --- Extraer nombre de la canción ---
+        let nombre = '';
+        const h1 = doc2.querySelector('h1');
+        if (h1) {
+          nombre = h1.textContent
+            .replace(/acordes de/i, '')
+            .replace(/tabs de/i, '')
+            .replace(/letra de/i, '')
+            .trim();
+        }
+        if (!nombre) {
+          nombre = doc2.title
+            .split('-')[0]
+            .replace(/acordes/i, '')
+            .replace(/tabs/i, '')
+            .trim();
+        }
+
+        // --- Extraer artista desde la URL ---
+        let artista = '';
+        try {
+          const urlObj = new URL(url);
+          const parts = urlObj.pathname.split('/').filter(Boolean);
+          if (parts.length >= 1) {
+            artista = parts[0]
+              .replace(/_/g, ' ')
+              .replace(/-/g, ' ')
+              .replace(/\b\w/g, c => c.toUpperCase());
+          }
+        } catch(_) {}
+
+        // --- Extraer tono ---
+        let tonoBase = 'C';
+        const bodyText = doc2.body?.innerText || html;
+        const tonoMatch = bodyText.match(/[Tt]ono[:\s]+([A-Ga-g][#bm]*)/);
+        if (tonoMatch) tonoBase = tonoMatch[1];
+
+        // --- Extraer letra/acordes ---
+        let letra = '';
+        const pre = doc2.querySelector('pre');
+        if (pre) {
+          letra = pre.textContent || '';
+        }
+
+        // --- Rellenar el formulario ---
+        if (nombre) document.getElementById('song-name-input').value = nombre;
+        if (artista) document.getElementById('song-artist-input').value = artista;
+
+        const keySelect = document.getElementById('song-key-input');
+        if (keySelect) {
+          const opt = Array.from(keySelect.options).find(o => o.value === tonoBase);
+          if (opt) keySelect.value = tonoBase;
+        }
+
+        if (letra) document.getElementById('song-lyrics-input').value = letra;
+
+        if (nombre && artista) {
+          statusEl.textContent = `✅ Importado: "${nombre}" de ${artista}`;
+          statusEl.style.color = 'var(--teal)';
+          urlInput.value = '';
+        } else {
+          statusEl.textContent = '⚠️ Se importó pero algunos campos pueden estar vacíos. Verifica.';
+          statusEl.style.color = 'var(--gold)';
+        }
+      } catch(err) {
+        statusEl.textContent = `❌ Error: ${err.message}`;
+        statusEl.style.color = 'var(--coral)';
+      } finally {
+        document.getElementById('btn-fetch-lacuerda').disabled = false;
+      }
+    });
+
 
     function calcularTiempoTranscurrido(fechaStr) {
       if (!fechaStr) return "Nunca tocada";
@@ -4817,41 +4946,39 @@
     }
 
     function renderizarMantenimientoCanciones() {
-      const alabList = document.getElementById('repertorio-alabanzas-list');
-      const adorList = document.getElementById('repertorio-adoraciones-list');
-      const alabCount = document.getElementById('repertorio-alabanza-count');
-      const adorCount = document.getElementById('repertorio-adoracion-count');
+      const todasList = document.getElementById('repertorio-todas-list');
+      const totalCount = document.getElementById('repertorio-total-count');
 
-      if (!alabList || !adorList) return;
+      if (!todasList) return;
 
-      alabList.innerHTML = "";
-      adorList.innerHTML = "";
+      const query = (document.getElementById('search-admin-canciones')?.value || '').toLowerCase().trim();
 
-      // Safe filtering with case-insensitive trim and alabanza default fallback
-      const alabanzas = cacheSongs.filter(s => {
-        if (!s) return false;
-        const tipoVal = (s.tipo || 'alabanza').trim().toLowerCase();
-        return tipoVal === 'alabanza';
-      });
-      const adoraciones = cacheSongs.filter(s => {
-        if (!s) return false;
-        const tipoVal = (s.tipo || 'alabanza').trim().toLowerCase();
-        return tipoVal === 'adoracion' || tipoVal === 'adoración';
-      });
+      todasList.innerHTML = "";
 
-      alabanzas.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
-      adoraciones.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+      // Todas las canciones ordenadas alfabéticamente
+      const todas = [...cacheSongs].filter(s => !!s).sort((a, b) =>
+        (a.nombre || '').localeCompare(b.nombre || '')
+      );
 
-      if (alabCount) alabCount.textContent = `(${alabanzas.length})`;
-      if (adorCount) adorCount.textContent = `(${adoraciones.length})`;
+      // Aplicar filtro de búsqueda
+      const filtradas = todas.filter(s =>
+        !query ||
+        (s.nombre || '').toLowerCase().includes(query) ||
+        (s.artista || '').toLowerCase().includes(query)
+      );
 
-      const populateList = (list, container, colorClass) => {
-        if (list.length === 0) {
-          container.innerHTML = "<p style='color:var(--text3);font-size:12px;text-align:center;padding:15px;'>Lista vacía.</p>";
-          return;
-        }
+      if (totalCount) {
+        totalCount.textContent = query
+          ? `${filtradas.length} de ${todas.length} canciones`
+          : `${todas.length} canciones`;
+      }
 
-        list.forEach(s => {
+      if (filtradas.length === 0) {
+        todasList.innerHTML = "<p style='color:var(--text3);font-size:12px;text-align:center;padding:20px;'>No se encontraron canciones.</p>";
+      } else {
+        const keysOptions = ['C','Cm','C#','C#m','D','Dm','D#','D#m','E','Em','F','Fm','F#','F#m','G','Gm','G#','G#m','A','Am','A#','A#m','B','Bm'];
+
+        filtradas.forEach(s => {
           const ultimaVezText = obtenerUltimaVezCantada(s.id);
           let tagColor = "var(--text3)";
           if (ultimaVezText.includes("semana") || ultimaVezText.includes("día") || ultimaVezText === "Hoy" || ultimaVezText === "Ayer") {
@@ -4860,24 +4987,14 @@
             tagColor = "var(--purple)";
           }
 
-          const isAlabanza = s.tipo === 'alabanza';
-          const cardBorder = isAlabanza 
-            ? 'border-left: 4px solid var(--teal) !important; border-color: rgba(78, 205, 196, 0.25) !important;' 
-            : 'border-left: 4px solid var(--purple) !important; border-color: rgba(155, 143, 255, 0.25) !important;';
-          const cardBg = isAlabanza 
-            ? 'background: rgba(78, 205, 196, 0.04) !important;' 
-            : 'background: rgba(155, 143, 255, 0.04) !important;';
-          const badgeStyle = isAlabanza
-            ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
-            : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
+          const hasLetra = s.letra && s.letra.trim() !== '';
 
           const div = document.createElement('div');
           div.className = "musico-song-card";
-          div.style.cssText = `${cardBg} ${cardBorder} margin-bottom: 8px !important; border-radius: var(--radius-sm) !important; border-bottom: 1px solid var(--border) !important;`;
-          
+          div.style.cssText = `margin-bottom: 8px !important; border-radius: var(--radius-sm) !important;`;
+
           div.innerHTML = `
-            <!-- Centro: Info -->
-            <div class="song-card-info" style="margin-left: 4px;">
+            <div class="song-card-info" style="margin-left: 4px; flex:1; min-width:0;">
               <div class="song-card-name" style="font-size:14px; font-weight: 600;">${s.nombre}</div>
               <div class="song-card-artist" style="font-size:11px; color: var(--text2); display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
                 <span>${s.artista}</span>
@@ -4887,16 +5004,36 @@
                 </span>
               </div>
             </div>
-            
-            <!-- Extremo Derecho: Tono y Acciones -->
-            <div style="display:flex; align-items:center; gap: 8px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
-              <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; ${badgeStyle}">Base: ${s.tonoBase}</div>
+
+            <div style="display:flex; align-items:center; gap: 6px; margin-left:auto; flex-shrink:0; padding-right: 4px;">
+              <select class="select-admin-tone" title="Cambiar tono base" style="background:var(--bg3); border:1px solid rgba(244,197,66,0.4); color:var(--gold); border-radius:6px; padding:4px 6px; font-size:11px; font-family:var(--font-body); outline:none; cursor:pointer; font-weight:600;">
+                ${keysOptions.map(t => `<option value="${t}" ${t === s.tonoBase ? 'selected' : ''}>${t}</option>`).join('')}
+              </select>
+              ${hasLetra ? `<button class="btn-ver-letra admin-ver-letra" style="margin: 0; padding: 5px 10px; font-size: 11px;">📄 Ver Letra</button>` : ''}
               ${currentUserRole === 'lider' ? `
-                <button class="chip chip-teal click-edit-song" style="cursor:pointer; border:none; padding: 6px 12px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Editar">✏️ Editar</button>
-                <button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 6px 12px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Eliminar">🗑️</button>
+                <button class="chip chip-teal click-edit-song" style="cursor:pointer; border:none; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Editar">✏️ Editar</button>
+                <button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Eliminar">🗑️</button>
               ` : ''}
             </div>
           `;
+
+          // Selector de tono
+          const toneSelect = div.querySelector('.select-admin-tone');
+          if (toneSelect) {
+            toneSelect.addEventListener('change', async (ev) => {
+              const nuevoTono = ev.target.value;
+              await setDoc(doc(db, "biblioteca_canciones", s.id), { ...s, tonoBase: nuevoTono });
+              showToast(`🎵 Tono de "${s.nombre}" → ${nuevoTono}`);
+            });
+          }
+
+          // Ver Letra
+          const verLetraBtn = div.querySelector('.admin-ver-letra');
+          if (verLetraBtn) {
+            verLetraBtn.addEventListener('click', () => {
+              if (window.abrirModalLetraGlobal) window.abrirModalLetraGlobal(s.id, cacheSongs);
+            });
+          }
 
           if (currentUserRole === 'lider') {
             const editBtn = div.querySelector('.click-edit-song');
@@ -4917,8 +5054,6 @@
                   btnSubmit.textContent = "Actualizar Canción";
                   btnSubmit.style.background = "var(--teal)";
                 }
-
-                // Open modal
                 const modal = document.getElementById('admin-song-modal');
                 const title = document.getElementById('song-modal-title');
                 if (title) title.textContent = "Editar Canción";
@@ -4934,12 +5069,16 @@
               });
             }
           }
-          container.appendChild(div);
+          todasList.appendChild(div);
         });
-      };
+      }
 
-      populateList(alabanzas, alabList, 'var(--teal)');
-      populateList(adoraciones, adorList, 'var(--purple)');
+      // Listener de búsqueda en tiempo real
+      const searchInput = document.getElementById('search-admin-canciones');
+      if (searchInput && !searchInput.dataset.listenerAdded) {
+        searchInput.dataset.listenerAdded = '1';
+        searchInput.addEventListener('input', () => renderizarMantenimientoCanciones());
+      }
     }
 
 
@@ -6809,6 +6948,20 @@
       <h2 class="modal-title" id="song-modal-title" style="color: var(--teal);">Agregar Nueva Canción</h2>
       <p class="modal-subtitle" style="margin-bottom: 16px;">Completa los datos de la canción para guardarla en el repertorio global.</p>
       <form id="form-add-song">
+
+        <!-- Campo Importar desde LaCuerda -->
+        <div class="field" style="background:rgba(78,205,196,0.05); border:1.5px dashed rgba(78,205,196,0.3); border-radius:var(--radius-sm); padding:12px; margin-bottom:14px;">
+          <label style="color:var(--teal); font-weight:700; font-size:12px;">🔗 Importar desde LaCuerda <span style="font-weight:400; color:var(--text3);">(pega el link de la canción)</span></label>
+          <div style="display:flex; gap:8px; margin-top:6px;">
+            <input type="url" id="lacuerda-url-input" placeholder="https://www.lacuerda.net/artista/cancion/"
+              style="flex:1; padding:8px 10px; background:var(--bg); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-size:13px; outline:none;">
+            <button type="button" id="btn-fetch-lacuerda"
+              style="padding:8px 14px; background:var(--teal); color:#0f0e17; border:none; border-radius:var(--radius-sm); font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap;"
+            >🚀 Importar</button>
+          </div>
+          <p id="lacuerda-fetch-status" style="font-size:11px; color:var(--text3); margin-top:5px; min-height:16px;"></p>
+        </div>
+
         <div class="field"><label>Nombre de la Canción</label><input type="text" id="song-name-input" required
             placeholder="Ej: Grande y Fuerte"></div>
         <div class="field"><label>Artista / Ministerio</label><input type="text" id="song-artist-input" required
@@ -6843,7 +6996,7 @@
             <option value="Bm">Bm (Si menor)</option>
           </select>
         </div>
-        <div class="field">
+        <div class="field" style="display:none;">
           <label>Tipo de Canción</label>
           <select id="song-type-input">
             <option value="alabanza">Alabanza (Rápida)</option>
