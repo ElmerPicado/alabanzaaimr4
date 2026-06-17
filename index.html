@@ -1225,6 +1225,53 @@
       background: rgba(244, 197, 66, 0.25);
     }
 
+    /* === REPERTORIO ACTION BUTTONS === */
+    .repertorio-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      font-family: var(--font-body);
+      min-height: 32px;
+      box-sizing: border-box;
+      border: 1px solid transparent;
+      user-select: none;
+    }
+    .repertorio-btn-youtube {
+      background: rgba(255, 107, 107, 0.08);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      color: var(--coral);
+      box-shadow: 0 2px 6px rgba(255, 107, 107, 0.1);
+    }
+    .repertorio-btn-youtube:hover {
+      background: rgba(255, 107, 107, 0.15);
+      transform: translateY(-1px);
+    }
+    .repertorio-btn-youtube:active {
+      transform: scale(0.96);
+      background: rgba(255, 107, 107, 0.25);
+    }
+    .repertorio-btn-letra {
+      background: rgba(78, 205, 196, 0.08);
+      border: 1px solid rgba(78, 205, 196, 0.3);
+      color: var(--teal);
+      box-shadow: 0 2px 6px rgba(78, 205, 196, 0.1);
+    }
+    .repertorio-btn-letra:hover {
+      background: rgba(78, 205, 196, 0.15);
+      transform: translateY(-1px);
+    }
+    .repertorio-btn-letra:active {
+      transform: scale(0.96);
+      background: rgba(78, 205, 196, 0.25);
+    }
+
     .btn-remove-song {
       position: absolute;
       top: 6px;
@@ -1397,6 +1444,31 @@
       background: rgba(230, 92, 0, 0.25);
     }
 
+    body.theme-light .repertorio-btn-youtube {
+      background: rgba(255, 68, 68, 0.08);
+      border-color: rgba(255, 68, 68, 0.3);
+      color: #cc0000;
+      box-shadow: 0 2px 6px rgba(255, 68, 68, 0.1);
+    }
+    body.theme-light .repertorio-btn-youtube:hover {
+      background: rgba(255, 68, 68, 0.15);
+    }
+    body.theme-light .repertorio-btn-youtube:active {
+      background: rgba(255, 68, 68, 0.25);
+    }
+    body.theme-light .repertorio-btn-letra {
+      background: rgba(0, 150, 136, 0.08);
+      border-color: rgba(0, 150, 136, 0.3);
+      color: #00796b;
+      box-shadow: 0 2px 6px rgba(0, 150, 136, 0.1);
+    }
+    body.theme-light .repertorio-btn-letra:hover {
+      background: rgba(0, 150, 136, 0.15);
+    }
+    body.theme-light .repertorio-btn-letra:active {
+      background: rgba(0, 150, 136, 0.25);
+    }
+
     body.theme-light .order-btn {
       background: #f4f5f8;
       border-color: rgba(0, 0, 0, 0.1);
@@ -1526,6 +1598,21 @@
       }
       .lyrics-modal-body {
         padding: 16px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        overflow-x: auto !important;
+      }
+      .lyrics-content {
+        display: inline-block !important;
+        text-align: left !important;
+        margin: 0 auto !important;
+        max-width: 100% !important;
+        font-size: 13px !important;
+        line-height: 1.6 !important;
+        word-break: normal !important;
+        word-wrap: break-word !important;
+        white-space: pre-wrap !important;
       }
       .lyrics-modal-footer {
         padding: 12px 16px !important;
@@ -2452,7 +2539,7 @@
             const btnLetra = songCard.querySelector('.btn-ver-letra-modal');
             if (btnLetra) {
               btnLetra.addEventListener('click', () => {
-                window.abrirModalLetraGlobal(s.id);
+                window.abrirModalLetraGlobal(s.id, rehearsalSongs);
               });
             }
             
@@ -4571,10 +4658,10 @@
           row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04);';
 
           const youtubeBtn = s.youtube && s.youtube.trim()
-            ? `<a href="${s.youtube}" target="_blank" class="chip chip-coral" style="text-decoration:none; padding:4px 8px; font-size:11px; display:inline-flex; align-items:center; gap:3px;">▶ YouTube</a>`
+            ? `<a href="${s.youtube}" target="_blank" class="repertorio-action-btn repertorio-btn-youtube">▶ YouTube</a>`
             : '';
           const lyricsBtn = s.letra && s.letra.trim()
-            ? `<button class="chip chip-teal view-lyrics-btn" data-id="${s.id}" style="border:none; cursor:pointer; padding:4px 8px; font-size:11px; display:inline-flex; align-items:center; gap:3px;">📖 Letra</button>`
+            ? `<button class="repertorio-action-btn repertorio-btn-letra view-lyrics-btn" data-id="${s.id}">📖 Letra</button>`
             : '';
 
           row.innerHTML = `
@@ -4592,7 +4679,7 @@
           if (btnLy) {
             btnLy.onclick = () => {
               if (window.abrirModalLetraGlobal) {
-                window.abrirModalLetraGlobal(s.id);
+                window.abrirModalLetraGlobal(s.id, filteredRapidas);
               }
             };
           }
@@ -4610,10 +4697,10 @@
           row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04);';
 
           const youtubeBtn = s.youtube && s.youtube.trim()
-            ? `<a href="${s.youtube}" target="_blank" class="chip chip-coral" style="text-decoration:none; padding:4px 8px; font-size:11px; display:inline-flex; align-items:center; gap:3px;">▶ YouTube</a>`
+            ? `<a href="${s.youtube}" target="_blank" class="repertorio-action-btn repertorio-btn-youtube">▶ YouTube</a>`
             : '';
           const lyricsBtn = s.letra && s.letra.trim()
-            ? `<button class="chip chip-teal view-lyrics-btn" data-id="${s.id}" style="border:none; cursor:pointer; padding:4px 8px; font-size:11px; display:inline-flex; align-items:center; gap:3px;">📖 Letra</button>`
+            ? `<button class="repertorio-action-btn repertorio-btn-letra view-lyrics-btn" data-id="${s.id}">📖 Letra</button>`
             : '';
 
           row.innerHTML = `
@@ -4631,7 +4718,7 @@
           if (btnLy) {
             btnLy.onclick = () => {
               if (window.abrirModalLetraGlobal) {
-                window.abrirModalLetraGlobal(s.id);
+                window.abrirModalLetraGlobal(s.id, filteredLentas);
               }
             };
           }
@@ -4775,7 +4862,7 @@
                 <div class="song-card-artist" style="color: var(--text2); font-size: 12px;">${s.artista}</div>
                 ${hasLetra ? `
                   <div style="margin-top: 4px;">
-                    <button class="btn-ver-letra" onclick="window.abrirModalLetraGlobal('${s.id}')">
+                    <button class="btn-ver-letra" onclick="window.abrirModalLetraGlobal('${s.id}', window._currentServiceSongs)">
                       📄 Ver Letra
                     </button>
                   </div>
@@ -5051,7 +5138,7 @@
       }).join('\\n');
     }
 
-    window.abrirModalLetraGlobal = function (cancionId) {
+    window.abrirModalLetraGlobal = function (cancionId, playlistContext) {
       const cache = window._lyricsCache || {};
       let song = cache[cancionId];
       if (!song) {
@@ -5158,7 +5245,7 @@
       document.getElementById('lyrics-modal-overlay').classList.add('active');
 
       // Configurar Paginación
-      const currentList = window._currentServiceSongs || [];
+      const currentList = playlistContext || window._currentServiceSongs || [];
       const currentIndex = currentList.findIndex(s => s.id === cancionId);
 
       const prevBtn = document.getElementById('lyrics-modal-prev');
@@ -5184,7 +5271,7 @@
             prevBtn.style.opacity = '1';
             prevBtn.style.pointerEvents = 'auto';
             prevBtn.onclick = () => {
-              window.abrirModalLetraGlobal(prevSong.id);
+              window.abrirModalLetraGlobal(prevSong.id, currentList);
             };
           } else {
             prevBtn.innerHTML = `◀ Anterior`;
@@ -5209,7 +5296,7 @@
             nextBtn.style.opacity = '1';
             nextBtn.style.pointerEvents = 'auto';
             nextBtn.onclick = () => {
-              window.abrirModalLetraGlobal(nextSong.id);
+              window.abrirModalLetraGlobal(nextSong.id, currentList);
             };
           } else {
             nextBtn.innerHTML = `Siguiente ▶`;
@@ -5502,7 +5589,7 @@
                 <div class="song-card-artist" style="font-size:11px; color: var(--text2);">${s.artista}</div>
                 ${hasLetra ? `
                   <div style="margin-top: 4px;">
-                    <button class="btn-ver-letra" onclick="window.abrirModalLetraGlobal('${s.id}')">
+                    <button class="btn-ver-letra" onclick="window.abrirModalLetraGlobal('${s.id}', window._currentServiceSongs)">
                       📄 Ver Letra
                     </button>
                   </div>
