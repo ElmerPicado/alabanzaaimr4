@@ -4310,7 +4310,7 @@
               }
             }
           }
-          showToast(`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> ¡Se corrigieron ${fixedCount} canciones!`);
+          showToast(`¡Se corrigieron ${fixedCount} canciones!`);
         } catch(e) {
           console.error("Error corrigiendo tonos:", e);
           showToast("Error durante la corrección masiva.");
@@ -4812,7 +4812,7 @@
             nota_adicional: val,
             mensajeEditado: deleteField()
           });
-          showToast('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg> Nota guardada — el mensaje de WhatsApp se actualizó');
+          showToast('Nota guardada — el mensaje de WhatsApp se actualizó');
         });
       }
 
@@ -5481,7 +5481,7 @@
         toneSelect.addEventListener('change', async (ev) => {
           const nuevoTono = ev.target.value;
           await updateDoc(doc(db, "biblioteca_canciones", s.id), { tonoBase: nuevoTono });
-          showToast(`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> Tono de "${s.nombre}" → ${nuevoTono}`);
+          showToast(`Tono de "${s.nombre}" → ${nuevoTono}`);
         });
       }
 
@@ -6222,7 +6222,7 @@
           const prev = (window._prevCambiosTono || {})[songId];
           if (prev && info.timestamp !== prev.timestamp && info.usuario !== activeSessionUser.nombre) {
             const song = cacheSongs.find(s => s.id === songId) || (data.customSongsMetadata && data.customSongsMetadata[songId]);
-            showToast(`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> ${info.usuario} cambió "${song ? song.nombre : songId}" → ${info.tono}`);
+            showToast(`${info.usuario} cambió "${song ? song.nombre : songId}" → ${info.tono}`);
           }
         }
         window._prevCambiosTono = Object.assign({}, cambios);
@@ -7549,7 +7549,7 @@
         
         try {
           await updateDoc(docRef, updates);
-          showToast(`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> Se agregaron ${window._selectedSongsToAdd.size} canciones.`);
+          showToast(`Se agregaron ${window._selectedSongsToAdd.size} canciones.`);
           document.getElementById('musico-add-song-modal').classList.remove('active');
           window._selectedSongsToAdd.clear();
           renderAddSongResults(type, document.getElementById('musico-add-song-search').value.trim());
