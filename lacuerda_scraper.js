@@ -89,7 +89,9 @@
       const doc2 = new DOMParser().parseFromString(html, 'text/html');
       
       // Letra y acordes (están en <pre id="tCode"> o en el primer <pre> que aparezca)
-      const pre = doc2.getElementById('tCode') || doc2.querySelector('pre');
+      // Buscamos el <pre> que tenga contenido (más de 10 caracteres) para evitar el <pre id='tCode'></pre> vacío
+      const preElements = Array.from(doc2.querySelectorAll('pre, PRE'));
+      const pre = preElements.find(p => p.textContent.trim().length > 10) || preElements[0];
       const letra = pre ? pre.textContent : '';
 
       // === DETECCIÓN DEL TONO BASE (KEY) ===
@@ -98,7 +100,9 @@
       // LaCuerda define los acordes utilizados en una variable javascript global: odes='C G Am F...'
       const odesMatch = html.match(/odes\s*=\s*['"]([^'"]+)['"]/);
       if (odesMatch) {
-        const chords = odesMatch[1].split(/\s+/).filter(Boolean);
+        // Reemplazar @ con # para los sostenidos (LaCuerda usa @ internamente para #)
+        const cleanOdes = odesMatch[1].replace(/@/g, '#');
+        const chords = cleanOdes.split(/\s+/).filter(Boolean);
         if (chords.length > 0) {
           const primerAcorde = chords[0];
           // Limpiar el acorde para obtener solo la nota raíz y si es menor (ej. Ab, Bbm, F#)
