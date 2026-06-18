@@ -3375,7 +3375,6 @@
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button id="btn-add-song-global" class="btn-primary admin-only" style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;"> Nueva Canción</button>
             <button id="btn-import-songs" class="btn-primary admin-only" style="background: var(--purple); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">📥 Importar JSON</button>
-            <button id="btn-fix-tones-global" class="btn-primary admin-only" style="background: var(--gold); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">🛠️ Auto-Corregir Tonos</button>
             <input type="file" id="import-songs-file" accept=".json" style="display:none;">
           </div>
         </div>
@@ -4276,48 +4275,6 @@
     if (btnImportSongs && importSongsFile) {
       btnImportSongs.addEventListener('click', () => {
         importSongsFile.click();
-      });
-    }
-
-    const btnFixTones = document.getElementById('btn-fix-tones-global');
-    if (btnFixTones) {
-      btnFixTones.addEventListener('click', async () => {
-        if (!confirm("¿Seguro que deseas escanear todas las canciones guardadas con Tono Base 'C' y tratar de auto-corregirlas leyendo el primer acorde de sus letras?")) return;
-        
-        let fixedCount = 0;
-        showToast("Escaneando canciones en C...");
-        btnFixTones.disabled = true;
-        
-        try {
-          const songsToFix = (window.cacheSongs || []).filter(s => s.tonoBase === 'C' && s.letra);
-          const mapAcordes = { 'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B' };
-          const chordRegex = /\b(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])[#bm]*\b/i;
-          
-          for (const s of songsToFix) {
-            const firstChordMatch = s.letra.match(chordRegex);
-            if (firstChordMatch) {
-              let chordFound = firstChordMatch[0].toUpperCase();
-              Object.keys(mapAcordes).forEach(k => {
-                if (chordFound.startsWith(k)) chordFound = chordFound.replace(k, mapAcordes[k]);
-              });
-              const cleanMatch = chordFound.match(/^([CDEFGAB][#bm]*)/);
-              if (cleanMatch) {
-                const newTone = cleanMatch[1];
-                if (newTone !== 'C') {
-                  const docRef = doc(db, "canciones_global", s.id);
-                  await updateDoc(docRef, { tonoBase: newTone });
-                  fixedCount++;
-                }
-              }
-            }
-          }
-          showToast(`¡Se corrigieron ${fixedCount} canciones!`);
-        } catch(e) {
-          console.error("Error corrigiendo tonos:", e);
-          showToast("Error durante la corrección masiva.");
-        } finally {
-          btnFixTones.disabled = false;
-        }
       });
 
       importSongsFile.addEventListener('change', async (e) => {
