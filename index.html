@@ -1971,8 +1971,8 @@
 
     /* Edge-to-edge list styling inside active tab contents */
     .section-group-card {
-      margin-left: -16px !important;
-      margin-right: -16px !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
     }
     .lyrics-modal-body {
       padding: 16px !important;
@@ -2469,7 +2469,7 @@
                   canciones: selectedSongIds,
                   tonos: tonos
                 });
-                showToast(`✅ Ensayo "${etiqueta}" actualizado`);
+                showToast(`Ensayo "${etiqueta}" actualizado`);
               } else {
                 // CREATE
                 await addDoc(collection(db, 'ensayos'), {
@@ -2481,7 +2481,7 @@
                   tonos: tonos,
                   confirmaciones: {}
                 });
-                showToast(`✅ Ensayo "${etiqueta}" creado`);
+                showToast(`Ensayo "${etiqueta}" creado`);
               }
 
               if (modalEnsayo) modalEnsayo.classList.remove('active');
@@ -2495,8 +2495,8 @@
 
               // Handle WhatsApp notification if selected
               if (notifyVal === 'both') {
-                let msg = `✨ *CONVOCATORIA A ENSAYO* ✨\n\n`;
-                msg += `🎵 *Ensayo:* ${etiqueta}\n`;
+                let msg = `*CONVOCATORIA A ENSAYO*\n\n`;
+                msg += `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> *Ensayo:* ${etiqueta}\n`;
                 msg += `📅 *Fecha:* ${fecha}\n`;
                 msg += `⏰ *Hora:* ${hora ? hora : 'No especificada'}\n\n`;
 
@@ -2513,15 +2513,15 @@
                   .join(', ');
 
                 if (musiciansNames) {
-                  msg += `🎹 *Músicos Convocados:* ${musiciansNames}\n`;
+                  msg += `*Músicos Convocados:* ${musiciansNames}\n`;
                 }
                 if (singersNames) {
-                  msg += `🎤 *Voces Convocadas:* ${singersNames}\n`;
+                  msg += `*Voces Convocadas:* ${singersNames}\n`;
                 }
                 msg += `\n`;
 
                 if (selectedSongIds.length > 0) {
-                  msg += `🎶 *Canciones a ensayar:* \n`;
+                  msg += ` *Canciones a ensayar:* \n`;
                   selectedSongIds.forEach((sid, idx) => {
                     const s = (window.cacheSongs || []).find(x => x.id === sid);
                     if (s) {
@@ -2698,8 +2698,8 @@
           });
         };
 
-        renderSection('🎹 Músicos', musicos);
-        renderSection('🎤 Voces', voces);
+        renderSection('Músicos', musicos);
+        renderSection('Voces', voces);
       }
     </script>
 
@@ -2745,10 +2745,10 @@
             card.innerHTML = `
             <div class="ensayo-card-wrapper">
               <div class="ensayo-card-info">
-                <div class="ensayo-card-title">🎵 ${e.nombre}</div>
+                <div class="ensayo-card-title"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> ${e.nombre}</div>
                 <div class="ensayo-card-date">📅 ${(e.fecha || '').split('-').reverse().join('/')}${e.hora ? ' &nbsp;⏰ ' + e.hora : ''}</div>
                 <div class="ensayo-card-confirmations">👥 ${confirmados}/${totalMiembros} confirmados</div>
-                <div class="ensayo-card-songs">🎶 ${songNames}</div>
+                <div class="ensayo-card-songs"> ${songNames}</div>
               </div>
               <div class="ensayo-card-actions">
                 <button class="btn-ver-conf chip chip-teal">👁 Confirmaciones</button>
@@ -2850,13 +2850,13 @@
             const m = (window.cacheMembers || []).find(x => x.usuario === uid);
             const nombre = m ? m.nombre : uid;
             const statusVal = confs[uid];
-            let estado = '❌ Sin confirmar';
+            let estado = 'Sin confirmar';
             if (statusVal === true || statusVal === 'confirmado') {
-              estado = '✅ Confirmado';
+              estado = 'Confirmado';
             } else if (statusVal === 'indeciso') {
-              estado = '❓ No sé aún';
+              estado = 'No sé aún';
             } else if (statusVal === false || statusVal === 'ausente') {
-              estado = '❌ No puede';
+              estado = 'No puede';
             }
             lista += `\n  • ${nombre}: ${estado}`;
           });
@@ -2909,11 +2909,11 @@
 
             let statusText = 'Mi asistencia: <span style="color:var(--text3);">Sin confirmar</span>';
             if (status === 'confirmado') {
-              statusText = 'Mi asistencia: <span style="color:var(--teal); font-weight:bold;">✅ Confirmado</span>';
+              statusText = 'Mi asistencia: <span style="color:var(--teal); font-weight:bold;">Confirmado</span>';
             } else if (status === 'indeciso') {
-              statusText = 'Mi asistencia: <span style="color:var(--gold); font-weight:bold;">❓ No sé aún</span>';
+              statusText = 'Mi asistencia: <span style="color:var(--gold); font-weight:bold;">No sé aún</span>';
             } else if (status === 'ausente') {
-              statusText = 'Mi asistencia: <span style="color:var(--coral); font-weight:bold;">❌ No puedo asistir</span>';
+              statusText = 'Mi asistencia: <span style="color:var(--coral); font-weight:bold;">No puedo asistir</span>';
             }
 
             let borderColor = 'var(--border2)';
@@ -2946,7 +2946,7 @@
             card.innerHTML = `
               <div class="musico-card-header">
                 <div class="ensayo-card-info">
-                  <div class="ensayo-card-title">🎵 ${e.nombre}</div>
+                  <div class="ensayo-card-title"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> ${e.nombre}</div>
                   <div class="ensayo-card-date">📅 ${(e.fecha || '').split('-').reverse().join('/')}${e.hora ? ' &nbsp;⏰ <b>' + e.hora + '</b>' : ''}</div>
                 </div>
               </div>
@@ -3041,31 +3041,31 @@
               const closeBtn = document.getElementById('btn-ensayo-reminder-close');
 
               if (reminderModal && titleEl && textEl) {
-                titleEl.textContent = isConfirmed ? '🎵 Ensayo Confirmado' : '🚨 Ensayo Programado';
+                titleEl.textContent = isConfirmed ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> Ensayo Confirmado' : 'Ensayo Programado';
                 titleEl.style.color = isConfirmed ? 'var(--gold)' : 'var(--teal)';
                 reminderModal.querySelector('.modal-box').style.borderColor = isConfirmed ? 'var(--gold)' : 'var(--teal)';
 
                 let msgHtml = `Hola <b>${activeSessionUser.nombre}</b>,<br><br>`;
                 if (isConfirmed) {
                   msgHtml += `Recuerda tu ensayo confirmado:<br><br>`;
-                  msgHtml += `🎵 <b>${ensayoToShow.nombre}</b><br>`;
+                  msgHtml += `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> <b>${ensayoToShow.nombre}</b><br>`;
                   msgHtml += `📅 <b>Fecha:</b> ${(ensayoToShow.fecha || '').split('-').reverse().join('/')}<br>`;
                   msgHtml += `⏰ <b>Hora:</b> ${ensayoToShow.hora || 'No especificada'}<br><br>`;
                   msgHtml += `<i>¡Nos vemos pronto!</i>`;
                   if (confirmBtn) confirmBtn.style.display = 'none';
                 } else {
                   msgHtml += `Tienes un ensayo programado pendiente de confirmar:<br><br>`;
-                  msgHtml += `🎵 <b>${ensayoToShow.nombre}</b><br>`;
+                  msgHtml += `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> <b>${ensayoToShow.nombre}</b><br>`;
                   msgHtml += `📅 <b>Fecha:</b> ${(ensayoToShow.fecha || '').split('-').reverse().join('/')}<br>`;
                   msgHtml += `⏰ <b>Hora:</b> ${ensayoToShow.hora || 'No especificada'}<br><br>`;
-                  msgHtml += `<span style="color:var(--coral); font-weight:bold; font-size:14px;">⏳ ${daysText}</span><br><br>`;
+                  msgHtml += `<span style="color:var(--coral); font-weight:bold; font-size:14px;">${daysText}</span><br><br>`;
                   msgHtml += `Por favor, confirma tu asistencia para que podamos coordinar.`;
                   if (confirmBtn) {
                     confirmBtn.style.display = 'block';
                     confirmBtn.onclick = () => {
                       const docRef = doc(db, 'ensayos', ensayoToShow.id);
                       updateDoc(docRef, { [`confirmaciones.${musicoId}`]: 'confirmado' }).then(() => {
-                        showToast('✅ Asistencia confirmada');
+                        showToast('Asistencia confirmada');
                         reminderModal.classList.remove('active');
                       });
                     };
@@ -3094,10 +3094,10 @@
         if (!musicoId) return;
         const docRef = doc(db, 'ensayos', ensayoId);
         updateDoc(docRef, { [`confirmaciones.${musicoId}`]: statusVal }).then(() => {
-          showToast(`✅ Asistencia actualizada: ${statusVal === 'confirmado' ? 'Confirmado' : statusVal === 'indeciso' ? 'No sé aún' : 'No puedo'}`);
+          showToast(`Asistencia actualizada: ${statusVal === 'confirmado' ? 'Confirmado' : statusVal === 'indeciso' ? 'No sé aún' : 'No puedo'}`);
         }).catch(err => {
           console.error("Error al actualizar asistencia:", err);
-          showToast("❌ Error al guardar asistencia");
+          showToast("Error al guardar asistencia");
         });
       }
 
@@ -3179,7 +3179,7 @@
               <div style="display:flex; align-items:center; gap: 8px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
                 <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; ${badgeStyle}">${s.tonoServicio}</div>
                 ${hasYoutube ? `
-                  <a href="${s.youtube}" target="_blank" rel="noopener" class="repertorio-action-btn repertorio-btn-youtube" style="font-size: 11px; min-height: unset; padding: 6px 10px; margin: 0;">▶ YouTube</a>
+                  <a href="${s.youtube}" target="_blank" rel="noopener" class="repertorio-action-btn repertorio-btn-youtube" style="font-size: 11px; min-height: unset; padding: 6px 10px; margin: 0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> YouTube</a>
                 ` : ''}
               </div>
             `;
@@ -3278,16 +3278,16 @@
           style="border-color: var(--teal); display: none; background: linear-gradient(135deg, rgba(78,205,196,0.08) 0%, rgba(26,24,40,0.8) 100%);">
           <h4
             style="font-size: 14px; text-transform: uppercase; color: var(--teal); letter-spacing: 0.5px; margin-bottom: 8px;">
-            📢 Mi Disponibilidad para esta fecha</h4>
+             Mi Disponibilidad para esta fecha</h4>
           <p style="font-size: 13px; color: var(--text2); margin-bottom: 12px;">Confirma si estarás disponible para
             tocar/cantar en este servicio.</p>
           <div style="display: flex; gap: 10px;">
             <button id="btn-avail-confirm" class="btn-primary"
               style="margin-top: 0; background: var(--teal); color: #0f0e17; font-size: 13px; padding: 10px 16px; flex: 1;">Voy
-              a Asistir 👍</button>
+              a Asistir</button>
             <button id="btn-avail-decline" class="btn-primary"
               style="margin-top: 0; background: var(--coral); color: #0f0e17; font-size: 13px; padding: 10px 16px; flex: 1;">No
-              Disponible 👎</button>
+              Disponible</button>
           </div>
           <p id="my-avail-status"
             style="font-size: 13px; font-weight: 600; color: var(--gold); margin-top: 10px; text-align: center;"></p>
@@ -3295,7 +3295,7 @@
 
 
         <!-- SECCIÓN DE MÚSICOS (Filtrados por disponibilidad real) -->
-        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin: 20px 0 10px;">🎹
+        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin: 20px 0 10px;">
           Asignación de Equipo</h3>
         <p class="section-sub" style="margin-bottom: 10px;">Solo se muestran los integrantes confirmados mediante su
           asistencia.</p>
@@ -3308,19 +3308,19 @@
         </div>
 
         <!-- SECCIÓN DE CANCIONES (Buscador y Categorías) -->
-        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin: 24px 0 10px;">🎤
+        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin: 24px 0 10px;">
           Selección de Canciones</h3>
         <div class="field">
-          <input type="text" id="search-service-songs" placeholder="🔍 Buscar canción por nombre o artista...">
+          <input type="text" id="search-service-songs" placeholder="Buscar canción por nombre o artista...">
         </div>
 
         <!-- Lista dividida por Alabanza -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0 8px;">
           <h4 style="font-size: 13px; text-transform: uppercase; color: var(--teal); letter-spacing: 0.5px; margin:0;">
-            🔥
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"></path></svg>
             Alabanza (Rápidas)</h4>
           <button class="btn-add-song-trigger admin-only" data-type="alabanza"
-            style="background:none; border:none; color:var(--teal); font-size:12px; font-weight:600; cursor:pointer; display:none;">➕
+            style="background:none; border:none; color:var(--teal); font-size:12px; font-weight:600; cursor:pointer; display:none;">
             Agregar Alabanza</button>
         </div>
         <div class="card song-list-scroll" id="songs-alabanza-container" style="background: rgba(78, 205, 196, 0.04); border-color: rgba(78, 205, 196, 0.2); padding: 12px; margin-bottom: 16px;"></div>
@@ -3329,9 +3329,9 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0 8px;">
           <h4
             style="font-size: 13px; text-transform: uppercase; color: var(--purple); letter-spacing: 0.5px; margin:0;">
-            🙏 Adoración (Lentas)</h4>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path><path d="M12 2v2"></path><path d="M12 22v-2"></path><path d="m17 20.66-1-1.73"></path><path d="M11 10.27 7 3.34"></path><path d="m20.66 17-1.73-1"></path><path d="m3.34 7 1.73 1"></path><path d="M14 12h8"></path><path d="M2 12h2"></path><path d="m20.66 7-1.73 1"></path><path d="m3.34 17 1.73-1"></path><path d="m17 3.34-1 1.73"></path><path d="m11 13.73-4 6.93"></path></svg> Adoración (Lentas)</h4>
           <button class="btn-add-song-trigger admin-only" data-type="adoracion"
-            style="background:none; border:none; color:var(--purple); font-size:12px; font-weight:600; cursor:pointer; display:none;">➕
+            style="background:none; border:none; color:var(--purple); font-size:12px; font-weight:600; cursor:pointer; display:none;">
             Agregar Adoración</button>
         </div>
         <div class="card song-list-scroll" id="songs-adoracion-container" style="background: rgba(155, 143, 255, 0.04); border-color: rgba(155, 143, 255, 0.2); padding: 12px; margin-bottom: 16px;"></div>
@@ -3383,7 +3383,7 @@
                 Guardar</button>
               <button class="btn-primary" id="btn-copy-whatsapp"
                 style="background: var(--teal); color: #0f0e17; width: 100%; margin-top: 0;">💬 Enviar por WhatsApp
-                ✅</button>
+               </button>
             </div>
           </div>
         </div>
@@ -3416,10 +3416,10 @@
         <h2 class="section-title">Ensayos Programados</h2>
         <p class="section-sub">Crea y gestiona los ensayos. Los músicos pueden confirmar su asistencia.</p>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px;">
-          <input type="text" id="ensayo-search" placeholder="🔍 Buscar por nombre o fecha..."
+          <input type="text" id="ensayo-search" placeholder="Buscar por nombre o fecha..."
             style="flex:1; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text);">
           <button id="btn-add-ensayo" class="btn-primary admin-only"
-            style="background:var(--teal); color:#0f0e17; margin-top:0; padding:9px 16px; font-size:13px; width:auto; white-space:nowrap;">➕
+            style="background:var(--teal); color:#0f0e17; margin-top:0; padding:9px 16px; font-size:13px; width:auto; white-space:nowrap;">
             Nuevo Ensayo</button>
         </div>
         <div id="ensayo-list">
@@ -3435,7 +3435,7 @@
             <p class="section-sub" style="margin-bottom: 0;">Lista total de canciones registradas para alabanza y adoración.</p>
           </div>
           <div style="display: flex; gap: 8px;">
-            <button id="btn-add-song-global" class="btn-primary admin-only" style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">➕ Nueva Canción</button>
+            <button id="btn-add-song-global" class="btn-primary admin-only" style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;"> Nueva Canción</button>
             <button id="btn-import-songs" class="btn-primary admin-only" style="background: var(--purple); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">📥 Importar JSON</button>
             <input type="file" id="import-songs-file" accept=".json" style="display:none;">
           </div>
@@ -3447,7 +3447,7 @@
             <span style="font-size:13px; text-transform:uppercase; font-weight:700; letter-spacing:0.5px; color:var(--text2);">📚 Todas las canciones</span>
             <span id="repertorio-total-count" style="font-size:11px; color:var(--text3); margin-left:auto;">0 canciones</span>
           </div>
-          <input type="text" id="search-admin-canciones" placeholder="🔍 Buscar por nombre o artista..." style="width:100%; padding:8px 12px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; margin-bottom:10px; outline:none;">
+          <input type="text" id="search-admin-canciones" placeholder="Buscar por nombre o artista..." style="width:100%; padding:8px 12px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; margin-bottom:10px; outline:none;">
           <div class="song-list-scroll" id="repertorio-todas-list" style="max-height: 560px; overflow-y: auto;"></div>
         </div>
       </div>
@@ -3542,7 +3542,7 @@
         Alaban<svg viewBox="0 0 55 100" fill="currentColor" style="width: 0.55em; height: 1.1em; display: inline-block; vertical-align: middle; transform: translateY(-0.06em); margin: 0 -2px;"><path d="M32.108,45.02C31.428,42.709,30.78,40.425,30.195,38.209C34.229,34.433,37.429,29.413,37.5,21.283C37.536,17.06,37.032,12.006,33.025,6.535C31.843,4.922,29.604,4.519,27.934,5.621C23.985,8.227,20,14.457,20,22.5C20,26.253,20.699,30.663,21.782,35.411C20.949,36.021,20.077,36.63,19.177,37.259C12.86,41.667,5,47.153,5,60C5,74.084,16.44,82.5,27.5,82.5C29.658,82.5,31.729,82.271,33.677,81.841C33.684,82.066,33.688,82.285,33.688,82.5C33.688,85.257,31.445,87.5,28.688,87.5C27.352,87.5,26.096,86.98,25.153,86.036L19.848,91.339C22.209,93.7,25.348,95,28.688,95C35.581,95,41.188,89.393,41.188,82.5C41.188,81.387,41.118,80.206,40.986,78.964C46.528,75.615,50,70.154,50,63.75C50,53.699,42.05,45.47,32.108,45.02ZM29.244,15.311C29.86,17.224,30.017,19.139,30,21.218C29.973,24.421,29.287,26.889,28.125,28.943C27.729,26.582,27.5,24.41,27.5,22.5C27.5,19.607,28.264,17.158,29.244,15.311ZM27.5,75C20.229,75,12.5,69.743,12.5,60C12.5,51.065,17.341,47.686,23.469,43.409C23.573,43.337,23.677,43.264,23.781,43.192C24.103,44.346,24.438,45.509,24.78,46.677C19.873,49.271,16.188,54.53,16.188,60C16.188,63.338,17.488,66.477,19.848,68.838L25.153,63.535C24.209,62.59,23.688,61.335,23.688,59.999C23.688,57.909,25.121,55.645,27.027,54.157C27.096,54.384,27.166,54.611,27.234,54.838C29.303,61.627,31.419,68.566,32.64,74.372C31.05,74.78,29.322,75,27.5,75ZM39.503,70.664C38.239,65.243,36.406,59.209,34.508,52.981C39.128,54.381,42.5,58.679,42.5,63.75C42.5,67.58,41.442,70.932,39.503,70.664Z"></path></svg>app <span>IMR4</span>
       <div style="display: flex; gap: 8px; align-items: center;">
         <!-- Botón S.O.S estático en cabecera -->
-        <button id="btn-musico-sos" class="sos-btn" title="Pedir Asistencia (S.O.S)">🚨 S.O.S</button>
+        <button id="btn-musico-sos" class="sos-btn" title="Pedir Asistencia (S.O.S)">S.O.S</button>
         <!-- Selector de Tema Claro/Oscuro -->
         <button id="btn-musico-theme" class="theme-btn" title="Cambiar Tema">☀️</button>
         <div class="user-avatar-container" style="position: relative; cursor: pointer;" id="musico-avatar-container" title="Subir foto de perfil">
@@ -3661,7 +3661,7 @@
 
             <!-- Buscador unificado -->
             <input type="text" id="search-repertorio-musico"
-              placeholder="🔍 Buscar por nombre o artista..."
+              placeholder="Buscar por nombre o artista..."
               style="width:100%; padding:9px 13px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; margin-bottom:12px; outline:none;">
 
             <!-- Contador -->
@@ -3673,7 +3673,7 @@
 
           <div class="split-right-panel" id="musico-lyrics-detail-panel">
             <div class="lyrics-detail-placeholder" style="text-align:center; padding: 60px 20px; color: var(--text3); margin: auto;">
-              <div style="font-size: 64px; margin-bottom: 20px;">🎵</div>
+              <div style="font-size: 64px; margin-bottom: 20px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></div>
               <h3 style="color: var(--text); font-family: var(--font-display); font-size: 20px; margin-bottom: 8px;">Bienvenido al Repertorio</h3>
               <p style="font-size: 13px; max-width: 300px; margin: 0 auto; line-height: 1.5; color: var(--text2);">Selecciona una canción de la lista para ver su letra y acordes aquí.</p>
             </div>
@@ -3683,7 +3683,7 @@
                   <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     <h3 id="panel-lyrics-title" class="lyrics-modal-title" style="margin: 0; font-size: 22px;">Nombre de la Canción</h3>
                     <a id="panel-lyrics-yt-link" href="#" target="_blank" rel="noopener" style="display: none; align-items: center; gap: 4px; background: rgba(244, 63, 94, 0.12); color: var(--coral); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s;">
-                      ▶ YouTube
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> YouTube
                     </a>
                   </div>
                   <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
@@ -3700,7 +3700,7 @@
                     <!-- AutoScroll -->
                     <div style="display: inline-flex; align-items: center; gap: 4px;">
                       <button id="panel-lyrics-autoscroll-btn" style="background: var(--bg3); color: var(--teal); border: 1px solid var(--border2); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; outline: none; cursor: pointer;">
-                        ▶ AutoScroll
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> AutoScroll
                       </button>
                       <div id="panel-lyrics-speed-ctrl" style="display: none; align-items: center; gap: 4px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 2px 6px; font-size: 11px;">
                         <button id="panel-lyrics-speed-down" style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">-</button>
@@ -3750,7 +3750,7 @@
       <!-- Buscador -->
       <div class="search-wrapper">
         <input type="text" id="musico-add-song-search" class="search-input"
-          placeholder="🔍 Buscar por nombre o artista...">
+          placeholder="Buscar por nombre o artista...">
       </div>
 
       <!-- Lista de resultados de la biblioteca -->
@@ -3804,53 +3804,54 @@
         </div>
         <button id="btn-musico-add-custom" class="btn-primary"
           style="background:var(--gold); color:#0f0e17; font-size:13px; padding:10px; margin-top:0;">Agregar
-          Personalizada 🚀</button>
+          Personalizada</button>
       </div>
     </div>
   </div>
 
   <div id="lyrics-modal-overlay" class="lyrics-modal-overlay">
     <div class="lyrics-modal">
-      <div class="lyrics-modal-header">
-        <div>
+      <div class="lyrics-modal-header" style="align-items: flex-start; flex-wrap: wrap; gap: 12px; padding: 12px 16px;">
+        <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 4px;">
+          <div id="lyrics-modal-artist" style="font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px;">Artista</div>
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <h3 id="lyrics-modal-title" class="lyrics-modal-title">Nombre de la Canción</h3>
-            <a id="lyrics-modal-yt-link" href="#" target="_blank" rel="noopener" style="display: none; align-items: center; gap: 4px; background: rgba(244, 63, 94, 0.12); color: var(--coral); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s;" onmouseover="this.style.background='rgba(244, 63, 94, 0.2)'" onmouseout="this.style.background='rgba(244, 63, 94, 0.12)'">
-              ▶ YouTube
+            <h3 id="lyrics-modal-title" class="lyrics-modal-title" style="margin: 0;">Nombre de la Canción</h3>
+            <a id="lyrics-modal-yt-link" href="#" target="_blank" rel="noopener" style="display: none; align-items: center; gap: 4px; background: rgba(244, 63, 94, 0.12); color: var(--coral); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s; margin-top: 2px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> YouTube
             </a>
           </div>
-          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
-            <div id="lyrics-modal-meta" class="lyrics-modal-meta" style="margin-bottom: 0; display: none;">Tono Original: C | Tono Actual: D</div>
-            
-            <!-- Tono -->
-            <div style="display: inline-flex; align-items: center; gap: 4px;">
-              <span style="font-size: 11px; color: var(--text3);">Tono:</span>
-              <button id="lyrics-modal-tone-btn" style="background: var(--bg3); color: var(--gold); border: 1px solid var(--border2); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; outline: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
-                <span id="lyrics-modal-tone-display">C</span> ▼
-              </button>
-            </div>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end;">
+          <div id="lyrics-modal-meta" class="lyrics-modal-meta" style="margin-bottom: 0; display: none;">Tono Original: C | Tono Actual: D</div>
+          
+          <!-- Tono -->
+          <div style="display: inline-flex; align-items: center; gap: 4px;">
+            <button id="lyrics-modal-tone-btn" style="background: var(--bg3); color: var(--gold); border: 1px solid var(--border2); border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> <span id="lyrics-modal-tone-display">C</span> ▼
+            </button>
+          </div>
 
-            <!-- AutoScroll -->
-            <div style="display: inline-flex; align-items: center; gap: 4px;">
-              <button id="lyrics-modal-autoscroll-btn" style="background: var(--bg3); color: var(--teal); border: 1px solid var(--border2); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; outline: none; cursor: pointer;">
-                ▶ AutoScroll
-              </button>
-              <div id="lyrics-modal-speed-ctrl" style="display: none; align-items: center; gap: 4px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 2px 6px; font-size: 11px;">
-                <button id="lyrics-modal-speed-down" style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">-</button>
-                <span id="lyrics-modal-speed-val" style="color:var(--teal); font-weight:700; min-width: 14px; text-align:center;">2</span>
-                <button id="lyrics-modal-speed-up" style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">+</button>
-              </div>
-            </div>
-
-            <!-- Zoom Tamaño Letra -->
-            <div style="display: inline-flex; align-items: center; gap: 4px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 4px 6px;">
-              <button id="lyrics-modal-zoom-down" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color:var(--text); font-weight:bold; cursor:pointer; padding: 8px 16px; font-size: 16px;" title="Reducir letra">A-</button>
-              <span id="lyrics-modal-zoom-val" style="font-size: 14px; color: var(--gold); font-weight: 700; min-width: 24px; text-align: center;">20</span>
-              <button id="lyrics-modal-zoom-up" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color:var(--text); font-weight:bold; cursor:pointer; padding: 8px 16px; font-size: 16px;" title="Agrandar letra">A+</button>
+          <!-- AutoScroll -->
+          <div style="display: inline-flex; align-items: center; gap: 4px;">
+            <button id="lyrics-modal-autoscroll-btn" style="background: var(--bg3); color: var(--teal); border: 1px solid var(--border2); border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Scroll
+            </button>
+            <div id="lyrics-modal-speed-ctrl" style="display: none; align-items: center; gap: 4px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 4px 8px; font-size: 12px;">
+              <button id="lyrics-modal-speed-down" style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">-</button>
+              <span id="lyrics-modal-speed-val" style="color:var(--teal); font-weight:700; min-width: 14px; text-align:center;">2</span>
+              <button id="lyrics-modal-speed-up" style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">+</button>
             </div>
           </div>
+
+          <!-- Zoom Tamaño Letra -->
+          <div style="display: inline-flex; align-items: center; gap: 2px; background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 4px 6px;">
+            <button id="lyrics-modal-zoom-down" style="background: transparent; border: none; color:var(--text); font-weight:bold; cursor:pointer; padding: 6px 12px; font-size: 14px;" title="Reducir letra">A-</button>
+            <span id="lyrics-modal-zoom-val" style="font-size: 13px; color: var(--gold); font-weight: 700; min-width: 24px; text-align: center;">20</span>
+            <button id="lyrics-modal-zoom-up" style="background: transparent; border: none; color:var(--text); font-weight:bold; cursor:pointer; padding: 6px 12px; font-size: 14px;" title="Agrandar letra">A+</button>
+          </div>
+          <button id="lyrics-modal-close" class="lyrics-modal-close" style="margin-left: 8px; padding: 4px 8px;">&times;</button>
         </div>
-        <button id="lyrics-modal-close" class="lyrics-modal-close">&times;</button>
       </div>
       <div id="lyrics-modal-body" class="lyrics-modal-body">
         <div id="lyrics-modal-content" class="lyrics-content"></div>
@@ -3859,7 +3860,7 @@
         <!-- Bloque Anterior -->
         <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
           <button id="lyrics-modal-prev" style="margin-top:0; padding: 10px 16px; font-size:12.5px; background: var(--purple); border: none; color: #0f0e17; border-radius: 10px; cursor: pointer; font-family: var(--font-body); font-weight: 700; min-height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 12px rgba(155, 143, 255, 0.25); flex-shrink: 0;">
-            ◀ Anterior
+            Anterior
           </button>
           <span id="lyrics-modal-prev-name" style="font-size: 14px; color: var(--purple); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; display: none;"></span>
         </div>
@@ -3870,7 +3871,7 @@
         <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex: 1; min-width: 0;">
           <span id="lyrics-modal-next-name" style="font-size: 14px; color: var(--teal); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; display: none; text-align: right;"></span>
           <button id="lyrics-modal-next" style="margin-top:0; padding: 10px 16px; font-size:12.5px; background: var(--teal); border: none; color: #0f0e17; border-radius: 10px; cursor: pointer; font-family: var(--font-body); font-weight: 700; min-height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 12px rgba(78, 205, 196, 0.25); flex-shrink: 0;">
-            Siguiente ▶
+            Siguiente
           </button>
         </div>
       </div>
@@ -3899,7 +3900,7 @@
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
         <div style="flex:1;min-width:0;">
           <div class="tone-picker-title" id="tone-picker-song-name">Canción</div>
-          <div class="tone-picker-subtitle">Toca un tono — cambia para todo el equipo 🎵</div>
+          <div class="tone-picker-subtitle">Toca un tono — cambia para todo el equipo <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></div>
         </div>
         <button id="tone-picker-close"
           style="background:none;border:none;color:var(--text2);font-size:26px;cursor:pointer;padding:0;line-height:1;margin-left:12px;flex-shrink:0;">×</button>
@@ -3914,7 +3915,7 @@
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
         <div style="flex:1;min-width:0;">
           <div class="tone-picker-title" id="practice-tone-picker-song-name">Tono de Práctica</div>
-          <div class="tone-picker-subtitle">Toca un tono — el cambio es solo para tu pantalla local 🎵</div>
+          <div class="tone-picker-subtitle">Toca un tono — el cambio es solo para tu pantalla local <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></div>
         </div>
         <button id="practice-tone-picker-close"
           style="background:none;border:none;color:var(--text2);font-size:26px;cursor:pointer;padding:0;line-height:1;margin-left:12px;flex-shrink:0;">×</button>
@@ -4058,14 +4059,26 @@
       const modal = document.getElementById(modalId);
       if (modal) {
         modal.classList.add('active');
-        history.pushState({ modal: modalId }, '');
+        try {
+          history.pushState({ modal: modalId }, '');
+        } catch(e) {
+          console.warn('History API no disponible', e);
+        }
       }
     };
     
     window.cerrarModalConHistorial = function(modalId) {
       const modal = document.getElementById(modalId);
       if (modal && modal.classList.contains('active')) {
-        history.back(); // Esto dispara el popstate y cierra el modal
+        try {
+          if (history.state && history.state.modal === modalId) {
+            history.back(); // Esto dispara el popstate y cierra el modal
+          } else {
+            modal.classList.remove('active');
+          }
+        } catch(e) {
+          modal.classList.remove('active');
+        }
       }
     };
     const loginForm = document.getElementById('login-form');
@@ -4331,7 +4344,7 @@
               return;
             }
 
-            btnImportSongs.textContent = "⏳ Importando...";
+            btnImportSongs.textContent = "Importando...";
             btnImportSongs.disabled = true;
 
             // Construir set de canciones existentes (nombre+artista en minúsculas) para evitar duplicados
@@ -4370,7 +4383,7 @@
               await setDoc(doc(db, "biblioteca_canciones", idUnico), payload);
               importedCount++;
             }
-            alert(`¡Éxito!\n\n✅ Importadas: ${importedCount} canciones.\n⚠️ Omitidas (duplicadas): ${skippedCount}.`);
+            alert(`¡Éxito!\n\nImportadas: ${importedCount} canciones.\nOmitidas (duplicadas): ${skippedCount}.`);
           } catch(err) {
             alert("Error al procesar el archivo JSON: " + err.message);
           } finally {
@@ -4479,7 +4492,7 @@
         }
         console.log(`[LIMPIEZA NOMBRES] Proceso terminado. Se corrigieron ${corregidos} nombres.`);
         if (typeof showToast === 'function') {
-          showToast(`✅ Nombres de canciones corregidos (${corregidos} procesadas).`);
+          showToast(`Nombres de canciones corregidos (${corregidos} procesadas).`);
         }
       }
 
@@ -4587,7 +4600,7 @@
           <div class="member-info">
             <div class="member-name" style="font-size:15px; margin-bottom:5px;">Servicio: ${s.fecha}</div>
             <div class="member-role" style="margin-bottom:4px;">${badge}</div>
-            <div style="font-size:11px; color:var(--text3);">🎵 ${totalCanciones} canción(es) &nbsp;|&nbsp; 👥 ${totalMusicos} integrante(s)</div>
+            <div style="font-size:11px; color:var(--text3);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> ${totalCanciones} canción(es) &nbsp;|&nbsp; 👥 ${totalMusicos} integrante(s)</div>
           </div>
         </div>
         <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
@@ -4668,7 +4681,7 @@
       let msg = `*PROGRAMACIÓN DE ALABANZA - IMR4*\n🗓️ *${fechaLegible.toUpperCase()}*\n\n`;
 
       if (dataServicio.nota_adicional && dataServicio.nota_adicional.trim() !== "") {
-        msg += `📌 *NOTA DEL LÍDER:*\n_${dataServicio.nota_adicional}_\n\n`;
+        msg += `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg> *NOTA DEL LÍDER:*\n_${dataServicio.nota_adicional}_\n\n`;
       }
 
       // Combinar canciones de la biblioteca y personalizadas
@@ -4712,10 +4725,10 @@
       const adoraciones = allSelected.filter(s => s.tipo === 'adoracion');
       const alabanzas = allSelected.filter(s => s.tipo === 'alabanza');
 
-      msg += `🎵 *REPERTORIO SELECCIONADO:*\n`;
+      msg += `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> *REPERTORIO SELECCIONADO:*\n`;
 
       // Adoración primero
-      msg += `*🙏 ADORACIÓN (Lentas):*\n`;
+      msg += `*<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path><path d="M12 2v2"></path><path d="M12 22v-2"></path><path d="m17 20.66-1-1.73"></path><path d="M11 10.27 7 3.34"></path><path d="m20.66 17-1.73-1"></path><path d="m3.34 7 1.73 1"></path><path d="M14 12h8"></path><path d="M2 12h2"></path><path d="m20.66 7-1.73 1"></path><path d="m3.34 17 1.73-1"></path><path d="m17 3.34-1 1.73"></path><path d="m11 13.73-4 6.93"></path></svg> ADORACIÓN (Lentas):*\n`;
       if (adoraciones.length > 0) {
         adoraciones.forEach((s, idx) => {
           const tone = cancionesSeleccionadas[s.id];
@@ -4726,7 +4739,7 @@
       }
 
       // Alabanza después
-      msg += `\n*🔥 ALABANZA (Rápidas):*\n`;
+      msg += `\n*<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"></path></svg> ALABANZA (Rápidas):*\n`;
       if (alabanzas.length > 0) {
         alabanzas.forEach((s, idx) => {
           const tone = cancionesSeleccionadas[s.id];
@@ -4739,8 +4752,8 @@
       msg += `\n👥 *EQUIPO ASIGNADO:*\n`;
       let countMusicos = 0;
       let countCoristas = 0;
-      let cuerpoMusicos = " *🎹 Músicos:*\n";
-      let cuerpoCoristas = " *🎤 Voces/Coros:*\n";
+      let cuerpoMusicos = " *Músicos:*\n";
+      let cuerpoCoristas = " *Voces/Coros:*\n";
 
       cacheMembers.forEach(m => {
         if (dataServicio.musicosAsignados && dataServicio.musicosAsignados[m.usuario]) {
@@ -4760,7 +4773,7 @@
         msg += "  _No se han asignado integrantes._\n";
       }
 
-      msg += `\n_“Alabadle con salterio y arpa. Alabadle con pandero y danza...” Ps. 150_ 🙌🚀`;
+      msg += `\n_“Alabadle con salterio y arpa. Alabadle con pandero y danza...” Ps. 150_`;
       return msg;
     }
 
@@ -4778,11 +4791,11 @@
         const userAvail = dataServicio.disponibilidad ? dataServicio.disponibilidad[activeSessionUser.usuario] : null;
         const statusText = document.getElementById('my-avail-status');
         if (userAvail === 'confirmado') {
-          statusText.innerHTML = 'Tu estado: <span style="color:var(--teal);">Voy a Asistir 👍</span>';
+          statusText.innerHTML = 'Tu estado: <span style="color:var(--teal);">Voy a Asistir</span>';
         } else if (userAvail === 'ausente') {
-          statusText.innerHTML = 'Tu estado: <span style="color:var(--coral);">No Disponible 👎</span>';
+          statusText.innerHTML = 'Tu estado: <span style="color:var(--coral);">No Disponible</span>';
         } else {
-          statusText.innerHTML = 'Tu estado: <span style="color:var(--text3);">Sin Confirmar ⏳</span>';
+          statusText.innerHTML = 'Tu estado: <span style="color:var(--text3);">Sin Confirmar</span>';
         }
       } else {
         availCard.style.display = 'none';
@@ -4805,7 +4818,7 @@
             nota_adicional: val,
             mensajeEditado: deleteField()
           });
-          showToast('📌 Nota guardada — el mensaje de WhatsApp se actualizó');
+          showToast('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg> Nota guardada — el mensaje de WhatsApp se actualizó');
         });
       }
 
@@ -4846,7 +4859,7 @@
           warningBanner.style.fontSize = '12px';
           warningBanner.style.color = 'var(--coral)';
           warningBanner.style.fontWeight = '500';
-          warningBanner.innerHTML = `⚠️ Atención líder: Hay más de un integrante asignado para: <b>${duplicateInstruments.join(', ')}</b>.`;
+          warningBanner.innerHTML = `Atención líder: Hay más de un integrante asignado para: <b>${duplicateInstruments.join(', ')}</b>.`;
           teamCont.appendChild(warningBanner);
         }
 
@@ -4858,9 +4871,9 @@
           let statusBadge = "";
           if (!isAvailableGroup) {
             if (userAvail === 'ausente') {
-              statusBadge = `<span style="color:var(--coral); font-size:11px; margin-left: auto; margin-right: 10px; font-weight: 500;">❌ Ausente</span>`;
+              statusBadge = `<span style="color:var(--coral); font-size:11px; margin-left: auto; margin-right: 10px; font-weight: 500;">Ausente</span>`;
             } else {
-              statusBadge = `<span style="color:var(--text3); font-size:11px; margin-left: auto; margin-right: 10px;">⏳ Sin Responder</span>`;
+              statusBadge = `<span style="color:var(--text3); font-size:11px; margin-left: auto; margin-right: 10px;">Sin Responder</span>`;
             }
           }
 
@@ -5199,7 +5212,7 @@
           `${(s.nombre || '').toLowerCase()}||${(s.artista || '').toLowerCase()}` === key
         );
         if (existe) {
-          alert(`⚠️ Ya existe "${nombre}" de ${artista} en el catálogo.\n\nNo se puede agregar duplicado.`);
+          alert(`Ya existe "${nombre}" de ${artista} en el catálogo.\n\nNo se puede agregar duplicado.`);
           return;
         }
       }
@@ -5243,7 +5256,7 @@
 
       const wasEditing = !!editingSongId;
       resetSongForm();
-      showToast(wasEditing ? "✅ Canción actualizada." : "✅ Canción añadida al catálogo.");
+      showToast(wasEditing ? "Canción actualizada." : "Canción añadida al catálogo.");
     });
 
     // ====================================================
@@ -5255,17 +5268,17 @@
       const url = (urlInput.value || '').trim();
 
       if (!url) {
-        statusEl.textContent = '⚠️ Pega el link de la canción primero.';
+        statusEl.textContent = 'Pega el link de la canción primero.';
         statusEl.style.color = 'var(--gold)';
         return;
       }
       if (!url.includes('lacuerda.net')) {
-        statusEl.textContent = '⚠️ El link debe ser de lacuerda.net';
+        statusEl.textContent = 'El link debe ser de lacuerda.net';
         statusEl.style.color = 'var(--gold)';
         return;
       }
 
-      statusEl.textContent = '⏳ Buscando canción...';
+      statusEl.textContent = 'Buscando canción...';
       statusEl.style.color = 'var(--text3)';
       document.getElementById('btn-fetch-lacuerda').disabled = true;
 
@@ -5340,15 +5353,15 @@
         if (letra) document.getElementById('song-lyrics-input').value = letra;
 
         if (nombre && artista) {
-          statusEl.textContent = `✅ Importado: "${nombre}" de ${artista}`;
+          statusEl.textContent = `Importado: "${nombre}" de ${artista}`;
           statusEl.style.color = 'var(--teal)';
           urlInput.value = '';
         } else {
-          statusEl.textContent = '⚠️ Se importó pero algunos campos pueden estar vacíos. Verifica.';
+          statusEl.textContent = 'Se importó pero algunos campos pueden estar vacíos. Verifica.';
           statusEl.style.color = 'var(--gold)';
         }
       } catch(err) {
-        statusEl.textContent = `❌ Error: ${err.message}`;
+        statusEl.textContent = `Error: ${err.message}`;
         statusEl.style.color = 'var(--coral)';
       } finally {
         document.getElementById('btn-fetch-lacuerda').disabled = false;
@@ -5419,7 +5432,7 @@
             <span>${s.artista}</span>
             <span>•</span>
             <span style="background:rgba(255,255,255,0.05); padding:1px 6px; border-radius:4px; font-size:10px; color:${tagColor}; border:1px solid rgba(255,255,255,0.08); font-weight:500;">
-              🕒 ${ultimaVezText}
+              ${ultimaVezText}
             </span>
           </div>
         </div>
@@ -5456,7 +5469,7 @@
         toneSelect.addEventListener('change', async (ev) => {
           const nuevoTono = ev.target.value;
           await updateDoc(doc(db, "biblioteca_canciones", s.id), { tonoBase: nuevoTono });
-          showToast(`🎵 Tono de "${s.nombre}" → ${nuevoTono}`);
+          showToast(`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> Tono de "${s.nombre}" → ${nuevoTono}`);
         });
       }
 
@@ -5469,7 +5482,7 @@
           oficialBtn.addEventListener('click', async () => {
             const isOficialNow = !s.oficial;
             await updateDoc(doc(db, "biblioteca_canciones", s.id), { oficial: isOficialNow });
-            showToast(isOficialNow ? `🎯 "${s.nombre}" ahora es Oficial` : `○ "${s.nombre}" ya no es Oficial`);
+            showToast(isOficialNow ? `"${s.nombre}" ahora es Oficial` : `"${s.nombre}" ya no es Oficial`);
           });
         }
 
@@ -5786,8 +5799,8 @@
         </div>
         ${currentUserRole === 'lider' ? `
           <div style="display:flex; gap:6px;">
-            <button class="chip chip-teal click-edit-member" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Editar">✏️</button>
-            <button class="chip chip-coral click-del-member" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Eliminar">🗑️</button>
+            <button class="chip chip-teal click-edit-member" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Editar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>
+            <button class="chip chip-coral click-del-member" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Eliminar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
           </div>
         ` : ''}
       `;
@@ -6197,7 +6210,7 @@
           const prev = (window._prevCambiosTono || {})[songId];
           if (prev && info.timestamp !== prev.timestamp && info.usuario !== activeSessionUser.nombre) {
             const song = cacheSongs.find(s => s.id === songId) || (data.customSongsMetadata && data.customSongsMetadata[songId]);
-            showToast(`🎵 ${info.usuario} cambió "${song ? song.nombre : songId}" → ${info.tono}`);
+            showToast(`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> ${info.usuario} cambió "${song ? song.nombre : songId}" → ${info.tono}`);
           }
         }
         window._prevCambiosTono = Object.assign({}, cambios);
@@ -6210,7 +6223,7 @@
         // Nota del líder
         if (data.nota_adicional && data.nota_adicional.trim() !== "") {
           html += `<div class="card" style="border-color:var(--purple);background:rgba(155,143,255,0.06);margin-bottom:16px;">
-          <h4 style="font-size:11px;text-transform:uppercase;color:var(--purple);margin-bottom:8px;">📌 Nota del Líder</h4>
+          <h4 style="font-size:11px;text-transform:uppercase;color:var(--purple);margin-bottom:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg> Nota del Líder</h4>
           <p style="font-size:14px;color:var(--text2);line-height:1.6;margin:0;">${data.nota_adicional.replace(/\n/g, '<br>')}</p>
         </div>`;
         }
@@ -6324,15 +6337,15 @@
           // Agregar botón "+"
           g += `
         <button class="btn-add-song-musico" data-type="${type}" style="width: 100%; background: rgba(${color === 'teal' ? '78,205,196' : '155,143,255'}, 0.08); border: 1px dashed var(--${color}); color: var(--${color}); border-radius: 10px; padding: 12px; font-family: var(--font-body); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; border-style: dashed;">
-          <span>➕</span> Agregar otra canción
+          <span></span> Agregar otra canción
         </button>`;
 
           return g;
         };
 
         // Adoración primero, luego Alabanza
-        html += renderGroup(adoraciones, 'Adoración (Lentas)', 'purple', '🙏', 1, 'adoracion');
-        html += renderGroup(alabanzas, 'Alabanza (Rápidas)', 'teal', '🔥', adoraciones.length + 1, 'alabanza');
+        html += renderGroup(adoraciones, 'Adoración (Lentas)', 'purple', '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path><path d="M12 2v2"></path><path d="M12 22v-2"></path><path d="m17 20.66-1-1.73"></path><path d="M11 10.27 7 3.34"></path><path d="m20.66 17-1.73-1"></path><path d="m3.34 7 1.73 1"></path><path d="M14 12h8"></path><path d="M2 12h2"></path><path d="m20.66 7-1.73 1"></path><path d="m3.34 17 1.73-1"></path><path d="m17 3.34-1 1.73"></path><path d="m11 13.73-4 6.93"></path></svg>', 1, 'adoracion');
+        html += renderGroup(alabanzas, 'Alabanza (Rápidas)', 'teal', '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"></path></svg>', adoraciones.length + 1, 'alabanza');
 
         content.innerHTML = html;
 
@@ -6371,12 +6384,12 @@
           btn.addEventListener('click', async () => {
             const songId = btn.dataset.songId;
             const sName = cacheSongs.find(s => s.id === songId)?.nombre || (customSongsMetadata[songId]?.nombre) || "Canción";
-            if (confirm(`⚠️ ATENCIÓN:\nSi quitas "${sName}", se eliminará de la vista de TODO el equipo y tendrás que agregarla de nuevo si te equivocas.\n\n¿Quieres continuar y quitarla?`)) {
+            if (confirm(`ATENCIÓN:\nSi quitas "${sName}", se eliminará de la vista de TODO el equipo y tendrás que agregarla de nuevo si te equivocas.\n\n¿Quieres continuar y quitarla?`)) {
               const path = `cancionesSeleccionadas.${songId}`;
               await updateDoc(doc(db, "planes_servicio", dateStr), {
                 [path]: false
               });
-              showToast(`🗑️ "${sName}" quitada del servicio`);
+              showToast(`"${sName}" quitada del servicio`);
             }
           });
         });
@@ -6417,7 +6430,7 @@
         const pCur = document.getElementById('musico-avail-current');
 
         if (myStat === 'confirmado') {
-          pCur.innerHTML = `Estado actual: <span style="color:var(--teal); font-weight:bold;">✅ Voy a Asistir</span>`;
+          pCur.innerHTML = `Estado actual: <span style="color:var(--teal); font-weight:bold;">Voy a Asistir</span>`;
           btnMusicoConfirm.style.opacity = '1';
           btnMusicoConfirm.style.boxShadow = '0 0 15px rgba(78,205,196,0.4)';
           btnMusicoDecline.style.opacity = '0.3';
@@ -6425,7 +6438,7 @@
           btnMusicoMaybe.style.opacity = '0.3';
           btnMusicoMaybe.style.boxShadow = 'none';
         } else if (myStat === 'ausente') {
-          pCur.innerHTML = `Estado actual: <span style="color:var(--coral); font-weight:bold;">❌ No Disponible</span>`;
+          pCur.innerHTML = `Estado actual: <span style="color:var(--coral); font-weight:bold;">No Disponible</span>`;
           btnMusicoDecline.style.opacity = '1';
           btnMusicoDecline.style.boxShadow = '0 0 15px rgba(255,107,107,0.4)';
           btnMusicoConfirm.style.opacity = '0.3';
@@ -6433,7 +6446,7 @@
           btnMusicoMaybe.style.opacity = '0.3';
           btnMusicoMaybe.style.boxShadow = 'none';
         } else if (myStat === 'indeciso') {
-          pCur.innerHTML = `Estado actual: <span style="color:var(--gold); font-weight:bold;">❓ No estoy seguro aún</span>`;
+          pCur.innerHTML = `Estado actual: <span style="color:var(--gold); font-weight:bold;">No estoy seguro aún</span>`;
           btnMusicoMaybe.style.opacity = '1';
           btnMusicoMaybe.style.boxShadow = '0 0 15px rgba(244,197,66,0.4)';
           btnMusicoConfirm.style.opacity = '0.3';
@@ -6632,7 +6645,7 @@
       
       const mobBtn = document.getElementById('lyrics-modal-autoscroll-btn');
       if (mobBtn) {
-        mobBtn.innerHTML = '▶ AutoScroll';
+        mobBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> AutoScroll';
         mobBtn.style.color = 'var(--teal)';
       }
       const mobCtrl = document.getElementById('lyrics-modal-speed-ctrl');
@@ -6640,7 +6653,7 @@
 
       const panBtn = document.getElementById('panel-lyrics-autoscroll-btn');
       if (panBtn) {
-        panBtn.innerHTML = '▶ AutoScroll';
+        panBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> AutoScroll';
         panBtn.style.color = 'var(--teal)';
       }
       const panCtrl = document.getElementById('panel-lyrics-speed-ctrl');
@@ -6658,7 +6671,7 @@
       if (_scrollInterval) {
         detenerAutoscroll();
       } else {
-        btn.innerHTML = '⏸ Pausa';
+        btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> Pausa';
         btn.style.color = 'var(--coral)';
         if (ctrl) ctrl.style.display = 'inline-flex';
         if (speedVal) speedVal.textContent = _scrollSpeed;
@@ -6917,7 +6930,7 @@
       const lyricsContentContainer = document.getElementById(destPrefix + 'content');
       const lyricsHtml = hasLetra ? renderizarLetraTranspuesta(song.letra, song.tonoBase, tonoMostrar) : `
             <div style="text-align:center; padding: 60px 20px; color: var(--text3);">
-              <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
+              <div style="font-size: 48px; margin-bottom: 16px;"></div>
               <h4 style="color: var(--text2); margin-bottom: 8px; font-family: var(--font-display); font-size: 22px;">Letra no disponible</h4>
               <p style="font-size: 13px; max-width: 280px; margin: 0 auto; line-height: 1.5;">Esta canción aún no tiene la letra registrada en el repertorio global.</p>
             </div>
@@ -6958,7 +6971,7 @@
             if (currentIndex > 0) {
               const prevSong = currentList[currentIndex - 1];
               const prevName = prevSong.nombre || "Anterior";
-              prevBtn.innerHTML = `◀ Anterior`;
+              prevBtn.innerHTML = `Anterior`;
               if (prevNameLabel) {
                 prevNameLabel.textContent = prevName;
                 prevNameLabel.style.display = 'block';
@@ -6969,7 +6982,7 @@
                 window.abrirModalLetraGlobal(prevSong.id, currentList);
               };
             } else {
-              prevBtn.innerHTML = `◀ Anterior`;
+              prevBtn.innerHTML = `Anterior`;
               if (prevNameLabel) {
                 prevNameLabel.textContent = '';
                 prevNameLabel.style.display = 'none';
@@ -6983,7 +6996,7 @@
             if (currentIndex < currentList.length - 1) {
               const nextSong = currentList[currentIndex + 1];
               const nextName = nextSong.nombre || "Siguiente";
-              nextBtn.innerHTML = `Siguiente ▶`;
+              nextBtn.innerHTML = `Siguiente`;
               if (nextNameLabel) {
                 nextNameLabel.textContent = nextName;
                 nextNameLabel.style.display = 'block';
@@ -6994,7 +7007,7 @@
                 window.abrirModalLetraGlobal(nextSong.id, currentList);
               };
             } else {
-              nextBtn.innerHTML = `Siguiente ▶`;
+              nextBtn.innerHTML = `Siguiente`;
               if (nextNameLabel) {
                 nextNameLabel.textContent = '';
                 nextNameLabel.style.display = 'none';
@@ -7161,7 +7174,7 @@
         await setDoc(doc(db, "config", "app_settings"), { whatsapp_link: link }, { merge: true });
         window._whatsappGroupLink = link;
         const status = document.getElementById('whatsapp-link-status');
-        status.textContent = '✅ Enlace guardado correctamente';
+        status.textContent = 'Enlace guardado correctamente';
         setTimeout(() => status.textContent = '', 3500);
       } catch (e) { alert('Error al guardar: ' + e.message); }
     });
@@ -7294,8 +7307,8 @@
         return g;
       };
 
-      html += renderAdminGroup(adoraciones, 'Adoración (Lentas)', 'purple', '🙏', 1, 'adoracion');
-      html += renderAdminGroup(alabanzas, 'Alabanza (Rápidas)', 'teal', '🔥', adoraciones.length + 1, 'alabanza');
+      html += renderAdminGroup(adoraciones, 'Adoración (Lentas)', 'purple', '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path><path d="M12 2v2"></path><path d="M12 22v-2"></path><path d="m17 20.66-1-1.73"></path><path d="M11 10.27 7 3.34"></path><path d="m20.66 17-1.73-1"></path><path d="m3.34 7 1.73 1"></path><path d="M14 12h8"></path><path d="M2 12h2"></path><path d="m20.66 7-1.73 1"></path><path d="m3.34 17 1.73-1"></path><path d="m17 3.34-1 1.73"></path><path d="m11 13.73-4 6.93"></path></svg>', 1, 'adoracion');
+      html += renderAdminGroup(alabanzas, 'Alabanza (Rápidas)', 'teal', '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"></path></svg>', adoraciones.length + 1, 'alabanza');
 
       cont.innerHTML = html;
 
@@ -7327,12 +7340,12 @@
         btn.addEventListener('click', async () => {
           const songId = btn.dataset.songId;
           const sName = cacheSongs.find(s => s.id === songId)?.nombre || (customSongsMetadata[songId]?.nombre) || "Canción";
-          if (confirm(`⚠️ ATENCIÓN:\nSi quitas "${sName}", se eliminará de la vista de TODO el equipo y tendrás que agregarla de nuevo si te equivocas.\n\n¿Quieres continuar y quitarla?`)) {
+          if (confirm(`ATENCIÓN:\nSi quitas "${sName}", se eliminará de la vista de TODO el equipo y tendrás que agregarla de nuevo si te equivocas.\n\n¿Quieres continuar y quitarla?`)) {
             const path = `cancionesSeleccionadas.${songId}`;
             await updateDoc(doc(db, "planes_servicio", dateStr), {
               [path]: false
             });
-            showToast(`🗑️ "${sName}" quitada del servicio`);
+            showToast(`"${sName}" quitada del servicio`);
           }
         });
       });
@@ -7417,7 +7430,7 @@
           });
 
           document.getElementById('musico-add-song-modal').classList.remove('active');
-          showToast(`🎵 "${s.nombre}" agregada al servicio`);
+          showToast(`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> "${s.nombre}" agregada al servicio`);
         });
         resultsCont.appendChild(div);
       });
@@ -7502,7 +7515,7 @@
         });
 
         document.getElementById('musico-add-song-modal').classList.remove('active');
-        showToast(`🚀 "${customName}" agregada de forma personalizada`);
+        showToast(`"${customName}" agregada de forma personalizada`);
       });
     }
 
@@ -7532,7 +7545,7 @@
     if (btnMusicoSos) {
       btnMusicoSos.addEventListener('click', () => {
         const userName = activeSessionUser ? activeSessionUser.nombre : "Usuario";
-        const msg = `🚨 *${userName}* necesita asistencia (S.O.S) 🚨`;
+        const msg = `*${userName}* necesita asistencia (S.O.S)`;
         const encodedMsg = encodeURIComponent(msg);
 
         const groupLink = (window._whatsappGroupLink || "").trim();
@@ -7657,7 +7670,7 @@
             deferredPrompt = null;
           } else {
             // Si no hay prompt nativo disponible, dar un toast amigable
-            showToast("💡 Usa las opciones de tu navegador para instalar la aplicación.");
+            showToast("Usa las opciones de tu navegador para instalar la aplicación.");
           }
         });
       }
@@ -7679,7 +7692,7 @@
       // Ocultar si el usuario ya instaló
       window.addEventListener('appinstalled', () => {
         banner.style.display = 'none';
-        console.log('[PWA] App instalada exitosamente ✅');
+        console.log('[PWA] App instalada exitosamente');
       });
     })();
 
@@ -7738,7 +7751,7 @@
         const file = e.target.files[0];
         if (!file) return;
         if (!file.type.startsWith('image/')) {
-          showToast("❌ Por favor, selecciona una imagen válida.");
+          showToast("Por favor, selecciona una imagen válida.");
           return;
         }
 
@@ -7786,7 +7799,7 @@
               }
             }).catch(err => {
               console.error("Error saving profile pic:", err);
-              showToast("❌ Error al guardar la foto");
+              showToast("Error al guardar la foto");
             });
           };
           img.src = event.target.result;
@@ -7924,7 +7937,7 @@
       </div>
       <p class="modal-subtitle" style="margin-top:8px;">Selecciona las canciones para ensayar</p>
       <div class="field" style="margin-bottom: 8px;">
-        <input type="text" id="search-ensayo-songs" placeholder="🔍 Buscar canción por nombre o artista..."
+        <input type="text" id="search-ensayo-songs" placeholder="Buscar canción por nombre o artista..."
           style="width:100%; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-size: 13px; outline: none;">
       </div>
       <div id="ensayo-canciones-list"
@@ -7964,7 +7977,7 @@
               style="flex:1; padding:8px 10px; background:var(--bg); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-size:13px; outline:none;">
             <button type="button" id="btn-fetch-lacuerda"
               style="padding:8px 14px; background:var(--teal); color:#0f0e17; border:none; border-radius:var(--radius-sm); font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap;"
-            >🚀 Importar</button>
+            >Importar</button>
           </div>
           <p id="lacuerda-fetch-status" style="font-size:11px; color:var(--text3); margin-top:5px; min-height:16px;"></p>
         </div>
@@ -8042,7 +8055,7 @@
 
   <!-- Alerta de Actualización Disponible -->
   <div id="pwa-update-banner" style="position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120px); background: rgba(26, 24, 40, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.5px solid var(--teal); border-radius: var(--radius); padding: 16px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 16px; z-index: 200000; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto; max-width: 90%; width: 380px; box-sizing: border-box;">
-    <div style="font-size: 24px;">✨</div>
+    <div style="font-size: 24px;"></div>
     <div style="flex-grow: 1;">
       <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text);">Actualización disponible</h4>
       <p style="margin: 2px 0 0 0; font-size: 12px; color: var(--text2);">Nueva versión lista para instalar</p>
