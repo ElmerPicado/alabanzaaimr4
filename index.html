@@ -927,7 +927,7 @@
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.85);
-      z-index: 100000 !important;
+      z-index: 100005 !important;
       display: none;
       align-items: center;
       justify-content: center;
@@ -1006,8 +1006,8 @@
     }
 
     .lyrics-content {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 14px;
+      font-family: 'Courier New', Courier, monospace !important;
+      font-size: 26px;
       line-height: 1.6;
       color: var(--text);
       white-space: pre-wrap;
@@ -1926,7 +1926,7 @@
         font-size: 16px !important;
       }
       .lyrics-content {
-        font-size: 20px !important;
+        font-size: 26px;
         line-height: 1.8 !important;
         width: 100% !important;
         max-width: 900px !important;
@@ -3372,9 +3372,10 @@
             <h2 class="section-title">Repertorio Global de Canciones</h2>
             <p class="section-sub" style="margin-bottom: 0;">Lista total de canciones registradas para alabanza y adoración.</p>
           </div>
-          <div style="display: flex; gap: 8px;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button id="btn-add-song-global" class="btn-primary admin-only" style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;"> Nueva Canción</button>
             <button id="btn-import-songs" class="btn-primary admin-only" style="background: var(--purple); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">📥 Importar JSON</button>
+            <button id="btn-fix-tones-global" class="btn-primary admin-only" style="background: var(--gold); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">🛠️ Auto-Corregir Tonos</button>
             <input type="file" id="import-songs-file" accept=".json" style="display:none;">
           </div>
         </div>
@@ -3672,11 +3673,12 @@
   <!-- ========================================================= -->
   <!-- MODAL DE AGREGAR CANCIÓN (VISTA MÚSICO/LÍDER) -->
   <div id="musico-add-song-modal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 480px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <h3 class="modal-title" id="musico-add-song-title" style="font-size:22px;">Agregar Canción</h3>
-        <button id="musico-add-song-close"
-          style="background:none; border:none; color:var(--text2); font-size:26px; cursor:pointer; padding:0; line-height:1;">&times;</button>
+    <div class="modal-box" style="max-width: 600px; width: 95%;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <button id="musico-add-song-close" style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Volver
+        </button>
+        <h3 class="modal-title" id="musico-add-song-title" style="font-size:20px; margin:0; text-align:right; color:var(--gold);">Agregar Canción</h3>
       </div>
 
       <!-- Filtro: Todas / Oficial -->
@@ -3791,7 +3793,7 @@
           <!-- Zoom Tamaño Letra -->
           <div style="display: inline-flex; align-items: center; gap: 2px; background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 4px 6px;">
             <button id="lyrics-modal-zoom-down" style="background: transparent; border: none; color:var(--text); font-weight:bold; cursor:pointer; padding: 6px 12px; font-size: 14px;" title="Reducir letra">A-</button>
-            <span id="lyrics-modal-zoom-val" style="font-size: 13px; color: var(--gold); font-weight: 700; min-width: 24px; text-align: center;">20</span>
+            <span id="lyrics-modal-zoom-val" style="font-size: 13px; color: var(--gold); font-weight: 700; min-width: 24px; text-align: center;">26</span>
             <button id="lyrics-modal-zoom-up" style="background: transparent; border: none; color:var(--text); font-weight:bold; cursor:pointer; padding: 6px 12px; font-size: 14px;" title="Agrandar letra">A+</button>
           </div>
           <button id="lyrics-modal-close" class="lyrics-modal-close" style="margin-left: 8px; padding: 4px 8px;">&times;</button>
@@ -3854,7 +3856,7 @@
   </div>
 
   <!-- PRACTICE TONE PICKER OVERLAY (bottom sheet local) -->
-  <div id="practice-tone-picker-overlay" class="tone-picker-overlay" style="z-index: 100000;">
+  <div id="practice-tone-picker-overlay" class="tone-picker-overlay" style="z-index: 100010 !important;">
     <div class="tone-picker-box">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
         <div style="flex:1;min-width:0;">
@@ -4273,6 +4275,48 @@
     if (btnImportSongs && importSongsFile) {
       btnImportSongs.addEventListener('click', () => {
         importSongsFile.click();
+      });
+    }
+
+    const btnFixTones = document.getElementById('btn-fix-tones-global');
+    if (btnFixTones) {
+      btnFixTones.addEventListener('click', async () => {
+        if (!confirm("¿Seguro que deseas escanear todas las canciones guardadas con Tono Base 'C' y tratar de auto-corregirlas leyendo el primer acorde de sus letras?")) return;
+        
+        let fixedCount = 0;
+        showToast("Escaneando canciones en C...");
+        btnFixTones.disabled = true;
+        
+        try {
+          const songsToFix = (window.cacheSongs || []).filter(s => s.tonoBase === 'C' && s.letra);
+          const mapAcordes = { 'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B' };
+          const chordRegex = /\b(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])[#bm]*\b/i;
+          
+          for (const s of songsToFix) {
+            const firstChordMatch = s.letra.match(chordRegex);
+            if (firstChordMatch) {
+              let chordFound = firstChordMatch[0].toUpperCase();
+              Object.keys(mapAcordes).forEach(k => {
+                if (chordFound.startsWith(k)) chordFound = chordFound.replace(k, mapAcordes[k]);
+              });
+              const cleanMatch = chordFound.match(/^([CDEFGAB][#bm]*)/);
+              if (cleanMatch) {
+                const newTone = cleanMatch[1];
+                if (newTone !== 'C') {
+                  const docRef = doc(db, "canciones_global", s.id);
+                  await updateDoc(docRef, { tonoBase: newTone });
+                  fixedCount++;
+                }
+              }
+            }
+          }
+          showToast(`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> ¡Se corrigieron ${fixedCount} canciones!`);
+        } catch(e) {
+          console.error("Error corrigiendo tonos:", e);
+          showToast("Error durante la corrección masiva.");
+        } finally {
+          btnFixTones.disabled = false;
+        }
       });
 
       importSongsFile.addEventListener('change', async (e) => {
@@ -5277,17 +5321,35 @@
           }
         } catch(_) {}
 
+        // --- Extraer letra/acordes ---
+        let letra = '';
+        const pres = doc2.querySelectorAll('pre');
+        if (pres.length > 0) {
+          letra = Array.from(pres).map(p => p.textContent).join('\n\n');
+        } else {
+          const tBody = doc2.getElementById('t_body');
+          if (tBody) letra = tBody.innerText;
+        }
+
         // --- Extraer tono ---
         let tonoBase = 'C';
         const bodyText = doc2.body?.innerText || html;
         const tonoMatch = bodyText.match(/[Tt]ono[:\s]+([A-Ga-g][#bm]*)/);
-        if (tonoMatch) tonoBase = tonoMatch[1];
-
-        // --- Extraer letra/acordes ---
-        let letra = '';
-        const pre = doc2.querySelector('pre');
-        if (pre) {
-          letra = pre.textContent || '';
+        if (tonoMatch) {
+          tonoBase = tonoMatch[1].toUpperCase();
+        } else if (letra) {
+          // Intentar adivinar por el primer acorde
+          const chordRegex = /\b(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])[#bm]*\b/i;
+          const firstChordMatch = letra.match(chordRegex);
+          if (firstChordMatch) {
+            let chordFound = firstChordMatch[0].toUpperCase();
+            const mapAcordes = { 'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B' };
+            Object.keys(mapAcordes).forEach(k => {
+              if (chordFound.startsWith(k)) chordFound = chordFound.replace(k, mapAcordes[k]);
+            });
+            const cleanMatch = chordFound.match(/^([CDEFGAB][#bm]*)/);
+            if (cleanMatch) tonoBase = cleanMatch[1];
+          }
         }
 
         // --- Rellenar el formulario ---
@@ -6591,7 +6653,7 @@
 
     let _scrollInterval = null;
     let _scrollSpeed = 2; // 1 a 5
-    let _currentZoom = 20; // default
+    let _currentZoom = 26; // default
 
     function detenerAutoscroll() {
       if (_scrollInterval) {
@@ -7888,8 +7950,13 @@
   </script>
   <!-- Admin Repertorio Modal -->
   <div class="modal-overlay" id="admin-repertorio-modal">
-    <div class="modal-box">
-      <h2 class="modal-title">Nuevo / Editar Repertorio</h2>
+    <div class="modal-box" style="max-width: 600px; width: 95%;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <button onclick="document.getElementById('admin-repertorio-modal').classList.remove('active')" style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Volver
+        </button>
+        <h2 class="modal-title" style="margin:0; font-size:20px; text-align:right;">Nuevo / Editar Repertorio</h2>
+      </div>
       <p class="modal-subtitle">Etiqueta (editable, por defecto YYYY-MM-DD-N)</p>
       <input type="text" id="repertorio-etiqueta" placeholder="Etiqueta"
         style="width:100%; margin-bottom:12px; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text);">
@@ -7901,8 +7968,13 @@
   </div>
 
   <div class="modal-overlay" id="admin-ensayo-modal">
-    <div class="modal-box" style="max-width: 500px; max-height: 90vh; overflow-y: auto;">
-      <h2 class="modal-title">Nuevo / Editar Ensayo</h2>
+    <div class="modal-box" style="max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <button onclick="document.getElementById('admin-ensayo-modal').classList.remove('active')" style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Volver
+        </button>
+        <h2 class="modal-title" style="margin:0; font-size:20px; text-align:right;">Nuevo / Editar Ensayo</h2>
+      </div>
       <p class="modal-subtitle">Nombre del ensayo</p>
       <input type="text" id="ensayo-nombre" placeholder="Ej: Ensayo General"
         style="width:100%; margin-bottom:12px; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text);">
@@ -7986,8 +8058,13 @@
 
   <!-- Modal de Administración de Canción -->
   <div class="modal-overlay" id="admin-song-modal">
-    <div class="modal-box" style="max-width: 480px; max-height: 90vh; overflow-y: auto;">
-      <h2 class="modal-title" id="song-modal-title" style="color: var(--teal);">Agregar Nueva Canción</h2>
+    <div class="modal-box" style="max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <button onclick="document.getElementById('admin-song-modal').classList.remove('active')" style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Volver
+        </button>
+        <h2 class="modal-title" id="song-modal-title" style="margin:0; font-size:20px; color: var(--teal); text-align:right;">Agregar Nueva Canción</h2>
+      </div>
       <p class="modal-subtitle" style="margin-bottom: 16px;">Completa los datos de la canción para guardarla en el repertorio global.</p>
       <form id="form-add-song">
 
