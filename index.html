@@ -3988,6 +3988,7 @@
         tabManager: persistentMultipleTabManager()
       })
     });
+    window.db = db;
 
     // Nodos DOM globales
     const screenLogin = document.getElementById('screen-login');
@@ -4492,6 +4493,25 @@
 
       _migrationInProgress = false;
     }
+
+    window.dangerouslyDeleteAllSongs = async function() {
+      if (!confirm("⚠️ ATENCIÓN: Esto borrará permanentemente TODAS las canciones de la biblioteca y sus letras. ¿Estás seguro?")) return;
+      if (!confirm("¿Seguro al 100%? Esta acción NO se puede deshacer.")) return;
+      
+      const songs = [...(window.cacheSongs || [])];
+      console.log(`Iniciando borrado de ${songs.length} canciones...`);
+      let count = 0;
+      for (const s of songs) {
+        try {
+          await deleteDoc(doc(db, "biblioteca_canciones", s.id));
+          await deleteDoc(doc(db, "letras_canciones", s.id));
+          count++;
+        } catch (err) {
+          console.error(`Error borrando ${s.nombre}:`, err);
+        }
+      }
+      alert(`¡Completado! Se borraron ${count} canciones.`);
+    };
 
     // ====================================================
     // ESCUCHA DE DATOS BASE Y ENLACE DE EVENTOS
