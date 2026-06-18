@@ -2184,68 +2184,6 @@
       .split-left-panel {
         flex: 0 0 380px; /* Fixed width for left list on wide screens */
       }
-    }
-
-    /* --- MOBILE STACKED SONG CARDS (max-width: 767px) --- */
-    @media (max-width: 767px) {
-      .musico-song-card {
-        flex-wrap: wrap !important;
-        align-items: center !important;
-        gap: 8px 12px !important;
-        padding: 12px 14px !important;
-      }
-      
-      .musico-song-card .song-card-info {
-        flex: 1 1 0% !important;
-        min-width: 0 !important;
-        width: auto !important;
-      }
-      
-      .musico-song-card .song-card-name {
-        white-space: normal !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        word-break: break-word !important;
-        display: flex !important;
-        flex-wrap: wrap !important;
-        align-items: center !important;
-        gap: 6px !important;
-        font-size: 18px !important;
-      }
-      .musico-song-card .song-card-artist {
-        font-size: 14px !important;
-      }
-      
-      /* Target the actions/buttons container (which has margin-left auto style inline) */
-      .musico-song-card > div[style*="margin-left"] {
-        flex: 0 0 100% !important;
-        margin-left: 0 !important;
-        margin-top: 4px !important;
-        width: 100% !important;
-        display: flex !important;
-        flex-wrap: wrap !important;
-        gap: 6px 8px !important;
-        justify-content: flex-start !important;
-        padding-right: 0 !important;
-      }
-      
-      /* Make sure buttons/selectors in the action row have unified sizing and touch support */
-      .musico-song-card > div[style*="margin-left"] select,
-      .musico-song-card > div[style*="margin-left"] .chip,
-      .musico-song-card > div[style*="margin-left"] .tone-indicator,
-      .musico-song-card > div[style*="margin-left"] .song-tone-badge,
-      .musico-song-card > div[style*="margin-left"] a.repertorio-action-btn,
-      .musico-song-card > div[style*="margin-left"] button {
-        font-size: 11px !important;
-        padding: 6px 10px !important;
-        min-height: 32px !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        margin: 0 !important;
-        border-radius: 6px !important;
-      }
-      
       /* Special tweak for checkbox and fav btn sizes on mobile to align nicely with the multi-line card */
       .musico-song-card .song-check {
         width: 24px !important;
@@ -3758,8 +3696,14 @@
         <!-- Canciones cargadas dinámicamente -->
       </div>
 
+      <!-- Acciones de selección múltiple y manual -->
+      <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+        <button id="btn-musico-add-selected" class="btn-primary" style="flex: 1; display: none; padding: 10px; font-size: 13px; align-items: center; justify-content: center;"></button>
+        <button id="btn-musico-toggle-custom" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 13px; background: rgba(255,255,255,0.05); border: 1px dashed var(--border); border-radius: var(--radius-sm); color: var(--text2);">+ Agregar Manual</button>
+      </div>
+
       <!-- Opción de agregar canción personalizada -->
-      <div style="border-top: 1px solid var(--border); padding-top: 14px;">
+      <div id="musico-custom-song-container" style="display: none; border-top: 1px solid var(--border); padding-top: 14px;">
         <h4
           style="font-size:12px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;">
           ¿No está en la lista? Escríbela rápido:</h4>
@@ -4050,8 +3994,14 @@
     // Navegación Swipe Back (History API)
     window.addEventListener('popstate', (e) => {
       const modalesActivos = document.querySelectorAll('.modal-overlay.active, .lyrics-modal-overlay.active, .tone-picker-overlay.active');
-      if (modalesActivos.length > 0) {
+      if (!e.state || !e.state.modal) {
         modalesActivos.forEach(m => m.classList.remove('active'));
+      } else {
+        modalesActivos.forEach(m => {
+          if (m.id !== e.state.modal) {
+            m.classList.remove('active');
+          }
+        });
       }
     });
 
@@ -6408,6 +6358,12 @@
             document.getElementById('musico-custom-tone').value = "C";
 
             renderAddSongResults(type, "");
+            
+            window._selectedSongsToAdd = new Set();
+            const btnAddSel1 = document.getElementById('btn-musico-add-selected');
+            if (btnAddSel1) btnAddSel1.style.display = 'none';
+            const customCont1 = document.getElementById('musico-custom-song-container');
+            if (customCont1) customCont1.style.display = 'none';
 
             document.getElementById('musico-add-song-modal').classList.add('active');
           });
@@ -7397,7 +7353,10 @@
 
         const div = document.createElement('div');
         div.className = "musico-song-card";
-        div.style.cssText = `background: transparent !important; border: none !important; border-radius: 0 !important; margin-bottom: 0 !important; padding: 14px 4px !important; box-shadow: none !important; ${cardBorder}`;
+        div.style.cssText = `background: transparent !important; border: none !important; border-radius: 0 !important; margin-bottom: 0 !important; padding: 14px 4px !important; box-shadow: none !important; cursor: pointer; ${cardBorder}`;
+        
+        const isChecked = window._selectedSongsToAdd && window._selectedSongsToAdd.has(s.id);
+
         div.innerHTML = `
           <!-- Centro: Info -->
           <div class="song-card-info" style="margin-left: 4px;">
@@ -7407,30 +7366,39 @@
             <div class="song-card-artist" style="color: var(--text2); font-size: 12px; margin-top: 2px;">${s.artista}</div>
           </div>
           
-          <!-- Extremo Derecho: Tono y Botón Agregar -->
-          <div style="display:flex; align-items:center; gap: 8px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
+          <!-- Extremo Derecho: Tono y Checkbox -->
+          <div style="display:flex; align-items:center; gap: 12px; margin-left:auto; flex-shrink:0; padding-right: 6px;">
             <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; ${badgeStyle}">Base: ${s.tonoBase}</div>
-            <button class="chip chip-teal btn-add-song-select" style="cursor:pointer; border:none; padding:6px 12px; font-weight:600; margin:0;" data-id="${s.id}">
-              Agregar
-            </button>
+            <div class="custom-checkbox" style="width:22px; height:22px; border-radius:6px; border:2px solid ${isChecked ? 'var(--teal)' : 'var(--border2)'}; background:${isChecked ? 'var(--teal)' : 'transparent'}; display:flex; align-items:center; justify-content:center; transition: all 0.2s;">
+              ${isChecked ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f0e17" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
+            </div>
           </div>
         `;
-        div.querySelector('.btn-add-song-select').addEventListener('click', async () => {
-          const songId = s.id;
-          const dateStr = window._targetAddSongDate || serviceDateSelect.value || document.getElementById('musico-service-date').value;
-          const path = `cancionesSeleccionadas.${songId}`;
-
-          const docRef = doc(db, "planes_servicio", dateStr);
-          const currentOrder = dataServicio.ordenCanciones || [];
-          await updateDoc(docRef, {
-            [path]: s.tonoBase,
-            // Guardamos el tipo de la canción para este servicio específico
-            [`cancionesSeleccionadasTipos.${songId}`]: type,
-            ordenCanciones: [...currentOrder, songId]
-          });
-
-          document.getElementById('musico-add-song-modal').classList.remove('active');
-          showToast(`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> "${s.nombre}" agregada al servicio`);
+        div.addEventListener('click', () => {
+          if (!window._selectedSongsToAdd) window._selectedSongsToAdd = new Set();
+          
+          const checkbox = div.querySelector('.custom-checkbox');
+          if (window._selectedSongsToAdd.has(s.id)) {
+            window._selectedSongsToAdd.delete(s.id);
+            checkbox.style.background = 'transparent';
+            checkbox.style.borderColor = 'var(--border2)';
+            checkbox.innerHTML = '';
+          } else {
+            window._selectedSongsToAdd.add(s.id);
+            checkbox.style.background = 'var(--teal)';
+            checkbox.style.borderColor = 'var(--teal)';
+            checkbox.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f0e17" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          }
+          
+          const btnAddSel = document.getElementById('btn-musico-add-selected');
+          if (btnAddSel) {
+            if (window._selectedSongsToAdd.size > 0) {
+              btnAddSel.style.display = 'flex';
+              btnAddSel.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg> Agregar ${window._selectedSongsToAdd.size}`;
+            } else {
+              btnAddSel.style.display = 'none';
+            }
+          }
         });
         resultsCont.appendChild(div);
       });
@@ -7479,6 +7447,54 @@
     if (btnCloseAddModal) {
       btnCloseAddModal.addEventListener('click', () => {
         document.getElementById('musico-add-song-modal').classList.remove('active');
+      });
+    }
+
+    // Agregar canción personalizada
+    // Toggle Agregar Manual
+    const btnToggleCustom = document.getElementById('btn-musico-toggle-custom');
+    if (btnToggleCustom) {
+      btnToggleCustom.addEventListener('click', () => {
+        const cont = document.getElementById('musico-custom-song-container');
+        if (cont) {
+          cont.style.display = cont.style.display === 'none' ? 'block' : 'none';
+        }
+      });
+    }
+
+    // Agregar Seleccionadas
+    const btnAddSelected = document.getElementById('btn-musico-add-selected');
+    if (btnAddSelected) {
+      btnAddSelected.addEventListener('click', async () => {
+        if (!window._selectedSongsToAdd || window._selectedSongsToAdd.size === 0) return;
+        
+        const dateStr = window._targetAddSongDate || serviceDateSelect.value || document.getElementById('musico-service-date').value;
+        const docRef = doc(db, "planes_servicio", dateStr);
+        const dataServicio = window._currentServiceData || {};
+        let currentOrder = dataServicio.ordenCanciones || [];
+        const type = window._targetAddSongType;
+        
+        let updates = {};
+        window._selectedSongsToAdd.forEach(songId => {
+          const s = (window.cacheSongs || []).find(x => x.id === songId);
+          if (s) {
+            updates[`cancionesSeleccionadas.${songId}`] = s.tonoBase;
+            updates[`cancionesSeleccionadasTipos.${songId}`] = type;
+            currentOrder.push(songId);
+          }
+        });
+        updates['ordenCanciones'] = currentOrder;
+        
+        try {
+          await updateDoc(docRef, updates);
+          showToast(`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> Se agregaron ${window._selectedSongsToAdd.size} canciones.`);
+          document.getElementById('musico-add-song-modal').classList.remove('active');
+          window._selectedSongsToAdd.clear();
+          renderAddSongResults(type, document.getElementById('musico-add-song-search').value.trim());
+        } catch(e) {
+          console.error("Error agregando selección", e);
+          showToast("Error al guardar selección.");
+        }
       });
     }
 
@@ -7533,6 +7549,12 @@
         document.getElementById('musico-custom-tone').value = "C";
 
         renderAddSongResults(type, "");
+        
+        window._selectedSongsToAdd = new Set();
+        const btnAddSel2 = document.getElementById('btn-musico-add-selected');
+        if (btnAddSel2) btnAddSel2.style.display = 'none';
+        const customCont2 = document.getElementById('musico-custom-song-container');
+        if (customCont2) customCont2.style.display = 'none';
 
         document.getElementById('musico-add-song-modal').classList.add('active');
       });
