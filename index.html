@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>AlabanApp — Panel de Equipo IMR4</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -368,10 +368,10 @@
     }
 
     .card {
-      background: var(--bg3);
-      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: var(--radius);
-      padding: 16px;
+      padding: 18px;
       margin-bottom: 12px;
     }
 
@@ -993,10 +993,16 @@
       overflow-y: auto !important;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior: none;
       flex: 1 1 auto;
       min-height: 0;
       max-height: 100%;
-      background: #0f0e17;
+      background: #000000;
+    }
+    
+    .lyrics-modal.immersive .lyrics-modal-header,
+    .lyrics-modal.immersive .lyrics-modal-footer {
+      display: none !important;
     }
 
     .lyrics-content {
@@ -1011,7 +1017,7 @@
     }
 
     .chord-highlight {
-      color: var(--teal);
+      color: var(--gold);
       font-weight: bold;
     }
 
@@ -1109,7 +1115,7 @@
     }
 
     .song-card-name {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 700;
       color: var(--text);
       margin-bottom: 4px;
@@ -1602,15 +1608,17 @@
         display: none !important;
       }
       .app-header {
-        padding: 12px 12px 0 !important;
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 12px !important;
+        padding: 12px 14px 0 !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
       }
       .app-header > div:not(.logo) {
-        width: 100% !important;
         display: flex !important;
-        justify-content: space-between !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 6px !important;
       }
       .logo {
         font-size: 19px !important;
@@ -2202,10 +2210,10 @@
         flex-wrap: wrap !important;
         align-items: center !important;
         gap: 6px !important;
-        font-size: 16px !important;
+        font-size: 18px !important;
       }
       .musico-song-card .song-card-artist {
-        font-size: 13px !important;
+        font-size: 14px !important;
       }
       
       /* Target the actions/buttons container (which has margin-left auto style inline) */
@@ -3186,7 +3194,7 @@
         }
 
         const overlay = document.getElementById('ensayo-practice-overlay');
-        if (overlay) overlay.classList.add('active');
+        if (overlay) window.abrirModalConHistorial('ensayo-practice-overlay');
       };
 
       function toggleEnsayoConfirm(ensayoId, userId, btnElem) {
@@ -3835,10 +3843,10 @@
             </div>
 
             <!-- Zoom Tamaño Letra -->
-            <div style="display: inline-flex; align-items: center; gap: 2px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 2px 4px;">
-              <button id="lyrics-modal-zoom-down" style="background:none; border:none; color:var(--text3); font-weight:bold; cursor:pointer; padding: 0 6px; font-size: 11px;" title="Reducir letra">A-</button>
-              <span id="lyrics-modal-zoom-val" style="font-size: 10px; color: var(--text2); font-weight: 600;">14</span>
-              <button id="lyrics-modal-zoom-up" style="background:none; border:none; color:var(--text3); font-weight:bold; cursor:pointer; padding: 0 6px; font-size: 11px;" title="Agrandar letra">A+</button>
+            <div style="display: inline-flex; align-items: center; gap: 4px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 4px 6px;">
+              <button id="lyrics-modal-zoom-down" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color:var(--text); font-weight:bold; cursor:pointer; padding: 8px 16px; font-size: 16px;" title="Reducir letra">A-</button>
+              <span id="lyrics-modal-zoom-val" style="font-size: 14px; color: var(--gold); font-weight: 700; min-width: 24px; text-align: center;">20</span>
+              <button id="lyrics-modal-zoom-up" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color:var(--text); font-weight:bold; cursor:pointer; padding: 8px 16px; font-size: 16px;" title="Agrandar letra">A+</button>
             </div>
           </div>
         </div>
@@ -4037,6 +4045,29 @@
     // Nodos DOM globales
     const screenLogin = document.getElementById('screen-login');
     const screenDashboard = document.getElementById('screen-dashboard');
+    
+    // Navegación Swipe Back (History API)
+    window.addEventListener('popstate', (e) => {
+      const modalesActivos = document.querySelectorAll('.modal-overlay.active, .lyrics-modal-overlay.active, .tone-picker-overlay.active');
+      if (modalesActivos.length > 0) {
+        modalesActivos.forEach(m => m.classList.remove('active'));
+      }
+    });
+
+    window.abrirModalConHistorial = function(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.add('active');
+        history.pushState({ modal: modalId }, '');
+      }
+    };
+    
+    window.cerrarModalConHistorial = function(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal && modal.classList.contains('active')) {
+        history.back(); // Esto dispara el popstate y cierra el modal
+      }
+    };
     const loginForm = document.getElementById('login-form');
     const btnLogout = document.getElementById('btn-logout');
     const displayRole = document.getElementById('display-role');
@@ -6591,7 +6622,7 @@
 
     let _scrollInterval = null;
     let _scrollSpeed = 2; // 1 a 5
-    let _currentZoom = 14; // default
+    let _currentZoom = 20; // default
 
     function detenerAutoscroll() {
       if (_scrollInterval) {
@@ -6661,9 +6692,9 @@
 
     function aplicarZoomLetra(dir, contentId, zoomValId) {
       if (dir === 'up') {
-        _currentZoom = Math.min(_currentZoom + 1, 28);
+        _currentZoom = Math.min(_currentZoom + 2, 40);
       } else {
-        _currentZoom = Math.max(_currentZoom - 1, 10);
+        _currentZoom = Math.max(_currentZoom - 2, 10);
       }
       const el = document.getElementById(contentId);
       if (el) el.style.fontSize = _currentZoom + 'px';
@@ -6673,6 +6704,18 @@
     }
 
     function inicializarControlesLetra() {
+      // --- Immersive Mode Toggle ---
+      const lyricsBody = document.getElementById('lyrics-modal-body');
+      if (lyricsBody && !lyricsBody.dataset.boundImmersive) {
+        lyricsBody.dataset.boundImmersive = 'true';
+        lyricsBody.addEventListener('click', (e) => {
+          // Si el click fue en un botón u otro control interactivo, no ocultar
+          if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+          const modalInner = document.querySelector('.lyrics-modal');
+          if (modalInner) modalInner.classList.toggle('immersive');
+        });
+      }
+
       // --- Controles de Móvil (Modal) ---
       const mobBtn = document.getElementById('lyrics-modal-autoscroll-btn');
       if (mobBtn && !mobBtn.dataset.bound) {
@@ -6872,26 +6915,23 @@
 
       const hasLetra = song.letra && song.letra.trim() !== "";
       const lyricsContentContainer = document.getElementById(destPrefix + 'content');
-      if (lyricsContentContainer) {
-        if (hasLetra) {
-          lyricsContentContainer.innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, tonoMostrar);
-        } else {
-          lyricsContentContainer.innerHTML = `
+      const lyricsHtml = hasLetra ? renderizarLetraTranspuesta(song.letra, song.tonoBase, tonoMostrar) : `
             <div style="text-align:center; padding: 60px 20px; color: var(--text3);">
               <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
               <h4 style="color: var(--text2); margin-bottom: 8px; font-family: var(--font-display); font-size: 22px;">Letra no disponible</h4>
               <p style="font-size: 13px; max-width: 280px; margin: 0 auto; line-height: 1.5;">Esta canción aún no tiene la letra registrada en el repertorio global.</p>
             </div>
           `;
-        }
-      }
 
       if (isSplitView) {
-        // Mostrar panel, ocultar placeholder
+        document.getElementById('panel-lyrics-content').innerHTML = lyricsHtml;
+        document.getElementById('panel-lyrics-tone-display').textContent = tonoMostrar;
         document.querySelector('#musico-lyrics-detail-panel .lyrics-detail-placeholder').style.display = 'none';
         document.querySelector('#musico-lyrics-detail-panel .lyrics-detail-content-area').style.display = 'flex';
       } else {
-        document.getElementById('lyrics-modal-overlay').classList.add('active');
+        document.getElementById('lyrics-modal-content').innerHTML = lyricsHtml;
+        document.getElementById('lyrics-modal-tone-display').textContent = tonoMostrar;
+        window.abrirModalConHistorial('lyrics-modal-overlay');
 
         // Configurar Paginación (solo para el Modal, ya que en Split-View navegas haciendo click en la lista)
         const currentList = playlistContext || window._currentServiceSongs || [];
@@ -6902,6 +6942,12 @@
         const prevNameLabel = document.getElementById('lyrics-modal-prev-name');
         const nextNameLabel = document.getElementById('lyrics-modal-next-name');
         const pageIndicator = document.getElementById('lyrics-modal-page-indicator');
+        const closeBtn = document.getElementById('lyrics-modal-close');
+        if (closeBtn) {
+          closeBtn.onclick = () => {
+            window.cerrarModalConHistorial('lyrics-modal-overlay');
+          };
+        }
 
         if (prevBtn && nextBtn && pageIndicator) {
           if (currentIndex !== -1 && currentList.length > 1) {
@@ -6979,7 +7025,7 @@
     });
 
     document.getElementById('practice-modal-close').addEventListener('click', () => {
-      document.getElementById('ensayo-practice-overlay').classList.remove('active');
+      window.cerrarModalConHistorial('ensayo-practice-overlay');
     });
 
     // ====================================================
