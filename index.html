@@ -5343,32 +5343,50 @@
 
         // --- Extraer letra/acordes ---
         let letra = '';
-        const pres = doc2.querySelectorAll('pre');
-        if (pres.length > 0) {
-          letra = Array.from(pres).map(p => p.textContent).join('\n\n');
+        const preElements = Array.from(doc2.querySelectorAll('pre, PRE'));
+        const pre = preElements.find(p => p.textContent.trim().length > 10) || preElements[0];
+        if (pre) {
+          letra = pre.textContent.trim();
         } else {
           const tBody = doc2.getElementById('t_body');
-          if (tBody) letra = tBody.innerText;
+          if (tBody) letra = tBody.innerText.trim();
         }
 
         // --- Extraer tono ---
         let tonoBase = 'C';
-        const bodyText = doc2.body?.innerText || html;
-        const tonoMatch = bodyText.match(/[Tt]ono[:\s]+([A-Ga-g][#bm]*)/);
-        if (tonoMatch) {
-          tonoBase = tonoMatch[1].toUpperCase();
-        } else if (letra) {
-          // Intentar adivinar por el primer acorde
-          const chordRegex = /\b(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])[#bm]*\b/i;
-          const firstChordMatch = letra.match(chordRegex);
-          if (firstChordMatch) {
-            let chordFound = firstChordMatch[0].toUpperCase();
-            const mapAcordes = { 'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B' };
-            Object.keys(mapAcordes).forEach(k => {
-              if (chordFound.startsWith(k)) chordFound = chordFound.replace(k, mapAcordes[k]);
-            });
-            const cleanMatch = chordFound.match(/^([CDEFGAB][#bm]*)/);
-            if (cleanMatch) tonoBase = cleanMatch[1];
+        const odesMatch = html.match(/odes\s*=\s*['"]([^'"]+)['"]/);
+        if (odesMatch) {
+          const cleanOdes = odesMatch[1].replace(/@/g, '#');
+          const chords = cleanOdes.split(/\s+/).filter(Boolean);
+          if (chords.length > 0) {
+            const primerAcorde = chords[0];
+            const cleanMatch = primerAcorde.match(/^([A-G][#b]?)(m)?/i);
+            if (cleanMatch) {
+              let nota = cleanMatch[1];
+              nota = nota.charAt(0).toUpperCase() + nota.substring(1).toLowerCase();
+              const esMenor = cleanMatch[2] ? 'm' : '';
+              tonoBase = nota + esMenor;
+            }
+          }
+        } else {
+          // Fallback al texto de la página
+          const bodyText = doc2.body?.innerText || html;
+          const tonoMatch = bodyText.match(/[Tt]ono[:\s]+([A-Ga-g][#bm]*)/);
+          if (tonoMatch) {
+            tonoBase = tonoMatch[1].toUpperCase();
+          } else if (letra) {
+            // Intentar adivinar por el primer acorde
+            const chordRegex = /\b(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])[#bm]*\b/i;
+            const firstChordMatch = letra.match(chordRegex);
+            if (firstChordMatch) {
+              let chordFound = firstChordMatch[0].toUpperCase();
+              const mapAcordes = { 'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B' };
+              Object.keys(mapAcordes).forEach(k => {
+                if (chordFound.startsWith(k)) chordFound = chordFound.replace(k, mapAcordes[k]);
+              });
+              const cleanMatch = chordFound.match(/^([CDEFGAB][#bm]*)/);
+              if (cleanMatch) tonoBase = cleanMatch[1];
+            }
           }
         }
 

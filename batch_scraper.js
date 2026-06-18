@@ -1,46 +1,65 @@
 const fs = require('fs');
 const path = require('path');
 
-// Obtener el input desde la línea de comandos
-const rawInput = process.argv[2];
-
-if (!rawInput) {
-  console.log("\x1b[31m%s\x1b[0m", "⚠️ Error: Debes especificar el artista (slug o URL).");
-  console.log("Ejemplo de uso:");
-  console.log("  node scraper.js https://acordes.lacuerda.net/marcos_witt/");
-  console.log("  node scraper.js marcos_witt");
-  process.exit(1);
-}
-
-// Extraer el slug del artista del input
-let artistSlug = '';
-if (rawInput.includes('lacuerda.net')) {
-  // Limpiar protocolo y subdominio
-  const cleaned = rawInput.replace(/https?:\/\//i, '').replace(/www\./i, '');
-  const parts = cleaned.split('/').filter(Boolean);
-  if (parts.length > 1) {
-    artistSlug = parts[1]; // parte después del dominio (ej: 'marcos_witt')
-  } else {
-    artistSlug = parts[0];
-  }
-} else {
-  artistSlug = rawInput.trim();
-}
-
-if (!artistSlug) {
-  console.log("\x1b[31m%s\x1b[0m", "⚠️ Error: No se pudo identificar el slug del artista a partir del input.");
-  process.exit(1);
-}
+const artists = [
+  'alex_campos',
+  'abel_zavala',
+  'barak',
+  'bethel_music',
+  'christine_dclario',
+  'coalo_zamorano',
+  'corazon',
+  'coros_unidos',
+  'danilo_montero',
+  'danny_berrios',
+  'ebenezer',
+  'elevation_worship',
+  'en_espiritu_y_en_verdad',
+  'evan_craft',
+  'generacion_12',
+  'hillsong_united',
+  'ingrid_rosario',
+  'inspiracion',
+  'jesus_adrian_romero',
+  'jose_luis_reyes',
+  'juan_carlos_alvarado',
+  'julio_melgar',
+  'marcela_gandara',
+  'marco_barrientos',
+  'marcos_brunet',
+  'marcos_witt',
+  'miel_san_marcos',
+  'montesanto',
+  'musica_religiosa',
+  'new_wine',
+  'oasis_ministry',
+  'palabra_en_accion',
+  'rojo',
+  'vino_nuevo'
+];
 
 async function scrapeArtist(slug) {
+  const outPath = path.join(__dirname, `${slug}_corregido.json`);
+  
+  // Si el archivo ya existe y tiene datos, nos lo saltamos para ahorrar tiempo y no duplicar trabajo
+  if (fs.existsSync(outPath)) {
+    try {
+      const stats = fs.statSync(outPath);
+      if (stats.size > 200) {
+        console.log(`⏩ [Saltado] El archivo para "${slug}" ya existe y tiene datos (${outPath})`);
+        return;
+      }
+    } catch (e) {}
+  }
+
   const baseUrl = `https://acordes.lacuerda.net/${slug}/`;
-  console.log(`\n🔍 Conectando con LaCuerda para obtener canciones de: "${slug}"...`);
+  console.log(`\n🔍 Conectando con LaCuerda para: "${slug}"...`);
   
   try {
     const res = await fetch(baseUrl);
     if (!res.ok) {
-      console.log("\x1b[31m%s\x1b[0m", `❌ Error al conectar con la página del artista (Status: ${res.status}). Verifica el slug.`);
-      process.exit(1);
+      console.log(`❌ Error al conectar con la página del artista "${slug}" (Status: ${res.status}).`);
+      return;
     }
     
     const buffer = await res.arrayBuffer();
@@ -74,49 +93,42 @@ async function scrapeArtist(slug) {
     });
     
     if (songUrls.length === 0) {
-      console.log("\x1b[33m%s\x1b[0m", "⚠️ No se encontraron canciones. Verifica que el slug del artista sea correcto.");
-      process.exit(1);
+      console.log(`⚠️ No se encontraron canciones para "${slug}".`);
+      return;
     }
     
-    console.log(`\x1b[32m%s\x1b[0m`, `✅ Se encontraron ${songUrls.length} canciones.`);
-    console.log(`Iniciando descarga de letras y acordes... (Espera de 400ms entre canciones para evitar bloqueos)\n`);
+    console.log(`✅ Se encontraron ${songUrls.length} canciones para "${slug}". Iniciando descarga...`);
     
     const resultado = [];
     
     for (let i = 0; i < songUrls.length; i++) {
       const s = songUrls[i];
-      process.stdout.write(`[${i+1}/${songUrls.length}] Descargando: "${s.name}"... `);
       
       try {
         const resp = await fetch(s.url);
         if (!resp.ok) {
-          console.log(`❌ Falló la descarga (Status: ${resp.status})`);
+          console.log(`  [${i+1}/${songUrls.length}] ❌ Falló la descarga de "${s.name}"`);
           continue;
         }
         
         const songBuf = await resp.arrayBuffer();
         const songHtml = decoder.decode(songBuf);
         
-        // Extraer título
         const titleMatch = songHtml.match(/<TITLE>([^:]+):/i) || songHtml.match(/<h1[^>]*>([^<]+)<\/h1>/i);
         let nombre = titleMatch ? titleMatch[1].trim() : s.name;
         
-        // Limpiar nombre de la canción
         nombre = nombre
-          .replace(/,?\s*Abel Zavala/gi, '') // Limpiar artista específico si venía en el title
-          .replace(new RegExp(`,?\\s*${slug.replace(/_/g, ' ')}`, 'gi'), '') // Limpiar dinámico
+          .replace(new RegExp(`,?\\s*${slug.replace(/_/g, ' ')}`, 'gi'), '')
           .replace(/\s*[\(,\-]?\s*(acordes|letra|letras|tab|tabs|chords|lyric|lyrics|acordes\s+y\s+letra|letra\s+y\s+acordes|acordes\s+y\s+tab|tab\s+y\s+acordes)\s*\)?/gi, '')
           .replace(/\s+/g, ' ')
           .trim();
           
-        // Extraer PRE (letra)
         const preMatches = songHtml.match(/<pre[^>]*>([\s\S]*?)<\/pre>/gi) || [];
         const cleanPreMatches = preMatches.map(m => m.replace(/<[^>]*>/g, ''));
         const bestIdx = cleanPreMatches.findIndex(c => c.trim().length > 10);
         const bestPre = bestIdx !== -1 ? preMatches[bestIdx] : (preMatches[0] || '');
         const letra = bestPre.replace(/<[^>]*>/g, '').trim();
         
-        // Detección de tono base
         let tonoBase = 'C';
         const odesMatch = songHtml.match(/odes\s*=\s*['"]([^'"]+)['"]/);
         if (odesMatch) {
@@ -137,7 +149,6 @@ async function scrapeArtist(slug) {
           if (tonoMatch) tonoBase = tonoMatch[1];
         }
         
-        // Formatear nombre del artista
         const formattedArtist = slug.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
         
         resultado.push({
@@ -149,25 +160,32 @@ async function scrapeArtist(slug) {
           youtube: ''
         });
         
-        console.log(`\x1b[32m%s\x1b[0m`, `OK (Tono: ${tonoBase})`);
-        
       } catch (e) {
-        console.log(`\x1b[31m%s\x1b[0m`, `ERROR: ${e.message}`);
+        console.log(`  [${i+1}/${songUrls.length}] ❌ Error en "${s.name}": ${e.message}`);
       }
       
+      // Espera de 400ms para evitar sobrecargar el servidor
       await new Promise(r => setTimeout(r, 400));
     }
     
-    const outPath = path.join(__dirname, `${slug}_corregido.json`);
     fs.writeFileSync(outPath, JSON.stringify(resultado, null, 2), 'utf-8');
-    
-    console.log(`\n\x1b[32m%s\x1b[0m`, `🎉 ¡ÉXITO COMPLETO!`);
-    console.log(`Archivo guardado en: ${outPath}`);
-    console.log(`Canciones descargadas: ${resultado.length}\n`);
+    console.log(`\x1b[32m%s\x1b[0m`, `🎉 ¡Completado! Guardado: ${resultado.length} canciones en ${outPath}`);
     
   } catch (err) {
-    console.error('❌ Error general durante el scraping:', err);
+    console.error(`❌ Error general en "${slug}":`, err);
   }
 }
 
-scrapeArtist(artistSlug);
+async function scrapeAll() {
+  console.log(`🚀 INICIANDO DESCARGA EN LOTE DE ${artists.length} ARTISTAS...`);
+  const start = Date.now();
+  
+  for (const slug of artists) {
+    await scrapeArtist(slug);
+  }
+  
+  const diff = ((Date.now() - start) / 1000 / 60).toFixed(2);
+  console.log(`\n🎉 🎉 🎉 ¡TODAS LAS DESCARGAS COMPLETADAS EN ${diff} MINUTOS! 🎉 🎉 🎉`);
+}
+
+scrapeAll();
