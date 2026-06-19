@@ -5602,8 +5602,8 @@
       const letra = document.getElementById('song-lyrics-input').value;
 
       const payloadMetadata = {
-        nombre,
-        artista,
+        nombre: fixCorruptedText(nombre),
+        artista: fixCorruptedText(artista),
         tonoBase: document.getElementById('song-key-input').value.trim(),
         tipo: document.getElementById('song-type-input').value,
         youtube: document.getElementById('song-youtube-input').value.trim()
@@ -5623,7 +5623,7 @@
       await setDoc(doc(db, "biblioteca_canciones", idUnico), payloadMetadata);
 
       // 2. Guardar letra en letras_canciones
-      await setDoc(doc(db, "letras_canciones", idUnico), { letra });
+      await setDoc(doc(db, "letras_canciones", idUnico), { letra: fixCorruptedText(letra) });
 
       // 3. Guardar en cache local de letras
       if (!window._lyricsCache) window._lyricsCache = {};
@@ -5760,8 +5760,8 @@
         }
 
         // --- Rellenar el formulario ---
-        if (nombre) document.getElementById('song-name-input').value = nombre;
-        if (artista) document.getElementById('song-artist-input').value = artista;
+        if (nombre) document.getElementById('song-name-input').value = fixCorruptedText(nombre);
+        if (artista) document.getElementById('song-artist-input').value = fixCorruptedText(artista);
 
         const keySelect = document.getElementById('song-key-input');
         if (keySelect) {
@@ -5769,7 +5769,7 @@
           if (opt) keySelect.value = tonoBase;
         }
 
-        if (letra) document.getElementById('song-lyrics-input').value = letra;
+        if (letra) document.getElementById('song-lyrics-input').value = fixCorruptedText(letra);
 
         if (nombre && artista) {
           statusEl.textContent = `Importado: "${nombre}" de ${artista}`;
