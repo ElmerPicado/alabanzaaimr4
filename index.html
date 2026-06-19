@@ -287,6 +287,7 @@
       background: var(--bg3);
       border-radius: 10px;
     }
+
     .musico-subtab {
       flex: 1;
       padding: 8px 10px;
@@ -301,14 +302,16 @@
       transition: all 0.2s;
       white-space: nowrap;
     }
+
     .musico-subtab.active {
       background: var(--bg2);
       color: var(--gold);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
     }
+
     .btn-fav-song {
       background: none;
-      border: 1.5px solid rgba(255,200,60,0.3);
+      border: 1.5px solid rgba(255, 200, 60, 0.3);
       border-radius: 8px;
       width: 40px;
       height: 40px;
@@ -323,19 +326,21 @@
       margin: 0;
       flex-shrink: 0;
     }
+
     .btn-fav-song.es-fav {
       color: #f5c518;
-      border-color: rgba(245,197,24,0.5);
-      background: rgba(245,197,24,0.08);
+      border-color: rgba(245, 197, 24, 0.5);
+      background: rgba(245, 197, 24, 0.08);
     }
+
     .badge-oficial {
       font-size: 10px;
       font-weight: 700;
       padding: 2px 7px;
       border-radius: 4px;
-      background: rgba(78,205,196,0.12);
+      background: rgba(78, 205, 196, 0.12);
       color: var(--teal);
-      border: 1px solid rgba(78,205,196,0.3);
+      border: 1px solid rgba(78, 205, 196, 0.3);
       white-space: nowrap;
     }
 
@@ -610,7 +615,8 @@
       width: 100%;
       max-width: 340px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-      margin: auto 0; /* Centers vertically when short, scrolls from top when tall */
+      margin: auto 0;
+      /* Centers vertically when short, scrolls from top when tall */
     }
 
     .modal-title {
@@ -999,7 +1005,7 @@
       max-height: 100%;
       background: #000000;
     }
-    
+
     .lyrics-modal.immersive .lyrics-modal-header,
     .lyrics-modal.immersive .lyrics-modal-footer {
       display: none !important;
@@ -1084,11 +1090,11 @@
       margin-bottom: 12px !important;
     }
 
-    .section-group-card > h4 {
+    .section-group-card>h4 {
       padding: 0 16px !important;
     }
 
-    .section-group-card > div {
+    .section-group-card>div {
       gap: 0 !important;
     }
 
@@ -1314,30 +1320,36 @@
       border: 1px solid transparent;
       user-select: none;
     }
+
     .repertorio-btn-youtube {
       background: rgba(255, 107, 107, 0.08);
       border: 1px solid rgba(255, 107, 107, 0.3);
       color: var(--coral);
       box-shadow: 0 2px 6px rgba(255, 107, 107, 0.1);
     }
+
     .repertorio-btn-youtube:hover {
       background: rgba(255, 107, 107, 0.15);
       transform: translateY(-1px);
     }
+
     .repertorio-btn-youtube:active {
       transform: scale(0.96);
       background: rgba(255, 107, 107, 0.25);
     }
+
     .repertorio-btn-letra {
       background: rgba(78, 205, 196, 0.08);
       border: 1px solid rgba(78, 205, 196, 0.3);
       color: var(--teal);
       box-shadow: 0 2px 6px rgba(78, 205, 196, 0.1);
     }
+
     .repertorio-btn-letra:hover {
       background: rgba(78, 205, 196, 0.15);
       transform: translateY(-1px);
     }
+
     .repertorio-btn-letra:active {
       transform: scale(0.96);
       background: rgba(78, 205, 196, 0.25);
@@ -1498,9 +1510,11 @@
       border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
       box-shadow: none !important;
     }
+
     body.theme-light .musico-song-card:hover {
       background: rgba(0, 0, 0, 0.02) !important;
     }
+
     body.theme-light .musico-song-card:active {
       background: rgba(0, 0, 0, 0.04) !important;
     }
@@ -1530,21 +1544,26 @@
       color: #cc0000;
       box-shadow: 0 2px 6px rgba(255, 68, 68, 0.1);
     }
+
     body.theme-light .repertorio-btn-youtube:hover {
       background: rgba(255, 68, 68, 0.15);
     }
+
     body.theme-light .repertorio-btn-youtube:active {
       background: rgba(255, 68, 68, 0.25);
     }
+
     body.theme-light .repertorio-btn-letra {
       background: rgba(0, 150, 136, 0.08);
       border-color: rgba(0, 150, 136, 0.3);
       color: #00796b;
       box-shadow: 0 2px 6px rgba(0, 150, 136, 0.1);
     }
+
     body.theme-light .repertorio-btn-letra:hover {
       background: rgba(0, 150, 136, 0.15);
     }
+
     body.theme-light .repertorio-btn-letra:active {
       background: rgba(0, 150, 136, 0.25);
     }
@@ -1573,12 +1592,12 @@
       position: relative;
       cursor: pointer;
     }
-    
+
     .user-avatar-container:hover .avatar {
       transform: scale(1.08);
       border-color: var(--teal) !important;
     }
-    
+
     .user-avatar-container::after {
       content: '📷';
       position: absolute;
@@ -1594,12 +1613,12 @@
       align-items: center;
       justify-content: center;
       pointer-events: none;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
     }
-    
+
     body.theme-light .user-avatar-container::after {
       background: #ffffff;
-      border-color: rgba(0,0,0,0.15);
+      border-color: rgba(0, 0, 0, 0.15);
     }
 
     /* Hide text on mobile for tighter header fit */
@@ -1607,6 +1626,7 @@
       .hide-mobile {
         display: none !important;
       }
+
       .app-header {
         padding: 12px 14px 10px !important;
         flex-wrap: wrap !important;
@@ -1614,7 +1634,8 @@
         justify-content: space-between !important;
         gap: 10px !important;
       }
-      .app-header > div:not(.logo) {
+
+      .app-header>div:not(.logo) {
         display: flex !important;
         align-items: center !important;
         justify-content: flex-end !important;
@@ -1622,12 +1643,15 @@
         gap: 8px !important;
         width: 100%;
       }
+
       .logo {
         font-size: 19px !important;
       }
+
       .logo span {
         font-size: 13px !important;
       }
+
       .role-badge {
         max-width: 120px;
         overflow: hidden;
@@ -1636,6 +1660,7 @@
         padding: 6px 10px !important;
         font-size: 12px !important;
       }
+
       .theme-btn {
         padding: 4px 6px !important;
         min-width: unset !important;
@@ -1643,7 +1668,9 @@
         height: 30px !important;
         font-size: 11px !important;
       }
-      .sos-btn, .btn-logout {
+
+      .sos-btn,
+      .btn-logout {
         padding: 6px 14px !important;
         font-size: 13px !important;
         height: auto !important;
@@ -1652,10 +1679,12 @@
         text-align: center;
         justify-content: center;
       }
+
       .user-avatar-container .avatar {
         width: 28px !important;
         height: 28px !important;
       }
+
       .user-avatar-container::after {
         width: 12px;
         height: 12px;
@@ -1670,6 +1699,7 @@
       padding: 0 !important;
       overscroll-behavior: contain !important;
     }
+
     .lyrics-modal {
       width: 100% !important;
       max-width: 100% !important;
@@ -1692,26 +1722,31 @@
       justify-content: space-between;
       align-items: flex-start;
     }
+
     .ensayo-card-info {
       flex: 1;
       min-width: 0;
     }
+
     .ensayo-card-title {
       font-size: 16px;
       font-weight: 600;
       color: var(--text);
       margin-bottom: 4px;
     }
+
     .ensayo-card-date {
       font-size: 12px;
       color: var(--teal);
       margin-bottom: 4px;
     }
+
     .ensayo-card-confirmations {
       font-size: 11px;
       color: var(--text3);
       margin-bottom: 6px;
     }
+
     .ensayo-card-songs {
       font-size: 11px;
       color: var(--text2);
@@ -1719,6 +1754,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     .ensayo-card-actions {
       display: flex;
       flex-direction: column;
@@ -1726,6 +1762,7 @@
       margin-left: 10px;
       flex-shrink: 0;
     }
+
     .ensayo-card-actions .chip {
       cursor: pointer;
       border: none;
@@ -1741,6 +1778,7 @@
       align-items: flex-start;
       margin-bottom: 4px;
     }
+
     .musico-ensayo-practice-btn {
       margin-top: 12px;
       background: rgba(155, 143, 255, 0.12);
@@ -1755,6 +1793,7 @@
       justify-content: center;
       gap: 8px;
     }
+
     .musico-card-attendance-section {
       margin-top: 12px;
       display: flex;
@@ -1763,17 +1802,20 @@
       border-top: 1px solid var(--border);
       padding-top: 10px;
     }
+
     .musico-attendance-status-text {
       font-size: 12px;
       color: var(--text2);
       font-weight: 500;
       margin-bottom: 4px;
     }
+
     .musico-attendance-buttons {
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
     }
+
     .musico-attendance-buttons .attendance-btn {
       margin-top: 0;
       font-size: 11px;
@@ -1783,12 +1825,15 @@
       color: #0f0e17;
       font-weight: 600;
     }
+
     .attendance-btn-yes {
       background: var(--teal) !important;
     }
+
     .attendance-btn-maybe {
       background: var(--gold) !important;
     }
+
     .attendance-btn-no {
       background: var(--coral) !important;
     }
@@ -1797,42 +1842,52 @@
 
     /* --- RESPONSIVE FLUID SCALING (Tablets & Wider) --- */
     @media (min-width: 600px) {
+
       /* Fluid scale: larger padding, larger fonts on tablet */
       .card {
         padding: 24px !important;
         margin-bottom: 18px !important;
         border-radius: var(--radius-lg) !important;
       }
+
       .ensayo-card-title {
         font-size: 20px !important;
       }
+
       .ensayo-card-date {
         font-size: 15px !important;
       }
+
       .ensayo-card-confirmations {
         font-size: 14px !important;
         margin-bottom: 8px !important;
       }
+
       .ensayo-card-songs {
         font-size: 14px !important;
       }
+
       .ensayo-card-actions {
         gap: 8px !important;
         margin-left: 16px !important;
       }
+
       .ensayo-card-actions .chip {
         padding: 10px 18px !important;
         font-size: 13px !important;
         border-radius: 8px !important;
       }
+
       .musico-ensayo-practice-btn {
         padding: 16px !important;
         font-size: 15px !important;
         border-radius: var(--radius-sm) !important;
       }
+
       .musico-attendance-status-text {
         font-size: 15px !important;
       }
+
       .musico-attendance-buttons .attendance-btn {
         padding: 12px 16px !important;
         font-size: 13px !important;
@@ -1845,31 +1900,39 @@
         border-radius: 0 !important;
         margin-bottom: 0 !important;
       }
+
       .song-card-name {
         font-size: 18px !important;
       }
+
       .song-card-artist {
         font-size: 14px !important;
       }
+
       .song-num {
         font-size: 26px !important;
         min-width: 36px !important;
       }
+
       .tone-indicator {
         font-size: 14px !important;
         padding: 8px 16px !important;
         border-radius: 8px !important;
       }
-      .btn-ver-letra, .btn-ver-letra-modal {
+
+      .btn-ver-letra,
+      .btn-ver-letra-modal {
         padding: 10px 18px !important;
         font-size: 13px !important;
         border-radius: 8px !important;
       }
+
       .repertorio-btn-youtube {
         padding: 10px 18px !important;
         font-size: 13px !important;
         border-radius: 8px !important;
       }
+
       .btn-remove-song-inline {
         font-size: 22px !important;
         width: 36px !important;
@@ -1880,26 +1943,33 @@
         padding: 18px 12px !important;
         gap: 16px !important;
       }
+
       .song-name {
         font-size: 18px !important;
       }
+
       .song-meta {
         font-size: 14px !important;
         margin-top: 4px !important;
       }
+
       .song-check {
         width: 26px !important;
         height: 26px !important;
         border-radius: 8px !important;
       }
+
       .song-check.checked::after {
         font-size: 16px !important;
       }
+
       .select-change-tone {
         font-size: 13px !important;
         padding: 4px 10px !important;
       }
-      .click-edit-song, .click-del-song {
+
+      .click-edit-song,
+      .click-del-song {
         padding: 8px 16px !important;
         font-size: 13px !important;
         border-radius: 6px !important;
@@ -1909,27 +1979,35 @@
       .field label {
         font-size: 14px !important;
       }
-      .field input, .field select {
+
+      .field input,
+      .field select {
         padding: 15px 18px !important;
         font-size: 17px !important;
       }
+
       .btn-primary {
         padding: 18px !important;
         font-size: 17px !important;
       }
+
       .login-card {
         max-width: 460px !important;
         padding: 44px 36px !important;
       }
+
       .login-title {
         font-size: 38px !important;
       }
+
       .section-title {
         font-size: 28px !important;
       }
+
       .section-sub {
         font-size: 16px !important;
       }
+
       .lyrics-content {
         font-size: 26px;
         line-height: 1.8 !important;
@@ -1937,13 +2015,16 @@
         max-width: 900px !important;
         margin: 0 auto !important;
       }
+
       .lyrics-modal-body {
         padding: 32px 40px !important;
         overscroll-behavior-y: contain !important;
       }
+
       .lyrics-modal-title {
         font-size: 26px !important;
       }
+
       .lyrics-modal-meta {
         font-size: 16px !important;
       }
@@ -1953,6 +2034,7 @@
     #ensayo-practice-overlay {
       padding: 0 !important;
     }
+
     #ensayo-practice-overlay .modal-box {
       width: 100% !important;
       max-width: 100% !important;
@@ -1966,10 +2048,12 @@
       box-sizing: border-box !important;
       background: var(--bg) !important;
     }
-    #ensayo-practice-overlay .modal-box > div:first-child {
+
+    #ensayo-practice-overlay .modal-box>div:first-child {
       padding-left: 16px !important;
       padding-right: 16px !important;
     }
+
     #practice-modal-songs {
       gap: 0 !important;
     }
@@ -1979,12 +2063,14 @@
       margin-left: 0 !important;
       margin-right: 0 !important;
     }
+
     .lyrics-modal-body {
       padding: 16px !important;
       display: block !important;
       overflow-y: auto !important;
       overflow-x: auto !important;
     }
+
     .lyrics-content {
       display: block !important;
       width: 100% !important;
@@ -1997,6 +2083,7 @@
       word-wrap: break-word !important;
       white-space: pre-wrap !important;
     }
+
     .lyrics-modal-footer {
       padding: 12px 16px !important;
       min-height: 70px !important;
@@ -2032,7 +2119,8 @@
       padding-bottom: calc(90px + env(safe-area-inset-bottom, 12px)) !important;
     }
 
-    .nav-tab, .nav-tab-musico {
+    .nav-tab,
+    .nav-tab-musico {
       display: flex !important;
       flex-direction: column !important;
       align-items: center !important;
@@ -2067,7 +2155,8 @@
       border: none !important;
     }
 
-    .nav-tab .nav-icon, .nav-tab-musico .nav-icon {
+    .nav-tab .nav-icon,
+    .nav-tab-musico .nav-icon {
       width: 23px !important;
       height: 23px !important;
       display: block !important;
@@ -2078,11 +2167,13 @@
       transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
     }
 
-    .nav-tab.active .nav-icon, .nav-tab-musico.active .nav-icon {
+    .nav-tab.active .nav-icon,
+    .nav-tab-musico.active .nav-icon {
       transform: translateY(-2px) scale(1.06) !important;
     }
 
-    .nav-tab .nav-label, .nav-tab-musico .nav-label {
+    .nav-tab .nav-label,
+    .nav-tab-musico .nav-label {
       font-size: 10.5px !important;
       font-weight: 500 !important;
       display: block !important;
@@ -2102,12 +2193,15 @@
       width: 100%;
       align-items: stretch;
     }
+
     .split-left-panel {
       flex: 1;
       min-width: 0;
     }
+
     .split-right-panel {
-      display: none; /* Hidden on mobile by default */
+      display: none;
+      /* Hidden on mobile by default */
       flex: 1.2;
       min-width: 0;
       background: var(--bg3);
@@ -2121,17 +2215,20 @@
       max-height: calc(100vh - 120px);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     }
+
     .lyrics-detail-content-area {
       display: flex;
       flex-direction: column;
       height: 100%;
     }
+
     .panel-lyrics-body {
       flex: 1;
       overflow-y: auto;
       margin-top: 15px;
       padding-right: 5px;
     }
+
     .artist-row-item {
       display: flex;
       justify-content: space-between;
@@ -2144,15 +2241,18 @@
       cursor: pointer;
       transition: background-color 0.2s ease, border-color 0.2s ease;
     }
+
     .artist-row-item:hover {
       background: rgba(255, 255, 255, 0.07);
       border-color: var(--teal);
     }
+
     .artist-row-name {
       font-weight: 600;
       font-size: 14px;
       color: var(--text);
     }
+
     .artist-row-count {
       font-size: 11px;
       color: var(--teal);
@@ -2161,6 +2261,7 @@
       border-radius: 12px;
       font-weight: 700;
     }
+
     .back-btn-header {
       display: flex;
       align-items: center;
@@ -2177,6 +2278,7 @@
       width: fit-content;
       transition: all 0.2s;
     }
+
     .back-btn-header:hover {
       background: rgba(78, 205, 196, 0.12);
       border-style: solid;
@@ -2184,20 +2286,26 @@
 
     @media (min-width: 768px) {
       .split-right-panel {
-        display: flex; /* Visible on tablet/desktop */
+        display: flex;
+        /* Visible on tablet/desktop */
       }
+
       .split-left-panel {
-        flex: 0 0 380px; /* Fixed width for left list on wide screens */
+        flex: 0 0 380px;
+        /* Fixed width for left list on wide screens */
       }
+
       /* Special tweak for checkbox and fav btn sizes on mobile to align nicely with the multi-line card */
       .musico-song-card .song-check {
         width: 24px !important;
         height: 24px !important;
       }
+
       .musico-song-card .btn-fav-song {
         width: 38px !important;
         height: 38px !important;
       }
+
       .musico-song-card .song-name {
         white-space: normal !important;
         overflow: visible !important;
@@ -2218,7 +2326,12 @@
   <div id="screen-login" class="screen active">
     <div class="login-card">
       <h1 class="login-title" style="text-align: center;">
-        Alaban<svg viewBox="0 0 55 100" fill="currentColor" style="width: 0.55em; height: 1.1em; display: inline-block; vertical-align: middle; transform: translateY(-0.06em); margin: 0 -2px;"><path d="M32.108,45.02C31.428,42.709,30.78,40.425,30.195,38.209C34.229,34.433,37.429,29.413,37.5,21.283C37.536,17.06,37.032,12.006,33.025,6.535C31.843,4.922,29.604,4.519,27.934,5.621C23.985,8.227,20,14.457,20,22.5C20,26.253,20.699,30.663,21.782,35.411C20.949,36.021,20.077,36.63,19.177,37.259C12.86,41.667,5,47.153,5,60C5,74.084,16.44,82.5,27.5,82.5C29.658,82.5,31.729,82.271,33.677,81.841C33.684,82.066,33.688,82.285,33.688,82.5C33.688,85.257,31.445,87.5,28.688,87.5C27.352,87.5,26.096,86.98,25.153,86.036L19.848,91.339C22.209,93.7,25.348,95,28.688,95C35.581,95,41.188,89.393,41.188,82.5C41.188,81.387,41.118,80.206,40.986,78.964C46.528,75.615,50,70.154,50,63.75C50,53.699,42.05,45.47,32.108,45.02ZM29.244,15.311C29.86,17.224,30.017,19.139,30,21.218C29.973,24.421,29.287,26.889,28.125,28.943C27.729,26.582,27.5,24.41,27.5,22.5C27.5,19.607,28.264,17.158,29.244,15.311ZM27.5,75C20.229,75,12.5,69.743,12.5,60C12.5,51.065,17.341,47.686,23.469,43.409C23.573,43.337,23.677,43.264,23.781,43.192C24.103,44.346,24.438,45.509,24.78,46.677C19.873,49.271,16.188,54.53,16.188,60C16.188,63.338,17.488,66.477,19.848,68.838L25.153,63.535C24.209,62.59,23.688,61.335,23.688,59.999C23.688,57.909,25.121,55.645,27.027,54.157C27.096,54.384,27.166,54.611,27.234,54.838C29.303,61.627,31.419,68.566,32.64,74.372C31.05,74.78,29.322,75,27.5,75ZM39.503,70.664C38.239,65.243,36.406,59.209,34.508,52.981C39.128,54.381,42.5,58.679,42.5,63.75C42.5,67.58,41.442,70.932,39.503,70.664Z"></path></svg>app
+        Alaban<svg viewBox="0 0 55 100" fill="currentColor"
+          style="width: 0.55em; height: 1.1em; display: inline-block; vertical-align: middle; transform: translateY(-0.06em); margin: 0 -2px;">
+          <path
+            d="M32.108,45.02C31.428,42.709,30.78,40.425,30.195,38.209C34.229,34.433,37.429,29.413,37.5,21.283C37.536,17.06,37.032,12.006,33.025,6.535C31.843,4.922,29.604,4.519,27.934,5.621C23.985,8.227,20,14.457,20,22.5C20,26.253,20.699,30.663,21.782,35.411C20.949,36.021,20.077,36.63,19.177,37.259C12.86,41.667,5,47.153,5,60C5,74.084,16.44,82.5,27.5,82.5C29.658,82.5,31.729,82.271,33.677,81.841C33.684,82.066,33.688,82.285,33.688,82.5C33.688,85.257,31.445,87.5,28.688,87.5C27.352,87.5,26.096,86.98,25.153,86.036L19.848,91.339C22.209,93.7,25.348,95,28.688,95C35.581,95,41.188,89.393,41.188,82.5C41.188,81.387,41.118,80.206,40.986,78.964C46.528,75.615,50,70.154,50,63.75C50,53.699,42.05,45.47,32.108,45.02ZM29.244,15.311C29.86,17.224,30.017,19.139,30,21.218C29.973,24.421,29.287,26.889,28.125,28.943C27.729,26.582,27.5,24.41,27.5,22.5C27.5,19.607,28.264,17.158,29.244,15.311ZM27.5,75C20.229,75,12.5,69.743,12.5,60C12.5,51.065,17.341,47.686,23.469,43.409C23.573,43.337,23.677,43.264,23.781,43.192C24.103,44.346,24.438,45.509,24.78,46.677C19.873,49.271,16.188,54.53,16.188,60C16.188,63.338,17.488,66.477,19.848,68.838L25.153,63.535C24.209,62.59,23.688,61.335,23.688,59.999C23.688,57.909,25.121,55.645,27.027,54.157C27.096,54.384,27.166,54.611,27.234,54.838C29.303,61.627,31.419,68.566,32.64,74.372C31.05,74.78,29.322,75,27.5,75ZM39.503,70.664C38.239,65.243,36.406,59.209,34.508,52.981C39.128,54.381,42.5,58.679,42.5,63.75C42.5,67.58,41.442,70.932,39.503,70.664Z">
+          </path>
+        </svg>app
       </h1>
       <p class="login-sub">Panel de Coordinación IMR4</p>
       <form id="login-form">
@@ -2238,16 +2351,24 @@
   <div id="screen-dashboard" class="screen">
     <header class="app-header">
       <div class="logo">
-        Alaban<svg viewBox="0 0 55 100" fill="currentColor" style="width: 0.55em; height: 1.1em; display: inline-block; vertical-align: middle; transform: translateY(-0.06em); margin: 0 -2px;"><path d="M32.108,45.02C31.428,42.709,30.78,40.425,30.195,38.209C34.229,34.433,37.429,29.413,37.5,21.283C37.536,17.06,37.032,12.006,33.025,6.535C31.843,4.922,29.604,4.519,27.934,5.621C23.985,8.227,20,14.457,20,22.5C20,26.253,20.699,30.663,21.782,35.411C20.949,36.021,20.077,36.63,19.177,37.259C12.86,41.667,5,47.153,5,60C5,74.084,16.44,82.5,27.5,82.5C29.658,82.5,31.729,82.271,33.677,81.841C33.684,82.066,33.688,82.285,33.688,82.5C33.688,85.257,31.445,87.5,28.688,87.5C27.352,87.5,26.096,86.98,25.153,86.036L19.848,91.339C22.209,93.7,25.348,95,28.688,95C35.581,95,41.188,89.393,41.188,82.5C41.188,81.387,41.118,80.206,40.986,78.964C46.528,75.615,50,70.154,50,63.75C50,53.699,42.05,45.47,32.108,45.02ZM29.244,15.311C29.86,17.224,30.017,19.139,30,21.218C29.973,24.421,29.287,26.889,28.125,28.943C27.729,26.582,27.5,24.41,27.5,22.5C27.5,19.607,28.264,17.158,29.244,15.311ZM27.5,75C20.229,75,12.5,69.743,12.5,60C12.5,51.065,17.341,47.686,23.469,43.409C23.573,43.337,23.677,43.264,23.781,43.192C24.103,44.346,24.438,45.509,24.78,46.677C19.873,49.271,16.188,54.53,16.188,60C16.188,63.338,17.488,66.477,19.848,68.838L25.153,63.535C24.209,62.59,23.688,61.335,23.688,59.999C23.688,57.909,25.121,55.645,27.027,54.157C27.096,54.384,27.166,54.611,27.234,54.838C29.303,61.627,31.419,68.566,32.64,74.372C31.05,74.78,29.322,75,27.5,75ZM39.503,70.664C38.239,65.243,36.406,59.209,34.508,52.981C39.128,54.381,42.5,58.679,42.5,63.75C42.5,67.58,41.442,70.932,39.503,70.664Z"></path></svg>app <span>IMR4</span>
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <!-- Selector de Tema Claro/Oscuro -->
-        <button id="btn-leader-theme" class="theme-btn" title="Cambiar Tema">☀️</button>
-        <div class="user-avatar-container" style="position: relative; cursor: pointer;" id="leader-avatar-container" title="Subir foto de perfil">
-          <div id="leader-avatar" class="avatar" style="width: 32px; height: 32px; font-size: 13px; background-size: cover; background-position: center; border: 1.5px solid var(--border2); transition: transform 0.2s;"></div>
+        Alaban<svg viewBox="0 0 55 100" fill="currentColor"
+          style="width: 0.55em; height: 1.1em; display: inline-block; vertical-align: middle; transform: translateY(-0.06em); margin: 0 -2px;">
+          <path
+            d="M32.108,45.02C31.428,42.709,30.78,40.425,30.195,38.209C34.229,34.433,37.429,29.413,37.5,21.283C37.536,17.06,37.032,12.006,33.025,6.535C31.843,4.922,29.604,4.519,27.934,5.621C23.985,8.227,20,14.457,20,22.5C20,26.253,20.699,30.663,21.782,35.411C20.949,36.021,20.077,36.63,19.177,37.259C12.86,41.667,5,47.153,5,60C5,74.084,16.44,82.5,27.5,82.5C29.658,82.5,31.729,82.271,33.677,81.841C33.684,82.066,33.688,82.285,33.688,82.5C33.688,85.257,31.445,87.5,28.688,87.5C27.352,87.5,26.096,86.98,25.153,86.036L19.848,91.339C22.209,93.7,25.348,95,28.688,95C35.581,95,41.188,89.393,41.188,82.5C41.188,81.387,41.118,80.206,40.986,78.964C46.528,75.615,50,70.154,50,63.75C50,53.699,42.05,45.47,32.108,45.02ZM29.244,15.311C29.86,17.224,30.017,19.139,30,21.218C29.973,24.421,29.287,26.889,28.125,28.943C27.729,26.582,27.5,24.41,27.5,22.5C27.5,19.607,28.264,17.158,29.244,15.311ZM27.5,75C20.229,75,12.5,69.743,12.5,60C12.5,51.065,17.341,47.686,23.469,43.409C23.573,43.337,23.677,43.264,23.781,43.192C24.103,44.346,24.438,45.509,24.78,46.677C19.873,49.271,16.188,54.53,16.188,60C16.188,63.338,17.488,66.477,19.848,68.838L25.153,63.535C24.209,62.59,23.688,61.335,23.688,59.999C23.688,57.909,25.121,55.645,27.027,54.157C27.096,54.384,27.166,54.611,27.234,54.838C29.303,61.627,31.419,68.566,32.64,74.372C31.05,74.78,29.322,75,27.5,75ZM39.503,70.664C38.239,65.243,36.406,59.209,34.508,52.981C39.128,54.381,42.5,58.679,42.5,63.75C42.5,67.58,41.442,70.932,39.503,70.664Z">
+          </path>
+        </svg>app <span>IMR4</span>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <!-- Selector de Tema Claro/Oscuro -->
+          <button id="btn-leader-theme" class="theme-btn" title="Cambiar Tema">☀️</button>
+          <div class="user-avatar-container" style="position: relative; cursor: pointer;" id="leader-avatar-container"
+            title="Subir foto de perfil">
+            <div id="leader-avatar" class="avatar"
+              style="width: 32px; height: 32px; font-size: 13px; background-size: cover; background-position: center; border: 1.5px solid var(--border2); transition: transform 0.2s;">
+            </div>
+          </div>
+          <span class="role-badge" id="display-role">Cargando...</span>
+          <button class="btn-logout" id="btn-logout">Salir</button>
         </div>
-        <span class="role-badge" id="display-role">Cargando...</span>
-        <button class="btn-logout" id="btn-logout">Salir</button>
-      </div>
     </header>
     <script>
       // Placeholder to hook global Firebase references
@@ -2287,7 +2408,7 @@
             editingEnsayoId = null; // Reset editing mode
             window._tempSelectedSongs = [];
             window._tempSelectedTones = {};
-            
+
             try {
               if (window.renderEnsayoMembers) {
                 window.renderEnsayoMembers([]);
@@ -2577,7 +2698,7 @@
             checkbox.classList.toggle('on');
             const isChecked = checkbox.classList.contains('on');
             const toneContainer = div.querySelector('.ensayo-tone-selector-container');
-            
+
             if (isChecked) {
               if (!selectedSongIds.includes(s.id)) selectedSongIds.push(s.id);
               if (!selectedTones[s.id]) selectedTones[s.id] = s.tonoBase || 'C';
@@ -2709,8 +2830,8 @@
             card.querySelector('.btn-edit-ensayo').addEventListener('click', () => {
               editingEnsayoId = e.id;
               window._tempSelectedSongs = [...(e.canciones || [])];
-              window._tempSelectedTones = {...(e.tonos || {})};
-              
+              window._tempSelectedTones = { ...(e.tonos || {}) };
+
               const nameEl = document.getElementById('ensayo-nombre');
               const dateEl = document.getElementById('ensayo-fecha');
               if (nameEl) nameEl.value = e.nombre || '';
@@ -2965,14 +3086,14 @@
             if (ensayoToShow) {
               const statusVal = ensayoToShow.confirmaciones && ensayoToShow.confirmaciones[musicoId];
               const isConfirmed = statusVal === true || statusVal === 'confirmado';
-              
+
               // Calculate remaining days
               const today = new Date();
-              today.setHours(0,0,0,0);
+              today.setHours(0, 0, 0, 0);
               const rDate = new Date(ensayoToShow.fecha + 'T00:00:00');
               const diffTime = rDate - today;
               const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-              
+
               let daysText = '';
               if (diffDays === 0) {
                 daysText = '¡Hoy es el ensayo!';
@@ -3060,7 +3181,7 @@
           const s = (window.cacheSongs || []).find(x => x.id === sid);
           if (s) {
             const tone = (e.tonos && e.tonos[sid]) ? e.tonos[sid] : s.tonoBase;
-            
+
             // Setup in lyrics cache
             window._lyricsCache = window._lyricsCache || {};
             window._lyricsCache[sid] = {
@@ -3098,10 +3219,10 @@
             const num = idx + 1;
             const hasLetra = s.letra && s.letra.trim() !== "";
             const hasYoutube = s.youtube && s.youtube.trim() !== "";
-            
+
             const isAlabanza = (s.tipo || 'alabanza').trim().toLowerCase() === 'alabanza';
-            const cardBorder = isAlabanza 
-              ? 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;' 
+            const cardBorder = isAlabanza
+              ? 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;'
               : 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;';
             const numColor = isAlabanza ? 'color: rgba(78, 205, 196, 0.4);' : 'color: rgba(155, 143, 255, 0.4);';
             const badgeStyle = isAlabanza
@@ -3131,12 +3252,12 @@
                 ` : ''}
               </div>
             `;
-            
+
             songCard.onclick = (e) => {
               if (e.target.closest('.repertorio-btn-youtube')) return;
               window.abrirModalLetraGlobal(s.id, rehearsalSongs);
             };
-            
+
             songsCont.appendChild(songCard);
           });
         }
@@ -3156,7 +3277,8 @@
     <!-- NAVEGACIÓN PRINCIPAL -->
     <nav class="nav-tabs">
       <button class="nav-tab active" data-tab="tab-servicios">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
           <line x1="16" y1="2" x2="16" y2="6"></line>
           <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -3165,14 +3287,16 @@
         <span class="nav-label">Servicios</span>
       </button>
       <button class="nav-tab" data-tab="tab-historial">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
           <polyline points="12 6 12 12 16 14"></polyline>
         </svg>
         <span class="nav-label">Historial</span>
       </button>
       <button class="nav-tab" data-tab="tab-repertorio">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 18V5l12-2v13"></path>
           <circle cx="6" cy="18" r="3"></circle>
           <circle cx="18" cy="16" r="3"></circle>
@@ -3180,7 +3304,8 @@
         <span class="nav-label">Repertorio</span>
       </button>
       <button class="nav-tab" data-tab="tab-ensayos">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2L2 22h20L12 2z"></path>
           <path d="M12 18v-8"></path>
           <circle cx="12" cy="18" r="1"></circle>
@@ -3188,7 +3313,8 @@
         <span class="nav-label">Ensayos</span>
       </button>
       <button class="nav-tab" data-tab="tab-miembros">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
           <circle cx="9" cy="7" r="4"></circle>
           <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -3197,9 +3323,12 @@
         <span class="nav-label">Miembros</span>
       </button>
       <button class="nav-tab" data-tab="tab-ajustes">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"></circle>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          <path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
+          </path>
         </svg>
         <span class="nav-label">Ajustes</span>
       </button>
@@ -3226,7 +3355,7 @@
           style="border-color: var(--teal); display: none; background: linear-gradient(135deg, rgba(78,205,196,0.08) 0%, rgba(26,24,40,0.8) 100%);">
           <h4
             style="font-size: 14px; text-transform: uppercase; color: var(--teal); letter-spacing: 0.5px; margin-bottom: 8px;">
-             Mi Disponibilidad para esta fecha</h4>
+            Mi Disponibilidad para esta fecha</h4>
           <p style="font-size: 13px; color: var(--text2); margin-bottom: 12px;">Confirma si estarás disponible para
             tocar/cantar en este servicio.</p>
           <div style="display: flex; gap: 10px;">
@@ -3265,31 +3394,60 @@
         <!-- Lista dividida por Alabanza -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0 8px;">
           <h4 style="font-size: 13px; text-transform: uppercase; color: var(--teal); letter-spacing: 0.5px; margin:0;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"></path></svg>
-            Alabanza (Rápidas)</h4>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
+              <path
+                d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z">
+              </path>
+            </svg>
+            Alabanza (Rápidas)
+          </h4>
           <button class="btn-add-song-trigger admin-only" data-type="alabanza"
             style="background:none; border:none; color:var(--teal); font-size:12px; font-weight:600; cursor:pointer; display:none;">
             Agregar Alabanza</button>
         </div>
-        <div class="card song-list-scroll" id="songs-alabanza-container" style="background: rgba(78, 205, 196, 0.04); border-color: rgba(78, 205, 196, 0.2); padding: 12px; margin-bottom: 16px;"></div>
+        <div class="card song-list-scroll" id="songs-alabanza-container"
+          style="background: rgba(78, 205, 196, 0.04); border-color: rgba(78, 205, 196, 0.2); padding: 12px; margin-bottom: 16px;">
+        </div>
 
         <!-- Lista dividida por Adoración -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0 8px;">
           <h4
             style="font-size: 13px; text-transform: uppercase; color: var(--purple); letter-spacing: 0.5px; margin:0;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path><path d="M12 2v2"></path><path d="M12 22v-2"></path><path d="m17 20.66-1-1.73"></path><path d="M11 10.27 7 3.34"></path><path d="m20.66 17-1.73-1"></path><path d="m3.34 7 1.73 1"></path><path d="M14 12h8"></path><path d="M2 12h2"></path><path d="m20.66 7-1.73 1"></path><path d="m3.34 17 1.73-1"></path><path d="m17 3.34-1 1.73"></path><path d="m11 13.73-4 6.93"></path></svg> Adoración (Lentas)</h4>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
+              <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path>
+              <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path>
+              <path d="M12 2v2"></path>
+              <path d="M12 22v-2"></path>
+              <path d="m17 20.66-1-1.73"></path>
+              <path d="M11 10.27 7 3.34"></path>
+              <path d="m20.66 17-1.73-1"></path>
+              <path d="m3.34 7 1.73 1"></path>
+              <path d="M14 12h8"></path>
+              <path d="M2 12h2"></path>
+              <path d="m20.66 7-1.73 1"></path>
+              <path d="m3.34 17 1.73-1"></path>
+              <path d="m17 3.34-1 1.73"></path>
+              <path d="m11 13.73-4 6.93"></path>
+            </svg> Adoración (Lentas)
+          </h4>
           <button class="btn-add-song-trigger admin-only" data-type="adoracion"
             style="background:none; border:none; color:var(--purple); font-size:12px; font-weight:600; cursor:pointer; display:none;">
             Agregar Adoración</button>
         </div>
-        <div class="card song-list-scroll" id="songs-adoracion-container" style="background: rgba(155, 143, 255, 0.04); border-color: rgba(155, 143, 255, 0.2); padding: 12px; margin-bottom: 16px;"></div>
+        <div class="card song-list-scroll" id="songs-adoracion-container"
+          style="background: rgba(155, 143, 255, 0.04); border-color: rgba(155, 143, 255, 0.2); padding: 12px; margin-bottom: 16px;">
+        </div>
 
         <!-- ORDEN DEL REPERTORIO SELECCIONADO (Líder) -->
         <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin: 24px 0 10px;">📋 Orden
           del Repertorio</h3>
         <p class="section-sub">Usa las flechas ▲ y ▼ para ordenar las canciones y cambia el tono de cada una.</p>
         <div id="admin-selected-songs-container" style="margin-bottom: 24px;">
-          <p style="color: var(--text3); font-size: 13px; text-align: center; padding: 20px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); margin: 0;">No hay canciones seleccionadas aún.</p>
+          <p
+            style="color: var(--text3); font-size: 13px; text-align: center; padding: 20px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); margin: 0;">
+            No hay canciones seleccionadas aún.</p>
         </div>
 
         <!-- NOTA ADICIONAL DEL LÍDER (Solo visible para líderes) -->
@@ -3331,7 +3489,7 @@
                 Guardar</button>
               <button class="btn-primary" id="btn-copy-whatsapp"
                 style="background: var(--teal); color: #0f0e17; width: 100%; margin-top: 0;">💬 Enviar por WhatsApp
-               </button>
+              </button>
             </div>
           </div>
         </div>
@@ -3380,22 +3538,33 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
           <div>
             <h2 class="section-title">Repertorio Global de Canciones</h2>
-            <p class="section-sub" style="margin-bottom: 0;">Lista total de canciones registradas para alabanza y adoración.</p>
+            <p class="section-sub" style="margin-bottom: 0;">Lista total de canciones registradas para alabanza y
+              adoración.</p>
           </div>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button id="btn-add-song-global" class="btn-primary admin-only" style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;"> Nueva Canción</button>
-            <button id="btn-import-songs" class="btn-primary admin-only" style="background: var(--purple); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">📥 Importar JSON</button>
+            <button id="btn-add-song-global" class="btn-primary admin-only"
+              style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">
+              Nueva Canción</button>
+            <button id="btn-import-songs" class="btn-primary admin-only"
+              style="background: var(--purple); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">📥
+              Importar JSON</button>
             <input type="file" id="import-songs-file" accept=".json" style="display:none;">
           </div>
         </div>
 
         <!-- Lista unificada de canciones -->
-        <div class="card" style="padding: 16px; margin-top: 16px; margin-bottom: 0; display: flex; flex-direction: column;">
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:8px;">
-            <span style="font-size:13px; text-transform:uppercase; font-weight:700; letter-spacing:0.5px; color:var(--text2);">📚 Todas las canciones</span>
-            <span id="repertorio-total-count" style="font-size:11px; color:var(--text3); margin-left:auto;">0 canciones</span>
+        <div class="card"
+          style="padding: 16px; margin-top: 16px; margin-bottom: 0; display: flex; flex-direction: column;">
+          <div
+            style="display:flex; align-items:center; gap:8px; margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:8px;">
+            <span
+              style="font-size:13px; text-transform:uppercase; font-weight:700; letter-spacing:0.5px; color:var(--text2);">📚
+              Todas las canciones</span>
+            <span id="repertorio-total-count" style="font-size:11px; color:var(--text3); margin-left:auto;">0
+              canciones</span>
           </div>
-          <input type="text" id="search-admin-canciones" placeholder="Buscar por nombre o artista..." style="width:100%; padding:8px 12px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; margin-bottom:10px; outline:none;">
+          <input type="text" id="search-admin-canciones" placeholder="Buscar por nombre o artista..."
+            style="width:100%; padding:8px 12px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; margin-bottom:10px; outline:none;">
           <div class="song-list-scroll" id="repertorio-todas-list" style="max-height: 560px; overflow-y: auto;"></div>
         </div>
       </div>
@@ -3487,23 +3656,32 @@
   <div id="screen-musico" class="screen">
     <header class="app-header">
       <div class="logo">
-        Alaban<svg viewBox="0 0 55 100" fill="currentColor" style="width: 0.55em; height: 1.1em; display: inline-block; vertical-align: middle; transform: translateY(-0.06em); margin: 0 -2px;"><path d="M32.108,45.02C31.428,42.709,30.78,40.425,30.195,38.209C34.229,34.433,37.429,29.413,37.5,21.283C37.536,17.06,37.032,12.006,33.025,6.535C31.843,4.922,29.604,4.519,27.934,5.621C23.985,8.227,20,14.457,20,22.5C20,26.253,20.699,30.663,21.782,35.411C20.949,36.021,20.077,36.63,19.177,37.259C12.86,41.667,5,47.153,5,60C5,74.084,16.44,82.5,27.5,82.5C29.658,82.5,31.729,82.271,33.677,81.841C33.684,82.066,33.688,82.285,33.688,82.5C33.688,85.257,31.445,87.5,28.688,87.5C27.352,87.5,26.096,86.98,25.153,86.036L19.848,91.339C22.209,93.7,25.348,95,28.688,95C35.581,95,41.188,89.393,41.188,82.5C41.188,81.387,41.118,80.206,40.986,78.964C46.528,75.615,50,70.154,50,63.75C50,53.699,42.05,45.47,32.108,45.02ZM29.244,15.311C29.86,17.224,30.017,19.139,30,21.218C29.973,24.421,29.287,26.889,28.125,28.943C27.729,26.582,27.5,24.41,27.5,22.5C27.5,19.607,28.264,17.158,29.244,15.311ZM27.5,75C20.229,75,12.5,69.743,12.5,60C12.5,51.065,17.341,47.686,23.469,43.409C23.573,43.337,23.677,43.264,23.781,43.192C24.103,44.346,24.438,45.509,24.78,46.677C19.873,49.271,16.188,54.53,16.188,60C16.188,63.338,17.488,66.477,19.848,68.838L25.153,63.535C24.209,62.59,23.688,61.335,23.688,59.999C23.688,57.909,25.121,55.645,27.027,54.157C27.096,54.384,27.166,54.611,27.234,54.838C29.303,61.627,31.419,68.566,32.64,74.372C31.05,74.78,29.322,75,27.5,75ZM39.503,70.664C38.239,65.243,36.406,59.209,34.508,52.981C39.128,54.381,42.5,58.679,42.5,63.75C42.5,67.58,41.442,70.932,39.503,70.664Z"></path></svg>app <span>IMR4</span>
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <!-- Botón S.O.S estático en cabecera -->
-        <button id="btn-musico-sos" class="sos-btn" title="Pedir Asistencia (S.O.S)">S.O.S</button>
-        <!-- Selector de Tema Claro/Oscuro -->
-        <button id="btn-musico-theme" class="theme-btn" title="Cambiar Tema">☀️</button>
-        <div class="user-avatar-container" style="position: relative; cursor: pointer;" id="musico-avatar-container" title="Subir foto de perfil">
-          <div id="musico-avatar" class="avatar" style="width: 32px; height: 32px; font-size: 13px; background-size: cover; background-position: center; border: 1.5px solid var(--border2); transition: transform 0.2s;"></div>
+        Alaban<svg viewBox="0 0 55 100" fill="currentColor"
+          style="width: 0.55em; height: 1.1em; display: inline-block; vertical-align: middle; transform: translateY(-0.06em); margin: 0 -2px;">
+          <path
+            d="M32.108,45.02C31.428,42.709,30.78,40.425,30.195,38.209C34.229,34.433,37.429,29.413,37.5,21.283C37.536,17.06,37.032,12.006,33.025,6.535C31.843,4.922,29.604,4.519,27.934,5.621C23.985,8.227,20,14.457,20,22.5C20,26.253,20.699,30.663,21.782,35.411C20.949,36.021,20.077,36.63,19.177,37.259C12.86,41.667,5,47.153,5,60C5,74.084,16.44,82.5,27.5,82.5C29.658,82.5,31.729,82.271,33.677,81.841C33.684,82.066,33.688,82.285,33.688,82.5C33.688,85.257,31.445,87.5,28.688,87.5C27.352,87.5,26.096,86.98,25.153,86.036L19.848,91.339C22.209,93.7,25.348,95,28.688,95C35.581,95,41.188,89.393,41.188,82.5C41.188,81.387,41.118,80.206,40.986,78.964C46.528,75.615,50,70.154,50,63.75C50,53.699,42.05,45.47,32.108,45.02ZM29.244,15.311C29.86,17.224,30.017,19.139,30,21.218C29.973,24.421,29.287,26.889,28.125,28.943C27.729,26.582,27.5,24.41,27.5,22.5C27.5,19.607,28.264,17.158,29.244,15.311ZM27.5,75C20.229,75,12.5,69.743,12.5,60C12.5,51.065,17.341,47.686,23.469,43.409C23.573,43.337,23.677,43.264,23.781,43.192C24.103,44.346,24.438,45.509,24.78,46.677C19.873,49.271,16.188,54.53,16.188,60C16.188,63.338,17.488,66.477,19.848,68.838L25.153,63.535C24.209,62.59,23.688,61.335,23.688,59.999C23.688,57.909,25.121,55.645,27.027,54.157C27.096,54.384,27.166,54.611,27.234,54.838C29.303,61.627,31.419,68.566,32.64,74.372C31.05,74.78,29.322,75,27.5,75ZM39.503,70.664C38.239,65.243,36.406,59.209,34.508,52.981C39.128,54.381,42.5,58.679,42.5,63.75C42.5,67.58,41.442,70.932,39.503,70.664Z">
+          </path>
+        </svg>app <span>IMR4</span>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <!-- Botón S.O.S estático en cabecera -->
+          <button id="btn-musico-sos" class="sos-btn" title="Pedir Asistencia (S.O.S)">S.O.S</button>
+          <!-- Selector de Tema Claro/Oscuro -->
+          <button id="btn-musico-theme" class="theme-btn" title="Cambiar Tema">☀️</button>
+          <div class="user-avatar-container" style="position: relative; cursor: pointer;" id="musico-avatar-container"
+            title="Subir foto de perfil">
+            <div id="musico-avatar" class="avatar"
+              style="width: 32px; height: 32px; font-size: 13px; background-size: cover; background-position: center; border: 1.5px solid var(--border2); transition: transform 0.2s;">
+            </div>
+          </div>
+          <span id="musico-name-badge" class="role-badge"></span>
+          <button class="btn-logout" id="btn-musico-logout">Salir</button>
         </div>
-        <span id="musico-name-badge" class="role-badge"></span>
-        <button class="btn-logout" id="btn-musico-logout">Salir</button>
-      </div>
     </header>
 
     <nav class="nav-tabs">
       <button class="nav-tab-musico active" data-mtab="mtab-servicio">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
           <line x1="16" y1="2" x2="16" y2="6"></line>
           <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -3512,21 +3690,27 @@
         <span class="nav-label">Servicio</span>
       </button>
       <button class="nav-tab-musico" data-mtab="mtab-asistencia">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
           <polyline points="22 4 12 14.01 9 11.01"></polyline>
         </svg>
         <span class="nav-label">Asistencia</span>
       </button>
-      <button id="nav-tab-ensayos-musico" class="nav-tab-musico" data-mtab="mtab-ensayos-musico" style="position: relative;">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <button id="nav-tab-ensayos-musico" class="nav-tab-musico" data-mtab="mtab-ensayos-musico"
+        style="position: relative;">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
-          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+          <path
+            d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z">
+          </path>
         </svg>
         <span class="nav-label">Ensayos</span>
       </button>
       <button class="nav-tab-musico" data-mtab="mtab-repertorio-musico">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 18V5l12-2v13"></path>
           <circle cx="6" cy="18" r="3"></circle>
           <circle cx="18" cy="16" r="3"></circle>
@@ -3573,11 +3757,14 @@
           <p id="musico-avail-current" style="font-size: 13px; color: var(--text2); margin-bottom: 14px;"></p>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button id="btn-musico-confirm" class="btn-primary"
-              style="margin-top:0; background:var(--teal); color:#0f0e17; font-size:13px; padding:12px; flex:1; min-width: 80px;">Voy a ir</button>
+              style="margin-top:0; background:var(--teal); color:#0f0e17; font-size:13px; padding:12px; flex:1; min-width: 80px;">Voy
+              a ir</button>
             <button id="btn-musico-maybe" class="btn-primary"
-              style="margin-top:0; background:var(--gold); color:#0f0e17; font-size:13px; padding:12px; flex:1; min-width: 80px;">No sé aún</button>
+              style="margin-top:0; background:var(--gold); color:#0f0e17; font-size:13px; padding:12px; flex:1; min-width: 80px;">No
+              sé aún</button>
             <button id="btn-musico-decline" class="btn-primary"
-              style="margin-top:0; background:var(--coral); color:#0f0e17; font-size:13px; padding:12px; flex:1; min-width: 80px;">No puedo</button>
+              style="margin-top:0; background:var(--coral); color:#0f0e17; font-size:13px; padding:12px; flex:1; min-width: 80px;">No
+              puedo</button>
           </div>
         </div>
 
@@ -3598,7 +3785,8 @@
         <div class="split-repertorio-container">
           <div class="split-left-panel">
             <h2 class="section-title">Repertorio</h2>
-            <p class="section-sub" style="margin-bottom:14px;">Explora la biblioteca, guarda tus favoritas y consulta el repertorio oficial del grupo.</p>
+            <p class="section-sub" style="margin-bottom:14px;">Explora la biblioteca, guarda tus favoritas y consulta el
+              repertorio oficial del grupo.</p>
 
             <!-- Sub-tabs -->
             <div class="musico-subtabs">
@@ -3608,65 +3796,99 @@
             </div>
 
             <!-- Buscador unificado -->
-            <input type="text" id="search-repertorio-musico"
-              placeholder="Buscar por nombre o artista..."
+            <input type="text" id="search-repertorio-musico" placeholder="Buscar por nombre o artista..."
               style="width:100%; padding:9px 13px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; margin-bottom:12px; outline:none;">
 
             <!-- Contador -->
             <p id="count-repertorio-musico" style="font-size:11px; color:var(--text3); margin-bottom:10px;"></p>
 
             <!-- Lista -->
-            <div id="list-repertorio-musico" style="display:flex; flex-direction:column; gap:6px; padding-bottom: 30px;"></div>
+            <div id="list-repertorio-musico"
+              style="display:flex; flex-direction:column; gap:6px; padding-bottom: 30px;"></div>
           </div>
 
           <div class="split-right-panel" id="musico-lyrics-detail-panel">
-            <div class="lyrics-detail-placeholder" style="text-align:center; padding: 60px 20px; color: var(--text3); margin: auto;">
-              <div style="font-size: 64px; margin-bottom: 20px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></div>
-              <h3 style="color: var(--text); font-family: var(--font-display); font-size: 20px; margin-bottom: 8px;">Bienvenido al Repertorio</h3>
-              <p style="font-size: 13px; max-width: 300px; margin: 0 auto; line-height: 1.5; color: var(--text2);">Selecciona una canción de la lista para ver su letra y acordes aquí.</p>
+            <div class="lyrics-detail-placeholder"
+              style="text-align:center; padding: 60px 20px; color: var(--text3); margin: auto;">
+              <div style="font-size: 64px; margin-bottom: 20px;"><svg width="12" height="12" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  style="margin-right:4px;">
+                  <path d="M9 18V5l12-2v13"></path>
+                  <circle cx="6" cy="18" r="3"></circle>
+                  <circle cx="18" cy="16" r="3"></circle>
+                </svg></div>
+              <h3 style="color: var(--text); font-family: var(--font-display); font-size: 20px; margin-bottom: 8px;">
+                Bienvenido al Repertorio</h3>
+              <p style="font-size: 13px; max-width: 300px; margin: 0 auto; line-height: 1.5; color: var(--text2);">
+                Selecciona una canción de la lista para ver su letra y acordes aquí.</p>
             </div>
             <div class="lyrics-detail-content-area" style="display: none; height: 100%; flex-direction: column;">
-              <div class="lyrics-modal-header" style="border-bottom: 1px solid var(--border2); padding-bottom: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start;">
+              <div class="lyrics-modal-header"
+                style="border-bottom: 1px solid var(--border2); padding-bottom: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start;">
                 <div style="flex: 1;">
                   <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <h3 id="panel-lyrics-title" class="lyrics-modal-title" style="margin: 0; font-size: 22px;">Nombre de la Canción</h3>
-                    <button id="panel-lyrics-fav-btn" class="btn-fav-song" style="margin-left: 5px; flex-shrink: 0;" title="Añadir a Favoritos">★</button>
-                    <a id="panel-lyrics-yt-link" href="#" target="_blank" rel="noopener" style="display: none; align-items: center; gap: 4px; background: rgba(244, 63, 94, 0.12); color: var(--coral); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s;">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> YouTube
+                    <h3 id="panel-lyrics-title" class="lyrics-modal-title" style="margin: 0; font-size: 22px;">Nombre de
+                      la Canción</h3>
+                    <button id="panel-lyrics-fav-btn" class="btn-fav-song" style="margin-left: 5px; flex-shrink: 0;"
+                      title="Añadir a Favoritos">★</button>
+                    <a id="panel-lyrics-yt-link" href="#" target="_blank" rel="noopener"
+                      style="display: none; align-items: center; gap: 4px; background: rgba(244, 63, 94, 0.12); color: var(--coral); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s;">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                      </svg> YouTube
                     </a>
                   </div>
                   <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
-                    <div id="panel-lyrics-meta" class="lyrics-modal-meta" style="margin-bottom: 0; display: none;">Tono Original: C | Tono Actual: D</div>
-                    
+                    <div id="panel-lyrics-meta" class="lyrics-modal-meta" style="margin-bottom: 0; display: none;">Tono
+                      Original: C | Tono Actual: D</div>
+
                     <!-- Tono -->
                     <div style="display: inline-flex; align-items: center; gap: 4px;">
                       <span style="font-size: 11px; color: var(--text3);">Tono:</span>
-                      <button id="panel-lyrics-tone-btn" style="background: var(--bg3); color: var(--gold); border: 1px solid var(--border2); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; outline: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                      <button id="panel-lyrics-tone-btn"
+                        style="background: var(--bg3); color: var(--gold); border: 1px solid var(--border2); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; outline: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
                         <span id="panel-lyrics-tone-display">C</span> ▼
                       </button>
                     </div>
 
                     <!-- AutoScroll -->
                     <div style="display: inline-flex; align-items: center; gap: 4px;">
-                      <button id="panel-lyrics-autoscroll-btn" style="background: var(--bg3); color: var(--teal); border: 1px solid var(--border2); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; outline: none; cursor: pointer;">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> AutoScroll
+                      <button id="panel-lyrics-autoscroll-btn"
+                        style="background: var(--bg3); color: var(--teal); border: 1px solid var(--border2); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; outline: none; cursor: pointer;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
+                          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg> AutoScroll
                       </button>
-                      <div id="panel-lyrics-speed-ctrl" style="display: none; align-items: center; gap: 4px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 2px 6px; font-size: 11px;">
-                        <button id="panel-lyrics-speed-down" style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">-</button>
-                        <span id="panel-lyrics-speed-val" style="color:var(--teal); font-weight:700; min-width: 14px; text-align:center;">2</span>
-                        <button id="panel-lyrics-speed-up" style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">+</button>
+                      <div id="panel-lyrics-speed-ctrl"
+                        style="display: none; align-items: center; gap: 4px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 2px 6px; font-size: 11px;">
+                        <button id="panel-lyrics-speed-down"
+                          style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">-</button>
+                        <span id="panel-lyrics-speed-val"
+                          style="color:var(--teal); font-weight:700; min-width: 14px; text-align:center;">2</span>
+                        <button id="panel-lyrics-speed-up"
+                          style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">+</button>
                       </div>
                     </div>
 
                     <!-- Zoom Tamaño Letra -->
-                    <div style="display: inline-flex; align-items: center; gap: 2px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 2px 4px;">
-                      <button id="panel-lyrics-zoom-down" style="background:none; border:none; color:var(--text3); font-weight:bold; cursor:pointer; padding: 0 6px; font-size: 11px;" title="Reducir letra">A-</button>
-                      <span id="panel-lyrics-zoom-val" style="font-size: 10px; color: var(--text2); font-weight: 600;">14</span>
-                      <button id="panel-lyrics-zoom-up" style="background:none; border:none; color:var(--text3); font-weight:bold; cursor:pointer; padding: 0 6px; font-size: 11px;" title="Agrandar letra">A+</button>
+                    <div
+                      style="display: inline-flex; align-items: center; gap: 2px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 2px 4px;">
+                      <button id="panel-lyrics-zoom-down"
+                        style="background:none; border:none; color:var(--text3); font-weight:bold; cursor:pointer; padding: 0 6px; font-size: 11px;"
+                        title="Reducir letra">A-</button>
+                      <span id="panel-lyrics-zoom-val"
+                        style="font-size: 10px; color: var(--text2); font-weight: 600;">14</span>
+                      <button id="panel-lyrics-zoom-up"
+                        style="background:none; border:none; color:var(--text3); font-weight:bold; cursor:pointer; padding: 0 6px; font-size: 11px;"
+                        title="Agrandar letra">A+</button>
                     </div>
                   </div>
                 </div>
-                <button id="panel-lyrics-close" style="background: var(--bg3); border: 1px solid var(--border2); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; margin-left: 10px;">X Cerrar</button>
+                <button id="panel-lyrics-close"
+                  style="background: var(--bg3); border: 1px solid var(--border2); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; margin-left: 10px;">X
+                  Cerrar</button>
               </div>
               <div id="panel-lyrics-body" style="flex: 1; overflow-y: auto;">
                 <div id="panel-lyrics-content" class="lyrics-content"></div>
@@ -3686,16 +3908,23 @@
   <div id="musico-add-song-modal" class="modal-overlay">
     <div class="modal-box" style="max-width: 600px; width: 95%;">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-        <button id="musico-add-song-close" style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Volver
+        <button id="musico-add-song-close"
+          style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg> Volver
         </button>
-        <h3 class="modal-title" id="musico-add-song-title" style="font-size:20px; margin:0; text-align:right; color:var(--gold);">Agregar Canción</h3>
+        <h3 class="modal-title" id="musico-add-song-title"
+          style="font-size:20px; margin:0; text-align:right; color:var(--gold);">Agregar Canción</h3>
       </div>
 
       <!-- Filtro: Todas / Oficial -->
       <div style="display:none; gap:6px; margin-bottom:10px; padding:4px; background:var(--bg3); border-radius:8px;">
-        <button id="filter-picker-todas" style="flex:1; padding:7px; font-size:12px; font-weight:700; font-family:var(--font-body); background:var(--bg2); border:none; border-radius:6px; color:var(--gold); cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,0.2);">Todas</button>
-        <button id="filter-picker-oficial" style="flex:1; padding:7px; font-size:12px; font-weight:700; font-family:var(--font-body); background:transparent; border:none; border-radius:6px; color:var(--text2); cursor:pointer;">Oficial</button>
+        <button id="filter-picker-todas"
+          style="flex:1; padding:7px; font-size:12px; font-weight:700; font-family:var(--font-body); background:var(--bg2); border:none; border-radius:6px; color:var(--gold); cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,0.2);">Todas</button>
+        <button id="filter-picker-oficial"
+          style="flex:1; padding:7px; font-size:12px; font-weight:700; font-family:var(--font-body); background:transparent; border:none; border-radius:6px; color:var(--text2); cursor:pointer;">Oficial</button>
       </div>
 
       <!-- Buscador -->
@@ -3705,14 +3934,18 @@
       </div>
 
       <!-- Lista de resultados de la biblioteca -->
-      <div id="musico-add-song-results" class="song-list-scroll" style="display: none; max-height: 200px; margin-bottom: 16px;">
+      <div id="musico-add-song-results" class="song-list-scroll"
+        style="display: none; max-height: 200px; margin-bottom: 16px;">
         <!-- Canciones cargadas dinámicamente -->
       </div>
 
       <!-- Acciones de selección múltiple y manual -->
       <div style="display: none; gap: 10px; margin-bottom: 16px;">
-        <button id="btn-musico-add-selected" class="btn-primary" style="flex: 1; display: none; padding: 10px; font-size: 13px; align-items: center; justify-content: center;"></button>
-        <button id="btn-musico-toggle-custom" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 13px; background: rgba(255,255,255,0.05); border: 1px dashed var(--border); border-radius: var(--radius-sm); color: var(--text2);">+ Agregar Manual</button>
+        <button id="btn-musico-add-selected" class="btn-primary"
+          style="flex: 1; display: none; padding: 10px; font-size: 13px; align-items: center; justify-content: center;"></button>
+        <button id="btn-musico-toggle-custom" class="btn-secondary"
+          style="flex: 1; padding: 10px; font-size: 13px; background: rgba(255,255,255,0.05); border: 1px dashed var(--border); border-radius: var(--radius-sm); color: var(--text2);">+
+          Agregar Manual</button>
       </div>
 
       <!-- Opción de agregar canción personalizada -->
@@ -3770,65 +4003,101 @@
     <div class="lyrics-modal">
       <div class="lyrics-modal-header" style="align-items: flex-start; flex-wrap: wrap; gap: 12px; padding: 12px 16px;">
         <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 4px;">
-          <div id="lyrics-modal-artist" style="font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px;">Artista</div>
+          <div id="lyrics-modal-artist"
+            style="font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px;">Artista</div>
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <h3 id="lyrics-modal-title" class="lyrics-modal-title" style="margin: 0;">Nombre de la Canción</h3>
-            <button id="lyrics-modal-fav-btn" class="btn-fav-song" style="margin-left: 5px; flex-shrink: 0; width: 32px; height: 32px; font-size: 16px;" title="Añadir a Favoritos">★</button>
-            <a id="lyrics-modal-yt-link" href="#" target="_blank" rel="noopener" style="display: none; align-items: center; gap: 4px; background: rgba(244, 63, 94, 0.12); color: var(--coral); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s; margin-top: 2px;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> YouTube
+            <button id="lyrics-modal-fav-btn" class="btn-fav-song"
+              style="margin-left: 5px; flex-shrink: 0; width: 32px; height: 32px; font-size: 16px;"
+              title="Añadir a Favoritos">★</button>
+            <a id="lyrics-modal-yt-link" href="#" target="_blank" rel="noopener"
+              style="display: none; align-items: center; gap: 4px; background: rgba(244, 63, 94, 0.12); color: var(--coral); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s; margin-top: 2px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg> YouTube
             </a>
           </div>
         </div>
-        
+
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end;">
-          <div id="lyrics-modal-meta" class="lyrics-modal-meta" style="margin-bottom: 0; display: none;">Tono Original: C | Tono Actual: D</div>
-          
+          <div id="lyrics-modal-meta" class="lyrics-modal-meta" style="margin-bottom: 0; display: none;">Tono Original:
+            C | Tono Actual: D</div>
+
           <!-- Tono -->
           <div style="display: inline-flex; align-items: center; gap: 4px;">
-            <button id="lyrics-modal-tone-btn" style="background: var(--bg3); color: var(--gold); border: 1px solid var(--border2); border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> <span id="lyrics-modal-tone-display">C</span> ▼
+            <button id="lyrics-modal-tone-btn"
+              style="background: var(--bg3); color: var(--gold); border: 1px solid var(--border2); border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
+                <path d="M9 18V5l12-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="18" cy="16" r="3"></circle>
+              </svg> <span id="lyrics-modal-tone-display">C</span> ▼
             </button>
           </div>
 
           <!-- AutoScroll -->
           <div style="display: inline-flex; align-items: center; gap: 4px;">
-            <button id="lyrics-modal-autoscroll-btn" style="background: var(--bg3); color: var(--teal); border: 1px solid var(--border2); border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Scroll
+            <button id="lyrics-modal-autoscroll-btn"
+              style="background: var(--bg3); color: var(--teal); border: 1px solid var(--border2); border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg> Scroll
             </button>
-            <div id="lyrics-modal-speed-ctrl" style="display: none; align-items: center; gap: 4px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 4px 8px; font-size: 12px;">
-              <button id="lyrics-modal-speed-down" style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">-</button>
-              <span id="lyrics-modal-speed-val" style="color:var(--teal); font-weight:700; min-width: 14px; text-align:center;">2</span>
-              <button id="lyrics-modal-speed-up" style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">+</button>
+            <div id="lyrics-modal-speed-ctrl"
+              style="display: none; align-items: center; gap: 4px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 4px 8px; font-size: 12px;">
+              <button id="lyrics-modal-speed-down"
+                style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">-</button>
+              <span id="lyrics-modal-speed-val"
+                style="color:var(--teal); font-weight:700; min-width: 14px; text-align:center;">2</span>
+              <button id="lyrics-modal-speed-up"
+                style="background:none; border:none; color:var(--text); font-weight:bold; cursor:pointer; padding: 0 4px;">+</button>
             </div>
           </div>
 
           <!-- Zoom Tamaño Letra -->
-          <div style="display: inline-flex; align-items: center; gap: 2px; background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 4px 6px;">
-            <button id="lyrics-modal-zoom-down" style="background: transparent; border: none; color:var(--text); font-weight:bold; cursor:pointer; padding: 6px 12px; font-size: 14px;" title="Reducir letra">A-</button>
-            <span id="lyrics-modal-zoom-val" style="font-size: 13px; color: var(--gold); font-weight: 700; min-width: 24px; text-align: center;">26</span>
-            <button id="lyrics-modal-zoom-up" style="background: transparent; border: none; color:var(--text); font-weight:bold; cursor:pointer; padding: 6px 12px; font-size: 14px;" title="Agrandar letra">A+</button>
+          <div
+            style="display: inline-flex; align-items: center; gap: 2px; background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 4px 6px;">
+            <button id="lyrics-modal-zoom-down"
+              style="background: transparent; border: none; color:var(--text); font-weight:bold; cursor:pointer; padding: 6px 12px; font-size: 14px;"
+              title="Reducir letra">A-</button>
+            <span id="lyrics-modal-zoom-val"
+              style="font-size: 13px; color: var(--gold); font-weight: 700; min-width: 24px; text-align: center;">26</span>
+            <button id="lyrics-modal-zoom-up"
+              style="background: transparent; border: none; color:var(--text); font-weight:bold; cursor:pointer; padding: 6px 12px; font-size: 14px;"
+              title="Agrandar letra">A+</button>
           </div>
-          <button id="lyrics-modal-close" class="lyrics-modal-close" style="margin-left: 8px; padding: 4px 8px;">&times;</button>
+          <button id="lyrics-modal-close" class="lyrics-modal-close"
+            style="margin-left: 8px; padding: 4px 8px;">&times;</button>
         </div>
       </div>
       <div id="lyrics-modal-body" class="lyrics-modal-body">
         <div id="lyrics-modal-content" class="lyrics-content"></div>
       </div>
-      <div class="lyrics-modal-footer" style="padding: 16px 20px; border-top: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(180deg, var(--bg2) 0%, var(--bg3) 100%); flex-shrink: 0; gap: 8px; box-shadow: 0 -4px 20px rgba(0,0,0,0.3);">
+      <div class="lyrics-modal-footer"
+        style="padding: 16px 20px; border-top: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(180deg, var(--bg2) 0%, var(--bg3) 100%); flex-shrink: 0; gap: 8px; box-shadow: 0 -4px 20px rgba(0,0,0,0.3);">
         <!-- Bloque Anterior -->
         <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
-          <button id="lyrics-modal-prev" style="margin-top:0; padding: 10px 16px; font-size:12.5px; background: var(--purple); border: none; color: #0f0e17; border-radius: 10px; cursor: pointer; font-family: var(--font-body); font-weight: 700; min-height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 12px rgba(155, 143, 255, 0.25); flex-shrink: 0;">
+          <button id="lyrics-modal-prev"
+            style="margin-top:0; padding: 10px 16px; font-size:12.5px; background: var(--purple); border: none; color: #0f0e17; border-radius: 10px; cursor: pointer; font-family: var(--font-body); font-weight: 700; min-height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 12px rgba(155, 143, 255, 0.25); flex-shrink: 0;">
             Anterior
           </button>
-          <span id="lyrics-modal-prev-name" style="font-size: 14px; color: var(--purple); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; display: none;"></span>
+          <span id="lyrics-modal-prev-name"
+            style="font-size: 14px; color: var(--purple); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; display: none;"></span>
         </div>
 
-        <span id="lyrics-modal-page-indicator" style="font-size:13px; color:var(--text); font-weight:700; font-family:var(--font-body); background: rgba(0, 0, 0, 0.25); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); flex-shrink: 0; text-align: center; margin: 0 8px;">1 de 5</span>
+        <span id="lyrics-modal-page-indicator"
+          style="font-size:13px; color:var(--text); font-weight:700; font-family:var(--font-body); background: rgba(0, 0, 0, 0.25); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); flex-shrink: 0; text-align: center; margin: 0 8px;">1
+          de 5</span>
 
         <!-- Bloque Siguiente -->
         <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex: 1; min-width: 0;">
-          <span id="lyrics-modal-next-name" style="font-size: 14px; color: var(--teal); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; display: none; text-align: right;"></span>
-          <button id="lyrics-modal-next" style="margin-top:0; padding: 10px 16px; font-size:12.5px; background: var(--teal); border: none; color: #0f0e17; border-radius: 10px; cursor: pointer; font-family: var(--font-body); font-weight: 700; min-height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 12px rgba(78, 205, 196, 0.25); flex-shrink: 0;">
+          <span id="lyrics-modal-next-name"
+            style="font-size: 14px; color: var(--teal); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; display: none; text-align: right;"></span>
+          <button id="lyrics-modal-next"
+            style="margin-top:0; padding: 10px 16px; font-size:12.5px; background: var(--teal); border: none; color: #0f0e17; border-radius: 10px; cursor: pointer; font-family: var(--font-body); font-weight: 700; min-height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 12px rgba(78, 205, 196, 0.25); flex-shrink: 0;">
             Siguiente
           </button>
         </div>
@@ -3838,15 +4107,19 @@
 
   <!-- MODAL DE PRÁCTICA DE ENSAYO (MÚSICO) -->
   <div id="ensayo-practice-overlay" class="modal-overlay" style="z-index: 9980;">
-    <div class="modal-box" style="max-width: 600px; width: 95%; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; padding: 20px;">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 10px; flex-shrink: 0;">
+    <div class="modal-box"
+      style="max-width: 600px; width: 95%; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; padding: 20px;">
+      <div
+        style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 10px; flex-shrink: 0;">
         <div>
           <h3 id="practice-modal-title" class="modal-title" style="font-size: 20px;">Lista de Ensayo</h3>
           <div id="practice-modal-subtitle" class="modal-subtitle" style="margin-bottom: 0;">Fecha del ensayo</div>
         </div>
-        <button id="practice-modal-close" style="background: none; border: none; color: var(--text2); font-size: 28px; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
+        <button id="practice-modal-close"
+          style="background: none; border: none; color: var(--text2); font-size: 28px; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
       </div>
-      <div id="practice-modal-songs" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
+      <div id="practice-modal-songs"
+        style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
         <!-- Dinámico -->
       </div>
     </div>
@@ -3858,7 +4131,13 @@
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
         <div style="flex:1;min-width:0;">
           <div class="tone-picker-title" id="tone-picker-song-name">Canción</div>
-          <div class="tone-picker-subtitle">Toca un tono — cambia para todo el equipo <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></div>
+          <div class="tone-picker-subtitle">Toca un tono — cambia para todo el equipo <svg width="12" height="12"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" style="margin-right:4px;">
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
+            </svg></div>
         </div>
         <button id="tone-picker-close"
           style="background:none;border:none;color:var(--text2);font-size:26px;cursor:pointer;padding:0;line-height:1;margin-left:12px;flex-shrink:0;">×</button>
@@ -3873,7 +4152,13 @@
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
         <div style="flex:1;min-width:0;">
           <div class="tone-picker-title" id="practice-tone-picker-song-name">Tono de Práctica</div>
-          <div class="tone-picker-subtitle">Toca un tono — el cambio es solo para tu pantalla local <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></div>
+          <div class="tone-picker-subtitle">Toca un tono — el cambio es solo para tu pantalla local <svg width="12"
+              height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" style="margin-right:4px;">
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
+            </svg></div>
         </div>
         <button id="practice-tone-picker-close"
           style="background:none;border:none;color:var(--text2);font-size:26px;cursor:pointer;padding:0;line-height:1;margin-left:12px;flex-shrink:0;">×</button>
@@ -3928,7 +4213,8 @@
       <img src="logo.png" alt="AlabanApp IMR4"
         style="width:48px; height:48px; border-radius:12px; flex-shrink:0; object-fit:cover; box-shadow:0 4px 12px rgba(78,205,196,0.3);">
       <div style="flex:1; min-width:0;">
-        <div style="font-weight:700; font-size:14px; color:var(--teal); margin-bottom:2px;">Instalar AlabanApp IMR4</div>
+        <div style="font-weight:700; font-size:14px; color:var(--teal); margin-bottom:2px;">Instalar AlabanApp IMR4
+        </div>
         <div style="font-size:12px; color:var(--text2); line-height:1.4;">Agrégala a tu pantalla de inicio y úsala como
           una app nativa 📱</div>
       </div>
@@ -4005,7 +4291,7 @@
     // Nodos DOM globales
     const screenLogin = document.getElementById('screen-login');
     const screenDashboard = document.getElementById('screen-dashboard');
-    
+
     // Navegación Swipe Back (History API)
     window.addEventListener('popstate', (e) => {
       const modalesActivos = document.querySelectorAll('.modal-overlay.active, .lyrics-modal-overlay.active, .tone-picker-overlay.active');
@@ -4020,19 +4306,19 @@
       }
     });
 
-    window.abrirModalConHistorial = function(modalId) {
+    window.abrirModalConHistorial = function (modalId) {
       const modal = document.getElementById(modalId);
       if (modal) {
         modal.classList.add('active');
         try {
           history.pushState({ modal: modalId }, '');
-        } catch(e) {
+        } catch (e) {
           console.warn('History API no disponible', e);
         }
       }
     };
-    
-    window.cerrarModalConHistorial = function(modalId) {
+
+    window.cerrarModalConHistorial = function (modalId) {
       const modal = document.getElementById(modalId);
       if (modal && modal.classList.contains('active')) {
         try {
@@ -4041,7 +4327,7 @@
           } else {
             modal.classList.remove('active');
           }
-        } catch(e) {
+        } catch (e) {
           modal.classList.remove('active');
         }
       }
@@ -4085,10 +4371,10 @@
         const parentRect = parent.getBoundingClientRect();
         const tabRect = tab.getBoundingClientRect();
         if (parentRect.width === 0 || tabRect.width === 0) return;
-        
+
         const relativeLeft = tabRect.left - parentRect.left + parent.scrollLeft;
         const targetScrollLeft = relativeLeft - (parentRect.width / 2) + (tabRect.width / 2);
-        
+
         parent.scrollTo({
           left: targetScrollLeft,
           behavior: 'smooth'
@@ -4104,7 +4390,7 @@
         tab.classList.add('active');
         document.getElementById(tab.dataset.tab).classList.add('active');
         localStorage.setItem('activeLeaderTab', tab.dataset.tab);
-        
+
         // Autodesplazar pestaña activa para que sea completamente visible en móvil
         scrollActiveTabToCenter(tab);
 
@@ -4259,7 +4545,7 @@
       if (unsubscribeMusicoService) unsubscribeMusicoService();
       if (window._unsubMusicoServicePlan) { window._unsubMusicoServicePlan(); window._unsubMusicoServicePlan = null; }
       window._prevCambiosTono = {};
-      
+
       // Restablecer el tema por defecto (oscuro) para la pantalla de login
       if (typeof window.aplicarTemaPorUsuario === 'function') {
         window.aplicarTemaPorUsuario('dark');
@@ -4282,7 +4568,7 @@
         }
         const title = document.getElementById('song-modal-title');
         if (title) title.textContent = "Agregar Nueva Canción";
-        
+
         const modal = document.getElementById('admin-song-modal');
         if (modal) modal.classList.add('active');
       });
@@ -4354,7 +4640,7 @@
               importedCount++;
             }
             alert(`¡Éxito!\n\nImportadas: ${importedCount} canciones.\nOmitidas (duplicadas): ${skippedCount}.`);
-          } catch(err) {
+          } catch (err) {
             alert("Error al procesar el archivo JSON: " + err.message);
           } finally {
             importSongsFile.value = "";
@@ -4377,7 +4663,7 @@
     const btnMusicoTheme = document.getElementById('btn-musico-theme');
     const btnLeaderTheme = document.getElementById('btn-leader-theme');
 
-    window.aplicarTemaPorUsuario = function(tema) {
+    window.aplicarTemaPorUsuario = function (tema) {
       const isLight = (tema === 'light');
       if (isLight) {
         document.body.classList.add('theme-light');
@@ -4412,7 +4698,7 @@
     async function migrarBaseDatosLetras() {
       if (_migrationInProgress) return;
       if (currentUserRole !== 'lider') return;
-      
+
       const conLetra = (cacheSongs || []).filter(s => s.letra !== undefined && s.letra !== null && s.letra.trim() !== '');
       const cancionesSucias = (cacheSongs || []).filter(s => {
         const nombre = s.nombre || '';
@@ -4421,7 +4707,7 @@
       });
 
       if (conLetra.length === 0 && cancionesSucias.length === 0) return;
-      
+
       _migrationInProgress = true;
 
       // 1. Migrar letras si hay pendientes
@@ -4456,7 +4742,7 @@
           try {
             await updateDoc(doc(db, "biblioteca_canciones", s.id), { nombre: nombreLimpio });
             corregidos++;
-          } catch(err) {
+          } catch (err) {
             console.error(`Error corrigiendo nombre de "${s.nombre}":`, err);
           }
         }
@@ -4469,10 +4755,10 @@
       _migrationInProgress = false;
     }
 
-    window.dangerouslyDeleteAllSongs = async function() {
+    window.dangerouslyDeleteAllSongs = async function () {
       if (!confirm("⚠️ ATENCIÓN: Esto borrará permanentemente TODAS las canciones de la biblioteca y sus letras. ¿Estás seguro?")) return;
       if (!confirm("¿Seguro al 100%? Esta acción NO se puede deshacer.")) return;
-      
+
       const songs = [...(window.cacheSongs || [])];
       console.log(`Iniciando borrado de ${songs.length} canciones...`);
       let count = 0;
@@ -4491,7 +4777,7 @@
     function fixCorruptedText(str) {
       if (typeof str !== 'string') return str;
       if (!str.includes('Ã')) return str;
-      try { return decodeURIComponent(escape(str)); } catch(e) { return str; }
+      try { return decodeURIComponent(escape(str)); } catch (e) { return str; }
     }
 
     // ====================================================
@@ -4889,8 +5175,8 @@
             row.style.opacity = "0.5";
           }
 
-          const avatarPicStyle = m.profilePic 
-            ? `background-image: url(${m.profilePic}); background-size: cover; background-position: center; color: transparent;` 
+          const avatarPicStyle = m.profilePic
+            ? `background-image: url(${m.profilePic}); background-size: cover; background-position: center; color: transparent;`
             : '';
           const avatarInitials = m.profilePic ? '' : m.nombre.substring(0, 2).toUpperCase();
 
@@ -4969,11 +5255,11 @@
         const keysOptions = ['C', 'Cm', 'C#', 'C#m', 'D', 'Dm', 'D#', 'D#m', 'E', 'Em', 'F', 'Fm', 'F#', 'F#m', 'G', 'Gm', 'G#', 'G#m', 'A', 'Am', 'A#', 'A#m', 'B', 'Bm'];
 
         const isAlabanza = s.tipo === 'alabanza';
-        const cardBorder = isAlabanza 
-          ? 'border-left: 4px solid var(--teal) !important; border-color: rgba(78, 205, 196, 0.25) !important;' 
+        const cardBorder = isAlabanza
+          ? 'border-left: 4px solid var(--teal) !important; border-color: rgba(78, 205, 196, 0.25) !important;'
           : 'border-left: 4px solid var(--purple) !important; border-color: rgba(155, 143, 255, 0.25) !important;';
-        const cardBg = isAlabanza 
-          ? 'background: rgba(78, 205, 196, 0.04) !important;' 
+        const cardBg = isAlabanza
+          ? 'background: rgba(78, 205, 196, 0.04) !important;'
           : 'background: rgba(155, 143, 255, 0.04) !important;';
         const badgeStyle = isAlabanza
           ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
@@ -5170,7 +5456,7 @@
     document.getElementById('form-add-song').addEventListener('submit', async (e) => {
       e.preventDefault();
       let nombre = document.getElementById('song-name-input').value.trim();
-      
+
       // Limpiar automáticamente sufijos molestos en el nombre de la canción
       nombre = nombre
         .replace(/\s*[\(,\-]?\s*(acordes|letra|letras|tab|tabs|chords|lyric|lyrics|acordes\s+y\s+letra|letra\s+y\s+acordes)\s*\)?/gi, '')
@@ -5193,7 +5479,7 @@
 
       const idUnico = editingSongId || ("song_" + Date.now());
       const letra = document.getElementById('song-lyrics-input').value;
-      
+
       const payloadMetadata = {
         nombre,
         artista,
@@ -5301,7 +5587,7 @@
               .replace(/-/g, ' ')
               .replace(/\b\w/g, c => c.toUpperCase());
           }
-        } catch(_) {}
+        } catch (_) { }
 
         // --- Extraer letra/acordes ---
         let letra = '';
@@ -5372,7 +5658,7 @@
           statusEl.textContent = 'Se importó pero algunos campos pueden estar vacíos. Verifica.';
           statusEl.style.color = 'var(--gold)';
         }
-      } catch(err) {
+      } catch (err) {
         statusEl.textContent = `Error: ${err.message}`;
         statusEl.style.color = 'var(--coral)';
       } finally {
@@ -5385,11 +5671,11 @@
       if (!fechaStr) return "Nunca tocada";
       const partes = fechaStr.split('-');
       if (partes.length !== 3) return fechaStr;
-      
+
       const fechaServicio = new Date(partes[0], partes[1] - 1, partes[2]);
       const hoy = new Date();
-      hoy.setHours(0,0,0,0);
-      fechaServicio.setHours(0,0,0,0);
+      hoy.setHours(0, 0, 0, 0);
+      fechaServicio.setHours(0, 0, 0, 0);
 
       const diffTime = hoy.getTime() - fechaServicio.getTime();
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
@@ -5418,13 +5704,13 @@
     window._adminSelectedArtist = null;
 
     function crearCartaCancionAdmin(s, playlistContext) {
-      const cardBorder = s.oficial 
-        ? 'border-bottom: 1.5px solid rgba(244,197,66, 0.4) !important;' 
-        : (s.tipo === 'adoracion' 
-            ? 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;' 
-            : 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;');
+      const cardBorder = s.oficial
+        ? 'border-bottom: 1.5px solid rgba(244,197,66, 0.4) !important;'
+        : (s.tipo === 'adoracion'
+          ? 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;'
+          : 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;');
 
-      const keysOptions = ['C','Cm','C#','C#m','D','Dm','D#','D#m','E','Em','F','Fm','F#','F#m','G','Gm','G#','G#m','A','Am','A#','A#m','B','Bm'];
+      const keysOptions = ['C', 'Cm', 'C#', 'C#m', 'D', 'Dm', 'D#', 'D#m', 'E', 'Em', 'F', 'Fm', 'F#', 'F#m', 'G', 'Gm', 'G#', 'G#m', 'A', 'Am', 'A#', 'A#m', 'B', 'Bm'];
       const ultimaVezText = obtenerUltimaVezCantada(s.id);
       let tagColor = "var(--text3)";
       if (ultimaVezText.includes("semana") || ultimaVezText.includes("día") || ultimaVezText === "Hoy" || ultimaVezText === "Ayer") {
@@ -5465,9 +5751,9 @@
 
       div.onclick = (e) => {
         if (
-          e.target.classList.contains('click-edit-song') || 
-          e.target.classList.contains('click-del-song') || 
-          e.target.classList.contains('btn-toggle-oficial') || 
+          e.target.classList.contains('click-edit-song') ||
+          e.target.classList.contains('click-del-song') ||
+          e.target.classList.contains('btn-toggle-oficial') ||
           e.target.closest('.select-admin-tone')
         ) {
           return;
@@ -5506,7 +5792,7 @@
             document.getElementById('song-key-input').value = s.tonoBase;
             document.getElementById('song-type-input').value = s.tipo || "alabanza";
             document.getElementById('song-youtube-input').value = s.youtube || "";
-            
+
             // Cargar letra asíncronamente
             document.getElementById('song-lyrics-input').value = "Cargando letra...";
             try {
@@ -5526,7 +5812,7 @@
                   letra: letra
                 };
               }
-            } catch(err) {
+            } catch (err) {
               console.error("Error cargando letra para editar:", err);
               document.getElementById('song-lyrics-input').value = "";
             }
@@ -5591,7 +5877,7 @@
           const art = s.artista || 'Desconocido';
           artistCounts[art] = (artistCounts[art] || 0) + 1;
         });
-        const sortedArtists = Object.keys(artistCounts).sort((a,b) => a.localeCompare(b));
+        const sortedArtists = Object.keys(artistCounts).sort((a, b) => a.localeCompare(b));
 
         if (totalCount) {
           totalCount.textContent = `${sortedArtists.length} artistas`;
@@ -5640,10 +5926,10 @@
             e.stopPropagation();
             const container = todasList;
             const currentlyExpanded = container.querySelector('.artist-accordion-group.expanded');
-            
+
             const groupEl = artistGroup;
             const isNowExpanding = !groupEl.classList.contains('expanded');
-            
+
             if (currentlyExpanded && currentlyExpanded !== groupEl) {
               currentlyExpanded.classList.remove('expanded');
               const prevHeader = currentlyExpanded.querySelector('.artist-row-item');
@@ -5657,20 +5943,20 @@
                 prevCollapse.innerHTML = '';
               }
             }
-            
+
             if (isNowExpanding) {
               groupEl.classList.add('expanded');
               header.style.borderColor = 'var(--teal)';
               header.style.background = 'rgba(78, 205, 196, 0.08)';
               collapseDiv.style.display = 'block';
-              
+
               collapseDiv.innerHTML = '';
               const artistSongs = todas.filter(s => (s.artista || 'Desconocido') === art);
               artistSongs.forEach(s => {
                 const card = crearCartaCancionAdmin(s, artistSongs);
                 collapseDiv.appendChild(card);
               });
-              
+
               window._adminSelectedArtist = art;
             } else {
               groupEl.classList.remove('expanded');
@@ -5678,7 +5964,7 @@
               header.style.background = '';
               collapseDiv.style.display = 'none';
               collapseDiv.innerHTML = '';
-              
+
               window._adminSelectedArtist = null;
             }
           };
@@ -5796,8 +6082,8 @@
         const div = document.createElement('div');
         div.className = "member-row";
         div.style.justifyContent = "space-between";
-        const avatarPicStyle = m.profilePic 
-          ? `background-image: url(${m.profilePic}); background-size: cover; background-position: center; color: transparent;` 
+        const avatarPicStyle = m.profilePic
+          ? `background-image: url(${m.profilePic}); background-size: cover; background-position: center; color: transparent;`
           : '';
         const avatarInitials = m.profilePic ? '' : m.nombre.substring(0, 2).toUpperCase();
 
@@ -5956,11 +6242,11 @@
 
     function crearCartaCancionMusico(s, playlistContext) {
       const isFav = window.misFavoritos && window.misFavoritos.includes(s.id);
-      const cardBorder = s.oficial 
-        ? 'border-bottom: 1.5px solid rgba(244,197,66, 0.4) !important;' 
-        : (s.tipo === 'adoracion' 
-            ? 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;' 
-            : 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;');
+      const cardBorder = s.oficial
+        ? 'border-bottom: 1.5px solid rgba(244,197,66, 0.4) !important;'
+        : (s.tipo === 'adoracion'
+          ? 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;'
+          : 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;');
 
       const toneStyle = s.tipo === 'adoracion'
         ? 'background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);'
@@ -6027,14 +6313,14 @@
       const listCont = document.getElementById('list-repertorio-musico');
       const countEl = document.getElementById('count-repertorio-musico');
       const searchInput = document.getElementById('search-repertorio-musico');
-      
+
       if (!listCont) return;
 
       const query = removeAccents(searchInput?.value || '').toLowerCase().trim();
       const activeTabBtn = document.querySelector('.musico-subtab.active');
       const currentSubtab = activeTabBtn ? activeTabBtn.dataset.subtab : 'todas';
 
-      const allSongs = [...(cacheSongs || [])].sort((a,b) => (a.nombre||'').localeCompare(b.nombre||''));
+      const allSongs = [...(cacheSongs || [])].sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
 
       // Búsqueda por palabras clave sin importar el orden
       const queryWords = query.split(/\s+/).filter(Boolean);
@@ -6056,7 +6342,7 @@
             const art = s.artista || 'Desconocido';
             artistCounts[art] = (artistCounts[art] || 0) + 1;
           });
-          const sortedArtists = Object.keys(artistCounts).sort((a,b) => a.localeCompare(b));
+          const sortedArtists = Object.keys(artistCounts).sort((a, b) => a.localeCompare(b));
 
           if (countEl) {
             countEl.textContent = `${sortedArtists.length} artistas`;
@@ -6072,7 +6358,7 @@
             const artistGroup = document.createElement('div');
             artistGroup.className = 'artist-accordion-group';
             artistGroup.style.marginBottom = '6px';
-            
+
             const isExpanded = window._musicoSelectedArtist === art;
             if (isExpanded) {
               artistGroup.classList.add('expanded');
@@ -6106,10 +6392,10 @@
               e.stopPropagation();
               const container = listCont;
               const currentlyExpanded = container.querySelector('.artist-accordion-group.expanded');
-              
+
               const groupEl = artistGroup;
               const isNowExpanding = !groupEl.classList.contains('expanded');
-              
+
               if (currentlyExpanded && currentlyExpanded !== groupEl) {
                 currentlyExpanded.classList.remove('expanded');
                 const prevHeader = currentlyExpanded.querySelector('.artist-row-item');
@@ -6123,20 +6409,20 @@
                   prevCollapse.innerHTML = '';
                 }
               }
-              
+
               if (isNowExpanding) {
                 groupEl.classList.add('expanded');
                 header.style.borderColor = 'var(--teal)';
                 header.style.background = 'rgba(78, 205, 196, 0.08)';
                 collapseDiv.style.display = 'block';
-                
+
                 collapseDiv.innerHTML = '';
                 const artistSongs = allSongs.filter(s => (s.artista || 'Desconocido') === art);
                 artistSongs.forEach(s => {
                   const card = crearCartaCancionMusico(s, artistSongs);
                   collapseDiv.appendChild(card);
                 });
-                
+
                 window._musicoSelectedArtist = art;
               } else {
                 groupEl.classList.remove('expanded');
@@ -6144,7 +6430,7 @@
                 header.style.background = '';
                 collapseDiv.style.display = 'none';
                 collapseDiv.innerHTML = '';
-                
+
                 window._musicoSelectedArtist = null;
               }
             };
@@ -6313,8 +6599,8 @@
               const num = startNum + i;
               const safeNombre = (s.nombre || "").replace(/"/g, '&quot;');
 
-              const cardBorder = type === 'alabanza' 
-                ? 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;' 
+              const cardBorder = type === 'alabanza'
+                ? 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;'
                 : 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;';
               const numColor = type === 'alabanza' ? 'color: rgba(78, 205, 196, 0.4);' : 'color: rgba(155, 143, 255, 0.4);';
               const badgeStyle = type === 'alabanza'
@@ -6420,7 +6706,7 @@
             document.getElementById('musico-custom-tone').value = "C";
 
             renderAddSongResults(type, "");
-            
+
             window._selectedSongsToAdd = new Set();
             const btnAddSel1 = document.getElementById('btn-musico-add-selected');
             if (btnAddSel1) btnAddSel1.style.display = 'none';
@@ -6503,8 +6789,8 @@
             if (m.instrumento.includes('Batería') || m.instrumento.includes('Percusión')) avatarClass = "av-purple";
             else if (m.instrumento.includes('Voz') || m.instrumento.includes('Corista')) avatarClass = "av-teal";
 
-            const avatarPicStyle = m.profilePic 
-              ? `background-image: url(${m.profilePic}); background-size: cover; background-position: center; color: transparent;` 
+            const avatarPicStyle = m.profilePic
+              ? `background-image: url(${m.profilePic}); background-size: cover; background-position: center; color: transparent;`
               : '';
             const avatarInitials = m.profilePic ? '' : m.nombre.substring(0, 2).toUpperCase();
 
@@ -6631,7 +6917,7 @@
           }
 
           // Si NO es línea de acordes, evitamos reemplazar letras sueltas como 'A' o 'D' que suelen ser palabras (A la batalla, D...)
-          if (!isChordLine && match.length === 1 && !['[','{','(','<'].includes(prevChar)) {
+          if (!isChordLine && match.length === 1 && !['[', '{', '(', '<'].includes(prevChar)) {
             return match;
           }
 
@@ -6675,7 +6961,7 @@
         clearInterval(_scrollInterval);
         _scrollInterval = null;
       }
-      
+
       const mobBtn = document.getElementById('lyrics-modal-autoscroll-btn');
       if (mobBtn) {
         mobBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> AutoScroll';
@@ -6905,43 +7191,43 @@
       if (toneDisplay) {
         toneDisplay.textContent = tonoMostrar;
       }
-      
+
       if (toneBtn) {
         toneBtn.onclick = () => {
           const pOverlay = document.getElementById('practice-tone-picker-overlay');
           const pGrid = document.getElementById('practice-tone-picker-grid');
           const pTitle = document.getElementById('practice-tone-picker-song-name');
-          
+
           if (pTitle) pTitle.textContent = `${song.nombre}`;
-          
+
           const keys = ['C', 'Cm', 'C#', 'C#m', 'D', 'Dm', 'D#', 'D#m', 'E', 'Em', 'F', 'Fm', 'F#', 'F#m', 'G', 'Gm', 'G#', 'G#m', 'A', 'Am', 'A#', 'A#m', 'B', 'Bm'];
           const currentTonoPrac = song.tonoServicio || song.tonoBase;
-          
+
           pGrid.innerHTML = keys.map(k =>
             `<button class="tone-grid-btn ${k === currentTonoPrac ? 'current' : ''}" data-key="${k}">${k}</button>`
           ).join('');
-          
+
           pGrid.querySelectorAll('.tone-grid-btn').forEach(btn => {
             btn.onclick = () => {
               const selectedTone = btn.dataset.key;
               pOverlay.classList.remove('active');
-              
+
               if (toneDisplay) {
                 toneDisplay.textContent = selectedTone;
               }
-              
+
               const isSongHasLetra = song.letra && song.letra.trim() !== "";
               const lyricsContentContainer = document.getElementById(destPrefix + 'content');
               if (isSongHasLetra && lyricsContentContainer) {
                 lyricsContentContainer.innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, selectedTone);
               }
               document.getElementById(destPrefix + 'meta').textContent = `Tono Original: ${song.tonoBase} | Tono de Práctica: ${selectedTone}`;
-              
+
               song.tonoServicio = selectedTone;
               window._lyricsCache[cancionId] = song;
             };
           });
-          
+
           pOverlay.classList.add('active');
         };
       }
@@ -6965,10 +7251,10 @@
         const isFav = (window.misFavoritos || []).includes(cancionId);
         if (isFav) favBtn.classList.add('es-fav');
         else favBtn.classList.remove('es-fav');
-        
+
         const newFavBtn = favBtn.cloneNode(true);
         favBtn.parentNode.replaceChild(newFavBtn, favBtn);
-        
+
         newFavBtn.addEventListener('click', async (e) => {
           e.stopPropagation();
           if (!activeSessionUser || !activeSessionUser.usuario) return;
@@ -7004,7 +7290,7 @@
         document.getElementById('panel-lyrics-tone-display').textContent = tonoMostrar;
         document.querySelector('#musico-lyrics-detail-panel .lyrics-detail-placeholder').style.display = 'none';
         document.querySelector('#musico-lyrics-detail-panel .lyrics-detail-content-area').style.display = 'flex';
-        
+
         const panelCloseBtn = document.getElementById('panel-lyrics-close');
         if (panelCloseBtn) {
           panelCloseBtn.onclick = () => {
@@ -7337,8 +7623,8 @@
             const num = startNum + i;
             const safeNombre = (s.nombre || "").replace(/"/g, '&quot;');
 
-            const cardBorder = type === 'alabanza' 
-              ? 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;' 
+            const cardBorder = type === 'alabanza'
+              ? 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;'
               : 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;';
             const numColor = type === 'alabanza' ? 'color: rgba(78, 205, 196, 0.4);' : 'color: rgba(155, 143, 255, 0.4);';
             const badgeStyle = type === 'alabanza'
@@ -7448,7 +7734,7 @@
         const matchSearch = removeAccents(sNombre).toLowerCase().includes(filterText) || removeAccents(sArtista).toLowerCase().includes(filterText);
         const notAlreadySelected = !selectedIds.includes(s.id);
         const matchOficial = currentPickerFilter === 'todas' || s.oficial === true;
-        
+
         return matchSearch && notAlreadySelected && matchOficial;
       });
 
@@ -7459,8 +7745,8 @@
 
       filtered.forEach(s => {
         const isAlabanza = type === 'alabanza';
-        const cardBorder = isAlabanza 
-          ? 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;' 
+        const cardBorder = isAlabanza
+          ? 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;'
           : 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;';
         const badgeStyle = isAlabanza
           ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
@@ -7469,7 +7755,7 @@
         const div = document.createElement('div');
         div.className = "musico-song-card";
         div.style.cssText = `background: transparent !important; border: none !important; border-radius: 0 !important; margin-bottom: 0 !important; padding: 14px 4px !important; box-shadow: none !important; cursor: pointer; ${cardBorder}`;
-        
+
         const isChecked = window._selectedSongsToAdd && window._selectedSongsToAdd.has(s.id);
 
         div.innerHTML = `
@@ -7491,7 +7777,7 @@
         `;
         div.addEventListener('click', () => {
           if (!window._selectedSongsToAdd) window._selectedSongsToAdd = new Set();
-          
+
           const checkbox = div.querySelector('.custom-checkbox');
           if (window._selectedSongsToAdd.has(s.id)) {
             window._selectedSongsToAdd.delete(s.id);
@@ -7504,7 +7790,7 @@
             checkbox.style.borderColor = 'var(--teal)';
             checkbox.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f0e17" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
           }
-          
+
           const btnAddSel = document.getElementById('btn-musico-add-selected');
           if (btnAddSel) {
             if (window._selectedSongsToAdd.size > 0) {
@@ -7582,13 +7868,13 @@
     if (btnAddSelected) {
       btnAddSelected.addEventListener('click', async () => {
         if (!window._selectedSongsToAdd || window._selectedSongsToAdd.size === 0) return;
-        
+
         const dateStr = window._targetAddSongDate || serviceDateSelect.value || document.getElementById('musico-service-date').value;
         const docRef = doc(db, "planes_servicio", dateStr);
         const dataServicio = window._currentServiceData || {};
         let currentOrder = dataServicio.ordenCanciones || [];
         const type = window._targetAddSongType;
-        
+
         let updates = {};
         window._selectedSongsToAdd.forEach(songId => {
           const s = (window.cacheSongs || []).find(x => x.id === songId);
@@ -7599,14 +7885,14 @@
           }
         });
         updates['ordenCanciones'] = currentOrder;
-        
+
         try {
           await updateDoc(docRef, updates);
           showToast(`Se agregaron ${window._selectedSongsToAdd.size} canciones.`);
           document.getElementById('musico-add-song-modal').classList.remove('active');
           window._selectedSongsToAdd.clear();
           renderAddSongResults(type, document.getElementById('musico-add-song-search').value.trim());
-        } catch(e) {
+        } catch (e) {
           console.error("Error agregando selección", e);
           showToast("Error al guardar selección.");
         }
@@ -7664,7 +7950,7 @@
         document.getElementById('musico-custom-tone').value = "C";
 
         renderAddSongResults(type, "");
-        
+
         window._selectedSongsToAdd = new Set();
         const btnAddSel2 = document.getElementById('btn-musico-add-selected');
         if (btnAddSel2) btnAddSel2.style.display = 'none';
@@ -7767,7 +8053,7 @@
       // Detectar iOS
       const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
 
-      window.intentarMostrarPwaBanner = function() {
+      window.intentarMostrarPwaBanner = function () {
         if (!screenLogin) return;
         // Solo mostrar si la pantalla de login está activa
         if (screenLogin.classList.contains('active')) {
@@ -7837,7 +8123,7 @@
     // ====================================================
     // LÓGICA DE FOTOS DE PERFIL (AVATARS)
     // ====================================================
-    window.actualizarAvatares = function() {
+    window.actualizarAvatares = function () {
       const user = activeSessionUser;
       if (!user) return;
 
@@ -7920,16 +8206,16 @@
             ctx.drawImage(img, 0, 0, width, height);
 
             const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
-            
+
             if (!db || !doc || !setDoc) return;
-            
+
             // Save to Firestore using username document ID
             const userRef = doc(db, "usuarios", activeSessionUser.usuario);
             setDoc(userRef, { profilePic: compressedBase64 }, { merge: true }).then(() => {
               activeSessionUser.profilePic = compressedBase64;
               window.actualizarAvatares();
               showToast("📷 Foto de perfil actualizada");
-              
+
               // Update in local cacheMembers to propagate changes
               if (window.cacheMembers) {
                 const mLocal = window.cacheMembers.find(m => m.usuario === activeSessionUser.usuario);
@@ -8006,8 +8292,12 @@
   <div class="modal-overlay" id="admin-repertorio-modal">
     <div class="modal-box" style="max-width: 600px; width: 95%;">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-        <button onclick="document.getElementById('admin-repertorio-modal').classList.remove('active')" style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Volver
+        <button onclick="document.getElementById('admin-repertorio-modal').classList.remove('active')"
+          style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg> Volver
         </button>
         <h2 class="modal-title" style="margin:0; font-size:20px; text-align:right;">Nuevo / Editar Repertorio</h2>
       </div>
@@ -8024,8 +8314,12 @@
   <div class="modal-overlay" id="admin-ensayo-modal">
     <div class="modal-box" style="max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto;">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-        <button onclick="document.getElementById('admin-ensayo-modal').classList.remove('active')" style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Volver
+        <button onclick="document.getElementById('admin-ensayo-modal').classList.remove('active')"
+          style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg> Volver
         </button>
         <h2 class="modal-title" style="margin:0; font-size:20px; text-align:right;">Nuevo / Editar Ensayo</h2>
       </div>
@@ -8041,7 +8335,8 @@
         <div style="flex: 1.2; min-width: 180px;">
           <label style="font-size:12px; margin-bottom:4px; display:block;">Hora</label>
           <div style="display: flex; gap: 4px;">
-            <select id="ensayo-hora-hh" style="flex: 1; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); outline:none; height: 38px;">
+            <select id="ensayo-hora-hh"
+              style="flex: 1; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); outline:none; height: 38px;">
               <option value="">Hora</option>
               <option value="01">01</option>
               <option value="02">02</option>
@@ -8056,7 +8351,8 @@
               <option value="11">11</option>
               <option value="12">12</option>
             </select>
-            <select id="ensayo-hora-mm" style="flex: 1; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); outline:none; height: 38px;">
+            <select id="ensayo-hora-mm"
+              style="flex: 1; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); outline:none; height: 38px;">
               <option value="">Min</option>
               <option value="00">00</option>
               <option value="05">05</option>
@@ -8071,7 +8367,8 @@
               <option value="50">50</option>
               <option value="55">55</option>
             </select>
-            <select id="ensayo-hora-ampm" style="width: 70px; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); outline:none; height: 38px;">
+            <select id="ensayo-hora-ampm"
+              style="width: 70px; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); outline:none; height: 38px;">
               <option value="PM">PM</option>
               <option value="AM">AM</option>
             </select>
@@ -8114,25 +8411,33 @@
   <div class="modal-overlay" id="admin-song-modal">
     <div class="modal-box" style="max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto;">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-        <button onclick="document.getElementById('admin-song-modal').classList.remove('active')" style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Volver
+        <button onclick="document.getElementById('admin-song-modal').classList.remove('active')"
+          style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg> Volver
         </button>
-        <h2 class="modal-title" id="song-modal-title" style="margin:0; font-size:20px; color: var(--teal); text-align:right;">Agregar Nueva Canción</h2>
+        <h2 class="modal-title" id="song-modal-title"
+          style="margin:0; font-size:20px; color: var(--teal); text-align:right;">Agregar Nueva Canción</h2>
       </div>
-      <p class="modal-subtitle" style="margin-bottom: 16px;">Completa los datos de la canción para guardarla en el repertorio global.</p>
+      <p class="modal-subtitle" style="margin-bottom: 16px;">Completa los datos de la canción para guardarla en el
+        repertorio global.</p>
       <form id="form-add-song">
 
         <!-- Campo Importar desde LaCuerda -->
-        <div class="field" style="background:rgba(78,205,196,0.05); border:1.5px dashed rgba(78,205,196,0.3); border-radius:var(--radius-sm); padding:12px; margin-bottom:14px;">
-          <label style="color:var(--teal); font-weight:700; font-size:12px;">🔗 Importar desde LaCuerda <span style="font-weight:400; color:var(--text3);">(pega el link de la canción)</span></label>
+        <div class="field"
+          style="background:rgba(78,205,196,0.05); border:1.5px dashed rgba(78,205,196,0.3); border-radius:var(--radius-sm); padding:12px; margin-bottom:14px;">
+          <label style="color:var(--teal); font-weight:700; font-size:12px;">🔗 Importar desde LaCuerda <span
+              style="font-weight:400; color:var(--text3);">(pega el link de la canción)</span></label>
           <div style="display:flex; gap:8px; margin-top:6px;">
             <input type="url" id="lacuerda-url-input" placeholder="https://www.lacuerda.net/artista/cancion/"
               style="flex:1; padding:8px 10px; background:var(--bg); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-size:13px; outline:none;">
             <button type="button" id="btn-fetch-lacuerda"
-              style="padding:8px 14px; background:var(--teal); color:#0f0e17; border:none; border-radius:var(--radius-sm); font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap;"
-            >Importar</button>
+              style="padding:8px 14px; background:var(--teal); color:#0f0e17; border:none; border-radius:var(--radius-sm); font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap;">Importar</button>
           </div>
-          <p id="lacuerda-fetch-status" style="font-size:11px; color:var(--text3); margin-top:5px; min-height:16px;"></p>
+          <p id="lacuerda-fetch-status" style="font-size:11px; color:var(--text3); margin-top:5px; min-height:16px;">
+          </p>
         </div>
 
         <div class="field"><label>Nombre de la Canción</label><input type="text" id="song-name-input" required
@@ -8181,12 +8486,15 @@
           <input type="url" id="song-youtube-input" placeholder="Ej: https://www.youtube.com/watch?v=...">
         </div>
         <div class="field">
-          <label>Letra y Acordes <span style="color: var(--text3); font-weight: 400;">(Opcional. Pega formato tipo LaCuerda.net)</span></label>
+          <label>Letra y Acordes <span style="color: var(--text3); font-weight: 400;">(Opcional. Pega formato tipo
+              LaCuerda.net)</span></label>
           <textarea id="song-lyrics-input" placeholder="Pegar aquí la letra con los acordes arriba..."
             style="width:100%; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px; color:var(--text); font-family:'Courier New', Courier, monospace; font-size:13px; resize:vertical; min-height:120px; white-space: pre; outline:none;"></textarea>
         </div>
-        <button type="submit" class="btn-primary" style="background: var(--teal); color: #0f0e17; margin-top: 10px;">Guardar Canción</button>
-        <button type="button" class="btn-primary" id="btn-cancel-song-modal" style="background: var(--coral); color: #0f0e17; margin-top: 8px;">Cancelar</button>
+        <button type="submit" class="btn-primary"
+          style="background: var(--teal); color: #0f0e17; margin-top: 10px;">Guardar Canción</button>
+        <button type="button" class="btn-primary" id="btn-cancel-song-modal"
+          style="background: var(--coral); color: #0f0e17; margin-top: 8px;">Cancelar</button>
       </form>
     </div>
   </div>
@@ -8195,10 +8503,13 @@
   <div class="modal-overlay" id="ensayo-reminder-modal">
     <div class="modal-box" style="text-align: center; border-color: var(--gold); max-width: 380px;">
       <h2 class="modal-title" id="ensayo-reminder-title" style="margin-bottom: 8px;">Recordatorio de Ensayo</h2>
-      <p id="ensayo-reminder-text" style="font-size:14px; color:var(--text); margin-bottom:20px; line-height:1.6; text-align: left;"></p>
+      <p id="ensayo-reminder-text"
+        style="font-size:14px; color:var(--text); margin-bottom:20px; line-height:1.6; text-align: left;"></p>
       <div id="ensayo-reminder-actions" style="display: flex; flex-direction: column; gap: 8px;">
-        <button class="btn-primary" id="btn-ensayo-reminder-confirm" style="margin-top: 0; background: var(--teal); color: #0f0e17; display: none;">Confirmar Asistencia</button>
-        <button class="btn-primary" id="btn-ensayo-reminder-close" style="margin-top: 0; background: var(--bg3); border: 1px solid var(--border2); color: var(--text); padding: 10px 16px;">Entendido</button>
+        <button class="btn-primary" id="btn-ensayo-reminder-confirm"
+          style="margin-top: 0; background: var(--teal); color: #0f0e17; display: none;">Confirmar Asistencia</button>
+        <button class="btn-primary" id="btn-ensayo-reminder-close"
+          style="margin-top: 0; background: var(--bg3); border: 1px solid var(--border2); color: var(--text); padding: 10px 16px;">Entendido</button>
       </div>
     </div>
   </div>
@@ -8207,12 +8518,14 @@
   <input type="file" id="global-profile-pic-input" accept="image/*" style="display: none;">
 
   <!-- Alerta de Actualización Disponible -->
-  <div id="pwa-update-banner" style="position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120px); background: rgba(26, 24, 40, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.5px solid var(--teal); border-radius: var(--radius); padding: 16px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 16px; z-index: 200000; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto; max-width: 90%; width: 380px; box-sizing: border-box;">
+  <div id="pwa-update-banner"
+    style="position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120px); background: rgba(26, 24, 40, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.5px solid var(--teal); border-radius: var(--radius); padding: 16px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 16px; z-index: 200000; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto; max-width: 90%; width: 380px; box-sizing: border-box;">
     <div style="font-size: 24px;"></div>
     <div style="flex-grow: 1;">
       <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text);">Actualización disponible</h4>
       <p style="margin: 2px 0 0 0; font-size: 12px; color: var(--text2);">Nueva versión lista para instalar</p>
     </div>
-    <button id="pwa-update-btn" style="background: var(--teal); border: none; color: #0f0e17; padding: 8px 14px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; transition: transform 0.2s; white-space: nowrap;">Actualizar</button>
+    <button id="pwa-update-btn"
+      style="background: var(--teal); border: none; color: #0f0e17; padding: 8px 14px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; transition: transform 0.2s; white-space: nowrap;">Actualizar</button>
   </div>
 </body>
