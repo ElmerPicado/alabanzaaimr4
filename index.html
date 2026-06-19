@@ -3693,30 +3693,30 @@
       </div>
 
       <!-- Filtro: Todas / Oficial -->
-      <div style="display:flex; gap:6px; margin-bottom:10px; padding:4px; background:var(--bg3); border-radius:8px;">
+      <div style="display:none; gap:6px; margin-bottom:10px; padding:4px; background:var(--bg3); border-radius:8px;">
         <button id="filter-picker-todas" style="flex:1; padding:7px; font-size:12px; font-weight:700; font-family:var(--font-body); background:var(--bg2); border:none; border-radius:6px; color:var(--gold); cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,0.2);">Todas</button>
         <button id="filter-picker-oficial" style="flex:1; padding:7px; font-size:12px; font-weight:700; font-family:var(--font-body); background:transparent; border:none; border-radius:6px; color:var(--text2); cursor:pointer;">Oficial</button>
       </div>
 
       <!-- Buscador -->
-      <div class="search-wrapper">
+      <div class="search-wrapper" style="display:none;">
         <input type="text" id="musico-add-song-search" class="search-input"
           placeholder="Buscar por nombre o artista...">
       </div>
 
       <!-- Lista de resultados de la biblioteca -->
-      <div id="musico-add-song-results" class="song-list-scroll" style="max-height: 200px; margin-bottom: 16px;">
+      <div id="musico-add-song-results" class="song-list-scroll" style="display: none; max-height: 200px; margin-bottom: 16px;">
         <!-- Canciones cargadas dinámicamente -->
       </div>
 
       <!-- Acciones de selección múltiple y manual -->
-      <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+      <div style="display: none; gap: 10px; margin-bottom: 16px;">
         <button id="btn-musico-add-selected" class="btn-primary" style="flex: 1; display: none; padding: 10px; font-size: 13px; align-items: center; justify-content: center;"></button>
         <button id="btn-musico-toggle-custom" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 13px; background: rgba(255,255,255,0.05); border: 1px dashed var(--border); border-radius: var(--radius-sm); color: var(--text2);">+ Agregar Manual</button>
       </div>
 
       <!-- Opción de agregar canción personalizada -->
-      <div id="musico-custom-song-container" style="display: none; border-top: 1px solid var(--border); padding-top: 14px;">
+      <div id="musico-custom-song-container" style="display: block; padding-top: 0;">
         <h4
           style="font-size:12px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;">
           ¿No está en la lista? Escríbela rápido:</h4>
@@ -4488,6 +4488,12 @@
       alert(`¡Completado! Se borraron ${count} canciones.`);
     };
 
+    function fixCorruptedText(str) {
+      if (typeof str !== 'string') return str;
+      if (!str.includes('Ã')) return str;
+      try { return decodeURIComponent(escape(str)); } catch(e) { return str; }
+    }
+
     // ====================================================
     // ESCUCHA DE DATOS BASE Y ENLACE DE EVENTOS
     // ====================================================
@@ -4947,28 +4953,7 @@
           });
         }
 
-        // Renderizar No Disponibles / Sin Confirmar
-        const headerNoDisp = document.createElement('div');
-        headerNoDisp.className = "block-title";
-        headerNoDisp.style.marginTop = "20px";
-        headerNoDisp.style.color = "var(--text3)";
-        headerNoDisp.style.borderBottomColor = "rgba(255,255,255,0.05)";
-        headerNoDisp.textContent = "No Disponibles / Sin Confirmar (Bloqueados)";
-        teamCont.appendChild(headerNoDisp);
-
-        if (noDisponibles.length === 0) {
-          const p = document.createElement('p');
-          p.style.color = "var(--text3)";
-          p.style.fontSize = "12px";
-          p.style.padding = "12px 6px";
-          p.style.textAlign = "center";
-          p.textContent = "Todos los integrantes han confirmado asistencia.";
-          teamCont.appendChild(p);
-        } else {
-          noDisponibles.forEach(m => {
-            teamCont.appendChild(crearFilaMiembro(m, false));
-          });
-        }
+        // Eliminada sección de No Disponibles por petición del usuario
       }
 
       // --- 2. RENDER DE REPERTORIO CON TONO DINÁMICO ---
@@ -5450,12 +5435,12 @@
 
       const div = document.createElement('div');
       div.className = "musico-song-card";
-      div.style.cssText = `background: transparent !important; border: none !important; border-radius: 0 !important; margin-bottom: 0 !important; padding: 14px 4px !important; box-shadow: none !important; ${cardBorder}`;
+      div.style.cssText = `background: transparent !important; border: none !important; border-radius: 0 !important; margin-bottom: 0 !important; padding: 14px 4px !important; box-shadow: none !important; flex-wrap: wrap; flex-direction: column; align-items: stretch; gap: 10px; ${cardBorder}`;
 
       div.innerHTML = `
-        <div class="song-card-info" style="margin-left: 4px; flex:1; min-width:0;">
-          <div class="song-card-name" style="font-weight: 600;">${s.nombre}</div>
-          <div class="song-card-artist" style="font-size:11px; color: var(--text2); display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
+        <div class="song-card-info" style="margin-left: 4px; flex:1; min-width:0; width: 100%;">
+          <div class="song-card-name" style="font-weight: 600; white-space: normal; overflow: visible; word-break: break-word;">${s.nombre}</div>
+          <div class="song-card-artist" style="font-size:11px; color: var(--text2); display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:4px;">
             <span>${s.artista}</span>
             <span>•</span>
             <span style="background:rgba(255,255,255,0.05); padding:1px 6px; border-radius:4px; font-size:10px; color:${tagColor}; border:1px solid rgba(255,255,255,0.08); font-weight:500;">
@@ -5464,7 +5449,7 @@
           </div>
         </div>
 
-        <div style="display:flex; align-items:center; gap: 6px; margin-left:auto; flex-shrink:0; padding-right: 4px;">
+        <div style="display:flex; align-items:center; gap: 6px; flex-wrap: wrap; margin-left: 4px; padding-right: 4px;">
           <select class="select-admin-tone" title="Cambiar tono base" style="background:var(--bg3); border:1px solid rgba(244,197,66,0.4); color:var(--gold); border-radius:6px; padding:4px 6px; font-size:11px; font-family:var(--font-body); outline:none; cursor:pointer; font-weight:600;">
             ${keysOptions.map(t => `<option value="${t}" ${t === s.tonoBase ? 'selected' : ''}>${t}</option>`).join('')}
           </select>
@@ -6440,9 +6425,10 @@
             const btnAddSel1 = document.getElementById('btn-musico-add-selected');
             if (btnAddSel1) btnAddSel1.style.display = 'none';
             const customCont1 = document.getElementById('musico-custom-song-container');
-            if (customCont1) customCont1.style.display = 'none';
+            if (customCont1) customCont1.style.display = 'block';
 
             document.getElementById('musico-add-song-modal').classList.add('active');
+            setTimeout(() => document.getElementById('musico-custom-name').focus(), 100);
           });
         });
       });
@@ -7683,9 +7669,10 @@
         const btnAddSel2 = document.getElementById('btn-musico-add-selected');
         if (btnAddSel2) btnAddSel2.style.display = 'none';
         const customCont2 = document.getElementById('musico-custom-song-container');
-        if (customCont2) customCont2.style.display = 'none';
+        if (customCont2) customCont2.style.display = 'block';
 
         document.getElementById('musico-add-song-modal').classList.add('active');
+        setTimeout(() => document.getElementById('musico-custom-name').focus(), 100);
       });
     });
 
