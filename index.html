@@ -2193,6 +2193,11 @@
         width: 38px !important;
         height: 38px !important;
       }
+      .musico-song-card .song-name {
+        white-space: normal !important;
+        overflow: visible !important;
+        word-break: break-word;
+      }
 
       /* Increase results list height slightly on mobile for better visibility */
       #musico-add-song-results {
@@ -3616,8 +3621,8 @@
               <p style="font-size: 13px; max-width: 300px; margin: 0 auto; line-height: 1.5; color: var(--text2);">Selecciona una canción de la lista para ver su letra y acordes aquí.</p>
             </div>
             <div class="lyrics-detail-content-area" style="display: none; height: 100%; flex-direction: column;">
-              <div class="lyrics-modal-header" style="border-bottom: 1px solid var(--border2); padding-bottom: 16px; margin-bottom: 16px;">
-                <div>
+              <div class="lyrics-modal-header" style="border-bottom: 1px solid var(--border2); padding-bottom: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
                   <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     <h3 id="panel-lyrics-title" class="lyrics-modal-title" style="margin: 0; font-size: 22px;">Nombre de la Canción</h3>
                     <a id="panel-lyrics-yt-link" href="#" target="_blank" rel="noopener" style="display: none; align-items: center; gap: 4px; background: rgba(244, 63, 94, 0.12); color: var(--coral); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s;">
@@ -3655,6 +3660,7 @@
                     </div>
                   </div>
                 </div>
+                <button id="panel-lyrics-close" style="background: var(--bg3); border: 1px solid var(--border2); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; margin-left: 10px;">X Cerrar</button>
               </div>
               <div id="panel-lyrics-body" style="flex: 1; overflow-y: auto;">
                 <div id="panel-lyrics-content" class="lyrics-content"></div>
@@ -6609,11 +6615,25 @@
 
       const lineas = texto.split('\n');
       return lineas.map(linea => {
+        const trimmed = linea.trim();
+        if (trimmed === '') return linea;
+
+        // Heurística para detectar si es una línea de acordes
+        // Si quitamos los acordes y signos, la cantidad de letras restantes debe ser muy pequeña en proporción
+        const sinAcordes = linea.replace(/([A-G][b#]?(?:m|min|maj|dim|aug|sus|add)?\d?(?:\/[A-G][b#]?)?)/g, '');
+        const sinEspaciosYSig = sinAcordes.replace(/[\s\|\-\(\)\*\,\.]/g, '');
+        const isChordLine = sinEspaciosYSig.length <= linea.length * 0.3;
+
         return linea.replace(/([A-G][b#]?(?:m|min|maj|dim|aug|sus|add)?\d?(?:\/[A-G][b#]?)?)/g, (match, p1, offset, fullStr) => {
           const prevChar = offset > 0 ? fullStr[offset - 1] : ' ';
           const nextChar = offset + match.length < fullStr.length ? fullStr[offset + match.length] : ' ';
 
           if (/[a-zA-Z]/.test(prevChar) || /[a-zA-Z]/.test(nextChar)) {
+            return match;
+          }
+
+          // Si NO es línea de acordes, evitamos reemplazar letras sueltas como 'A' o 'D' que suelen ser palabras (A la batalla, D...)
+          if (!isChordLine && match.length === 1 && !['[','{','(','<'].includes(prevChar)) {
             return match;
           }
 
@@ -6650,7 +6670,7 @@
 
     let _scrollInterval = null;
     let _scrollSpeed = 2; // 1 a 5
-    let _currentZoom = 26; // default
+    let _currentZoom = 28; // default
 
     function detenerAutoscroll() {
       if (_scrollInterval) {
@@ -6876,7 +6896,7 @@
       const isSplitView = window.innerWidth >= 768 && isRepActive && !ensayoActive;
 
       // Elementos de destino dependiendo de la vista
-      const destPrefix = isSplitView ? 'panel-' : 'lyrics-modal-';
+      const destPrefix = isSplitView ? 'panel-lyrics-' : 'lyrics-modal-';
 
       document.getElementById(destPrefix + 'title').textContent = song.nombre;
       document.getElementById(destPrefix + 'meta').textContent = `Tono Original: ${song.tonoBase} | Tono del Servicio: ${tonoMostrar}`;
@@ -6956,6 +6976,14 @@
         document.getElementById('panel-lyrics-tone-display').textContent = tonoMostrar;
         document.querySelector('#musico-lyrics-detail-panel .lyrics-detail-placeholder').style.display = 'none';
         document.querySelector('#musico-lyrics-detail-panel .lyrics-detail-content-area').style.display = 'flex';
+        
+        const panelCloseBtn = document.getElementById('panel-lyrics-close');
+        if (panelCloseBtn) {
+          panelCloseBtn.onclick = () => {
+            document.querySelector('#musico-lyrics-detail-panel .lyrics-detail-placeholder').style.display = 'block';
+            document.querySelector('#musico-lyrics-detail-panel .lyrics-detail-content-area').style.display = 'none';
+          };
+        }
       } else {
         document.getElementById('lyrics-modal-content').innerHTML = lyricsHtml;
         document.getElementById('lyrics-modal-tone-display').textContent = tonoMostrar;
