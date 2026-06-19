@@ -4268,7 +4268,8 @@
       deleteField,
       addDoc,
       arrayUnion,
-      arrayRemove
+      arrayRemove,
+      writeBatch
     } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
     const firebaseConfig = {
       apiKey: "AIzaSyDjA2d8zn02Iu9Nm-Jy2mVw6GgbjeKUEJ4",
@@ -4613,6 +4614,7 @@
             let importedCount = 0;
             let skippedCount = 0;
 
+            const itemsToImport = [];
             for (const item of songsArray) {
               const nombre = (item.nombre || item.title || item.titulo || "").trim();
               const artista = (item.artista || item.artist || "").trim() || "Desconocido";
@@ -4625,19 +4627,40 @@
                 continue;
               }
               existingKeys.add(key); // Agregar al set para evitar duplicados dentro del mismo JSON
+              itemsToImport.push(item);
+            }
 
-              const idUnico = "song_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
-              const payload = {
-                nombre,
-                artista,
-                tonoBase: (item.tonoBase || item.key || item.tono || "C").trim(),
-                tipo: ((item.tipo || item.type || "alabanza").toLowerCase().includes("adora") ? "adoracion" : "alabanza"),
-                youtube: (item.youtube || item.url || "").trim(),
-                letra: item.letra || item.lyrics || item.content || ""
-              };
+            const chunkSize = 200;
+            for (let i = 0; i < itemsToImport.length; i += chunkSize) {
+              const chunk = itemsToImport.slice(i, i + chunkSize);
+              const batch = writeBatch(db);
 
-              await setDoc(doc(db, "biblioteca_canciones", idUnico), payload);
-              importedCount++;
+              for (const item of chunk) {
+                const idUnico = "song_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+                const nombre = fixCorruptedText((item.nombre || item.title || item.titulo || "").trim());
+                const artista = fixCorruptedText((item.artista || item.artist || "").trim() || "Desconocido");
+                const letra = fixCorruptedText(item.letra || item.lyrics || item.content || "");
+
+                const payload = {
+                  nombre,
+                  artista,
+                  tonoBase: (item.tonoBase || item.key || item.tono || "C").trim(),
+                  tipo: ((item.tipo || item.type || "alabanza").toLowerCase().includes("adora") ? "adoracion" : "alabanza"),
+                  youtube: (item.youtube || item.url || "").trim()
+                };
+
+                const songRef = doc(db, "biblioteca_canciones", idUnico);
+                batch.set(songRef, payload);
+
+                if (letra) {
+                  const letraRef = doc(db, "letras_canciones", idUnico);
+                  batch.set(letraRef, { letra });
+                }
+
+                importedCount++;
+              }
+
+              await batch.commit();
             }
             alert(`¡Éxito!\n\nImportadas: ${importedCount} canciones.\nOmitidas (duplicadas): ${skippedCount}.`);
           } catch (err) {
@@ -4716,18 +4739,34 @@
         if (typeof showToast === 'function') {
           showToast(`📦 Optimizando base de datos: Migrando ${conLetra.length} letras...`);
         }
-        let migrados = 0;
-        for (const s of conLetra) {
+        
+        const chunkSize = 200;
+        for (let i = 0; i < conLetra.length; i += chunkSize) {
+          const chunk = conLetra.slice(i, i + chunkSize);
+          const batch = writeBatch(db);
+
+          for (const s of chunk) {
+            const letraRef = doc(db, "letras_canciones", s.id);
+            const songRef = doc(db, "biblioteca_canciones", s.id);
+            
+            const letraCorregida = fixCorruptedText(s.letra);
+            const nombreCorregido = fixCorruptedText(s.nombre);
+
+            batch.set(letraRef, { letra: letraCorregida });
+            batch.update(songRef, { 
+              letra: deleteField(),
+              nombre: nombreCorregido
+            });
+          }
+
           try {
-            const letra = s.letra;
-            await setDoc(doc(db, "letras_canciones", s.id), { letra: letra });
-            await updateDoc(doc(db, "biblioteca_canciones", s.id), { letra: deleteField() });
-            migrados++;
+            await batch.commit();
+            console.log(`[MIGRACIÓN] Lote de ${chunk.length} letras completado.`);
           } catch (err) {
-            console.error(`Error migrando "${s.nombre}":`, err);
+            console.error("Error al comprometer lote de migración de letras:", err);
           }
         }
-        console.log(`[MIGRACIÓN] Proceso terminado. Se migraron exitosamente ${migrados} canciones.`);
+        console.log(`[MIGRACIÓN] Proceso de letras terminado.`);
       }
 
       // 2. Limpiar nombres sucios si los hay
@@ -4736,20 +4775,26 @@
         if (typeof showToast === 'function') {
           showToast(`🧹 Limpiando nombres de ${cancionesSucias.length} canciones...`);
         }
-        let corregidos = 0;
-        for (const s of cancionesSucias) {
-          const nombreLimpio = s.nombre.replace(/\s*[\(,\-]?\s*(acordes|letra|letras|tab|tabs)\s*\)?$/gi, '').trim();
+        
+        const chunkSize = 200;
+        for (let i = 0; i < cancionesSucias.length; i += chunkSize) {
+          const chunk = cancionesSucias.slice(i, i + chunkSize);
+          const batch = writeBatch(db);
+
+          for (const s of chunk) {
+            const songRef = doc(db, "biblioteca_canciones", s.id);
+            const nombreLimpio = fixCorruptedText(s.nombre.replace(/\s*[\(,\-]?\s*(acordes|letra|letras|tab|tabs)\s*\)?$/gi, '').trim());
+            batch.update(songRef, { nombre: nombreLimpio });
+          }
+
           try {
-            await updateDoc(doc(db, "biblioteca_canciones", s.id), { nombre: nombreLimpio });
-            corregidos++;
+            await batch.commit();
+            console.log(`[LIMPIEZA NOMBRES] Lote de ${chunk.length} nombres completado.`);
           } catch (err) {
-            console.error(`Error corrigiendo nombre de "${s.nombre}":`, err);
+            console.error("Error al comprometer lote de limpieza de nombres:", err);
           }
         }
-        console.log(`[LIMPIEZA NOMBRES] Proceso terminado. Se corrigieron ${corregidos} nombres.`);
-        if (typeof showToast === 'function') {
-          showToast(`Nombres de canciones corregidos (${corregidos} procesadas).`);
-        }
+        console.log(`[LIMPIEZA NOMBRES] Proceso terminado.`);
       }
 
       _migrationInProgress = false;
@@ -4772,6 +4817,82 @@
         }
       }
       alert(`¡Completado! Se borraron ${count} canciones.`);
+    };
+
+    window.dangerouslyFixAllCorruptedTexts = async function () {
+      if (!confirm("⚠️ ATENCIÓN: Esto buscará y corregirá caracteres corruptos (Mojibake) en TODAS las canciones y letras de la base de datos. ¿Estás seguro?")) return;
+      
+      console.log("Iniciando escaneo y reparación de textos corruptos...");
+      if (typeof showToast === 'function') {
+        showToast("🧹 Escaneando y reparando textos corruptos...");
+      }
+
+      // 1. Reparar biblioteca_canciones
+      const cancionesParaReparar = (cacheSongs || []).filter(s => 
+        (s.nombre && s.nombre.includes('Ã')) || (s.artista && s.artista.includes('Ã'))
+      );
+
+      console.log(`Encontradas ${cancionesParaReparar.length} canciones con nombre/artista corrupto.`);
+      
+      const chunkSize = 200;
+      let totalCorregidos = 0;
+      
+      for (let i = 0; i < cancionesParaReparar.length; i += chunkSize) {
+        const chunk = cancionesParaReparar.slice(i, i + chunkSize);
+        const batch = writeBatch(db);
+        
+        for (const s of chunk) {
+          const songRef = doc(db, "biblioteca_canciones", s.id);
+          batch.update(songRef, {
+            nombre: fixCorruptedText(s.nombre),
+            artista: fixCorruptedText(s.artista)
+          });
+          totalCorregidos++;
+        }
+        try {
+          await batch.commit();
+        } catch (e) {
+          console.error("Error al actualizar lote de canciones:", e);
+        }
+      }
+
+      // 2. Reparar letras_canciones
+      let letrasCorregidas = 0;
+      for (let i = 0; i < cacheSongs.length; i += chunkSize) {
+        const chunk = cacheSongs.slice(i, i + chunkSize);
+        const batch = writeBatch(db);
+        let batchNeedsCommit = false;
+        
+        for (const s of chunk) {
+          try {
+            const snap = await getDoc(doc(db, "letras_canciones", s.id));
+            if (snap.exists()) {
+              const letra = snap.data().letra || '';
+              if (letra.includes('Ã')) {
+                const letraRef = doc(db, "letras_canciones", s.id);
+                batch.update(letraRef, { letra: fixCorruptedText(letra) });
+                letrasCorregidas++;
+                batchNeedsCommit = true;
+              }
+            }
+          } catch (e) {
+            console.error(`Error escaneando letra de ${s.nombre}:`, e);
+          }
+        }
+        
+        if (batchNeedsCommit) {
+          try {
+            await batch.commit();
+          } catch (e) {
+            console.error("Error al actualizar lote de letras:", e);
+          }
+        }
+      }
+
+      alert(`¡Completado!\n\nCanciones corregidas en biblioteca: ${totalCorregidos}\nLetras corregidas en letras_canciones: ${letrasCorregidas}`);
+      if (typeof showToast === 'function') {
+        showToast("✨ Reparación de textos completada.");
+      }
     };
 
     function fixCorruptedText(str) {
@@ -7144,14 +7265,15 @@
             letra = found.letra || '';
           }
           if (song) {
-            song.letra = letra;
+            song.letra = fixCorruptedText(letra);
+            song.nombre = fixCorruptedText(song.nombre);
           } else {
             song = {
-              nombre: found.nombre,
+              nombre: fixCorruptedText(found.nombre),
               tonoBase: found.tonoBase,
               tonoServicio: found.tonoBase,
               youtube: found.youtube || '',
-              letra: letra
+              letra: fixCorruptedText(letra)
             };
           }
         } else if (cancionId.startsWith('custom_') && window._currentServiceData && window._currentServiceData.customSongsMetadata) {
