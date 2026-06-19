@@ -4901,6 +4901,72 @@
       try { return decodeURIComponent(escape(str)); } catch (e) { return str; }
     }
 
+    function convertirTextoEspañolAIngles(texto) {
+      if (typeof texto !== 'string') return texto;
+      
+      const mapAcordes = {
+        'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B'
+      };
+
+      const lineas = texto.split('\n');
+      const nuevasLineas = lineas.map(linea => {
+        const tokens = linea.trim().split(/\s+/);
+        if (tokens.length === 0 || tokens[0] === "") return linea;
+
+        let esLineaDeAcordes = true;
+        for (const token of tokens) {
+          const tClean = token.replace(/[|()\-+*.]/g, '').trim();
+          if (!tClean) continue;
+
+          const esEsp = /^(DO|RE|MI|FA|SOL|LA|SI)([#b]?(?:m|min|maj|dim|aug|sus|add|M)?\d*(?:\/(?:DO|RE|MI|FA|SOL|LA|SI|[A-G])[#b]?)?)$/i.test(tClean);
+          const esIng = /^([A-G])([#b]?(?:m|min|maj|dim|aug|sus|add|M)?\d*(?:\/(?:DO|RE|MI|FA|SOL|LA|SI|[A-G])[#b]?)?)$/i.test(tClean);
+          
+          if (!esEsp && !esIng) {
+            esLineaDeAcordes = false;
+            break;
+          }
+        }
+
+        if (esLineaDeAcordes) {
+          return linea.replace(/\b(DO|RE|MI|FA|SOL|LA|SI)([#b]?(?:m|min|maj|dim|aug|sus|add|M)?\d*(?:\/(?:DO|RE|MI|FA|SOL|LA|SI|[A-G])[#b]?)?)/gi, (match, nota, resto) => {
+            const notaIng = mapAcordes[nota.toUpperCase()] || nota;
+            const restoCorregido = resto.replace(/\b(DO|RE|MI|FA|SOL|LA|SI)\b/gi, m => mapAcordes[m.toUpperCase()] || m);
+            return notaIng + restoCorregido;
+          });
+        }
+
+        return linea.replace(/\[(DO|RE|MI|FA|SOL|LA|SI)([#b]?(?:m|min|maj|dim|aug|sus|add|M)?\d*(?:\/(?:DO|RE|MI|FA|SOL|LA|SI|[A-G])[#b]?)?)\]/gi, (match, nota, resto) => {
+          const notaIng = mapAcordes[nota.toUpperCase()] || nota;
+          const restoCorregido = resto.replace(/\b(DO|RE|MI|FA|SOL|LA|SI)\b/gi, m => mapAcordes[m.toUpperCase()] || m);
+          return `[${notaIng}${restoCorregido}]`;
+        });
+      });
+
+      return nuevasLineas.join('\n');
+    }
+
+    function normalizarTono(tono) {
+      if (!tono) return "C";
+      let t = tono.trim();
+      const mapAcordes = { 'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B' };
+      
+      const tUpper = t.toUpperCase();
+      Object.keys(mapAcordes).forEach(k => {
+        if (tUpper.startsWith(k)) {
+          t = t.replace(new RegExp(k, 'i'), mapAcordes[k]);
+        }
+      });
+      
+      const match = t.match(/^([A-G][#b]?)(m)?/i);
+      if (match) {
+        let nota = match[1];
+        nota = nota.charAt(0).toUpperCase() + (nota.length > 1 ? nota.substring(1).toLowerCase() : '');
+        const esMenor = match[2] ? 'm' : '';
+        return nota + esMenor;
+      }
+      return t;
+    }
+
     // ====================================================
     // ESCUCHA DE DATOS BASE Y ENLACE DE EVENTOS
     // ====================================================
@@ -5728,36 +5794,25 @@
           const cleanOdes = odesMatch[1].replace(/@/g, '#');
           const chords = cleanOdes.split(/\s+/).filter(Boolean);
           if (chords.length > 0) {
-            const primerAcorde = chords[0];
-            const cleanMatch = primerAcorde.match(/^([A-G][#b]?)(m)?/i);
-            if (cleanMatch) {
-              let nota = cleanMatch[1];
-              nota = nota.charAt(0).toUpperCase() + nota.substring(1).toLowerCase();
-              const esMenor = cleanMatch[2] ? 'm' : '';
-              tonoBase = nota + esMenor;
-            }
+            tonoBase = normalizarTono(chords[0]);
           }
         } else {
           // Fallback al texto de la página
           const bodyText = doc2.body?.innerText || html;
-          const tonoMatch = bodyText.match(/[Tt]ono[:\s]+([A-Ga-g][#bm]*)/);
+          const tonoMatch = bodyText.match(/[Tt]ono[:\s]+([A-Ga-gDdoReeMiiFaaSollLasiSI#bm]+)/i);
           if (tonoMatch) {
-            tonoBase = tonoMatch[1].toUpperCase();
+            tonoBase = normalizarTono(tonoMatch[1]);
           } else if (letra) {
             // Intentar adivinar por el primer acorde
             const chordRegex = /\b(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])[#bm]*\b/i;
             const firstChordMatch = letra.match(chordRegex);
             if (firstChordMatch) {
-              let chordFound = firstChordMatch[0].toUpperCase();
-              const mapAcordes = { 'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B' };
-              Object.keys(mapAcordes).forEach(k => {
-                if (chordFound.startsWith(k)) chordFound = chordFound.replace(k, mapAcordes[k]);
-              });
-              const cleanMatch = chordFound.match(/^([CDEFGAB][#bm]*)/);
-              if (cleanMatch) tonoBase = cleanMatch[1];
+              tonoBase = normalizarTono(firstChordMatch[0]);
             }
           }
         }
+
+        tonoBase = normalizarTono(tonoBase);
 
         // --- Rellenar el formulario ---
         if (nombre) document.getElementById('song-name-input').value = fixCorruptedText(nombre);
@@ -5769,7 +5824,7 @@
           if (opt) keySelect.value = tonoBase;
         }
 
-        if (letra) document.getElementById('song-lyrics-input').value = fixCorruptedText(letra);
+        if (letra) document.getElementById('song-lyrics-input').value = fixCorruptedText(convertirTextoEspañolAIngles(letra));
 
         if (nombre && artista) {
           statusEl.textContent = `Importado: "${nombre}" de ${artista}`;
@@ -7001,6 +7056,11 @@
 
     function renderizarLetraTranspuesta(texto, tonoBase, tonoDestino) {
       if (!texto) return "";
+
+      // Convertir acordes en español a inglés al vuelo para transposición y resaltado correctos
+      texto = convertirTextoEspañolAIngles(texto);
+      tonoBase = tonoBase ? normalizarTono(tonoBase) : null;
+      tonoDestino = tonoDestino ? normalizarTono(tonoDestino) : null;
 
       let diff = 0;
       if (tonoBase && tonoDestino) {
