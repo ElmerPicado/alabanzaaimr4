@@ -1121,7 +1121,7 @@
     }
 
     .song-card-name {
-      font-size: 18px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--text);
       margin-bottom: 4px;
@@ -2291,7 +2291,7 @@
       }
 
       .split-left-panel {
-        flex: 0 0 380px;
+        flex: 0 0 480px;
         /* Fixed width for left list on wide screens */
       }
 
@@ -2464,9 +2464,9 @@
         const searchInput = document.getElementById('search-ensayo-songs');
         if (searchInput && !searchInput.dataset.hasListener) {
           searchInput.dataset.hasListener = "true";
-          searchInput.addEventListener('input', () => {
+          searchInput.addEventListener('input', window.debounce(() => {
             renderEnsayoCancionesModal(window._tempSelectedSongs || [], window._tempSelectedTones || {});
-          });
+          }, 300));
         }
 
         if (btnSaveEnsayo && !btnSaveEnsayo.dataset.hasListener) {
@@ -4358,6 +4358,17 @@
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
+    function debounce(func, delay = 300) {
+      let timeoutId;
+      return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          func.apply(this, args);
+        }, delay);
+      };
+    }
+    window.debounce = debounce;
+
     // Poner el próximo domingo por defecto
     const baseDay = new Date();
     baseDay.setDate(baseDay.getDate() + (7 - baseDay.getDay()) % 7);
@@ -5122,9 +5133,11 @@
     });
 
     // Buscador de canciones en vivo
-    document.getElementById('search-service-songs').addEventListener('input', () => {
-      sincronizarPanelArmado();
-    });
+    document.getElementById('search-service-songs').addEventListener('input', debounce(() => {
+      if (window._currentServiceData) {
+        renderizarComponentesServicio(window._currentServiceData);
+      }
+    }, 300));
 
     // ====================================================
     // LOGICA CENTRAL: ARMADO DE SERVICIOS POR FECHA
@@ -6057,19 +6070,18 @@
         (a.nombre || '').localeCompare(b.nombre || '')
       );
 
-      // Búsqueda por palabras clave sin importar el orden
-      const queryWords = query.split(/\s+/).filter(Boolean);
       let filtradas = todas;
 
-      if (queryWords.length > 0) {
+      if (query) {
         filtradas = todas.filter(s => {
-          const searchStr = removeAccents(`${s.nombre || ''} ${s.artista || ''}`).toLowerCase();
-          return queryWords.every(word => searchStr.includes(word));
+          const sNombre = removeAccents(s.nombre || '').toLowerCase();
+          const sArtista = removeAccents(s.artista || '').toLowerCase();
+          return sNombre.includes(query) || sArtista.includes(query);
         });
         window._adminSelectedArtist = null; // Reset filter
       }
 
-      if (queryWords.length === 0) {
+      if (!query) {
         // Renderizar lista de artistas como un acordeón
         const artistCounts = {};
         todas.forEach(s => {
@@ -6193,7 +6205,7 @@
     const searchInput = document.getElementById('search-admin-canciones');
     if (searchInput && !searchInput.dataset.listenerAdded) {
       searchInput.dataset.listenerAdded = '1';
-      searchInput.addEventListener('input', () => renderizarMantenimientoCanciones());
+      searchInput.addEventListener('input', debounce(() => renderizarMantenimientoCanciones(), 300));
     }
 
 
@@ -6426,11 +6438,11 @@
       // Configurar buscadores en tiempo real
       const searchRapidas = document.getElementById('search-rapidas');
       if (searchRapidas) {
-        searchRapidas.addEventListener('input', () => renderRepertorioMusico());
+        searchRapidas.addEventListener('input', debounce(() => renderRepertorioMusico(), 300));
       }
       const searchLentas = document.getElementById('search-lentas');
       if (searchLentas) {
-        searchLentas.addEventListener('input', () => renderRepertorioMusico());
+        searchLentas.addEventListener('input', debounce(() => renderRepertorioMusico(), 300));
       }
 
       // Renderizado inicial
@@ -6521,19 +6533,18 @@
 
       const allSongs = [...(cacheSongs || [])].sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
 
-      // Búsqueda por palabras clave sin importar el orden
-      const queryWords = query.split(/\s+/).filter(Boolean);
       let filtered = allSongs;
 
-      if (queryWords.length > 0) {
+      if (query) {
         filtered = allSongs.filter(s => {
-          const searchStr = removeAccents(`${s.nombre || ''} ${s.artista || ''}`).toLowerCase();
-          return queryWords.every(word => searchStr.includes(word));
+          const sNombre = removeAccents(s.nombre || '').toLowerCase();
+          const sArtista = removeAccents(s.artista || '').toLowerCase();
+          return sNombre.includes(query) || sArtista.includes(query);
         });
         window._musicoSelectedArtist = null; // Reset filter
       }
 
-      if (queryWords.length === 0) {
+      if (!query) {
         if (currentSubtab === 'todas') {
           // Renderizar lista de artistas como un acordeón
           const artistCounts = {};
@@ -6674,7 +6685,7 @@
     const searchInputMusico = document.getElementById('search-repertorio-musico');
     if (searchInputMusico && !searchInputMusico.dataset.bound) {
       searchInputMusico.dataset.bound = 'true';
-      searchInputMusico.addEventListener('input', () => renderRepertorioMusico());
+      searchInputMusico.addEventListener('input', debounce(() => renderRepertorioMusico(), 300));
     }
 
     document.querySelectorAll('.musico-subtab').forEach(btn => {
@@ -6696,7 +6707,46 @@
 
       window._unsubMusicoServicePlan = onSnapshot(doc(db, "planes_servicio", dateStr), (snap) => {
         if (!snap.exists()) {
-          content.innerHTML = "<p style='color:var(--text3);font-size:13px;text-align:center;padding:20px;'>Aún no hay programación creada para esta fecha.</p>";
+          content.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; background: rgba(255, 255, 255, 0.02); border: 1px dashed var(--border2); border-radius: var(--radius); margin-top: 10px;">
+              <span style="font-size: 40px; margin-bottom: 12px; display: block;">🗓️</span>
+              <p style="color: var(--text2); font-size: 14px; font-weight: 500; margin-bottom: 18px; max-width: 280px; line-height: 1.5;">
+                Aún no hay programación creada para el <b>${dateStr}</b>.
+              </p>
+              <button id="btn-crear-servicio-musico" class="btn-primary" style="margin-top: 0; max-width: 220px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <span>➕</span> Agregar Servicio
+              </button>
+            </div>
+          `;
+          const btnCrear = document.getElementById('btn-crear-servicio-musico');
+          if (btnCrear) {
+            btnCrear.addEventListener('click', async () => {
+              try {
+                btnCrear.disabled = true;
+                btnCrear.textContent = "Creando...";
+                const docData = {
+                  fecha: dateStr,
+                  cancionesSeleccionadas: {},
+                  musicosAsignados: {},
+                  disponibilidad: {}
+                };
+                const members = window.cacheMembers || cacheMembers || [];
+                members.forEach(m => {
+                  if (m.usuario !== 'admin') {
+                    docData.disponibilidad[m.usuario] = 'confirmado';
+                    docData.musicosAsignados[m.usuario] = true;
+                  }
+                });
+                await setDoc(doc(db, "planes_servicio", dateStr), docData);
+                showToast("Servicio agregado correctamente");
+              } catch (err) {
+                console.error(err);
+                showToast("Error al agregar el servicio");
+                btnCrear.disabled = false;
+                btnCrear.textContent = "Agregar Servicio";
+              }
+            });
+          }
           return;
         }
         const data = snap.data();
@@ -8042,10 +8092,10 @@
     const modalSearchInput = document.getElementById('musico-add-song-search');
     if (modalSearchInput && !modalSearchInput.dataset.bound) {
       modalSearchInput.dataset.bound = 'true';
-      modalSearchInput.addEventListener('input', () => {
+      modalSearchInput.addEventListener('input', debounce(() => {
         const filterText = removeAccents(modalSearchInput.value).toLowerCase().trim();
         renderAddSongResults(window._targetAddSongType, filterText);
-      });
+      }, 300));
     }
 
     // Cerrar modal
