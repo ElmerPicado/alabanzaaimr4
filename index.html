@@ -2371,6 +2371,15 @@
         </div>
     </header>
     <script>
+      // Utility function to format dates as YYYY-MM-DD in local time
+      window.formatLocalDate = function (d) {
+        if (!d) d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
       // Placeholder to hook global Firebase references
       let db = null;
       let collection = null;
@@ -3073,7 +3082,7 @@
           }
 
           // 🔔 Show modal popup reminder once-per-day
-          const todayStr = new Date().toISOString().split('T')[0];
+          const todayStr = window.formatLocalDate(new Date());
           const futureEnsayos = filtered.filter(e => e.fecha >= todayStr);
           if (futureEnsayos.length > 0) {
             const ensayoToShow = futureEnsayos.find(e => {
@@ -4357,6 +4366,7 @@
       if (!str) return "";
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
+    window.removeAccents = removeAccents;
 
     function debounce(func, delay = 300) {
       let timeoutId;
@@ -4372,7 +4382,7 @@
     // Poner el próximo domingo por defecto
     const baseDay = new Date();
     baseDay.setDate(baseDay.getDate() + (7 - baseDay.getDay()) % 7);
-    serviceDateSelect.value = baseDay.toISOString().split('T')[0];
+    serviceDateSelect.value = window.formatLocalDate(baseDay);
 
     // Función auxiliar para desplazar y centrar la pestaña activa horizontalmente sin mover la pantalla
     function scrollActiveTabToCenter(tab) {
@@ -5318,7 +5328,7 @@
         newBtnSaveNota.addEventListener('click', async () => {
           const val = notaInput.value.trim();
           // Al guardar nota, borramos el borrador para que el preview se regenere con la nota incluida
-          await updateDoc(doc(db, "planes_servicio", targetDate), {
+          await updateDoc(doc(db, "planes_servicio", serviceDateSelect.value), {
             nota_adicional: val,
             mensajeEditado: deleteField()
           });
@@ -6395,7 +6405,7 @@
       // Set next sunday
       const baseDay = new Date();
       baseDay.setDate(baseDay.getDate() + (7 - baseDay.getDay()) % 7);
-      const dateStr = baseDay.toISOString().split('T')[0];
+      const dateStr = window.formatLocalDate(baseDay);
 
       msDate.value = dateStr;
       maDate.value = dateStr;
@@ -6730,13 +6740,6 @@
                   musicosAsignados: {},
                   disponibilidad: {}
                 };
-                const members = window.cacheMembers || cacheMembers || [];
-                members.forEach(m => {
-                  if (m.usuario !== 'admin') {
-                    docData.disponibilidad[m.usuario] = 'confirmado';
-                    docData.musicosAsignados[m.usuario] = true;
-                  }
-                });
                 await setDoc(doc(db, "planes_servicio", dateStr), docData);
                 showToast("Servicio agregado correctamente");
               } catch (err) {
