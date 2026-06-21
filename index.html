@@ -292,11 +292,15 @@
 
     .musico-subtab {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 10px;
-      width: 100%;
-      padding: 10px 14px;
-      font-size: 13px;
+      justify-content: center;
+      gap: 6px;
+      flex: 1;
+      min-width: 0;
+      padding: 10px 4px;
+      font-size: 11px;
+      text-align: center;
       font-weight: 600;
       font-family: var(--font-body);
       background: var(--bg3);
@@ -305,7 +309,7 @@
       color: var(--text2);
       cursor: pointer;
       transition: all 0.25s ease;
-      text-align: left;
+      text-align: center;
     }
 
     .musico-subtab:hover {
@@ -3701,8 +3705,8 @@
               style="width: 32px; height: 32px; font-size: 13px; background-size: cover; background-position: center; border: 1.5px solid var(--border2); transition: transform 0.2s;">
             </div>
             <div id="musico-avatar-dropdown" style="display: none; position: absolute; top: 40px; right: 0; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 8px; width: 220px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000;">
-              <button id="btn-musico-change-pic" style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; margin-bottom: 4px;">📸 Cambiar foto de perfil</button>
-              <button id="btn-musico-update" style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px;">🔄 Buscar actualizaciones</button>
+              <button id="btn-musico-change-pic" style="width: 100%; text-align: center; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; margin-bottom: 4px;">📸 Cambiar foto de perfil</button>
+              <button id="btn-musico-update" style="width: 100%; text-align: center; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px;">🔄 Buscar actualizaciones</button>
             </div>
           </div>
           <span id="musico-name-badge" class="role-badge"></span>
@@ -8872,7 +8876,7 @@
     <div class="modal-box" style="text-align: center; border-color: var(--gold); max-width: 380px;">
       <h2 class="modal-title" id="ensayo-reminder-title" style="margin-bottom: 8px;">Recordatorio de Ensayo</h2>
       <p id="ensayo-reminder-text"
-        style="font-size:14px; color:var(--text); margin-bottom:20px; line-height:1.6; text-align: left;"></p>
+        style="font-size:14px; color:var(--text); margin-bottom:20px; line-height:1.6; text-align: center;"></p>
       <div id="ensayo-reminder-actions" style="display: flex; flex-direction: column; gap: 8px;">
         <button class="btn-primary" id="btn-ensayo-reminder-confirm"
           style="margin-top: 0; background: var(--teal); color: #0f0e17; display: none;">Confirmar Asistencia</button>
