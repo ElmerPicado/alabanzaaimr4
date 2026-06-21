@@ -2340,6 +2340,7 @@
         max-height: 260px !important;
       }
     }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
 
@@ -5265,8 +5266,9 @@
           if (song) {
             
             let songCopy = { ...song };
-            if (dataServicio.cancionesSeleccionadasTipos && dataServicio.cancionesSeleccionadasTipos[id]) {
-              songCopy.tipo = dataServicio.cancionesSeleccionadasTipos[id];
+            const refData = typeof data !== 'undefined' ? data : (typeof dataServicio !== 'undefined' ? dataServicio : {});
+            if (refData.cancionesSeleccionadasTipos && refData.cancionesSeleccionadasTipos[id]) {
+              songCopy.tipo = refData.cancionesSeleccionadasTipos[id];
             }
             allSelected.push(songCopy);
           }
@@ -6768,7 +6770,7 @@
     function cargarServicioMusico(dateStr) {
       if (!dateStr) return;
       const content = document.getElementById('musico-service-content');
-      content.innerHTML = "<p style='color:var(--text3);font-size:13px;text-align:center;padding:20px;'>Cargando servicio...</p>";
+      content.innerHTML = "<div style='display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; gap:12px;'><div style='width:30px; height:30px; border:3px solid rgba(229,180,60,0.2); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite;'></div><p style='color:var(--text3); font-size:13px; margin:0;'>Cargando datos del servicio...</p></div>";
 
       // Cancelar suscripción anterior y crear nueva (tiempo real)
       if (window._unsubMusicoServicePlan) { window._unsubMusicoServicePlan(); }
@@ -6861,8 +6863,9 @@
             if (song) {
               
             let songCopy = { ...song };
-            if (dataServicio.cancionesSeleccionadasTipos && dataServicio.cancionesSeleccionadasTipos[id]) {
-              songCopy.tipo = dataServicio.cancionesSeleccionadasTipos[id];
+            const refData = typeof data !== 'undefined' ? data : (typeof dataServicio !== 'undefined' ? dataServicio : {});
+            if (refData.cancionesSeleccionadasTipos && refData.cancionesSeleccionadasTipos[id]) {
+              songCopy.tipo = refData.cancionesSeleccionadasTipos[id];
             }
             allSelected.push(songCopy);
             }
@@ -7903,8 +7906,9 @@
           if (song) {
             
             let songCopy = { ...song };
-            if (dataServicio.cancionesSeleccionadasTipos && dataServicio.cancionesSeleccionadasTipos[id]) {
-              songCopy.tipo = dataServicio.cancionesSeleccionadasTipos[id];
+            const refData = typeof data !== 'undefined' ? data : (typeof dataServicio !== 'undefined' ? dataServicio : {});
+            if (refData.cancionesSeleccionadasTipos && refData.cancionesSeleccionadasTipos[id]) {
+              songCopy.tipo = refData.cancionesSeleccionadasTipos[id];
             }
             allSelected.push(songCopy);
           }
