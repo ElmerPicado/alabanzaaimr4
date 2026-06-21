@@ -278,36 +278,48 @@
       border-bottom: 1px solid var(--bg);
     }
 
-    /* Sub-tabs de repertorio músico */
+    /* Sub-tabs de repertorio músico - apilados verticalmente */
     .musico-subtabs {
       display: flex;
-      gap: 6px;
-      margin-bottom: 14px;
-      padding: 4px;
-      background: var(--bg3);
-      border-radius: 10px;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding: 0;
+      background: transparent;
+      border-radius: 0;
     }
 
     .musico-subtab {
-      flex: 1;
-      padding: 8px 10px;
-      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 13px;
       font-weight: 600;
       font-family: var(--font-body);
-      background: transparent;
-      border: none;
-      border-radius: 8px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
       color: var(--text2);
       cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
+      transition: all 0.25s ease;
+      text-align: left;
+    }
+
+    .musico-subtab:hover {
+      background: var(--bg2);
+      color: var(--text);
+      border-color: var(--border2);
     }
 
     .musico-subtab.active {
-      background: var(--bg2);
+      background: rgba(229, 180, 60, 0.1);
       color: var(--gold);
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+      border-color: var(--gold);
+      box-shadow: 0 2px 8px rgba(229, 180, 60, 0.15);
     }
+
 
     .btn-fav-song {
       background: none;
@@ -2288,12 +2300,18 @@
       .split-right-panel {
         display: flex;
         /* Visible on tablet/desktop */
+        flex: 1; /* Mitad y mitad */
       }
 
       .split-left-panel {
-        flex: 0 0 480px;
-        /* Fixed width for left list on wide screens */
+        flex: 1; /* Mitad y mitad */
       }
+
+      .chevron-icon {
+        transition: transform 0.2s ease;
+        color: var(--teal);
+      }
+
 
       /* Special tweak for checkbox and fav btn sizes on mobile to align nicely with the multi-line card */
       .musico-song-card .song-check {
@@ -3797,12 +3815,22 @@
             <p class="section-sub" style="margin-bottom:14px;">Explora la biblioteca, guarda tus favoritas y consulta el
               repertorio oficial del grupo.</p>
 
-            <!-- Sub-tabs -->
+            <!-- Sub-tabs apilados verticalmente con iconos -->
             <div class="musico-subtabs">
-              <button class="musico-subtab active" data-subtab="todas">Todas</button>
-              <button class="musico-subtab" data-subtab="favoritos">Favoritas</button>
-              <button class="musico-subtab" data-subtab="oficial">Repertorio Oficial</button>
+              <button class="musico-subtab active" data-subtab="todas">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                <span>Todas las Canciones</span>
+              </button>
+              <button class="musico-subtab" data-subtab="favoritos">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <span>Mis Favoritas</span>
+              </button>
+              <button class="musico-subtab" data-subtab="oficial">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span>Repertorio Oficial</span>
+              </button>
             </div>
+
 
             <!-- Buscador unificado -->
             <input type="text" id="search-repertorio-musico" placeholder="Buscar por nombre o artista..."
@@ -3833,22 +3861,21 @@
             </div>
             <div class="lyrics-detail-content-area" style="display: none; height: 100%; flex-direction: column;">
               <div class="lyrics-modal-header"
-                style="border-bottom: 1px solid var(--border2); padding-bottom: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start;">
+                style="border-bottom: 1px solid var(--border2); padding: 8px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="flex: 1;">
-                  <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <h3 id="panel-lyrics-title" class="lyrics-modal-title" style="margin: 0; font-size: 22px;">Nombre de
-                      la Canción</h3>
-                    <button id="panel-lyrics-fav-btn" class="btn-fav-song" style="margin-left: 5px; flex-shrink: 0;"
+                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <h3 id="panel-lyrics-title" class="lyrics-modal-title" style="margin: 0; font-size: 18px;">Nombre de la Canción</h3>
+                    <button id="panel-lyrics-fav-btn" class="btn-fav-song" style="margin-left: 2px; flex-shrink: 0; width: 30px; height: 30px; font-size: 14px;"
                       title="Añadir a Favoritos">★</button>
                     <a id="panel-lyrics-yt-link" href="#" target="_blank" rel="noopener"
-                      style="display: none; align-items: center; gap: 4px; background: rgba(244, 63, 94, 0.12); color: var(--coral); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s;">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
+                      style="display: none; align-items: center; gap: 4px; background: rgba(244, 63, 94, 0.12); color: var(--coral); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 20px; padding: 2px 10px; font-size: 10px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s;">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;">
                         <polygon points="5 3 19 12 5 21 5 3"></polygon>
                       </svg> YouTube
                     </a>
                   </div>
-                  <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
+                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
                     <div id="panel-lyrics-meta" class="lyrics-modal-meta" style="margin-bottom: 0; display: none;">Tono
                       Original: C | Tono Actual: D</div>
 
@@ -4010,19 +4037,19 @@
 
   <div id="lyrics-modal-overlay" class="lyrics-modal-overlay">
     <div class="lyrics-modal">
-      <div class="lyrics-modal-header" style="align-items: flex-start; flex-wrap: wrap; gap: 12px; padding: 12px 16px;">
-        <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 4px;">
+      <div class="lyrics-modal-header" style="align-items: center; flex-wrap: wrap; gap: 8px; padding: 8px 16px;">
+        <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 2px;">
           <div id="lyrics-modal-artist"
-            style="font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px;">Artista</div>
-          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <h3 id="lyrics-modal-title" class="lyrics-modal-title" style="margin: 0;">Nombre de la Canción</h3>
+            style="font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: -2px;">Artista</div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <h3 id="lyrics-modal-title" class="lyrics-modal-title" style="margin: 0; font-size: 18px;">Nombre de la Canción</h3>
             <button id="lyrics-modal-fav-btn" class="btn-fav-song"
-              style="margin-left: 5px; flex-shrink: 0; width: 32px; height: 32px; font-size: 16px;"
+              style="margin-left: 2px; flex-shrink: 0; width: 30px; height: 30px; font-size: 14px;"
               title="Añadir a Favoritos">★</button>
             <a id="lyrics-modal-yt-link" href="#" target="_blank" rel="noopener"
-              style="display: none; align-items: center; gap: 4px; background: rgba(244, 63, 94, 0.12); color: var(--coral); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s; margin-top: 2px;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
+              style="display: none; align-items: center; gap: 4px; background: rgba(244, 63, 94, 0.12); color: var(--coral); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 20px; padding: 2px 10px; font-size: 10px; font-weight: 600; text-decoration: none; font-family: var(--font-body); transition: all 0.2s; margin-top: 2px;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
               </svg> YouTube
             </a>
@@ -4449,6 +4476,12 @@
         iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234" });
         return;
       }
+      if (userVal === "musico" && passVal === "1234") {
+        console.log("Acceso concedido al Músico de Prueba.");
+        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234" });
+        return;
+      }
+
 
       // 2. LOGICA DE CONSULTA PARA MÚSICOS REGISTRADOS
       try {
@@ -6591,7 +6624,12 @@
               header.style.background = 'rgba(78, 205, 196, 0.08)';
             }
             header.innerHTML = `
-              <span class="artist-row-name">${art}</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; color: var(--teal); ${isExpanded ? 'transform: rotate(90deg);' : ''}">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+                <span class="artist-row-name">${art}</span>
+              </div>
               <span class="artist-row-count">${artistCounts[art]} ${artistCounts[art] === 1 ? 'canción' : 'canciones'}</span>
             `;
 
@@ -6622,6 +6660,8 @@
                 if (prevHeader) {
                   prevHeader.style.borderColor = '';
                   prevHeader.style.background = '';
+                  const prevChevron = prevHeader.querySelector('.chevron-icon');
+                  if (prevChevron) prevChevron.style.transform = '';
                 }
                 const prevCollapse = currentlyExpanded.querySelector('.artist-songs-collapse');
                 if (prevCollapse) {
@@ -6634,6 +6674,8 @@
                 groupEl.classList.add('expanded');
                 header.style.borderColor = 'var(--teal)';
                 header.style.background = 'rgba(78, 205, 196, 0.08)';
+                const chevron = header.querySelector('.chevron-icon');
+                if (chevron) chevron.style.transform = 'rotate(90deg)';
                 collapseDiv.style.display = 'block';
 
                 collapseDiv.innerHTML = '';
@@ -6648,6 +6690,8 @@
                 groupEl.classList.remove('expanded');
                 header.style.borderColor = '';
                 header.style.background = '';
+                const chevron = header.querySelector('.chevron-icon');
+                if (chevron) chevron.style.transform = '';
                 collapseDiv.style.display = 'none';
                 collapseDiv.innerHTML = '';
 
@@ -6701,7 +6745,7 @@
     document.querySelectorAll('.musico-subtab').forEach(btn => {
       btn.addEventListener('click', (e) => {
         document.querySelectorAll('.musico-subtab').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
+        e.currentTarget.classList.add('active');
         window._musicoSelectedArtist = null; // Reset filter
         renderRepertorioMusico();
       });
@@ -7211,7 +7255,8 @@
 
     let _scrollInterval = null;
     let _scrollSpeed = 2; // 1 a 5
-    let _currentZoom = 28; // default
+    let _currentZoom = window.innerWidth >= 768 ? 32 : 28; // default tablet: 32, mobile: 28
+
 
     function detenerAutoscroll() {
       if (_scrollInterval) {
@@ -7281,16 +7326,17 @@
 
     function aplicarZoomLetra(dir, contentId, zoomValId) {
       if (dir === 'up') {
-        _currentZoom = Math.min(_currentZoom + 2, 40);
+        _currentZoom = Math.min(_currentZoom + 2, 80);
       } else {
-        _currentZoom = Math.max(_currentZoom - 2, 10);
+        _currentZoom = Math.max(_currentZoom - 2, 12);
       }
       const el = document.getElementById(contentId);
-      if (el) el.style.fontSize = _currentZoom + 'px';
+      if (el) el.style.setProperty('font-size', _currentZoom + 'px', 'important');
 
       const zoomVal = document.getElementById(zoomValId);
       if (zoomVal) zoomVal.textContent = _currentZoom;
     }
+
 
     function inicializarControlesLetra() {
       // --- Immersive Mode Toggle ---
@@ -7360,7 +7406,7 @@
       }
     }
 
-    window.abrirModalLetraGlobal = async function (cancionId, playlistContext) {
+    window.abrirModalLetraGlobal = async function (cancionId, playlistContext, forceModal = false) {
       detenerAutoscroll();
       inicializarControlesLetra();
       requestWakeLock();
@@ -7371,14 +7417,15 @@
       if (panBody) panBody.scrollTop = 0;
 
       const mobContent = document.getElementById('lyrics-modal-content');
-      if (mobContent) mobContent.style.fontSize = _currentZoom + 'px';
+      if (mobContent) mobContent.style.setProperty('font-size', _currentZoom + 'px', 'important');
       const panContent = document.getElementById('panel-lyrics-content');
-      if (panContent) panContent.style.fontSize = _currentZoom + 'px';
+      if (panContent) panContent.style.setProperty('font-size', _currentZoom + 'px', 'important');
 
       const mobZoomVal = document.getElementById('lyrics-modal-zoom-val');
       if (mobZoomVal) mobZoomVal.textContent = _currentZoom;
       const panZoomVal = document.getElementById('panel-lyrics-zoom-val');
       if (panZoomVal) panZoomVal.textContent = _currentZoom;
+
 
       const cache = window._lyricsCache || {};
       let song = cache[cancionId];
@@ -7435,7 +7482,8 @@
       const mtabRep = document.getElementById('mtab-repertorio-musico');
       const isRepActive = mtabRep && mtabRep.classList.contains('active');
       const ensayoActive = document.getElementById('ensayo-practice-overlay')?.classList.contains('active');
-      const isSplitView = window.innerWidth >= 768 && isRepActive && !ensayoActive;
+      const isSplitView = !forceModal && window.innerWidth >= 768 && isRepActive && !ensayoActive;
+
 
       // Elementos de destino dependiendo de la vista
       const destPrefix = isSplitView ? 'panel-lyrics-' : 'lyrics-modal-';
@@ -7544,6 +7592,16 @@
           `;
 
       if (isSplitView) {
+        const panelLyricsBody = document.getElementById('panel-lyrics-body');
+        if (panelLyricsBody) {
+          const newBody = panelLyricsBody.cloneNode(true);
+          panelLyricsBody.parentNode.replaceChild(newBody, panelLyricsBody);
+          newBody.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.tagName === 'A' || e.target.closest('a')) return;
+            window.abrirModalLetraGlobal(cancionId, playlistContext, true);
+          });
+        }
+
         document.getElementById('panel-lyrics-content').innerHTML = lyricsHtml;
         document.getElementById('panel-lyrics-tone-display').textContent = tonoMostrar;
         document.querySelector('#musico-lyrics-detail-panel .lyrics-detail-placeholder').style.display = 'none';
