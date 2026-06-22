@@ -1,0 +1,1 @@
+const fs = require('fs'); const html = fs.readFileSync('index.html', 'utf8'); const match = html.split('<script type=" module\>')[1].split('</script>')[0]; fs.writeFileSync('extracted.js', match); console.log('done');
