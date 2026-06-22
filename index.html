@@ -4516,17 +4516,40 @@
 
 
       // 2. LOGICA DE CONSULTA PARA MÚSICOS REGISTRADOS
-      try {
-        const uSnap = await getDoc(doc(db, "usuarios", userVal));
-        if (uSnap.exists() && uSnap.data().password === passVal) {
-          iniciarSesionDashboard(uSnap.data());
-        } else {
-          alert("Credenciales inválidas. Revisa tu usuario y clave.");
+      const _showLoginMsg = (msg, isError) => {
+        let el = document.getElementById('login-msg-banner');
+        if (!el) {
+          el = document.createElement('p');
+          el.id = 'login-msg-banner';
+          el.style.cssText = 'margin: 10px 0 0; font-size: 13px; text-align: center; padding: 8px 12px; border-radius: 8px;';
+          const form = document.getElementById('login-form');
+          if (form) form.appendChild(el);
         }
-      } catch (err) {
-        console.error(err);
-        alert("Error de conexión a la base de datos de Firebase.");
-      }
+        el.textContent = msg;
+        el.style.background = isError ? 'rgba(255,100,100,0.12)' : 'rgba(78,205,196,0.12)';
+        el.style.color = isError ? 'var(--coral, #ff6b6b)' : 'var(--teal, #4ecdc4)';
+        el.style.display = 'block';
+        setTimeout(() => { if (el) el.style.display = 'none'; }, 4000);
+      };
+      const _tryFirebaseLogin = async (retryCount = 0) => {
+        try {
+          const uSnap = await getDoc(doc(db, "usuarios", userVal));
+          if (uSnap.exists() && uSnap.data().password === passVal) {
+            iniciarSesionDashboard(uSnap.data());
+          } else {
+            _showLoginMsg("Usuario o contraseña incorrectos.", true);
+          }
+        } catch (err) {
+          console.error("Firebase login error:", err);
+          if (retryCount < 1) {
+            // Reintento automático silencioso después de 1.5s
+            setTimeout(() => _tryFirebaseLogin(retryCount + 1), 1500);
+          } else {
+            _showLoginMsg("Sin conexión a internet. Verifica tu red.", true);
+          }
+        }
+      };
+      await _tryFirebaseLogin();
     });
 
     const screenMusico = document.getElementById('screen-musico');
