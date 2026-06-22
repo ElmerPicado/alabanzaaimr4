@@ -4300,7 +4300,8 @@
     import {
       initializeFirestore,
       persistentLocalCache,
-      persistentMultipleTabManager,
+      persistentSingleTabManager,
+      memoryLocalCache,
       doc,
       setDoc,
       getDoc,
@@ -4324,12 +4325,20 @@
       measurementId: "G-YLK9DBWT10"
     };
 
-    console.log('MARK 1'); const app = initializeApp(firebaseConfig);
-    console.log('MARK 2'); const db = initializeFirestore(app, {
-      localCache: persistentLocalCache({
-        tabManager: persistentMultipleTabManager()
-      })
-    });
+    const app = initializeApp(firebaseConfig);
+    let db;
+    try {
+      db = initializeFirestore(app, {
+        localCache: persistentLocalCache({
+          tabManager: persistentSingleTabManager({ forceOwnership: true })
+        })
+      });
+    } catch (e) {
+      console.warn("Firestore persistentCache no disponible, usando memoria:", e.message);
+      db = initializeFirestore(app, {
+        localCache: memoryLocalCache()
+      });
+    }
     window.db = db;
 
     // Lógica de Opciones (Admin Dropdown)
@@ -5116,6 +5125,9 @@
           if (msDate) cargarServicioMusico(msDate);
           if (typeof renderRepertorioMusico === 'function') renderRepertorioMusico();
         }
+      }, (err) => {
+        console.error("Error cargando biblioteca_canciones:", err);
+        if (typeof showToast === 'function') showToast("⚠️ Error al cargar el repertorio. Revisa tu conexión.", { duration: 5000 });
       });
 
       onSnapshot(collection(db, "usuarios"), (snap) => {
@@ -5136,6 +5148,8 @@
         if (window.renderEnsayoMembers) {
           window.renderEnsayoMembers();
         }
+      }, (err) => {
+        console.error("Error cargando usuarios:", err);
       });
 
       onSnapshot(collection(db, "planes_servicio"), (snap) => {
@@ -5144,6 +5158,8 @@
         cacheHistorial.sort((a, b) => b.fecha.localeCompare(a.fecha));
         window.cacheHistorial = cacheHistorial;
         if (currentUserRole === 'lider') renderizarHistorialServicios();
+      }, (err) => {
+        console.error("Error cargando planes_servicio:", err);
       });
 
       // Initialize rehearsals logic helper
