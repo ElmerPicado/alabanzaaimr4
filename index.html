@@ -4369,10 +4369,27 @@
       });
     }
 
+    // Músico avatar dropdown
+    const musicoAvBtn = document.getElementById('musico-avatar-container');
+    if (musicoAvBtn) {
+      musicoAvBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const dropdown = document.getElementById('musico-avatar-dropdown');
+        if (dropdown) {
+          dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        }
+      });
+    }
+
+    // Cerrar dropdowns al hacer click fuera
     document.addEventListener('click', (e) => {
       const leaderDrop = document.getElementById('leader-avatar-dropdown');
       if (leaderDrop && leaderDrop.style.display === 'block' && !e.target.closest('#leader-avatar-container')) {
         leaderDrop.style.display = 'none';
+      }
+      const musicoDrop = document.getElementById('musico-avatar-dropdown');
+      if (musicoDrop && musicoDrop.style.display === 'block' && !e.target.closest('#musico-avatar-container')) {
+        musicoDrop.style.display = 'none';
       }
     });
 
@@ -8568,29 +8585,8 @@
         uploaderInput.click();
       };
 
-      if (leaderAvBtn) {
-        leaderAvBtn.onclick = (e) => {
-          e.stopPropagation();
-          const dropdown = document.getElementById('leader-avatar-dropdown');
-          if(dropdown) {
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-          }
-        };
-      }
-      
-      if (musicoAvBtn) {
-        musicoAvBtn.onclick = (e) => {
-          e.stopPropagation();
-          const dropdown = document.getElementById('musico-avatar-dropdown');
-          if(dropdown) {
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-          }
-        };
-        document.addEventListener('click', () => {
-          const dropdown = document.getElementById('musico-avatar-dropdown');
-          if(dropdown) dropdown.style.display = 'none';
-        });
-      }
+      // NO sobreescribir onclick del contenedor del avatar — ya manejado en el módulo principal
+      // Solo conectar el botón interno "Cambiar foto"
       
       const btnLeaderChangePic = document.getElementById('btn-leader-change-pic');
       if (btnLeaderChangePic) btnLeaderChangePic.onclick = triggerUpload;
