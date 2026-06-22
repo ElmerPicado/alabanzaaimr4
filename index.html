@@ -4355,7 +4355,7 @@
     const btnLeaderLogoutDrop = document.getElementById('btn-leader-logout-dropdown');
     if (btnLeaderLogoutDrop) {
       btnLeaderLogoutDrop.addEventListener('click', () => {
-        document.getElementById('btn-logout')?.click();
+        if (typeof window._cerrarSesion === 'function') window._cerrarSesion();
       });
     }
 
@@ -4672,8 +4672,12 @@
       activeSessionUser = null;
     }
 
-    btnLogout.addEventListener('click', cerrarSesion);
-    document.getElementById('btn-musico-logout').addEventListener('click', cerrarSesion);
+    // Logout: registrar globalmente para acceso desde cualquier listener
+    window._cerrarSesion = cerrarSesion;
+    // Conectar botones de logout si existen como elementos directos
+    if (btnLogout) btnLogout.addEventListener('click', cerrarSesion);
+    const _btnMusicoLogout = document.getElementById('btn-musico-logout');
+    if (_btnMusicoLogout) _btnMusicoLogout.addEventListener('click', cerrarSesion);
 
     const btnAddSongGlobal = document.getElementById('btn-add-song-global');
     if (btnAddSongGlobal) {
@@ -5264,7 +5268,8 @@
 
       const spinnerHtml = "<div style='display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; gap:12px;'><div style='width:30px; height:30px; border:3px solid rgba(229,180,60,0.2); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite;'></div><p style='color:var(--text3); font-size:13px; margin:0;'>Cargando datos del servicio...</p></div>";
       document.getElementById('service-team-container').innerHTML = spinnerHtml;
-      document.getElementById('selected-songs-admin-container').innerHTML = spinnerHtml;
+      const _adminSongsCont = document.getElementById('admin-selected-songs-container');
+      if (_adminSongsCont) _adminSongsCont.innerHTML = spinnerHtml;
 
       const serviceDocRef = doc(db, "planes_servicio", targetDate);
 
@@ -8586,7 +8591,7 @@
       const btnMusicoLogoutDrop = document.getElementById('btn-musico-logout-dropdown');
       if (btnMusicoLogoutDrop) {
         btnMusicoLogoutDrop.addEventListener('click', () => {
-          document.getElementById('btn-musico-logout')?.click();
+          if (typeof window._cerrarSesion === 'function') window._cerrarSesion();
         });
       }
       
