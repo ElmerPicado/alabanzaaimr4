@@ -5181,6 +5181,11 @@
       customAlert(`¡Completado! Se escanearon ${analizados} letras y se corrigió el tono de ${corregidos} canciones.`);
     };
 
+    const btnRecalculateTones = document.getElementById('btn-recalculate-tones');
+    if (btnRecalculateTones) {
+      btnRecalculateTones.addEventListener('click', dangerouslyRecalculateAllTones);
+    }
+
     window.dangerouslyFixAllCorruptedTexts = async function () {
       if (!await customConfirm("⚠️ ATENCIÓN: Esto buscará y corregirá caracteres corruptos (Mojibake) en TODAS las canciones y letras de la base de datos. ¿Estás seguro?")) return;
 
