@@ -5383,7 +5383,7 @@
           const sinEspaciosYSig = sinAcordes.replace(/[\s\|\-\(\)\*\,\.]/g, '');
           const isChordLine = sinEspaciosYSig.length <= linea.length * 0.3;
 
-          if (isChordLine && !linea.match(/^([eEaAdDgGbB][:|]\s*[\d\-]+)|^([eEaAdDgGbB]\s*-{2,})|^-{3,}/)) {
+          if (isChordLine && !linea.match(/^\s*([eEaAdDgGbB][:|]\s*[\d\-]+)|^\s*([eEaAdDgGbB]\s*-{2,})|^\s*-{3,}/)) {
             let match;
             while ((match = chordRegex.exec(linea)) !== null) {
               let acordeLimpio = match[0].split('/')[0];
@@ -7834,7 +7834,7 @@
         const sinEspaciosYSig = sinAcordes.replace(/[\s\|\-\(\)\*\,\.]/g, '');
         const isChordLine = sinEspaciosYSig.length <= linea.length * 0.3;
 
-        if (linea.match(/^([eEaAdDgGbB][:|]\s*[\d\-]+)|^([eEaAdDgGbB]\s*-{2,})|^-{3,}/)) return linea;
+        if (linea.match(/^\s*([eEaAdDgGbB][:|]\s*[\d\-]+)|^\s*([eEaAdDgGbB]\s*-{2,})|^\s*-{3,}/)) return linea;
 
         return linea.replace(/([A-G][b#]?(?:m|min|maj|dim|aug|sus|add)?\d?(?:\/[A-G][b#]?)?)/g, (match, p1, offset, fullStr) => {
           const prevChar = offset > 0 ? fullStr[offset - 1] : ' ';
@@ -7879,7 +7879,7 @@
         const isChordLine = sinEspaciosYSig.length <= linea.length * 0.3;
 
         // Si es una línea de tablatura (ej. e:--- o B|---) ignorar
-        if (linea.match(/^([eEaAdDgGbB][:|]\s*[\d\-]+)|^([eEaAdDgGbB]\s*-{2,})|^-{3,}/)) return linea;
+        if (linea.match(/^\s*([eEaAdDgGbB][:|]\s*[\d\-]+)|^\s*([eEaAdDgGbB]\s*-{2,})|^\s*-{3,}/)) return linea;
 
         return linea.replace(/([A-G][b#]?(?:m|min|maj|dim|aug|sus|add)?\d?(?:\/[A-G][b#]?)?)/g, (match, p1, offset, fullStr) => {
           const prevChar = offset > 0 ? fullStr[offset - 1] : ' ';
