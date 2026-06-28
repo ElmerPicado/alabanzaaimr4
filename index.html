@@ -6112,10 +6112,18 @@
       const idUnico = editingSongId || ("song_" + Date.now());
       const letra = document.getElementById('song-lyrics-input').value;
 
+      const analisisAutomatico = analizarTonalidadAvanzado(letra);
+      let tonoCalculado = normalizarTono(analisisAutomatico.tonalidad);
+      
+      // Fallback por si la letra está completamente vacía o sin acordes
+      if (!tonoCalculado) {
+        tonoCalculado = document.getElementById('song-key-input').value.trim() || 'C';
+      }
+
       const payloadMetadata = {
         nombre: fixCorruptedText(nombre),
         artista: fixCorruptedText(artista),
-        tonoBase: document.getElementById('song-key-input').value.trim(),
+        tonoBase: tonoCalculado,
         tipo: document.getElementById('song-type-input').value,
         youtube: document.getElementById('song-youtube-input').value.trim()
       };
@@ -6363,9 +6371,9 @@
         </div>
 
         <div style="display:flex; align-items:center; gap: 6px; flex-wrap: wrap; margin-left: 4px; padding-right: 4px;">
-          <select class="select-admin-tone" title="Cambiar tono base" style="background:var(--bg3); border:1px solid rgba(244,197,66,0.4); color:var(--gold); border-radius:6px; padding:4px 6px; font-size:11px; font-family:var(--font-body); outline:none; cursor:pointer; font-weight:600;">
-            ${keysOptions.map(t => `<option value="${t}" ${t === s.tonoBase ? 'selected' : ''}>${t}</option>`).join('')}
-          </select>
+          <div style="background:var(--bg3); border:1px solid rgba(244,197,66,0.4); color:var(--gold); border-radius:6px; padding:4px 8px; font-size:11px; font-family:var(--font-body); font-weight:600;" title="Tono Original (Guardado en base de datos)">
+            🎵 ${s.tonoBase || 'C'}
+          </div>
           <button class="chip btn-auto-tone" style="cursor:pointer; border:1px solid rgba(244,197,66,0.5); background:rgba(244,197,66,0.15); color:var(--gold); padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Auto-detectar tono base">
             ✨ Auto
           </button>
@@ -6384,7 +6392,7 @@
           e.target.classList.contains('click-edit-song') ||
           e.target.classList.contains('click-del-song') ||
           e.target.classList.contains('btn-toggle-oficial') ||
-          e.target.closest('.select-admin-tone')
+          e.target.classList.contains('btn-auto-tone')
         ) {
           return;
         }
