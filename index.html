@@ -5332,9 +5332,18 @@
       const acordesEncontrados = [];
       const chordRegex = /\b(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])[#b]?(?:m|maj7|m7|7|sus4|sus2|dim|aug)?\b/gi;
       
-      let match;
-      while ((match = chordRegex.exec(texto)) !== null) {
-        acordesEncontrados.push(normalizarTono(match[0]));
+      const lineas = texto.split('\n');
+      for (const linea of lineas) {
+        const sinAcordes = linea.replace(/([A-G][b#]?(?:m|min|maj|dim|aug|sus|add)?\d?(?:\/[A-G][b#]?)?)/g, '');
+        const sinEspaciosYSig = sinAcordes.replace(/[\s\|\-\(\)\*\,\.]/g, '');
+        const isChordLine = sinEspaciosYSig.length <= linea.length * 0.3;
+        
+        if (isChordLine && !linea.match(/^[eBGDAE][:|]?\s*-+/)) {
+          let match;
+          while ((match = chordRegex.exec(linea)) !== null) {
+            acordesEncontrados.push(normalizarTono(match[0]));
+          }
+        }
       }
 
       if (acordesEncontrados.length === 0) {
