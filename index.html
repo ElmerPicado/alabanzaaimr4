@@ -6139,8 +6139,8 @@
         statusEl.style.color = 'var(--gold)';
         return;
       }
-      if (!url.includes('lacuerda.net')) {
-        statusEl.textContent = 'El link debe ser de lacuerda.net';
+      if (!url.includes('lacuerda.net') && !url.includes('cifraclub.com')) {
+        statusEl.textContent = 'El link debe ser de lacuerda.net o cifraclub.com';
         statusEl.style.color = 'var(--gold)';
         return;
       }
@@ -6159,69 +6159,84 @@
         const html = decoder.decode(buffer);
         const doc2 = new DOMParser().parseFromString(html, 'text/html');
 
-        // --- Extraer nombre de la canción ---
+        const isCifraClub = url.includes('cifraclub.com');
         let nombre = '';
-        const h1 = doc2.querySelector('h1');
-        if (h1) {
-          nombre = h1.textContent
-            .replace(/acordes de/i, '')
-            .replace(/tabs de/i, '')
-            .replace(/letra de/i, '')
-            .trim();
-        }
-        if (!nombre) {
-          nombre = doc2.title
-            .split('-')[0]
-            .replace(/acordes/i, '')
-            .replace(/tabs/i, '')
-            .trim();
-        }
-        if (nombre) {
-          nombre = nombre
-            .replace(/\s*[\(,\-]?\s*(acordes|letra|letras|tab|tabs|chords|lyric|lyrics|acordes\s+y\s+letra|letra\s+y\s+acordes)\s*\)?/gi, '')
-            .replace(/\s+/g, ' ')
-            .trim();
-        }
-
-        // --- Extraer artista desde la URL ---
         let artista = '';
-        try {
-          const urlObj = new URL(url);
-          const parts = urlObj.pathname.split('/').filter(Boolean);
-          if (parts.length >= 1) {
-            artista = parts[0]
-              .replace(/_/g, ' ')
-              .replace(/-/g, ' ')
-              .replace(/\b\w/g, c => c.toUpperCase());
-          }
-        } catch (_) { }
-
-        // --- Extraer letra/acordes ---
         let letra = '';
-        const preElements = Array.from(doc2.querySelectorAll('pre, PRE'));
-        const pre = preElements.find(p => p.textContent.trim().length > 10) || preElements[0];
-        if (pre) {
-          letra = pre.textContent.trim();
+        let textoParaAnalisis = '';
+
+        if (isCifraClub) {
+          // --- Cifra Club Parser ---
+          const h1 = doc2.querySelector('h1.t1') || doc2.querySelector('h1');
+          if (h1) nombre = h1.textContent.trim();
+
+          const h2 = doc2.querySelector('h2.t3 a') || doc2.querySelector('h2.t3') || doc2.querySelector('h2');
+          if (h2) artista = h2.textContent.trim();
+          
+          if (!artista) {
+            try {
+              const urlObj = new URL(url);
+              const parts = urlObj.pathname.split('/').filter(Boolean);
+              if (parts.length >= 1) {
+                artista = parts[0].replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+              }
+            } catch (_) { }
+          }
+
+          const pre = doc2.querySelector('.cifra_cnt pre') || doc2.querySelector('pre');
+          if (pre) letra = pre.textContent.trim();
+          
+          textoParaAnalisis = letra || '';
+          const tomEl = doc2.getElementById('cifra_tom');
+          if (tomEl) {
+             const aTom = tomEl.querySelector('a');
+             if (aTom) textoParaAnalisis += " " + aTom.textContent.trim();
+          }
         } else {
-          const tBody = doc2.getElementById('t_body');
-          if (tBody) letra = tBody.innerText.trim();
+          // --- LaCuerda Parser ---
+          const h1 = doc2.querySelector('h1');
+          if (h1) {
+            nombre = h1.textContent.replace(/acordes de/i, '').replace(/tabs de/i, '').replace(/letra de/i, '').trim();
+          }
+          if (!nombre) {
+            nombre = doc2.title.split('-')[0].replace(/acordes/i, '').replace(/tabs/i, '').trim();
+          }
+          if (nombre) {
+            nombre = nombre.replace(/\s*[\(,\-]?\s*(acordes|letra|letras|tab|tabs|chords|lyric|lyrics|acordes\s+y\s+letra|letra\s+y\s+acordes)\s*\)?/gi, '').replace(/\s+/g, ' ').trim();
+          }
+
+          try {
+            const urlObj = new URL(url);
+            const parts = urlObj.pathname.split('/').filter(Boolean);
+            if (parts.length >= 1) {
+              artista = parts[0].replace(/_/g, ' ').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            }
+          } catch (_) { }
+
+          const preElements = Array.from(doc2.querySelectorAll('pre, PRE'));
+          const pre = preElements.find(p => p.textContent.trim().length > 10) || preElements[0];
+          if (pre) {
+            letra = pre.textContent.trim();
+          } else {
+            const tBody = doc2.getElementById('t_body');
+            if (tBody) letra = tBody.innerText.trim();
+          }
+
+          textoParaAnalisis = letra || '';
+          const odesMatch = html.match(/odes\s*=\s*['"]([^'"]+)['"]/);
+          if (odesMatch) {
+            const cleanOdes = odesMatch[1].replace(/@/g, '#');
+            textoParaAnalisis += " " + cleanOdes;
+          } else {
+             const bodyText = doc2.body?.innerText || html;
+             const tonoMatch = bodyText.match(/[Tt]ono[:\s]+([A-Ga-gDdoReeMiiFaaSollLasiSI#bm]+)/i);
+             if (tonoMatch) {
+               textoParaAnalisis += " " + tonoMatch[1];
+             }
+          }
         }
 
-        // --- Extraer tono usando análisis avanzado ---
-        let textoParaAnalisis = letra || '';
-        const odesMatch = html.match(/odes\s*=\s*['"]([^'"]+)['"]/);
-        if (odesMatch) {
-          const cleanOdes = odesMatch[1].replace(/@/g, '#');
-          textoParaAnalisis += " " + cleanOdes;
-        } else {
-           const bodyText = doc2.body?.innerText || html;
-           const tonoMatch = bodyText.match(/[Tt]ono[:\s]+([A-Ga-gDdoReeMiiFaaSollLasiSI#bm]+)/i);
-           if (tonoMatch) {
-             textoParaAnalisis += " " + tonoMatch[1];
-           }
-        }
-
-        // Ejecutar algoritmo de análisis de tonalidad (sin melodía explícita desde scraping por ahora, pero la función la soporta)
+        // Ejecutar algoritmo de análisis de tonalidad avanzado
         const analisis = analizarTonalidadAvanzado(textoParaAnalisis, []);
         let tonoBase = normalizarTono(analisis.tonalidad);
 
@@ -9356,10 +9371,10 @@
         <!-- Campo Importar desde LaCuerda -->
         <div class="field"
           style="background:rgba(78,205,196,0.05); border:1.5px dashed rgba(78,205,196,0.3); border-radius:var(--radius-sm); padding:12px; margin-bottom:14px;">
-          <label style="color:var(--teal); font-weight:700; font-size:12px;">🔗 Importar desde LaCuerda <span
-              style="font-weight:400; color:var(--text3);">(pega el link de la canción)</span></label>
+          <label style="color:var(--teal); font-weight:700; font-size:12px;">🔗 Importar Automáticamente <span
+              style="font-weight:400; color:var(--text3);">(soporta LaCuerda.net y CifraClub.com)</span></label>
           <div style="display:flex; gap:8px; margin-top:6px;">
-            <input type="url" id="lacuerda-url-input" placeholder="https://www.lacuerda.net/artista/cancion/"
+            <input type="url" id="lacuerda-url-input" placeholder="https://www.lacuerda.net/... o https://www.cifraclub.com/..."
               style="flex:1; padding:8px 10px; background:var(--bg); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-size:13px; outline:none;">
             <button type="button" id="btn-fetch-lacuerda"
               style="padding:8px 14px; background:var(--teal); color:#0f0e17; border:none; border-radius:var(--radius-sm); font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap;">Importar</button>

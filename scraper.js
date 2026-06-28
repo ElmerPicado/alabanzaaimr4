@@ -198,7 +198,7 @@ async function scrapeArtist(slug) {
       await new Promise(r => setTimeout(r, 400));
     }
     
-    const outPath = path.join(__dirname, `${slug}_corregido.json`);
+    const outPath = path.join(__dirname, 'repertorio', `${slug}_corregido.json`);
     fs.writeFileSync(outPath, JSON.stringify(resultado, null, 2), 'utf-8');
     
     console.log(`\n\x1b[32m%s\x1b[0m`, `🎉 ¡ÉXITO COMPLETO!`);

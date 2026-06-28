@@ -97,7 +97,7 @@ function analizarTonalidadAvanzado(texto) {
 }
 
 async function scrapeArtist(slug) {
-  const outPath = path.join(__dirname, `${slug}_corregido.json`);
+  const outPath = path.join(__dirname, 'repertorio', `${slug}_corregido.json`);
   
   // Si el archivo ya existe y tiene datos, nos lo saltamos para ahorrar tiempo y no duplicar trabajo
   if (fs.existsSync(outPath)) {
