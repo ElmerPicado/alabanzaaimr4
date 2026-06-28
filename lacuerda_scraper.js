@@ -146,7 +146,10 @@
 
         for (const [keyName, diatonic] of Object.entries(keys)) {
           let score = 0;
-          basicChords.forEach(c => { if (diatonic.includes(c)) score += 1; });
+          basicChords.forEach(c => { 
+            if (diatonic.includes(c)) score += 1; 
+            else score -= 1.5;
+          });
           const I = diatonic[0]; const IV = diatonic[3]; const V = diatonic[4];
           if (freq[I]) score += freq[I] * 1.5;
           if (freq[IV]) score += freq[IV] * 1.2;

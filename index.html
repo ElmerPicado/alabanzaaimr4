@@ -4951,10 +4951,20 @@
                 const artista = fixCorruptedText((item.artista || item.artist || "").trim() || "Desconocido");
                 const letra = fixCorruptedText(item.letra || item.lyrics || item.content || "");
 
+                let tonoCalculado = "C";
+                if (letra) {
+                  const analisis = analizarTonalidadAvanzado(letra);
+                  tonoCalculado = normalizarTono(analisis.tonalidad);
+                }
+                
+                if (!tonoCalculado) {
+                  tonoCalculado = (item.tonoBase || item.key || item.tono || "C").trim();
+                }
+
                 const payload = {
                   nombre,
                   artista,
-                  tonoBase: (item.tonoBase || item.key || item.tono || "C").trim(),
+                  tonoBase: tonoCalculado,
                   tipo: ((item.tipo || item.type || "alabanza").toLowerCase().includes("adora") ? "adoracion" : "alabanza"),
                   youtube: (item.youtube || item.url || "").trim()
                 };
@@ -5387,7 +5397,10 @@
         let score = 0;
         const isMinor = keyName.endsWith('m');
         
-        basicChords.forEach(c => { if (diatonic.includes(c)) score += 1; });
+        basicChords.forEach(c => { 
+          if (diatonic.includes(c)) score += 1; 
+          else score -= 1.5; // Penalización por acordes fuera de escala
+        });
 
         const I = diatonic[0]; const IV = diatonic[3]; const V = diatonic[4];
         if (freq[I]) score += freq[I] * 1.5;
