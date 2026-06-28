@@ -7639,6 +7639,9 @@
         const sinEspaciosYSig = sinAcordes.replace(/[\s\|\-\(\)\*\,\.]/g, '');
         const isChordLine = sinEspaciosYSig.length <= linea.length * 0.3;
 
+        // Si es una línea de tablatura (ej. e:--- o B|---) ignorar
+        if (linea.match(/^[eBGDAE][:|]?\s*-+/)) return linea;
+
         return linea.replace(/([A-G][b#]?(?:m|min|maj|dim|aug|sus|add)?\d?(?:\/[A-G][b#]?)?)/g, (match, p1, offset, fullStr) => {
           const prevChar = offset > 0 ? fullStr[offset - 1] : ' ';
           const nextChar = offset + match.length < fullStr.length ? fullStr[offset + match.length] : ' ';
@@ -9527,14 +9530,36 @@
   </div>
 
   <script>
-    window.openPreviewLyrics = function(songId) {
+    window.openPreviewLyrics = async function(songId) {
       if (!window._cacheSongsForPreview) return;
       const song = window._cacheSongsForPreview.find(s => s.id === songId);
       if (!song) return;
       document.getElementById('preview-lyrics-title').textContent = song.nombre;
       document.getElementById('preview-lyrics-artist').textContent = song.artista || '';
-      document.getElementById('preview-lyrics-content').textContent = song.letra || 'Letra no disponible.';
+      
+      let letra = song.letra;
+      if (!letra && window._lyricsCache && window._lyricsCache[songId] && window._lyricsCache[songId].letra) {
+          letra = window._lyricsCache[songId].letra;
+      }
+
+      document.getElementById('preview-lyrics-content').textContent = letra ? letra : 'Cargando letra...';
       document.getElementById('preview-lyrics-modal').classList.add('active');
+
+      if (!letra) {
+          try {
+              const { getDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+              const snap = await getDoc(doc(window.db, "letras_canciones", songId));
+              if (snap.exists() && snap.data().letra) {
+                  song.letra = snap.data().letra;
+                  document.getElementById('preview-lyrics-content').textContent = song.letra;
+              } else {
+                  document.getElementById('preview-lyrics-content').textContent = 'Letra no disponible.';
+              }
+          } catch (err) {
+              console.error(err);
+              document.getElementById('preview-lyrics-content').textContent = 'Error al cargar la letra.';
+          }
+      }
     };
     document.getElementById('btn-close-preview-lyrics')?.addEventListener('click', () => {
       document.getElementById('preview-lyrics-modal').classList.remove('active');
