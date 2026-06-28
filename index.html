@@ -2613,7 +2613,7 @@
             }
 
             if (!fecha) {
-              alert('Selecciona una fecha para el ensayo.');
+              customAlert('Selecciona una fecha para el ensayo.');
               btnSaveEnsayo.disabled = false;
               btnSaveEnsayo.textContent = originalText;
               return;
@@ -2630,7 +2630,7 @@
               });
             }
             if (selectedIds.length === 0) {
-              alert('Selecciona al menos un integrante.');
+              customAlert('Selecciona al menos un integrante.');
               btnSaveEnsayo.disabled = false;
               btnSaveEnsayo.textContent = originalText;
               return;
@@ -2743,7 +2743,7 @@
               }
             } catch (err) {
               console.error('Error procesando ensayo', err);
-              alert('Error al procesar el ensayo: ' + err.message);
+              customAlert('Error al procesar el ensayo: ' + err.message);
             } finally {
               btnSaveEnsayo.disabled = false;
               btnSaveEnsayo.textContent = originalText;
@@ -3039,7 +3039,7 @@
               if (modalEnsayo) modalEnsayo.classList.add('active');
             });
             card.querySelector('.btn-del-ensayo').addEventListener('click', async () => {
-              if (confirm(`¿Eliminar el ensayo "${e.nombre}"?`)) {
+              if (await customConfirm(`¿Eliminar el ensayo "${e.nombre}"?`)) {
                 await deleteDoc(doc(db, 'ensayos', e.id));
                 showToast('🗑 Ensayo eliminado');
               }
@@ -3074,7 +3074,7 @@
             lista += `\n  • ${nombre}: ${estado}`;
           });
           const confirmed = Object.values(confs).filter(v => v === true || v === 'confirmado').length;
-          alert(`Ensayo: ${data.nombre}\nFecha: ${(data.fecha || '').split('-').reverse().join('/')}${data.hora ? ' ⏰ ' + data.hora : ''}\nConfirmados: ${confirmed}/${miembros.length}\n${lista}`);
+          customAlert(`Ensayo: ${data.nombre}\nFecha: ${(data.fecha || '').split('-').reverse().join('/')}${data.hora ? ' ⏰ ' + data.hora : ''}\nConfirmados: ${confirmed}/${miembros.length}\n${lista}`);
         });
       }
 
@@ -4893,11 +4893,11 @@
             const data = JSON.parse(event.target.result);
             const songsArray = Array.isArray(data) ? data : (data.canciones || data.songs || []);
             if (!Array.isArray(songsArray) || songsArray.length === 0) {
-              alert("El archivo JSON debe contener un arreglo de canciones.");
+              customAlert("El archivo JSON debe contener un arreglo de canciones.");
               return;
             }
 
-            if (!confirm(`¿Estás seguro de que quieres importar ${songsArray.length} canciones al repertorio?`)) {
+            if (!await customConfirm(`¿Estás seguro de que quieres importar ${songsArray.length} canciones al repertorio?`)) {
               importSongsFile.value = "";
               return;
             }
@@ -4963,9 +4963,9 @@
 
               await batch.commit();
             }
-            alert(`¡Éxito!\n\nImportadas: ${importedCount} canciones.\nOmitidas (duplicadas): ${skippedCount}.`);
+            customAlert(`¡Éxito!\n\nImportadas: ${importedCount} canciones.\nOmitidas (duplicadas): ${skippedCount}.`);
           } catch (err) {
-            alert("Error al procesar el archivo JSON: " + err.message);
+            customAlert("Error al procesar el archivo JSON: " + err.message);
           } finally {
             importSongsFile.value = "";
             btnImportSongs.textContent = "📥 Importar JSON";
@@ -5102,8 +5102,8 @@
     }
 
     window.dangerouslyDeleteAllSongs = async function () {
-      if (!confirm("⚠️ ATENCIÓN: Esto borrará permanentemente TODAS las canciones de la biblioteca y sus letras. ¿Estás seguro?")) return;
-      if (!confirm("¿Seguro al 100%? Esta acción NO se puede deshacer.")) return;
+      if (!await customConfirm("⚠️ ATENCIÓN: Esto borrará permanentemente TODAS las canciones de la biblioteca y sus letras. ¿Estás seguro?")) return;
+      if (!await customConfirm("¿Seguro al 100%? Esta acción NO se puede deshacer.")) return;
 
       const songs = [...(window.cacheSongs || [])];
       console.log(`Iniciando borrado de ${songs.length} canciones...`);
@@ -5117,11 +5117,11 @@
           console.error(`Error borrando ${s.nombre}:`, err);
         }
       }
-      alert(`¡Completado! Se borraron ${count} canciones.`);
+      customAlert(`¡Completado! Se borraron ${count} canciones.`);
     };
 
     window.dangerouslyRecalculateAllTones = async function () {
-      if (!confirm("⚠️ ATENCIÓN: Esto descargará y analizará las letras de TODAS las canciones para corregir su tono base usando el nuevo algoritmo. Puede tomar un par de minutos. ¿Estás seguro?")) return;
+      if (!await customConfirm("⚠️ ATENCIÓN: Esto descargará y analizará las letras de TODAS las canciones para corregir su tono base usando el nuevo algoritmo. Puede tomar un par de minutos. ¿Estás seguro?")) return;
       
       console.log("Iniciando recálculo de tonos...");
       if (typeof showToast === 'function') showToast("🎵 Analizando tonos de todas las canciones. Revisa la consola...");
@@ -5153,11 +5153,11 @@
           console.error(`Error analizando ${s.nombre}:`, err);
         }
       }
-      alert(`¡Completado! Se escanearon ${analizados} letras y se corrigió el tono de ${corregidos} canciones.`);
+      customAlert(`¡Completado! Se escanearon ${analizados} letras y se corrigió el tono de ${corregidos} canciones.`);
     };
 
     window.dangerouslyFixAllCorruptedTexts = async function () {
-      if (!confirm("⚠️ ATENCIÓN: Esto buscará y corregirá caracteres corruptos (Mojibake) en TODAS las canciones y letras de la base de datos. ¿Estás seguro?")) return;
+      if (!await customConfirm("⚠️ ATENCIÓN: Esto buscará y corregirá caracteres corruptos (Mojibake) en TODAS las canciones y letras de la base de datos. ¿Estás seguro?")) return;
 
       console.log("Iniciando escaneo y reparación de textos corruptos...");
       if (typeof showToast === 'function') {
@@ -5226,7 +5226,7 @@
         }
       }
 
-      alert(`¡Completado!\n\nCanciones corregidas en biblioteca: ${totalCorregidos}\nLetras corregidas en letras_canciones: ${letrasCorregidas}`);
+      customAlert(`¡Completado!\n\nCanciones corregidas en biblioteca: ${totalCorregidos}\nLetras corregidas en letras_canciones: ${letrasCorregidas}`);
       if (typeof showToast === 'function') {
         showToast("✨ Reparación de textos completada.");
       }
@@ -5967,13 +5967,13 @@
     // Guardar como BORRADOR (sin marcar enviado)
     document.getElementById('btn-save-draft').addEventListener('click', async () => {
       const targetDate = serviceDateSelect.value;
-      if (!targetDate) { alert('Primero selecciona una fecha.'); return; }
+      if (!targetDate) { customAlert('Primero selecciona una fecha.'); return; }
       const newMsg = document.getElementById('whatsapp-preview').value;
       await updateDoc(doc(db, "planes_servicio", targetDate), {
         mensajeEditado: newMsg,
         estadoEnvio: 'pendiente'
       });
-      alert("Borrador guardado. El historial lo muestra como 🟡 Pendiente.");
+      customAlert("Borrador guardado. El historial lo muestra como 🟡 Pendiente.");
     });
 
     // Enviar por WhatsApp (iOS-safe: sin await antes de abrir enlace)
@@ -5981,7 +5981,7 @@
       const previewEl = document.getElementById('whatsapp-preview');
       const msg = previewEl.value;
       if (!msg || msg.startsWith("Selecciona") || msg.trim() === "") {
-        alert("No hay datos cargados para generar un mensaje aún.");
+        customAlert("No hay datos cargados para generar un mensaje aún.");
         return;
       }
 
@@ -6056,7 +6056,7 @@
           `${(s.nombre || '').toLowerCase()}||${(s.artista || '').toLowerCase()}` === key
         );
         if (existe) {
-          alert(`Ya existe "${nombre}" de ${artista} en el catálogo.\n\nNo se puede agregar duplicado.`);
+          customAlert(`Ya existe "${nombre}" de ${artista} en el catálogo.\n\nNo se puede agregar duplicado.`);
           return;
         }
       }
@@ -6395,7 +6395,7 @@
 
         if (delBtn) {
           delBtn.addEventListener('click', async () => {
-            if (confirm(`¿Quieres borrar definitivamente "${s.nombre}" del catálogo?`)) {
+            if (await customConfirm(`¿Quieres borrar definitivamente "${s.nombre}" del catálogo?`)) {
               await deleteDoc(doc(db, "biblioteca_canciones", s.id));
               await deleteDoc(doc(db, "letras_canciones", s.id));
               if (window._lyricsCache) delete window._lyricsCache[s.id];
@@ -6610,7 +6610,7 @@
       const selectedChips = Array.from(msCheckboxes).filter(c => c.checked).map(c => c.value);
 
       if (selectedChips.length === 0) {
-        alert("Por favor, selecciona al menos un rol o instrumento de la lista.");
+        customAlert("Por favor, selecciona al menos un rol o instrumento de la lista.");
         return;
       }
 
@@ -6629,7 +6629,7 @@
 
       const wasEditing = !!editingUserKey;
       resetMemberForm();
-      alert(wasEditing ? "Integrante actualizado exitosamente." : "Integrante guardado exitosamente.");
+      customAlert(wasEditing ? "Integrante actualizado exitosamente." : "Integrante guardado exitosamente.");
     });
 
 
@@ -6702,7 +6702,7 @@
           });
 
           div.querySelector('.click-del-member').addEventListener('click', async () => {
-            if (confirm(`¿Eliminar la cuenta de "${m.nombre}" del sistema de acceso?`)) {
+            if (await customConfirm(`¿Eliminar la cuenta de "${m.nombre}" del sistema de acceso?`)) {
               await deleteDoc(doc(db, "usuarios", m.usuario));
             }
           });
@@ -7293,7 +7293,7 @@
           btn.addEventListener('click', async () => {
             const songId = btn.dataset.songId;
             const sName = cacheSongs.find(s => s.id === songId)?.nombre || (customSongsMetadata[songId]?.nombre) || "Canción";
-            if (confirm(`ATENCIÓN:\nSi quitas "${sName}", se eliminará de la vista de TODO el equipo y tendrás que agregarla de nuevo si te equivocas.\n\n¿Quieres continuar y quitarla?`)) {
+            if (await customConfirm(`ATENCIÓN:\nSi quitas "${sName}", se eliminará de la vista de TODO el equipo y tendrás que agregarla de nuevo si te equivocas.\n\n¿Quieres continuar y quitarla?`)) {
               const path = `cancionesSeleccionadas.${songId}`;
               await updateDoc(doc(db, "planes_servicio", dateStr), {
                 [path]: false
@@ -8204,7 +8204,7 @@
         const status = document.getElementById('whatsapp-link-status');
         status.textContent = 'Enlace guardado correctamente';
         setTimeout(() => status.textContent = '', 3500);
-      } catch (e) { alert('Error al guardar: ' + e.message); }
+      } catch (e) { customAlert('Error al guardar: ' + e.message); }
     });
 
     // ====================================================
@@ -8377,7 +8377,7 @@
         btn.addEventListener('click', async () => {
           const songId = btn.dataset.songId;
           const sName = cacheSongs.find(s => s.id === songId)?.nombre || (customSongsMetadata[songId]?.nombre) || "Canción";
-          const res = confirm(`¿Estás seguro de quitar "${sName}" de este servicio?`);
+          const res = await customConfirm(`¿Estás seguro de quitar "${sName}" de este servicio?`);
           if (!res) return;
 
           try {
@@ -8637,7 +8637,7 @@
         const type = window._targetAddSongType;
 
         if (!customName) {
-          alert("Por favor escribe el nombre de la canción.");
+          customAlert("Por favor escribe el nombre de la canción.");
           return;
         }
 
@@ -9306,6 +9306,94 @@
     <button id="pwa-update-btn"
       style="background: var(--teal); border: none; color: #0f0e17; padding: 8px 14px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; transition: transform 0.2s; white-space: nowrap;">Actualizar</button>
   </div>
+
+  <!-- Modal Custom Alert / Confirm -->
+  <div id="custom-dialog-overlay" class="modal-overlay" style="z-index: 999999;">
+    <div class="modal-box" style="text-align: center; border-color: var(--teal); max-width: 380px;">
+      <h2 class="modal-title" id="custom-dialog-title" style="margin-bottom: 8px;">Aviso</h2>
+      <p id="custom-dialog-message" style="font-size:14px; color:var(--text); margin-bottom:20px; line-height:1.6; text-align: center; white-space: pre-wrap;"></p>
+      <div id="custom-dialog-actions" style="display: flex; gap: 8px; justify-content: center;">
+        <button class="btn-primary" id="custom-dialog-cancel" style="margin-top: 0; background: var(--bg3); border: 1px solid var(--border2); color: var(--text); padding: 10px 16px; display: none;">Cancelar</button>
+        <button class="btn-primary" id="custom-dialog-confirm" style="margin-top: 0; background: var(--teal); color: #0f0e17; padding: 10px 24px;">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.customAlert = function(msg, title = "Aviso") {
+      return new Promise(resolve => {
+        const overlay = document.getElementById('custom-dialog-overlay');
+        const box = overlay.querySelector('.modal-box');
+        document.getElementById('custom-dialog-title').textContent = title;
+        document.getElementById('custom-dialog-message').textContent = msg;
+        
+        const btnCancel = document.getElementById('custom-dialog-cancel');
+        const btnConfirm = document.getElementById('custom-dialog-confirm');
+        
+        btnCancel.style.display = 'none';
+        btnConfirm.textContent = 'Aceptar';
+        box.style.borderColor = 'var(--teal)';
+        btnConfirm.style.background = 'var(--teal)';
+        btnConfirm.style.color = '#0f0e17';
+
+        overlay.classList.add('active');
+
+        const close = () => {
+          overlay.classList.remove('active');
+          btnConfirm.removeEventListener('click', close);
+          resolve();
+        };
+        btnConfirm.addEventListener('click', close);
+      });
+    };
+
+    window.customConfirm = function(msg, title = "Confirmación") {
+      return new Promise(resolve => {
+        const overlay = document.getElementById('custom-dialog-overlay');
+        const box = overlay.querySelector('.modal-box');
+        document.getElementById('custom-dialog-title').textContent = title;
+        document.getElementById('custom-dialog-message').textContent = msg;
+        
+        const btnCancel = document.getElementById('custom-dialog-cancel');
+        const btnConfirm = document.getElementById('custom-dialog-confirm');
+        
+        // Determinar si es una alerta destructiva por las palabras clave
+        const isDanger = msg.toLowerCase().includes('borrar') || msg.toLowerCase().includes('eliminar') || msg.toLowerCase().includes('quitar') || msg.toLowerCase().includes('deshacer') || msg.toLowerCase().includes('atención');
+        
+        btnCancel.style.display = 'block';
+        btnConfirm.textContent = isDanger ? 'Sí, continuar' : 'Confirmar';
+        
+        if (isDanger) {
+           box.style.borderColor = 'var(--coral)';
+           btnConfirm.style.background = 'var(--coral)';
+           btnConfirm.style.color = '#fff';
+        } else {
+           box.style.borderColor = 'var(--teal)';
+           btnConfirm.style.background = 'var(--teal)';
+           btnConfirm.style.color = '#0f0e17';
+        }
+
+        overlay.classList.add('active');
+
+        const onConfirm = () => {
+          cleanup();
+          resolve(true);
+        };
+        const onCancel = () => {
+          cleanup();
+          resolve(false);
+        };
+        const cleanup = () => {
+          overlay.classList.remove('active');
+          btnConfirm.removeEventListener('click', onConfirm);
+          btnCancel.removeEventListener('click', onCancel);
+        };
+
+        btnConfirm.addEventListener('click', onConfirm);
+        btnCancel.addEventListener('click', onCancel);
+      });
+    };
+  </script>
 </body>
 
 </html>

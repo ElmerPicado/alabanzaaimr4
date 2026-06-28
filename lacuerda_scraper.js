@@ -94,33 +94,77 @@
       const pre = preElements.find(p => p.textContent.trim().length > 10) || preElements[0];
       const letra = pre ? pre.textContent : '';
 
-      // === DETECCIÓN DEL TONO BASE (KEY) ===
-      let tonoBase = 'C';
-
-      // LaCuerda define los acordes utilizados en una variable javascript global: odes='C G Am F...'
+      // === DETECCIÓN DEL TONO BASE (KEY) AVANZADA ===
+      let textoParaAnalisis = letra || '';
       const odesMatch = html.match(/odes\s*=\s*['"]([^'"]+)['"]/);
       if (odesMatch) {
-        // Reemplazar @ con # para los sostenidos (LaCuerda usa @ internamente para #)
         const cleanOdes = odesMatch[1].replace(/@/g, '#');
-        const chords = cleanOdes.split(/\s+/).filter(Boolean);
-        if (chords.length > 0) {
-          const primerAcorde = chords[0];
-          // Limpiar el acorde para obtener solo la nota raíz y si es menor (ej. Ab, Bbm, F#)
-          // Excluyendo extensiones como 7, maj7, sus4, 9, etc.
-          const cleanMatch = primerAcorde.match(/^([A-G][#b]?)(m)?/i);
-          if (cleanMatch) {
-            let nota = cleanMatch[1];
-            // Normalizar (ej: Ab, F#, Bb, C)
-            nota = nota.charAt(0).toUpperCase() + nota.substring(1).toLowerCase();
-            const esMenor = cleanMatch[2] ? 'm' : '';
-            tonoBase = nota + esMenor;
+        textoParaAnalisis += " " + cleanOdes;
+      } else {
+        const tonoMatch = html.match(/[Tt]ono[:\s]+([A-Ga-g][#bm]*)/);
+        if (tonoMatch) textoParaAnalisis += " " + tonoMatch[1];
+      }
+
+      // Algoritmo insertado
+      function analizarTonalidadAvanzado(texto) {
+        if (!texto) return 'C';
+        const acordesEncontrados = [];
+        const chordRegex = /\b(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])[#b]?(?:m|maj7|m7|7|sus4|sus2|dim|aug)?\b/gi;
+        
+        let match;
+        while ((match = chordRegex.exec(texto)) !== null) {
+          let t = match[0].toUpperCase();
+          const tr = {'DO':'C','RE':'D','MI':'E','FA':'F','SOL':'G','LA':'A','SI':'B'};
+          for(let k in tr) t = t.replace(k, tr[k]);
+          t = t.charAt(0) + t.slice(1).toLowerCase();
+          acordesEncontrados.push(t);
+        }
+
+        if (acordesEncontrados.length === 0) return 'C';
+
+        const basicChords = acordesEncontrados.map(c => c.replace(/maj7|m7|7|sus4|sus2|dim|aug/i, ''));
+        const freq = {};
+        basicChords.forEach(c => freq[c] = (freq[c] || 0) + 1);
+
+        const firstChord = basicChords[0];
+        const lastChord = basicChords[basicChords.length - 1];
+        const mostFrequent = Object.keys(freq).reduce((a, b) => freq[a] > freq[b] ? a : b);
+
+        const keys = {
+          'C': ['C','Dm','Em','F','G','Am','Bdim'], 'G': ['G','Am','Bm','C','D','Em','F#dim'], 'D': ['D','Em','F#m','G','A','Bm','C#dim'],
+          'A': ['A','Bm','C#m','D','E','F#m','G#dim'], 'E': ['E','F#m','G#m','A','B','C#m','D#dim'], 'B': ['B','C#m','D#m','E','F#','G#m','A#dim'],
+          'F#': ['F#','G#m','A#m','B','C#','D#m','E#dim'], 'F': ['F','Gm','Am','Bb','C','Dm','Edim'], 'Bb': ['Bb','Cm','Dm','Eb','F','Gm','Adim'],
+          'Eb': ['Eb','Fm','Gm','Ab','Bb','Cm','Ddim'], 'Ab': ['Ab','Bbm','Cm','Db','Eb','Fm','Gdim'], 'Db': ['Db','Ebm','Fm','Gb','Ab','Bbm','Cdim'],
+          'Am': ['Am','Bdim','C','Dm','Em','F','G'], 'Em': ['Em','F#dim','G','Am','Bm','C','D'], 'Bm': ['Bm','C#dim','D','Em','F#m','G','A'],
+          'F#m': ['F#m','G#dim','A','Bm','C#m','D','E'], 'C#m': ['C#m','D#dim','E','F#m','G#m','A','B'], 'G#m': ['G#m','A#dim','B','C#m','D#m','E','F#'],
+          'D#m': ['D#m','E#dim','F#','G#m','A#m','B','C#'], 'Dm': ['Dm','Edim','F','Gm','Am','Bb','C'], 'Gm': ['Gm','Adim','Bb','Cm','Dm','Eb','F'],
+          'Cm': ['Cm','Ddim','Eb','Fm','Gm','Ab','Bb'], 'Fm': ['Fm','Gdim','Ab','Bbm','Cm','Db','Eb'], 'Bbm': ['Bbm','Cdim','Db','Ebm','Fm','Gb','Ab']
+        };
+
+        let bestScore = -1;
+        let bestKey = 'C';
+
+        for (const [keyName, diatonic] of Object.entries(keys)) {
+          let score = 0;
+          basicChords.forEach(c => { if (diatonic.includes(c)) score += 1; });
+          const I = diatonic[0]; const IV = diatonic[3]; const V = diatonic[4];
+          if (freq[I]) score += freq[I] * 1.5;
+          if (freq[IV]) score += freq[IV] * 1.2;
+          if (freq[V]) score += freq[V] * 1.2;
+          if (firstChord === I) score += 5;
+          if (lastChord === I) score += 5;
+
+          if (score > bestScore) {
+            bestScore = score;
+            bestKey = keyName;
+          } else if (score === bestScore) {
+             if (lastChord === keyName || mostFrequent === keyName) bestKey = keyName;
           }
         }
-      } else {
-        // Fallback: buscar la etiqueta "Tono: X" en el HTML
-        const tonoMatch = html.match(/[Tt]ono[:\s]+([A-Ga-g][#bm]*)/);
-        if (tonoMatch) tonoBase = tonoMatch[1];
+        return bestKey;
       }
+      
+      let tonoBase = analizarTonalidadAvanzado(textoParaAnalisis);
 
       resultado.push({
         nombre,
