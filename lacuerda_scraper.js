@@ -106,20 +106,27 @@
       }
 
       // Algoritmo insertado
-      function analizarTonalidadAvanzado(texto) {
-        if (!texto) return 'C';
-        const acordesEncontrados = [];
-        const chordRegex = /\b(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])[#b]?(?:m|maj7|m7|7|sus4|sus2|dim|aug)?\b/gi;
-        
-        let match;
-        while ((match = chordRegex.exec(texto)) !== null) {
-          let t = match[0].toUpperCase();
-          const tr = {'DO':'C','RE':'D','MI':'E','FA':'F','SOL':'G','LA':'A','SI':'B'};
-          for(let k in tr) t = t.replace(k, tr[k]);
-          t = t.charAt(0) + t.slice(1).toLowerCase();
-          acordesEncontrados.push(t);
-        }
+      function analizarTonalidadAvanzado(texto, notasMelodia = []) {
+      if (!texto) return { tonalidad: 'C', modo: 'Mayor', puntuacionFinal: 0, explicacion: { error: 'Sin texto para analizar.' } };
 
+      const chordRegex = /\b(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])[#b]?(?:m|maj7|m7|7|sus4|sus2|dim|aug)?(?:\/[CDEFGAB][#b]?)?\b/gi;
+      
+      const parrafos = texto.split(/\n\s*\n/);
+      const secciones = [];
+      let acordesGlobales = [];
+      let transiciones = [];
+      
+      for (const p of parrafos) {
+        const lineas = p.split('\n');
+        let acordesSeccion = [];
+        let tipoSeccion = 'General';
+        
+        if (lineas.length > 0) {
+          const primeraLinea = lineas[0].toLowerCase();
+          if (primeraLinea.includes('coro') || primeraLinea.includes('chorus')) tipoSeccion = 'Coro';
+          else if (primeraLinea.includes('verso') || primeraLinea.includes('verse')) tipoSeccion = 'Verso';
+        }
+        
         if (acordesEncontrados.length === 0) return 'C';
 
         const basicChords = acordesEncontrados.map(c => c.replace(/maj7|m7|7|sus4|sus2|dim|aug/i, ''));
@@ -167,7 +174,7 @@
         return bestKey;
       }
       
-      let tonoBase = analizarTonalidadAvanzado(textoParaAnalisis);
+      let tonoBase = analizarTonalidadAvanzado(textoParaAnalisis).tonalidad;
 
       resultado.push({
         nombre,

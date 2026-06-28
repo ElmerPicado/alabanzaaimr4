@@ -5347,36 +5347,68 @@
     }
 
     function analizarTonalidadAvanzado(texto, notasMelodia = []) {
-      if (!texto) return { tonalidad: 'C', modo: 'Mayor', confianza: 0, explicacion: 'Sin texto para analizar.' };
+      if (!texto) return { tonalidad: 'C', modo: 'Mayor', puntuacionFinal: 0, explicacion: { error: 'Sin texto para analizar.' } };
 
-      const acordesEncontrados = [];
-      const chordRegex = /\b(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])[#b]?(?:m|maj7|m7|7|sus4|sus2|dim|aug)?\b/gi;
-
-      const lineas = texto.split('\n');
-      for (const linea of lineas) {
-        const sinAcordes = linea.replace(/([A-G][b#]?(?:m|min|maj|dim|aug|sus|add)?\d?(?:\/[A-G][b#]?)?)/g, '');
-        const sinEspaciosYSig = sinAcordes.replace(/[\s\|\-\(\)\*\,\.]/g, '');
-        const isChordLine = sinEspaciosYSig.length <= linea.length * 0.3;
-
-        if (isChordLine && !linea.match(/^[eBGDAE][:|]?\s*-+/)) {
-          let match;
-          while ((match = chordRegex.exec(linea)) !== null) {
-            acordesEncontrados.push(normalizarTono(match[0]));
+      const chordRegex = /\b(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])[#b]?(?:m|maj7|m7|7|sus4|sus2|dim|aug)?(?:\/[CDEFGAB][#b]?)?\b/gi;
+      
+      const parrafos = texto.split(/\n\s*\n/);
+      const secciones = [];
+      let acordesGlobales = [];
+      let transiciones = [];
+      
+      for (const p of parrafos) {
+        const lineas = p.split('\n');
+        let acordesSeccion = [];
+        let tipoSeccion = 'General';
+        
+        if (lineas.length > 0) {
+          const primeraLinea = lineas[0].toLowerCase();
+          if (primeraLinea.includes('coro') || primeraLinea.includes('chorus')) tipoSeccion = 'Coro';
+          else if (primeraLinea.includes('verso') || primeraLinea.includes('verse')) tipoSeccion = 'Verso';
+        }
+        
+        for (const linea of lineas) {
+          const sinAcordes = linea.replace(/([A-G][b#]?(?:m|min|maj|dim|aug|sus|add)?\d?(?:\/[A-G][b#]?)?)/g, '');
+          const sinEspaciosYSig = sinAcordes.replace(/[\s\|\-\(\)\*\,\.]/g, '');
+          const isChordLine = sinEspaciosYSig.length <= linea.length * 0.3;
+          
+          if (isChordLine && !linea.match(/^[eBGDAE][:|]?\s*-+/)) {
+            let match;
+            while ((match = chordRegex.exec(linea)) !== null) {
+              let acordeLimpio = match[0].split('/')[0];
+              acordeLimpio = normalizarTono(acordeLimpio);
+              acordesSeccion.push(acordeLimpio);
+              acordesGlobales.push(acordeLimpio);
+            }
           }
+        }
+        
+        if (acordesSeccion.length > 0) {
+          secciones.push({
+            tipo: tipoSeccion,
+            primerAcorde: acordesSeccion[0].replace(/maj7|m7|7|sus4|sus2|dim|aug/i, ''),
+            ultimoAcorde: acordesSeccion[acordesSeccion.length - 1].replace(/maj7|m7|7|sus4|sus2|dim|aug/i, ''),
+            acordes: acordesSeccion
+          });
         }
       }
 
-      if (acordesEncontrados.length === 0) {
-        return { tonalidad: 'C', modo: 'Mayor', confianza: 0, explicacion: 'No se encontraron acordes en el texto.' };
+      if (acordesGlobales.length === 0) {
+        return { tonalidad: 'C', modo: 'Mayor', puntuacionFinal: 0, explicacion: { error: 'No se encontraron acordes en el texto.' } };
       }
 
-      const basicChords = acordesEncontrados.map(c => c.replace(/maj7|m7|7|sus4|sus2|dim|aug/i, ''));
+      const basicChords = acordesGlobales.map(c => c.replace(/maj7|m7|7|sus4|sus2|dim|aug/i, ''));
+      
+      for (let i = 0; i < basicChords.length - 1; i++) {
+        transiciones.push([basicChords[i], basicChords[i+1]]);
+      }
+
       const freq = {};
       basicChords.forEach(c => freq[c] = (freq[c] || 0) + 1);
-
-      const firstChord = basicChords[0];
-      const lastChord = basicChords[basicChords.length - 1];
       const mostFrequent = Object.keys(freq).reduce((a, b) => freq[a] > freq[b] ? a : b);
+
+      const globalFirstChord = basicChords[0];
+      const globalLastChord = basicChords[basicChords.length - 1];
 
       const keys = {
         'C': ['C', 'Dm', 'Em', 'F', 'G', 'Am', 'Bdim'], 'G': ['G', 'Am', 'Bm', 'C', 'D', 'Em', 'F#dim'], 'D': ['D', 'Em', 'F#m', 'G', 'A', 'Bm', 'C#dim'],
@@ -5389,61 +5421,111 @@
         'Cm': ['Cm', 'Ddim', 'Eb', 'Fm', 'Gm', 'Ab', 'Bb'], 'Fm': ['Fm', 'Gdim', 'Ab', 'Bbm', 'Cm', 'Db', 'Eb'], 'Bbm': ['Bbm', 'Cdim', 'Db', 'Ebm', 'Fm', 'Gb', 'Ab']
       };
 
-      let bestScore = -1;
+      let bestScore = -9999;
       let bestKey = 'C';
       let bestMode = 'Mayor';
+      let bestExplicacion = {};
 
       for (const [keyName, diatonic] of Object.entries(keys)) {
         let score = 0;
         const isMinor = keyName.endsWith('m');
+        const T = diatonic[0];
+        
+        let validChords = [...diatonic];
+        if (isMinor) {
+          const naturalV = diatonic[4];
+          if (naturalV.endsWith('m')) {
+            const majorV = naturalV.replace('m', '');
+            validChords.push(majorV);
+          }
+        }
 
-        basicChords.forEach(c => { if (diatonic.includes(c)) score += 1; });
+        const uniqueChords = [...new Set(basicChords)];
+        let coincidenciasEncontradas = [];
+        uniqueChords.forEach(c => {
+          if (validChords.includes(c)) {
+            score += freq[c] * 2;
+            coincidenciasEncontradas.push(c);
+          } else {
+            score -= freq[c] * 1.5;
+          }
+        });
 
-        const I = diatonic[0]; const IV = diatonic[3]; const V = diatonic[4];
-        if (freq[I]) score += freq[I] * 1.5;
-        if (freq[IV]) score += freq[IV] * 1.2;
-        if (freq[V]) score += freq[V] * 1.2;
+        if (mostFrequent === T) {
+          score += 10;
+        }
 
-        if (firstChord === I) score += 5;
-        if (lastChord === I) score += 5;
+        if (globalFirstChord === T) {
+          score += 15;
+        }
+        if (globalLastChord === T) {
+          score += 20;
+        }
 
-        if (notasMelodia && notasMelodia.length > 0) {
-          const rootNote = keyName.replace('m', '');
-          if (notasMelodia[notasMelodia.length - 1] === rootNote) score += 5;
-          const freqNotes = {};
-          notasMelodia.forEach(n => freqNotes[n] = (freqNotes[n] || 0) + 1);
-          if (freqNotes[rootNote]) score += (freqNotes[rootNote] * 0.5);
+        let sectionStarts = 0;
+        let sectionEnds = 0;
+        for (const sec of secciones) {
+          const bonus = sec.tipo === 'Coro' ? 8 : 5;
+          if (sec.primerAcorde === T) {
+            score += bonus;
+            sectionStarts++;
+          }
+          if (sec.ultimoAcorde === T) {
+            score += bonus;
+            sectionEnds++;
+          }
+        }
+
+        let cadenciasEncontradas = 0;
+        const IV = diatonic[3];
+        const V_natural = diatonic[4];
+        const V_armonica = isMinor && V_natural.endsWith('m') ? V_natural.replace('m', '') : V_natural;
+
+        for (const [a, b] of transiciones) {
+          if ((a === V_natural || a === V_armonica) && b === T) {
+            score += 8;
+            cadenciasEncontradas++;
+          }
+          if (a === IV && b === T) {
+            score += 4;
+            cadenciasEncontradas++;
+          }
         }
 
         if (score > bestScore) {
           bestScore = score;
           bestKey = keyName;
           bestMode = isMinor ? 'Menor' : 'Mayor';
-        } else if (score === bestScore) {
-          if (lastChord === keyName || mostFrequent === keyName) {
-            bestKey = keyName;
-            bestMode = isMinor ? 'Menor' : 'Mayor';
-          }
+          
+          let resumenCoincidencias = `${Math.round((coincidenciasEncontradas.length / uniqueChords.length) * 100)}%`;
+          let detalles = `Coincidencias: ${coincidenciasEncontradas.join(', ')} (${resumenCoincidencias}). `;
+          detalles += `Inicio/Fin: ${globalFirstChord === T ? 'Sí' : 'No'}/${globalLastChord === T ? 'Sí' : 'No'}. `;
+          if (mostFrequent === T) detalles += `Acorde más frecuente (${mostFrequent}). `;
+          detalles += `Inicia ${sectionStarts} secciones, termina ${sectionEnds}. `;
+          detalles += `${cadenciasEncontradas} resoluciones. Puntuación: ${score.toFixed(1)}.`;
+
+          bestExplicacion = {
+            tonalidad: bestKey,
+            coincidencias: coincidenciasEncontradas.join(', '),
+            primerAcorde: globalFirstChord,
+            ultimoAcorde: globalLastChord,
+            acordeMasFrecuente: mostFrequent,
+            seccionesIniciadas: sectionStarts,
+            seccionesTerminadas: sectionEnds,
+            resoluciones: cadenciasEncontradas,
+            puntuacionFinal: score.toFixed(1),
+            textoLog: detalles
+          };
         }
       }
 
-      const totalPossible = basicChords.length * 2.5 + 10;
-      let confidence = Math.min(100, Math.round((bestScore / totalPossible) * 100));
-      if (confidence < 0) confidence = 0;
-
-      const razones = [];
-      razones.push(`Los acordes pertenecen principalmente a ${bestKey} ${bestMode}.`);
-      if (lastChord === bestKey) razones.push(`La canción finaliza en el centro tonal ${bestKey}.`);
-      if (mostFrequent === bestKey) razones.push(`El acorde más repetido es ${bestKey}.`);
-      if (notasMelodia && notasMelodia.length > 0) razones.push(`El análisis de melodía refuerza la tonalidad.`);
-
-      console.log(`[Análisis Tonal] Detectado: ${bestKey} (${confidence}%) -> ${razones.join(' ')}`);
+      console.log(`[Análisis Tonal] Detectado: ${bestKey} -> ${bestExplicacion.textoLog}`);
 
       return {
         tonalidad: bestKey,
         modo: bestMode,
-        confianza: confidence,
-        explicacion: razones.join(' ')
+        puntuacionFinal: bestExplicacion.puntuacionFinal,
+        explicacion: bestExplicacion
       };
     }
 
@@ -6381,7 +6463,7 @@
         </div>
 
         <div style="display:flex; align-items:center; gap: 6px; flex-wrap: wrap; margin-left: 4px; padding-right: 4px;">
-          <div style="background:var(--bg3); border:1px solid rgba(244,197,66,0.4); color:var(--gold); border-radius:6px; padding:4px 8px; font-size:11px; font-family:var(--font-body); font-weight:600;" title="Tono Original (Guardado en base de datos)">
+          <div class="badge-tono-base" style="background:var(--bg3); border:1px solid rgba(244,197,66,0.4); color:var(--gold); border-radius:6px; padding:4px 8px; font-size:11px; font-family:var(--font-body); font-weight:600;" title="Tono Original (Guardado en base de datos)">
             🎵 ${s.tonoBase || 'C'}
           </div>
           <button class="chip btn-auto-tone" style="cursor:pointer; border:1px solid rgba(244,197,66,0.5); background:rgba(244,197,66,0.15); color:var(--gold); padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Auto-detectar tono base">
@@ -6440,8 +6522,9 @@
               const nuevoTono = normalizarTono(analisis.tonalidad);
               if (nuevoTono !== s.tonoBase) {
                 await updateDoc(doc(window.db, "biblioteca_canciones", s.id), { tonoBase: nuevoTono });
-                if (toneSelect) toneSelect.value = nuevoTono;
                 s.tonoBase = nuevoTono;
+                const badge = div.querySelector('.badge-tono-base');
+                if (badge) badge.textContent = `🎵 ${nuevoTono}`;
                 showToast(`✨ ¡Detectado! Tono de "${s.nombre}" → ${nuevoTono}`);
               } else {
                 showToast(`El tono actual ya es correcto (${nuevoTono})`);
