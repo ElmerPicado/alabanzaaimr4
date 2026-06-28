@@ -6508,6 +6508,15 @@
               const confirmed = await customConfirm(`¿Estás seguro que deseas ELIMINAR TODAS las ${artistSongs.length} canciones de "${art}"?\n\nEsta acción no se puede deshacer.`);
               if (!confirmed) return;
               
+              // Segunda capa de seguridad con código PIN
+              const verifyName = prompt(`⚠️ ZONA DE PELIGRO ⚠️\n\nEstás a punto de borrar TODAS las ${artistSongs.length} canciones de ${art}.\nPara confirmar esta acción, ingresa el PIN de seguridad:`);
+              if (verifyName !== '030819') {
+                 if (verifyName !== null) { // Si no le dio a cancelar
+                   customAlert("PIN incorrecto. Operación cancelada por seguridad.");
+                 }
+                 return;
+              }
+              
               try {
                 btnDeleteArtist.textContent = '...';
                 btnDeleteArtist.disabled = true;
