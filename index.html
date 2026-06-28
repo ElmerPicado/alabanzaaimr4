@@ -6523,8 +6523,8 @@
               const confirmed = await customConfirm(`¿Estás seguro que deseas ELIMINAR TODAS las ${artistSongs.length} canciones de "${art}"?\n\nEsta acción no se puede deshacer.`);
               if (!confirmed) return;
               
-              // Segunda capa de seguridad con código PIN
-              const verifyName = prompt(`⚠️ ZONA DE PELIGRO ⚠️\n\nEstás a punto de borrar TODAS las ${artistSongs.length} canciones de ${art}.\nPara confirmar esta acción, ingresa el PIN de seguridad:`);
+              // Segunda capa de seguridad con código PIN (usando modal personalizado)
+              const verifyName = await customPrompt(`ZONA DE PELIGRO\n\nEstás a punto de borrar TODAS las ${artistSongs.length} canciones de ${art}.\nPara confirmar, ingresa el PIN de seguridad:`, "⚠️ Acción Destructiva", "Ej: 1234");
               if (verifyName !== '030819') {
                  if (verifyName !== null) { // Si no le dio a cancelar
                    customAlert("PIN incorrecto. Operación cancelada por seguridad.");
@@ -9491,6 +9491,9 @@
     <div class="modal-box" style="text-align: center; border-color: var(--teal); max-width: 380px;">
       <h2 class="modal-title" id="custom-dialog-title" style="margin-bottom: 8px;">Aviso</h2>
       <p id="custom-dialog-message" style="font-size:14px; color:var(--text); margin-bottom:20px; line-height:1.6; text-align: center; white-space: pre-wrap;"></p>
+      
+      <input type="text" id="custom-dialog-input" style="display:none; width:100%; padding:10px; margin-bottom:20px; background:var(--bg); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-size:14px; text-align:center; outline:none;" />
+      
       <div id="custom-dialog-actions" style="display: flex; gap: 8px; justify-content: center;">
         <button class="btn-primary" id="custom-dialog-cancel" style="margin-top: 0; background: var(--bg3); border: 1px solid var(--border2); color: var(--text); padding: 10px 16px; display: none;">Cancelar</button>
         <button class="btn-primary" id="custom-dialog-confirm" style="margin-top: 0; background: var(--teal); color: #0f0e17; padding: 10px 24px;">Aceptar</button>
@@ -9520,8 +9523,10 @@
         
         const btnCancel = document.getElementById('custom-dialog-cancel');
         const btnConfirm = document.getElementById('custom-dialog-confirm');
+        const inputField = document.getElementById('custom-dialog-input');
         
         btnCancel.style.display = 'none';
+        inputField.style.display = 'none';
         btnConfirm.textContent = 'Aceptar';
         box.style.borderColor = 'var(--teal)';
         btnConfirm.style.background = 'var(--teal)';
@@ -9547,11 +9552,13 @@
         
         const btnCancel = document.getElementById('custom-dialog-cancel');
         const btnConfirm = document.getElementById('custom-dialog-confirm');
+        const inputField = document.getElementById('custom-dialog-input');
         
         // Determinar si es una alerta destructiva por las palabras clave
         const isDanger = msg.toLowerCase().includes('borrar') || msg.toLowerCase().includes('eliminar') || msg.toLowerCase().includes('quitar') || msg.toLowerCase().includes('deshacer') || msg.toLowerCase().includes('atención');
         
         btnCancel.style.display = 'block';
+        inputField.style.display = 'none';
         btnConfirm.textContent = isDanger ? 'Sí, continuar' : 'Confirmar';
         
         if (isDanger) {
