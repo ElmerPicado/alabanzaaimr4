@@ -2544,6 +2544,38 @@
           });
         }
 
+        // Setup filter buttons
+        const btnFilterEnsTodas = document.getElementById('filter-ensayo-todas');
+        const btnFilterEnsOficial = document.getElementById('filter-ensayo-oficial');
+        window.currentEnsayoPickerFilter = 'todas';
+
+        if (btnFilterEnsTodas && !btnFilterEnsTodas.dataset.hasListener) {
+          btnFilterEnsTodas.dataset.hasListener = "true";
+          btnFilterEnsTodas.addEventListener('click', () => {
+            window.currentEnsayoPickerFilter = 'todas';
+            btnFilterEnsTodas.style.background = 'var(--bg2)';
+            btnFilterEnsTodas.style.color = 'var(--gold)';
+            btnFilterEnsTodas.style.boxShadow = '0 1px 4px rgba(0,0,0,0.2)';
+            btnFilterEnsOficial.style.background = 'transparent';
+            btnFilterEnsOficial.style.color = 'var(--text2)';
+            btnFilterEnsOficial.style.boxShadow = 'none';
+            renderEnsayoCancionesModal(window._tempSelectedSongs || [], window._tempSelectedTones || {});
+          });
+        }
+        if (btnFilterEnsOficial && !btnFilterEnsOficial.dataset.hasListener) {
+          btnFilterEnsOficial.dataset.hasListener = "true";
+          btnFilterEnsOficial.addEventListener('click', () => {
+            window.currentEnsayoPickerFilter = 'oficial';
+            btnFilterEnsOficial.style.background = 'var(--bg2)';
+            btnFilterEnsOficial.style.color = 'var(--gold)';
+            btnFilterEnsOficial.style.boxShadow = '0 1px 4px rgba(0,0,0,0.2)';
+            btnFilterEnsTodas.style.background = 'transparent';
+            btnFilterEnsTodas.style.color = 'var(--text2)';
+            btnFilterEnsTodas.style.boxShadow = 'none';
+            renderEnsayoCancionesModal(window._tempSelectedSongs || [], window._tempSelectedTones || {});
+          });
+        }
+
         // Search input keyup/input handler
         const searchInput = document.getElementById('search-ensayo-songs');
         if (searchInput && !searchInput.dataset.hasListener) {
@@ -2743,6 +2775,14 @@
         }
         const filterVal = removeAccents(document.getElementById('search-ensayo-songs')?.value || "").toLowerCase().trim();
 
+        // Lógica perezosa para evitar congelamientos
+        if (window.currentEnsayoPickerFilter === 'todas' && filterVal.length < 2) {
+          cont.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:15px;">Escribe al menos 2 letras para buscar en la lista global.</p>`;
+          return;
+        }
+
+        let addedCount = 0;
+
         window.cacheSongs.forEach(s => {
           if (!s) return;
           const nameVal = s.nombre || 'Canción sin título';
@@ -2752,6 +2792,12 @@
           if (filterVal && !removeAccents(nameVal).toLowerCase().includes(filterVal) && !removeAccents(artistVal).toLowerCase().includes(filterVal)) {
             return;
           }
+
+          if (window.currentEnsayoPickerFilter === 'oficial' && s.oficial !== true) {
+            return;
+          }
+
+          addedCount++;
 
           const div = document.createElement('div');
           div.className = 'member-row';
@@ -2764,7 +2810,7 @@
             <div class="assign-check ${isSelected ? 'on' : ''}" data-song-id="${s.id}"></div>
             <div class="member-info" style="flex:1; min-width:0; display:flex; justify-content:space-between; align-items:center; gap:8px;">
               <div>
-                <div class="member-name" style="font-size:13px; font-weight:500;">${nameVal}</div>
+                <div class="member-name" style="font-size:13px; font-weight:500;">${nameVal} ${s.oficial ? '<span class="badge-oficial" style="display:inline-block; vertical-align:middle; margin-left:6px;">OFICIAL</span>' : ''}</div>
                 <div class="member-role">${artistVal} | <span class="chip-type chip-${typeVal}">${typeVal}</span></div>
               </div>
               <div class="ensayo-tone-selector-container" style="display: ${isSelected ? 'inline-flex' : 'none'}; align-items: center; gap: 4px;">
@@ -2776,9 +2822,10 @@
             </div>
           `;
 
-          div.querySelector('.assign-check').addEventListener('click', e => {
-            e.stopPropagation();
-            const checkbox = e.currentTarget;
+          div.style.cursor = 'pointer';
+          div.addEventListener('click', e => {
+            if (e.target.tagName === 'SELECT' || e.target.tagName === 'OPTION') return;
+            const checkbox = div.querySelector('.assign-check');
             checkbox.classList.toggle('on');
             const isChecked = checkbox.classList.contains('on');
             const toneContainer = div.querySelector('.ensayo-tone-selector-container');
@@ -2805,7 +2852,7 @@
           cont.appendChild(div);
         });
 
-        if (cont.children.length === 0) {
+        if (addedCount === 0) {
           cont.innerHTML = `<p style='color:var(--text3);font-size:12px;text-align:center;padding:10px;'>No se encontraron canciones.</p>`;
         }
       }
@@ -2842,10 +2889,10 @@
                 <div class="member-role">${instVal}</div>
               </div>
             `;
+            div.style.cursor = 'pointer';
             // toggle check on click
-            div.querySelector('.assign-check').addEventListener('click', (e) => {
-              e.stopPropagation();
-              e.currentTarget.classList.toggle('on');
+            div.addEventListener('click', () => {
+              div.querySelector('.assign-check').classList.toggle('on');
             });
             ensayoMiembrosList.appendChild(div);
           });
@@ -2969,6 +3016,19 @@
               // Render songs with current pre-selected ones
               if (typeof renderEnsayoCancionesModal === 'function') {
                 renderEnsayoCancionesModal(window._tempSelectedSongs, window._tempSelectedTones);
+              }
+
+              // Reset filter picker
+              const btnFilterEnsTodas = document.getElementById('filter-ensayo-todas');
+              const btnFilterEnsOficial = document.getElementById('filter-ensayo-oficial');
+              if (btnFilterEnsTodas && btnFilterEnsOficial) {
+                window.currentEnsayoPickerFilter = 'todas';
+                btnFilterEnsTodas.style.background = 'var(--bg2)';
+                btnFilterEnsTodas.style.color = 'var(--gold)';
+                btnFilterEnsTodas.style.boxShadow = '0 1px 4px rgba(0,0,0,0.2)';
+                btnFilterEnsOficial.style.background = 'transparent';
+                btnFilterEnsOficial.style.color = 'var(--text2)';
+                btnFilterEnsOficial.style.boxShadow = 'none';
               }
 
               // Reset notify radio to default
@@ -4142,6 +4202,9 @@
   <div id="lyrics-modal-overlay" class="lyrics-modal-overlay">
     <div class="lyrics-modal">
       <div class="lyrics-modal-header" style="align-items: center; flex-wrap: wrap; gap: 8px; padding: 8px 16px;">
+        <button id="lyrics-modal-back-btn" class="btn-secondary" style="margin-right: 4px; padding: 6px 12px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border-radius: 6px; cursor: pointer; background: var(--bg3); border: 1px solid var(--border); color: var(--text);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Atrás
+        </button>
         <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 2px;">
           <div id="lyrics-modal-artist"
             style="font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: -2px;">
@@ -5057,6 +5120,42 @@
       alert(`¡Completado! Se borraron ${count} canciones.`);
     };
 
+    window.dangerouslyRecalculateAllTones = async function () {
+      if (!confirm("⚠️ ATENCIÓN: Esto descargará y analizará las letras de TODAS las canciones para corregir su tono base usando el nuevo algoritmo. Puede tomar un par de minutos. ¿Estás seguro?")) return;
+      
+      console.log("Iniciando recálculo de tonos...");
+      if (typeof showToast === 'function') showToast("🎵 Analizando tonos de todas las canciones. Revisa la consola...");
+
+      const songs = [...(window.cacheSongs || [])];
+      let corregidos = 0;
+      let analizados = 0;
+
+      for (const s of songs) {
+        try {
+          const letraDoc = await getDoc(doc(db, "letras_canciones", s.id));
+          if (letraDoc.exists()) {
+             const data = letraDoc.data();
+             const letra = data.letra || '';
+             if (letra.trim().length > 0) {
+               const analisis = analizarTonalidadAvanzado(letra);
+               const nuevoTono = normalizarTono(analisis.tonalidad);
+               
+               if (nuevoTono !== s.tonoBase) {
+                 await updateDoc(doc(db, "biblioteca_canciones", s.id), { tonoBase: nuevoTono });
+                 console.log(`Corregido: ${s.nombre} | Antes: ${s.tonoBase} -> Ahora: ${nuevoTono}`);
+                 corregidos++;
+               }
+             }
+          }
+          analizados++;
+          if (analizados % 10 === 0) console.log(`Progreso: ${analizados} / ${songs.length}...`);
+        } catch (err) {
+          console.error(`Error analizando ${s.nombre}:`, err);
+        }
+      }
+      alert(`¡Completado! Se escanearon ${analizados} letras y se corrigió el tono de ${corregidos} canciones.`);
+    };
+
     window.dangerouslyFixAllCorruptedTexts = async function () {
       if (!confirm("⚠️ ATENCIÓN: Esto buscará y corregirá caracteres corruptos (Mojibake) en TODAS las canciones y letras de la base de datos. ¿Estás seguro?")) return;
 
@@ -5226,6 +5325,98 @@
         return nota + esMenor;
       }
       return t;
+    }
+
+    function analizarTonalidadAvanzado(texto, notasMelodia = []) {
+      if (!texto) return { tonalidad: 'C', modo: 'Mayor', confianza: 0, explicacion: 'Sin texto para analizar.' };
+      
+      const acordesEncontrados = [];
+      const chordRegex = /\b(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])[#b]?(?:m|maj7|m7|7|sus4|sus2|dim|aug)?\b/gi;
+      
+      let match;
+      while ((match = chordRegex.exec(texto)) !== null) {
+        acordesEncontrados.push(normalizarTono(match[0]));
+      }
+
+      if (acordesEncontrados.length === 0) {
+        return { tonalidad: 'C', modo: 'Mayor', confianza: 0, explicacion: 'No se encontraron acordes en el texto.' };
+      }
+
+      const basicChords = acordesEncontrados.map(c => c.replace(/maj7|m7|7|sus4|sus2|dim|aug/i, ''));
+      const freq = {};
+      basicChords.forEach(c => freq[c] = (freq[c] || 0) + 1);
+
+      const firstChord = basicChords[0];
+      const lastChord = basicChords[basicChords.length - 1];
+      const mostFrequent = Object.keys(freq).reduce((a, b) => freq[a] > freq[b] ? a : b);
+
+      const keys = {
+        'C': ['C','Dm','Em','F','G','Am','Bdim'], 'G': ['G','Am','Bm','C','D','Em','F#dim'], 'D': ['D','Em','F#m','G','A','Bm','C#dim'],
+        'A': ['A','Bm','C#m','D','E','F#m','G#dim'], 'E': ['E','F#m','G#m','A','B','C#m','D#dim'], 'B': ['B','C#m','D#m','E','F#','G#m','A#dim'],
+        'F#': ['F#','G#m','A#m','B','C#','D#m','E#dim'], 'F': ['F','Gm','Am','Bb','C','Dm','Edim'], 'Bb': ['Bb','Cm','Dm','Eb','F','Gm','Adim'],
+        'Eb': ['Eb','Fm','Gm','Ab','Bb','Cm','Ddim'], 'Ab': ['Ab','Bbm','Cm','Db','Eb','Fm','Gdim'], 'Db': ['Db','Ebm','Fm','Gb','Ab','Bbm','Cdim'],
+        'Am': ['Am','Bdim','C','Dm','Em','F','G'], 'Em': ['Em','F#dim','G','Am','Bm','C','D'], 'Bm': ['Bm','C#dim','D','Em','F#m','G','A'],
+        'F#m': ['F#m','G#dim','A','Bm','C#m','D','E'], 'C#m': ['C#m','D#dim','E','F#m','G#m','A','B'], 'G#m': ['G#m','A#dim','B','C#m','D#m','E','F#'],
+        'D#m': ['D#m','E#dim','F#','G#m','A#m','B','C#'], 'Dm': ['Dm','Edim','F','Gm','Am','Bb','C'], 'Gm': ['Gm','Adim','Bb','Cm','Dm','Eb','F'],
+        'Cm': ['Cm','Ddim','Eb','Fm','Gm','Ab','Bb'], 'Fm': ['Fm','Gdim','Ab','Bbm','Cm','Db','Eb'], 'Bbm': ['Bbm','Cdim','Db','Ebm','Fm','Gb','Ab']
+      };
+
+      let bestScore = -1;
+      let bestKey = 'C';
+      let bestMode = 'Mayor';
+
+      for (const [keyName, diatonic] of Object.entries(keys)) {
+        let score = 0;
+        const isMinor = keyName.endsWith('m');
+        
+        basicChords.forEach(c => { if (diatonic.includes(c)) score += 1; });
+
+        const I = diatonic[0]; const IV = diatonic[3]; const V = diatonic[4];
+        if (freq[I]) score += freq[I] * 1.5;
+        if (freq[IV]) score += freq[IV] * 1.2;
+        if (freq[V]) score += freq[V] * 1.2;
+
+        if (firstChord === I) score += 5;
+        if (lastChord === I) score += 5;
+
+        if (notasMelodia && notasMelodia.length > 0) {
+           const rootNote = keyName.replace('m', '');
+           if (notasMelodia[notasMelodia.length - 1] === rootNote) score += 5;
+           const freqNotes = {};
+           notasMelodia.forEach(n => freqNotes[n] = (freqNotes[n] || 0) + 1);
+           if (freqNotes[rootNote]) score += (freqNotes[rootNote] * 0.5);
+        }
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestKey = keyName;
+          bestMode = isMinor ? 'Menor' : 'Mayor';
+        } else if (score === bestScore) {
+           if (lastChord === keyName || mostFrequent === keyName) {
+             bestKey = keyName;
+             bestMode = isMinor ? 'Menor' : 'Mayor';
+           }
+        }
+      }
+
+      const totalPossible = basicChords.length * 2.5 + 10;
+      let confidence = Math.min(100, Math.round((bestScore / totalPossible) * 100));
+      if (confidence < 0) confidence = 0;
+      
+      const razones = [];
+      razones.push(`Los acordes pertenecen principalmente a ${bestKey} ${bestMode}.`);
+      if (lastChord === bestKey) razones.push(`La canción finaliza en el centro tonal ${bestKey}.`);
+      if (mostFrequent === bestKey) razones.push(`El acorde más repetido es ${bestKey}.`);
+      if (notasMelodia && notasMelodia.length > 0) razones.push(`El análisis de melodía refuerza la tonalidad.`);
+
+      console.log(`[Análisis Tonal] Detectado: ${bestKey} (${confidence}%) -> ${razones.join(' ')}`);
+
+      return {
+        tonalidad: bestKey,
+        modo: bestMode,
+        confianza: confidence,
+        explicacion: razones.join(' ')
+      };
     }
 
     // ====================================================
@@ -5993,32 +6184,23 @@
           if (tBody) letra = tBody.innerText.trim();
         }
 
-        // --- Extraer tono ---
-        let tonoBase = 'C';
+        // --- Extraer tono usando análisis avanzado ---
+        let textoParaAnalisis = letra || '';
         const odesMatch = html.match(/odes\s*=\s*['"]([^'"]+)['"]/);
         if (odesMatch) {
           const cleanOdes = odesMatch[1].replace(/@/g, '#');
-          const chords = cleanOdes.split(/\s+/).filter(Boolean);
-          if (chords.length > 0) {
-            tonoBase = normalizarTono(chords[0]);
-          }
+          textoParaAnalisis += " " + cleanOdes;
         } else {
-          // Fallback al texto de la página
-          const bodyText = doc2.body?.innerText || html;
-          const tonoMatch = bodyText.match(/[Tt]ono[:\s]+([A-Ga-gDdoReeMiiFaaSollLasiSI#bm]+)/i);
-          if (tonoMatch) {
-            tonoBase = normalizarTono(tonoMatch[1]);
-          } else if (letra) {
-            // Intentar adivinar por el primer acorde
-            const chordRegex = /\b(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])[#bm]*\b/i;
-            const firstChordMatch = letra.match(chordRegex);
-            if (firstChordMatch) {
-              tonoBase = normalizarTono(firstChordMatch[0]);
-            }
-          }
+           const bodyText = doc2.body?.innerText || html;
+           const tonoMatch = bodyText.match(/[Tt]ono[:\s]+([A-Ga-gDdoReeMiiFaaSollLasiSI#bm]+)/i);
+           if (tonoMatch) {
+             textoParaAnalisis += " " + tonoMatch[1];
+           }
         }
 
-        tonoBase = normalizarTono(tonoBase);
+        // Ejecutar algoritmo de análisis de tonalidad (sin melodía explícita desde scraping por ahora, pero la función la soporta)
+        const analisis = analizarTonalidadAvanzado(textoParaAnalisis, []);
+        let tonoBase = normalizarTono(analisis.tonalidad);
 
         // --- Rellenar el formulario ---
         if (nombre) document.getElementById('song-name-input').value = fixCorruptedText(nombre);
@@ -7682,6 +7864,26 @@
 
               song.tonoServicio = selectedTone;
               window._lyricsCache[cancionId] = song;
+
+              // Sincronizar con Firebase si estamos en el contexto de un Servicio
+              if (window._currentLyricsPlaylistContext && window._currentLyricsPlaylistContext.includes('-')) {
+                 const dateStr = window._currentLyricsPlaylistContext;
+                 const path = `cancionesSeleccionadas.${cancionId}`;
+                 const cambioPath = `cambiosTono.${cancionId}`;
+                 
+                 updateDoc(doc(db, "planes_servicio", dateStr), {
+                   [path]: selectedTone,
+                   [cambioPath]: {
+                     usuario: (activeSessionUser ? activeSessionUser.nombre : "Usuario"),
+                     tono: selectedTone,
+                     timestamp: Date.now()
+                   }
+                 }).then(() => {
+                   if (typeof showToast === 'function') showToast(`Tono cambiado a ${selectedTone} para todos.`);
+                 }).catch(err => {
+                   console.error("Error sincronizando el tono en Firebase:", err);
+                 });
+              }
             };
           });
 
@@ -7855,11 +8057,13 @@
       }
     };
 
-    document.getElementById('lyrics-modal-close').addEventListener('click', () => {
+    const closeLyricsModal = () => {
       document.getElementById('lyrics-modal-overlay').classList.remove('active');
       releaseWakeLock();
       detenerAutoscroll();
-    });
+    };
+    document.getElementById('lyrics-modal-close').addEventListener('click', closeLyricsModal);
+    document.getElementById('lyrics-modal-back-btn').addEventListener('click', closeLyricsModal);
 
     document.getElementById('practice-modal-close').addEventListener('click', () => {
       window.cerrarModalConHistorial('ensayo-practice-overlay');
@@ -8403,7 +8607,7 @@
         window._selectedSongsToAdd.forEach(songId => {
           const s = (window.cacheSongs || []).find(x => x.id === songId);
           if (s) {
-            updates[`cancionesSeleccionadas.${songId}`] = s.tonoBase;
+            updates[`cancionesSeleccionadas.${songId}`] = s.tonoBase || 'C';
             updates[`cancionesSeleccionadasTipos.${songId}`] = type;
             currentOrder.push(songId);
           }
@@ -8946,6 +9150,15 @@
         style="max-height:150px; overflow-y:auto; border:1px solid var(--border2); border-radius:var(--radius-sm); padding:8px; background:var(--bg2); margin-bottom: 12px;">
       </div>
       <p class="modal-subtitle" style="margin-top:8px;">Selecciona las canciones para ensayar</p>
+      
+      <!-- Filtro: Todas / Oficial -->
+      <div style="display:flex; gap:6px; margin-bottom:10px; padding:4px; background:var(--bg3); border-radius:8px;">
+        <button id="filter-ensayo-todas"
+          style="flex:1; padding:7px; font-size:12px; font-weight:700; font-family:var(--font-body); background:var(--bg2); border:none; border-radius:6px; color:var(--gold); cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,0.2);">Todas</button>
+        <button id="filter-ensayo-oficial"
+          style="flex:1; padding:7px; font-size:12px; font-weight:700; font-family:var(--font-body); background:transparent; border:none; border-radius:6px; color:var(--text2); cursor:pointer;">Oficial</button>
+      </div>
+
       <div class="field" style="margin-bottom: 8px;">
         <input type="text" id="search-ensayo-songs" placeholder="Buscar canción por nombre o artista..."
           style="width:100%; padding:8px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-size: 13px; outline: none;">
