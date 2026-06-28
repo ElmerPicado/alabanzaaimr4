@@ -5716,13 +5716,15 @@
       let cuerpoCoristas = " *Voces/Coros:*\n";
 
       cacheMembers.forEach(m => {
-        if (dataServicio.musicosAsignados && dataServicio.musicosAsignados[m.usuario]) {
+        const asigVal = dataServicio.musicosAsignados ? dataServicio.musicosAsignados[m.usuario] : null;
+        if (asigVal) {
+          const displayInst = typeof asigVal === 'string' ? asigVal : m.instrumento;
           if (m.type === 'musico') {
             countMusicos++;
-            cuerpoMusicos += `  • ${m.nombre} [${m.instrumento}]\n`;
+            cuerpoMusicos += `  • ${m.nombre} [${displayInst}]\n`;
           } else {
             countCoristas++;
-            cuerpoCoristas += `  • ${m.nombre} [${m.instrumento}]\n`;
+            cuerpoCoristas += `  • ${m.nombre} [${displayInst}]\n`;
           }
         }
       });
@@ -5823,8 +5825,11 @@
 
         // 1b. Helper para renderizar filas de miembros
         const crearFilaMiembro = (m, isAvailableGroup) => {
-          const isChecked = dataServicio.musicosAsignados && dataServicio.musicosAsignados[m.usuario];
+          const isChecked = dataServicio.musicosAsignados && !!dataServicio.musicosAsignados[m.usuario];
+          const assignedValue = dataServicio.musicosAsignados ? dataServicio.musicosAsignados[m.usuario] : null;
           const userAvail = dataServicio.disponibilidad ? dataServicio.disponibilidad[m.usuario] : null;
+          const instArr = m.instrumento.split(',').map(s => s.trim());
+          const currentSelectedInst = typeof assignedValue === 'string' ? assignedValue : instArr[0];
 
           let statusBadge = "";
           if (!isAvailableGroup) {
@@ -5837,7 +5842,6 @@
 
           const containsVoice = m.instrumento.includes("Voz") || m.instrumento.includes("Corista");
           const containsRhythm = m.instrumento.includes("Batería") || m.instrumento.includes("Bajo") || m.instrumento.includes("Percusión");
-          const containsInst = m.instrumento.includes("Batería") || m.instrumento.includes("Bajo") || m.instrumento.includes("Teclado") || m.instrumento.includes("Guitarra") || m.instrumento.includes("Percusión");
 
           let avatarClass = "av-gold";
           if (containsRhythm) {
@@ -5857,25 +5861,42 @@
             : '';
           const avatarInitials = m.profilePic ? '' : m.nombre.substring(0, 2).toUpperCase();
 
+          let roleHtml = `<div class="member-role">${m.instrumento}</div>`;
+          if (instArr.length > 1 && currentUserRole === 'lider' && isAvailableGroup && isChecked) {
+            let options = instArr.map(inst => `<option value="${inst}" ${inst === currentSelectedInst ? 'selected' : ''}>${inst}</option>`).join('');
+            roleHtml = `<select class="member-role-select" data-user="${m.usuario}" style="background:transparent; border:1px solid var(--border2); color:var(--teal); font-size:11px; padding:2px; border-radius:4px; margin-top:2px; font-weight: 600; outline: none; cursor: pointer;">${options}</select>`;
+          } else if (isChecked && typeof assignedValue === 'string') {
+             roleHtml = `<div class="member-role" style="color: var(--teal); font-weight: 600;">${assignedValue}</div>`;
+          }
+
           row.innerHTML = `
           <div class="avatar ${avatarClass}" style="${avatarPicStyle}">${avatarInitials}</div>
           <div class="member-info">
             <div class="member-name">${m.nombre}</div>
-            <div class="member-role">${m.instrumento}</div>
+            ${roleHtml}
           </div>
           ${statusBadge}
           <div class="assign-check ${isChecked ? 'on' : ''} ${(!isAvailableGroup || currentUserRole !== 'lider') ? 'song-locked' : ''}"></div>
-
-
         `;
 
           if (currentUserRole === 'lider' && isAvailableGroup) {
             row.querySelector('.assign-check').addEventListener('click', async () => {
               const path = `musicosAsignados.${m.usuario}`;
+              const newValue = !isChecked ? instArr[0] : false;
               await updateDoc(doc(db, "planes_servicio", serviceDateSelect.value), {
-                [path]: !isChecked
+                [path]: newValue
               });
             });
+
+            const selectEl = row.querySelector('.member-role-select');
+            if (selectEl) {
+              selectEl.addEventListener('change', async (e) => {
+                const path = `musicosAsignados.${m.usuario}`;
+                await updateDoc(doc(db, "planes_servicio", serviceDateSelect.value), {
+                  [path]: e.target.value
+                });
+              });
+            }
           }
           return row;
         };
@@ -8267,7 +8288,50 @@
       window._currentServiceSongs = [...adoraciones, ...alabanzas];
 
       if (allSelected.length === 0) {
-        cont.innerHTML = `<p style="color: var(--text3); font-size: 13px; text-align: center; padding: 20px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); margin: 0;">No hay canciones seleccionadas aún.</p>`;
+        cont.innerHTML = `
+          <div style="text-align: center; padding: 30px 20px; background: var(--bg3); border: 1px dashed var(--border); border-radius: var(--radius); margin-bottom: 20px;">
+            <div style="font-size: 24px; margin-bottom: 10px;">🎶</div>
+            <h4 style="color: var(--text); font-size: 14px; margin: 0 0 15px;">No hay canciones seleccionadas aún</h4>
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+              <button class="btn-add-song-trigger-dynamic" data-type="adoracion" style="background: rgba(155, 143, 255, 0.15); border: 1px solid var(--purple); color: var(--purple); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;">
+                + Agregar Adoración
+              </button>
+              <button class="btn-add-song-trigger-dynamic" data-type="alabanza" style="background: rgba(78, 205, 196, 0.15); border: 1px solid var(--teal); color: var(--teal); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;">
+                + Agregar Alabanza
+              </button>
+            </div>
+          </div>
+        `;
+        
+        // Attach click listeners to the new dynamic buttons
+        cont.querySelectorAll('.btn-add-song-trigger-dynamic').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const type = btn.dataset.type;
+            window._targetAddSongType = type;
+            window._targetAddSongDate = serviceDateSelect.value;
+            
+            document.getElementById('musico-add-song-title').textContent = `Agregar a ${type === 'adoracion' ? 'Adoración' : 'Alabanza'}`;
+            document.getElementById('musico-add-song-search').value = "";
+            document.getElementById('musico-custom-name').value = "";
+            document.getElementById('musico-custom-artist').value = "";
+            document.getElementById('musico-custom-tone').value = "C";
+            
+            // Llamar a la función que renderiza resultados del modal
+            if (typeof renderAddSongResults === 'function') {
+              renderAddSongResults(type, "");
+            }
+            
+            window._selectedSongsToAdd = new Set();
+            const btnAddSel2 = document.getElementById('btn-musico-add-selected');
+            if (btnAddSel2) btnAddSel2.style.display = 'none';
+            const customCont2 = document.getElementById('musico-custom-song-container');
+            if (customCont2) customCont2.style.display = 'none';
+            
+            const modal = document.getElementById('musico-add-song-modal');
+            if (modal) modal.classList.add('active');
+          });
+        });
+        
         return;
       }
 
