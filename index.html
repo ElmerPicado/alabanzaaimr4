@@ -5605,6 +5605,8 @@
           await setDoc(serviceDocRef, {
             fecha: targetDate,
             cancionesSeleccionadas: {}, // id_cancion: tono_elegido
+            cancionesSeleccionadasTipos: {}, // id_cancion: tipo
+            ordenCanciones: [],
             musicosAsignados: {},       // id_usuario: true/false
             disponibilidad: {}          // id_usuario: 'confirmado' | 'ausente'
           });
@@ -8603,19 +8605,27 @@
         let currentOrder = dataServicio.ordenCanciones || [];
         const type = window._targetAddSongType;
 
-        let updates = {};
+        let selData = {};
+        let selTipos = {};
+
         window._selectedSongsToAdd.forEach(songId => {
           const s = (window.cacheSongs || []).find(x => x.id === songId);
           if (s) {
-            updates[`cancionesSeleccionadas.${songId}`] = s.tonoBase || 'C';
-            updates[`cancionesSeleccionadasTipos.${songId}`] = type;
-            currentOrder.push(songId);
+            selData[songId] = s.tonoBase || 'C';
+            selTipos[songId] = type;
+            if (!currentOrder.includes(songId)) {
+              currentOrder.push(songId);
+            }
           }
         });
-        updates['ordenCanciones'] = currentOrder;
 
         try {
-          await updateDoc(docRef, updates);
+          await setDoc(docRef, {
+            cancionesSeleccionadas: selData,
+            cancionesSeleccionadasTipos: selTipos,
+            ordenCanciones: currentOrder
+          }, { merge: true });
+          
           showToast(`Se agregaron ${window._selectedSongsToAdd.size} canciones.`);
           document.getElementById('musico-add-song-modal').classList.remove('active');
           window._selectedSongsToAdd.clear();
@@ -8648,18 +8658,29 @@
         const dataServicio = window._currentServiceData || {};
         const currentOrder = dataServicio.ordenCanciones || [];
 
-        await updateDoc(docRef, {
-          [`cancionesSeleccionadas.${customId}`]: customTone,
-          [`customSongsMetadata.${customId}`]: {
-            nombre: customName,
-            artista: customArtist,
-            tonoBase: customTone,
-            tipo: type
-          },
-          ordenCanciones: [...currentOrder, customId]
-        });
+        try {
+          await setDoc(docRef, {
+            cancionesSeleccionadas: {
+              [customId]: customTone
+            },
+            cancionesSeleccionadasTipos: {
+              [customId]: type
+            },
+            customSongsMetadata: {
+              [customId]: {
+                nombre: customName,
+                artista: customArtist,
+                tonoBase: customTone,
+                tipo: type
+              }
+            },
+            ordenCanciones: [...currentOrder, customId]
+          }, { merge: true });
 
-        document.getElementById('musico-add-song-modal').classList.remove('active');
+          document.getElementById('musico-add-song-modal').classList.remove('active');
+        } catch (e) {
+          console.error("Error agregando cancion custom", e);
+        }
         showToast(`"${customName}" agregada de forma personalizada`);
       });
     }
