@@ -4961,10 +4961,16 @@
                 const artista = fixCorruptedText((item.artista || item.artist || "").trim() || "Desconocido");
                 const letra = fixCorruptedText(item.letra || item.lyrics || item.content || "");
 
+                let tonoBaseFinal = (item.tonoBase || item.key || item.tono || "C").trim();
+                if (letra.trim().length > 0) {
+                  const analisis = analizarTonalidadAvanzado(letra);
+                  tonoBaseFinal = normalizarTono(analisis.tonalidad);
+                }
+
                 const payload = {
                   nombre,
                   artista,
-                  tonoBase: (item.tonoBase || item.key || item.tono || "C").trim(),
+                  tonoBase: tonoBaseFinal,
                   tipo: ((item.tipo || item.type || "alabanza").toLowerCase().includes("adora") ? "adoracion" : "alabanza"),
                   youtube: (item.youtube || item.url || "").trim()
                 };
@@ -6208,20 +6214,34 @@
       }
 
       const idUnico = editingSongId || ("song_" + Date.now());
-      const letra = document.getElementById('song-lyrics-input').value;
+      let finalLetra = document.getElementById('song-lyrics-input').value;
+      let finalTonoBase = document.getElementById('song-key-input').value.trim();
 
-      const analisisAutomatico = analizarTonalidadAvanzado(letra);
-      let tonoCalculado = normalizarTono(analisisAutomatico.tonalidad);
+      const analisisAutomatico = analizarTonalidadAvanzado(finalLetra);
+      const tonoOriginalLetra = normalizarTono(analisisAutomatico.tonalidad);
 
-      // Fallback por si la letra está completamente vacía o sin acordes
-      if (!tonoCalculado) {
-        tonoCalculado = document.getElementById('song-key-input').value.trim() || 'C';
+      if (editingSongId) {
+        const prevSong = (cacheSongs || []).find(x => x.id === editingSongId);
+        if (prevSong) {
+          const tonoAnterior = normalizarTono(prevSong.tonoBase);
+          // Si el admin CAMBIÓ explícitamente el dropdown a un tono diferente al que tenía la canción:
+          if (finalTonoBase && finalTonoBase !== tonoAnterior) {
+            // El admin quiere transponer la canción
+            finalLetra = transponerLetraCruda(finalLetra, tonoOriginalLetra || tonoAnterior, finalTonoBase);
+          } else {
+            // El admin no cambió el dropdown, confiamos en el tono original de la letra actual
+            finalTonoBase = tonoOriginalLetra || tonoAnterior || 'C';
+          }
+        }
+      } else {
+        // Canción nueva. Siempre auto-detectamos el tono basado en los acordes.
+        finalTonoBase = tonoOriginalLetra || finalTonoBase || 'C';
       }
 
       const payloadMetadata = {
         nombre: fixCorruptedText(nombre),
         artista: fixCorruptedText(artista),
-        tonoBase: tonoCalculado,
+        tonoBase: finalTonoBase,
         tipo: document.getElementById('song-type-input').value,
         youtube: document.getElementById('song-youtube-input').value.trim()
       };
@@ -6240,7 +6260,7 @@
       await setDoc(doc(db, "biblioteca_canciones", idUnico), payloadMetadata);
 
       // 2. Guardar letra en letras_canciones
-      await setDoc(doc(db, "letras_canciones", idUnico), { letra: fixCorruptedText(letra) });
+      await setDoc(doc(db, "letras_canciones", idUnico), { letra: fixCorruptedText(finalLetra) });
 
       // 3. Guardar en cache local de letras
       if (!window._lyricsCache) window._lyricsCache = {};
@@ -6249,7 +6269,7 @@
         tonoBase: payloadMetadata.tonoBase,
         tonoServicio: payloadMetadata.tonoBase,
         youtube: payloadMetadata.youtube,
-        letra
+        letra: finalLetra
       };
 
       const wasEditing = !!editingSongId;
@@ -6541,7 +6561,12 @@
             console.error(err);
             showToast("Error al auto-detectar tono.");
           } finally {
-            autoToneBtn.textContent = '✨ Auto';
+            autoToneBtn.textContent = 'Tono detectado';
+            setTimeout(() => {
+              if (autoToneBtn && autoToneBtn.isConnected) {
+                autoToneBtn.textContent = 'Auto-Tono';
+              }
+            }, 2000);
             autoToneBtn.disabled = false;
           }
         });
@@ -7774,6 +7799,47 @@
         }
       }
       return nuevoAcorde + mods;
+    }
+
+    function transponerLetraCruda(texto, tonoBase, tonoDestino) {
+      if (!texto) return "";
+      texto = convertirTextoEspañolAIngles(texto);
+      tonoBase = tonoBase ? normalizarTono(tonoBase) : null;
+      tonoDestino = tonoDestino ? normalizarTono(tonoDestino) : null;
+
+      let diff = 0;
+      let usarBemoles = false;
+      if (tonoBase && tonoDestino) {
+        const idxBase = getIndexAcorde(tonoBase);
+        const idxDest = getIndexAcorde(tonoDestino);
+        if (idxBase !== -1 && idxDest !== -1) {
+          diff = idxDest - idxBase;
+        }
+        usarBemoles = TONOS_CON_BEMOLES.includes(tonoDestino);
+      }
+
+      if (diff === 0 && !usarBemoles) return texto;
+
+      const lineas = texto.split('\n');
+      return lineas.map(linea => {
+        const trimmed = linea.trim();
+        if (trimmed === '') return linea;
+
+        const sinAcordes = linea.replace(/([A-G][b#]?(?:m|min|maj|dim|aug|sus|add)?\d?(?:\/[A-G][b#]?)?)/g, '');
+        const sinEspaciosYSig = sinAcordes.replace(/[\s\|\-\(\)\*\,\.]/g, '');
+        const isChordLine = sinEspaciosYSig.length <= linea.length * 0.3;
+
+        if (linea.match(/^[eBGDAE][:|]?\s*-+/)) return linea;
+
+        return linea.replace(/([A-G][b#]?(?:m|min|maj|dim|aug|sus|add)?\d?(?:\/[A-G][b#]?)?)/g, (match, p1, offset, fullStr) => {
+          const prevChar = offset > 0 ? fullStr[offset - 1] : ' ';
+          const nextChar = offset + match.length < fullStr.length ? fullStr[offset + match.length] : ' ';
+          if (/[a-zA-Z]/.test(prevChar) || /[a-zA-Z]/.test(nextChar)) return match;
+          if (!isChordLine && match.length === 1 && !['[', '{', '(', '<'].includes(prevChar)) return match;
+
+          return transponerAcordeUnico(match, diff, usarBemoles);
+        });
+      }).join('\n');
     }
 
     function renderizarLetraTranspuesta(texto, tonoBase, tonoDestino) {
