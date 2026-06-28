@@ -6492,8 +6492,49 @@
           }
           header.innerHTML = `
             <span class="artist-row-name">${art}</span>
-            <span class="artist-row-count">${artistCounts[art]} ${artistCounts[art] === 1 ? 'canción' : 'canciones'}</span>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span class="artist-row-count">${artistCounts[art]} ${artistCounts[art] === 1 ? 'canción' : 'canciones'}</span>
+              <button class="btn-delete-artist admin-only" data-artist="${art}" style="background:var(--coral); color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:600; cursor:pointer;">Eliminar</button>
+            </div>
           `;
+
+          const btnDeleteArtist = header.querySelector('.btn-delete-artist');
+          if (btnDeleteArtist) {
+            btnDeleteArtist.onclick = async (e) => {
+              e.stopPropagation();
+              const artistSongs = todas.filter(s => (s.artista || 'Desconocido') === art);
+              if (artistSongs.length === 0) return;
+              
+              const confirmed = await customConfirm(`¿Estás seguro que deseas ELIMINAR TODAS las ${artistSongs.length} canciones de "${art}"?\n\nEsta acción no se puede deshacer.`);
+              if (!confirmed) return;
+              
+              try {
+                btnDeleteArtist.textContent = '...';
+                btnDeleteArtist.disabled = true;
+                
+                let deletedCount = 0;
+                const chunkSize = 250; // max batch is 500 writes, we do 2 writes per song
+                for (let i = 0; i < artistSongs.length; i += chunkSize) {
+                  const chunk = artistSongs.slice(i, i + chunkSize);
+                  const batch = writeBatch(db);
+                  
+                  for (const song of chunk) {
+                    batch.delete(doc(db, "biblioteca_canciones", song.id));
+                    batch.delete(doc(db, "letras_canciones", song.id));
+                    deletedCount++;
+                  }
+                  await batch.commit();
+                }
+                
+                customAlert(`¡Éxito!\nSe eliminaron ${deletedCount} canciones de ${art}.`);
+              } catch (err) {
+                console.error("Error al eliminar artista:", err);
+                customAlert("Error al eliminar: " + err.message);
+                btnDeleteArtist.textContent = 'Eliminar';
+                btnDeleteArtist.disabled = false;
+              }
+            };
+          }
 
           const collapseDiv = document.createElement('div');
           collapseDiv.className = 'artist-songs-collapse';
@@ -8522,6 +8563,8 @@
       const cancionesSeleccionadas = dataServicio.cancionesSeleccionadas || {};
       const selectedIds = Object.keys(cancionesSeleccionadas).filter(k => cancionesSeleccionadas[k] !== false);
 
+      window._cacheSongsForPreview = cacheSongs;
+
       const filtered = cacheSongs.filter(s => {
         const sNombre = s.nombre || "";
         const sArtista = s.artista || "";
@@ -8561,6 +8604,10 @@
             <div style="display: flex; align-items: center; justify-content: space-between;">
               <div class="song-card-artist" style="color: var(--text2); font-size: 12px; margin-left: 4px;">${s.artista}</div>
               <div style="display:flex; align-items:center; gap: 12px; padding-right: 6px;">
+                <button class="btn-preview-lyrics" data-song-id="${s.id}" style="background:transparent; border:1px solid var(--border2); color:var(--text2); border-radius:6px; padding:4px 8px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;" title="Ver letra">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                  Letra
+                </button>
                 <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; ${badgeStyle}">Base: ${s.tonoBase}</div>
                 <div class="custom-checkbox" style="width:22px; height:22px; border-radius:6px; border:2px solid ${isChecked ? 'var(--teal)' : 'var(--border2)'}; background:${isChecked ? 'var(--teal)' : 'transparent'}; display:flex; align-items:center; justify-content:center; transition: all 0.2s;">
                   ${isChecked ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f0e17" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
@@ -8569,6 +8616,15 @@
             </div>
           </div>
         `;
+        
+        const btnPreview = div.querySelector('.btn-preview-lyrics');
+        if (btnPreview) {
+          btnPreview.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.openPreviewLyrics) window.openPreviewLyrics(s.id);
+          });
+        }
+
         div.addEventListener('click', () => {
           if (!window._selectedSongsToAdd) window._selectedSongsToAdd = new Set();
 
@@ -9392,6 +9448,20 @@
       style="background: var(--teal); border: none; color: #0f0e17; padding: 8px 14px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; transition: transform 0.2s; white-space: nowrap;">Actualizar</button>
   </div>
 
+  <!-- Modal Preview de Letra -->
+  <div id="preview-lyrics-modal" class="modal-overlay" style="z-index: 999990;">
+    <div class="modal-box" style="text-align: left; border-color: var(--teal); max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+        <div>
+          <h2 class="modal-title" id="preview-lyrics-title" style="margin-bottom: 4px; font-size: 16px;">Letra</h2>
+          <div id="preview-lyrics-artist" style="font-size: 12px; color: var(--text2);"></div>
+        </div>
+        <button id="btn-close-preview-lyrics" style="background: transparent; border: none; color: var(--text3); font-size: 20px; cursor: pointer; padding: 4px;">✕</button>
+      </div>
+      <div id="preview-lyrics-content" style="flex: 1; overflow-y: auto; font-family: monospace; font-size: 14px; line-height: 1.5; color: var(--text); white-space: pre-wrap; padding-right: 8px;"></div>
+    </div>
+  </div>
+
   <!-- Modal Custom Alert / Confirm -->
   <div id="custom-dialog-overlay" class="modal-overlay" style="z-index: 999999;">
     <div class="modal-box" style="text-align: center; border-color: var(--teal); max-width: 380px;">
@@ -9405,6 +9475,18 @@
   </div>
 
   <script>
+    window.openPreviewLyrics = function(songId) {
+      if (!window._cacheSongsForPreview) return;
+      const song = window._cacheSongsForPreview.find(s => s.id === songId);
+      if (!song) return;
+      document.getElementById('preview-lyrics-title').textContent = song.nombre;
+      document.getElementById('preview-lyrics-artist').textContent = song.artista || '';
+      document.getElementById('preview-lyrics-content').textContent = song.letra || 'Letra no disponible.';
+      document.getElementById('preview-lyrics-modal').classList.add('active');
+    };
+    document.getElementById('btn-close-preview-lyrics')?.addEventListener('click', () => {
+      document.getElementById('preview-lyrics-modal').classList.remove('active');
+    });
     window.customAlert = function(msg, title = "Aviso") {
       return new Promise(resolve => {
         const overlay = document.getElementById('custom-dialog-overlay');
