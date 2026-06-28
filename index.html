@@ -1222,7 +1222,7 @@
       background: rgba(0, 0, 0, 0.75);
       z-index: 5000;
       display: none;
-      align-items: flex-end;
+      align-items: center;
       justify-content: center;
       backdrop-filter: blur(4px);
     }
@@ -1234,20 +1234,24 @@
     .tone-picker-box {
       background: var(--bg2);
       border: 1px solid var(--border2);
-      border-radius: 20px 20px 0 0;
-      padding: 20px 18px 38px;
-      width: 100%;
+      border-radius: 20px;
+      padding: 24px 20px;
+      width: 90%;
       max-width: 500px;
-      animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    @keyframes slideUp {
+    @keyframes popIn {
       from {
-        transform: translateY(100%);
+        opacity: 0;
+        transform: scale(0.95);
       }
 
       to {
-        transform: translateY(0);
+        opacity: 1;
+        transform: scale(1);
       }
     }
 
@@ -8161,6 +8165,11 @@
       }
       if (!song) return;
 
+      // Asegurar que el tonoServicio esté actualizado con el cambio desde afuera
+      if (window._currentServiceData && window._currentServiceData.cancionesSeleccionadas && window._currentServiceData.cancionesSeleccionadas[cancionId]) {
+        song.tonoServicio = window._currentServiceData.cancionesSeleccionadas[cancionId];
+      }
+
       // Actualizar cache local
       if (!window._lyricsCache) window._lyricsCache = {};
       window._lyricsCache[cancionId] = song;
@@ -8194,7 +8203,7 @@
 
           if (pTitle) pTitle.textContent = `${song.nombre}`;
 
-          const keys = ['C', 'Cm', 'C#', 'C#m', 'D', 'Dm', 'D#', 'D#m', 'E', 'Em', 'F', 'Fm', 'F#', 'F#m', 'G', 'Gm', 'G#', 'G#m', 'A', 'Am', 'A#', 'A#m', 'B', 'Bm'];
+          const keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'Cm', 'C#m', 'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm'];
           const currentTonoPrac = song.tonoServicio || song.tonoBase;
 
           pGrid.innerHTML = keys.map(k =>
@@ -8461,7 +8470,7 @@
       const grid = document.getElementById('tone-picker-grid');
       document.getElementById('tone-picker-song-name').textContent = songName;
 
-      const keys = ['C', 'Cm', 'C#', 'C#m', 'D', 'Dm', 'D#', 'D#m', 'E', 'Em', 'F', 'Fm', 'F#', 'F#m', 'G', 'Gm', 'G#', 'G#m', 'A', 'Am', 'A#', 'A#m', 'B', 'Bm'];
+      const keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'Cm', 'C#m', 'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm'];
       grid.innerHTML = keys.map(k =>
         `<button class="tone-grid-btn ${k === currentTone ? 'current' : ''}" data-key="${k}">${k}</button>`
       ).join('');
