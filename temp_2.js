@@ -1368,47 +1368,50 @@
         const payload = { disponibilidad: d };
         // si declina, lo quitamos del equipo asignado
         if (estado === 'ausente') {
-          const mAsig = data.musicosAsignados || {};
-          mAsig[activeSessionUser.usuario] = false;
-          payload.musicosAsignados = mAsig;
-        }
+          const mAsig =     // MOTOR DE TRANSPOSICIÓN Y MODAL DE LETRAS
+    // ====================================================
+    const ACORDES_SOSTENIDOS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const ACORDES_BEMOLES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+    
+    // Tonos que convencionalmente usan bemoles en su armadura
+    const TONOS_CON_BEMOLES = ['F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Dm', 'Gm', 'Cm', 'Fm', 'Bbm', 'Ebm'];
 
-        await updateDoc(docRef, payload);
-      }
+    function getIndexAcorde(acorde) {
+      const eq = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
+      let b = acorde.replace(/m$/, '');
+      if (eq[b]) b = eq[b];
+      return ACORDES_SOSTENIDOS.indexOf(b);
     }
 
-    // ====================================================
-    // MOTOR DE TRANSPOSICIÓN Y MODAL DE LETRAS
-    // ====================================================
-    const ACORDES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-
-    function transponerAcordeUnico(acorde, diff) {
+    function transponerAcordeUnico(acorde, diff, usarBemoles) {
       const match = acorde.match(/^([A-G][b#]?)(.*)$/);
       if (!match) return acorde;
       let base = match[1];
       let mods = match[2];
 
       const eq = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
-      if (eq[base]) base = eq[base];
+      let baseNormalizada = eq[base] ? eq[base] : base;
 
-      let i = ACORDES.indexOf(base);
+      let i = ACORDES_SOSTENIDOS.indexOf(baseNormalizada);
       if (i === -1) return acorde;
 
       let newI = (i + diff) % 12;
       if (newI < 0) newI += 12;
-      let nuevoAcorde = ACORDES[newI];
+      
+      const escala = usarBemoles ? ACORDES_BEMOLES : ACORDES_SOSTENIDOS;
+      let nuevoAcorde = escala[newI];
 
       if (mods.includes('/')) {
         let parts = mods.split('/');
         let bajoMatch = parts[1].match(/^([A-G][b#]?)(.*)$/);
         if (bajoMatch) {
           let bBase = bajoMatch[1];
-          if (eq[bBase]) bBase = eq[bBase];
-          let bi = ACORDES.indexOf(bBase);
+          let bBaseNorm = eq[bBase] ? eq[bBase] : bBase;
+          let bi = ACORDES_SOSTENIDOS.indexOf(bBaseNorm);
           if (bi !== -1) {
             let bnI = (bi + diff) % 12;
             if (bnI < 0) bnI += 12;
-            parts[1] = ACORDES[bnI] + bajoMatch[2];
+            parts[1] = escala[bnI] + bajoMatch[2];
             mods = parts.join('/');
           }
         }
@@ -1420,19 +1423,15 @@
       if (!texto) return "";
 
       let diff = 0;
+      let usarBemoles = false;
       if (tonoBase && tonoDestino) {
-        const eq = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
-        let tb = tonoBase.replace(/m$/, '');
-        let td = tonoDestino.replace(/m$/, '');
-        if (eq[tb]) tb = eq[tb];
-        if (eq[td]) td = eq[td];
-
-        const idxBase = ACORDES.indexOf(tb);
-        const idxDest = ACORDES.indexOf(td);
-
+        const idxBase = getIndexAcorde(tonoBase);
+        const idxDest = getIndexAcorde(tonoDestino);
+        
         if (idxBase !== -1 && idxDest !== -1) {
           diff = idxDest - idxBase;
         }
+        usarBemoles = TONOS_CON_BEMOLES.includes(tonoDestino);
       }
 
       const lineas = texto.split('\\n');
@@ -1445,8 +1444,8 @@
             return match;
           }
 
-          if (diff === 0) return `<span class="chord-highlight">${match}</span>`;
-          let trans = transponerAcordeUnico(match, diff);
+          if (diff === 0 && !usarBemoles) return `<span class="chord-highlight">${match}</span>`;
+          let trans = transponerAcordeUnico(match, diff, usarBemoles);
           return `<span class="chord-highlight">${trans}</span>`;
         });
       }).join('\\n');
@@ -1454,11 +1453,34 @@
 
     window.abrirModalLetraGlobal = function (cancionId) {
       const cache = window._lyricsCache || {};
-      const song = cache[cancionId];
-      if (!song) return;
-      const tonoMostrar = song.tonoServicio || song.tonoBase;
+      let song = cache[cancionId];
+      let tonoMostrar = null;
+
+      if (!song) {
+        const sGlobal = window.cacheSongs ? window.cacheSongs.find(s => s.id === cancionId) : null;
+        if (!sGlobal) return;
+        
+        let selectedTone = sGlobal.tonoBase;
+        const sData = window._currentServiceData || {};
+        if (sData.cancionesSeleccionadas && sData.cancionesSeleccionadas[cancionId]) {
+          selectedTone = sData.cancionesSeleccionadas[cancionId];
+        }
+        
+        song = {
+          nombre: sGlobal.nombre,
+          tonoBase: sGlobal.tonoBase,
+          tonoServicio: selectedTone,
+          letra: sGlobal.letra
+        };
+      }
+      
+      tonoMostrar = song.tonoServicio || song.tonoBase;
+
       document.getElementById('lyrics-modal-title').textContent = song.nombre;
       document.getElementById('lyrics-modal-meta').textContent = `Tono Original: ${song.tonoBase} | Tono del Servicio: ${tonoMostrar}`;
+      document.getElementById('lyrics-modal-content').innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, tonoMostrar);
+      document.getElementById('lyrics-modal-overlay').classList.add('active');
+    };se} | Tono del Servicio: ${tonoMostrar}`;
       document.getElementById('lyrics-modal-content').innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, tonoMostrar);
       document.getElementById('lyrics-modal-overlay').classList.add('active');
     };
