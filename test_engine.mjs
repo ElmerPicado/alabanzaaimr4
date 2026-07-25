@@ -1,25 +1,20 @@
 import { ChordReviewEngine } from './chord_engine/index.js';
 
 const song = `
-Intro:
-G D Em C
-
-Verso 1:
-G               D
-Dios es grande, Dios es fuerte
-Em              C
-Más que todo lo que existe
-
-Coro:
-G               D
-Toda la gloria y la honra
-Em              C
-Sean para siempre al Rey
+B
+Sabes que te amo
+G#m
+Sabes que yo quiero
+F#m
+Conocerte más
+E
+Mucho más que antes
 `;
 
 try {
     const result = ChordReviewEngine.analyze(song);
-    console.log(JSON.stringify(result.chordData, null, 2));
+    console.log("Top detected key:", result.chordData.possibleKeys[0]);
+    console.log("All possible keys:", result.chordData.possibleKeys);
 } catch (e) {
     console.error(e);
 }
