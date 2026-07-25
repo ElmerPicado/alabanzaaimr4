@@ -5927,15 +5927,14 @@
       if (miembrosFiltrados.length === 0) {
         teamCont.innerHTML = `<p style="color: var(--text3); font-size:12px; text-align:center;">No hay personal registrado en el sistema.</p>`;
       } else {
-        // 1a. Contar instrumentos asignados para advertir duplicados
+        // 1a. Contar instrumentos asignados para advertir duplicados usando el instrumento SELECCIONADO actualmente
         const assignedCounts = {};
         miembrosFiltrados.forEach(m => {
-          const isAssigned = dataServicio.musicosAsignados && dataServicio.musicosAsignados[m.usuario];
-          if (isAssigned) {
-            const userInsts = m.instrumento.split(',').map(s => s.trim());
-            userInsts.forEach(inst => {
-              assignedCounts[inst] = (assignedCounts[inst] || 0) + 1;
-            });
+          const assignedVal = dataServicio.musicosAsignados && dataServicio.musicosAsignados[m.usuario];
+          if (assignedVal) {
+            const instArr = m.instrumento.split(',').map(s => s.trim());
+            const selectedInst = typeof assignedVal === 'string' ? assignedVal : instArr[0];
+            assignedCounts[selectedInst] = (assignedCounts[selectedInst] || 0) + 1;
           }
         });
 
@@ -6021,6 +6020,12 @@
             row.querySelector('.assign-check').addEventListener('click', async () => {
               const path = `musicosAsignados.${m.usuario}`;
               const newValue = !isChecked ? instArr[0] : false;
+              if (!dataServicio.musicosAsignados) dataServicio.musicosAsignados = {};
+              dataServicio.musicosAsignados[m.usuario] = newValue;
+              
+              // Recalcular advertencias e interfaz en tiempo real
+              renderizarComponentesServicio(dataServicio);
+
               await updateDoc(doc(db, "planes_servicio", serviceDateSelect.value), {
                 [path]: newValue
               });
@@ -6029,9 +6034,16 @@
             const selectEl = row.querySelector('.member-role-select');
             if (selectEl) {
               selectEl.addEventListener('change', async (e) => {
+                const newInst = e.target.value;
+                if (!dataServicio.musicosAsignados) dataServicio.musicosAsignados = {};
+                dataServicio.musicosAsignados[m.usuario] = newInst;
+
+                // Recalcular advertencias e interfaz en tiempo real al cambiar el selector
+                renderizarComponentesServicio(dataServicio);
+
                 const path = `musicosAsignados.${m.usuario}`;
                 await updateDoc(doc(db, "planes_servicio", serviceDateSelect.value), {
-                  [path]: e.target.value
+                  [path]: newInst
                 });
               });
             }
@@ -6041,16 +6053,50 @@
 
         // 1c. Clasificar miembros
         const disponibles = [];
-        const noDisponibles = [];
+        const sinConfirmarList = [];
+        const noAsistiranList = [];
 
         miembrosFiltrados.forEach(m => {
           const userAvail = dataServicio.disponibilidad ? dataServicio.disponibilidad[m.usuario] : null;
           if (userAvail === 'confirmado') {
             disponibles.push(m);
+          } else if (userAvail === 'ausente' || userAvail === 'no') {
+            noAsistiranList.push({ member: m, icon: '❌', text: 'No asistirá' });
+          } else if (userAvail === 'no_estoy_seguro' || userAvail === 'duda' || userAvail === 'talvez') {
+            noAsistiranList.push({ member: m, icon: '❓', text: 'En duda' });
           } else {
-            noDisponibles.push(m);
+            sinConfirmarList.push({ member: m, icon: '⏳', text: 'Sin responder' });
           }
         });
+
+        // --- BOTONES INFORMATIVOS DE ASISTENCIA (SOLO VISTA LÍDER) ---
+        if (currentUserRole === 'lider') {
+          const infoButtonsCont = document.createElement('div');
+          infoButtonsCont.style.cssText = "display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;";
+
+          infoButtonsCont.innerHTML = `
+            <button type="button" id="btn-info-unconfirmed" style="flex: 1; min-width: 130px; padding: 8px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s;">
+              <span>⏳ Sin Confirmar</span>
+              <span style="background: var(--bg3); padding: 2px 8px; border-radius: 12px; font-size: 11px; color: var(--gold); font-weight: 700;">${sinConfirmarList.length}</span>
+            </button>
+            <button type="button" id="btn-info-not-attending" style="flex: 1; min-width: 130px; padding: 8px 12px; background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: var(--radius-sm); color: var(--coral); font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s;">
+              <span>❌ / ❓ No Asistirán</span>
+              <span style="background: rgba(244, 63, 94, 0.15); padding: 2px 8px; border-radius: 12px; font-size: 11px; color: #fff; font-weight: 700;">${noAsistiranList.length}</span>
+            </button>
+          `;
+
+          teamCont.appendChild(infoButtonsCont);
+
+          infoButtonsCont.querySelector('#btn-info-unconfirmed').addEventListener('click', () => {
+            const items = sinConfirmarList.map(x => `<span>${x.icon} <b>${x.member.nombre}</b></span> <span style="color:var(--text3); font-size:11px;">${x.member.instrumento}</span>`);
+            window.showInfoAttendanceModal(`Sin Confirmar (${sinConfirmarList.length})`, items);
+          });
+
+          infoButtonsCont.querySelector('#btn-info-not-attending').addEventListener('click', () => {
+            const items = noAsistiranList.map(x => `<span>${x.icon} <b>${x.member.nombre}</b></span> <span style="color:var(--text3); font-size:11px;">${x.member.instrumento} (${x.text})</span>`);
+            window.showInfoAttendanceModal(`No Asistirán / En Duda (${noAsistiranList.length})`, items);
+          });
+        }
 
         // Renderizar Confirmados
         const headerDisp = document.createElement('div');
@@ -10002,6 +10048,48 @@
         btnConfirm.addEventListener('click', onConfirm);
         btnCancel.addEventListener('click', onCancel);
       });
+    };
+
+    window.showInfoAttendanceModal = function(title, items) {
+      const overlay = document.getElementById('custom-dialog-overlay');
+      const box = overlay.querySelector('.modal-box');
+      document.getElementById('custom-dialog-title').textContent = title;
+      
+      const msgEl = document.getElementById('custom-dialog-message');
+      msgEl.style.textAlign = 'left';
+      msgEl.style.maxHeight = '280px';
+      msgEl.style.overflowY = 'auto';
+      msgEl.style.paddingRight = '4px';
+      
+      if (items.length === 0) {
+        msgEl.innerHTML = '<div style="text-align:center; color:var(--text3); padding:10px;">Ningún integrante en esta lista.</div>';
+      } else {
+        msgEl.innerHTML = items.map(item => `
+          <div style="padding: 8px 10px; margin-bottom: 6px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; display: flex; align-items: center; justify-content: space-between;">
+            <div>${item}</div>
+          </div>
+        `).join('');
+      }
+
+      const btnCancel = document.getElementById('custom-dialog-cancel');
+      const btnConfirm = document.getElementById('custom-dialog-confirm');
+      const inputField = document.getElementById('custom-dialog-input');
+
+      btnCancel.style.display = 'none';
+      inputField.style.display = 'none';
+      btnConfirm.textContent = 'Cerrar';
+      box.style.borderColor = 'var(--purple)';
+      btnConfirm.style.background = 'var(--purple)';
+      btnConfirm.style.color = '#0f0e17';
+
+      overlay.classList.add('active');
+
+      const close = () => {
+        overlay.classList.remove('active');
+        btnConfirm.removeEventListener('click', close);
+        msgEl.style.textAlign = 'center';
+      };
+      btnConfirm.addEventListener('click', close);
     };
   </script>
   <script type="module" src="chord_engine/index.js"></script>
