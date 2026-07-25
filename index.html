@@ -6198,6 +6198,65 @@
     // ====================================================
     // RESPALDO: CRUD MANTENIMIENTOS (REPERTORIO Y MIEMBROS)
     // ====================================================
+    let cachedAnalysisText = "";
+    let cachedAnalysisResult = null;
+
+    document.getElementById('btn-auto-tone').addEventListener('click', () => {
+      const letra = document.getElementById('song-lyrics-input').value;
+      const feedback = document.getElementById('chord-engine-feedback');
+      const selectKey = document.getElementById('song-key-input');
+      
+      if (!letra.trim()) {
+        customAlert('Pega la letra y acordes primero.');
+        return;
+      }
+      
+      try {
+        if (!window.ChordReviewEngine) {
+            customAlert('El motor de análisis no está cargado aún.');
+            return;
+        }
+        
+        let data;
+        if (letra === cachedAnalysisText && cachedAnalysisResult) {
+            data = cachedAnalysisResult;
+        } else {
+            const result = window.ChordReviewEngine.analyze(letra);
+            data = result.chordData;
+            cachedAnalysisText = letra;
+            cachedAnalysisResult = data;
+        }
+        
+        // Populate the key
+        const topKeyObj = data.possibleKeys[0];
+        let detectedKey = normalizarTono(topKeyObj.key);
+        
+        if (detectedKey) {
+            // Find option or fallback
+            const opt = Array.from(selectKey.options).find(o => o.value === detectedKey);
+            if (opt) {
+                selectKey.value = detectedKey;
+            } else {
+                selectKey.value = 'C';
+            }
+        }
+        
+        // Show feedback
+        feedback.style.display = 'block';
+        feedback.innerHTML = `Detectado: <strong>${detectedKey} ${topKeyObj.mode}</strong> (Confianza: ${topKeyObj.confidence}%)<br>` +
+                             `Secciones: ${data.structure.sections.length} | Acordes únicos: ${data.harmonicAnalysis.chordsUsed.join(', ')}`;
+                             
+        if (data.warnings && data.warnings.length > 0) {
+            feedback.innerHTML += `<br><span style="color:var(--coral);">⚠️ ${data.warnings.join(' ')}</span>`;
+        }
+        
+        showToast('Análisis armónico completado');
+      } catch (e) {
+        console.error(e);
+        customAlert('Error al analizar la canción: ' + e.message);
+      }
+    });
+
     document.getElementById('form-add-song').addEventListener('submit', async (e) => {
       e.preventDefault();
       let nombre = document.getElementById('song-name-input').value.trim();
@@ -6225,9 +6284,30 @@
       const idUnico = editingSongId || ("song_" + Date.now());
       let finalLetra = document.getElementById('song-lyrics-input').value;
       let finalTonoBase = document.getElementById('song-key-input').value.trim();
+      let chordData = null;
+      let tonoOriginalLetra = finalTonoBase;
 
-      const analisisAutomatico = analizarTonalidadAvanzado(finalLetra);
-      const tonoOriginalLetra = normalizarTono(analisisAutomatico.tonalidad);
+      if (finalLetra.trim()) {
+          try {
+              if (window.ChordReviewEngine) {
+                  if (finalLetra === cachedAnalysisText && cachedAnalysisResult) {
+                      chordData = cachedAnalysisResult;
+                  } else {
+                      const result = window.ChordReviewEngine.analyze(finalLetra);
+                      chordData = result.chordData;
+                      cachedAnalysisText = finalLetra;
+                      cachedAnalysisResult = chordData;
+                  }
+                  tonoOriginalLetra = normalizarTono(chordData.possibleKeys[0].key);
+              } else {
+                  // Fallback to basic if engine not loaded
+                  const analisisAutomatico = analizarTonalidadAvanzado(finalLetra);
+                  tonoOriginalLetra = normalizarTono(analisisAutomatico.tonalidad);
+              }
+          } catch (e) {
+              console.error("Error en ChordReviewEngine:", e);
+          }
+      }
 
       if (editingSongId) {
         const prevSong = (cacheSongs || []).find(x => x.id === editingSongId);
@@ -6254,6 +6334,10 @@
         tipo: document.getElementById('song-type-input').value,
         youtube: document.getElementById('song-youtube-input').value.trim()
       };
+
+      if (chordData) {
+        payloadMetadata.chordData = chordData;
+      }
 
       // Si estamos editando, conservar el campo 'oficial' anterior
       if (editingSongId) {
@@ -9664,8 +9748,28 @@
             placeholder="Ej: Grande y Fuerte"></div>
         <div class="field"><label>Artista / Ministerio</label><input type="text" id="song-artist-input" required
             placeholder="Ej: Miel San Marcos"></div>
+
+        <div class="field" style="display:none;">
+          <label>Tipo de Canción</label>
+          <select id="song-type-input">
+            <option value="alabanza">Alabanza (Rápida)</option>
+            <option value="adoracion">Adoración (Lenta)</option>
+          </select>
+        </div>
         <div class="field">
-          <label>Tonalidad Base sugerida</label>
+          <label>Enlace de YouTube <span style="color: var(--text3); font-weight: 400;">(Opcional)</span></label>
+          <input type="url" id="song-youtube-input" placeholder="Ej: https://www.youtube.com/watch?v=...">
+        </div>
+        <div class="field">
+          <label>Letra y Acordes <span style="color: var(--text3); font-weight: 400;">(Opcional. Pega formato tipo
+              LaCuerda.net)</span></label>
+          <textarea id="song-lyrics-input" placeholder="Pegar aquí la letra con los acordes arriba..."
+            style="width:100%; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px; color:var(--text); font-family:'Courier New', Courier, monospace; font-size:13px; resize:vertical; min-height:120px; white-space: pre; outline:none;"></textarea>
+          <button type="button" id="btn-auto-tone" style="margin-top:8px; padding:8px 14px; background:rgba(155, 143, 255, 0.15); border:1px solid var(--purple); color:var(--purple); border-radius:var(--radius-sm); font-weight:700; font-size:12px; cursor:pointer;">✨ Auto Tone (Revisar Acordes)</button>
+        </div>
+        
+        <div class="field">
+          <label>Song Key (Detectada)</label>
           <select id="song-key-input" required>
             <option value="" disabled selected>Selecciona un tono...</option>
             <option value="C">C (Do)</option>
@@ -9693,23 +9797,7 @@
             <option value="B">B (Si)</option>
             <option value="Bm">Bm (Si menor)</option>
           </select>
-        </div>
-        <div class="field" style="display:none;">
-          <label>Tipo de Canción</label>
-          <select id="song-type-input">
-            <option value="alabanza">Alabanza (Rápida)</option>
-            <option value="adoracion">Adoración (Lenta)</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Enlace de YouTube <span style="color: var(--text3); font-weight: 400;">(Opcional)</span></label>
-          <input type="url" id="song-youtube-input" placeholder="Ej: https://www.youtube.com/watch?v=...">
-        </div>
-        <div class="field">
-          <label>Letra y Acordes <span style="color: var(--text3); font-weight: 400;">(Opcional. Pega formato tipo
-              LaCuerda.net)</span></label>
-          <textarea id="song-lyrics-input" placeholder="Pegar aquí la letra con los acordes arriba..."
-            style="width:100%; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px; color:var(--text); font-family:'Courier New', Courier, monospace; font-size:13px; resize:vertical; min-height:120px; white-space: pre; outline:none;"></textarea>
+          <div id="chord-engine-feedback" style="margin-top: 6px; font-size: 11px; color: var(--gold); display: none;"></div>
         </div>
         <button type="submit" class="btn-primary"
           style="background: var(--teal); color: #0f0e17; margin-top: 10px;">Guardar Canción</button>
@@ -9901,6 +9989,7 @@
       });
     };
   </script>
+  <script type="module" src="chord_engine/index.js"></script>
 </body>
 
 </html>
