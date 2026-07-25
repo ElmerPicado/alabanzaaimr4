@@ -6401,16 +6401,20 @@
       document.getElementById('btn-fetch-lacuerda').disabled = true;
 
       try {
+        const isCifraClub = url.includes('cifraclub.com');
+
         // Usar proxy CORS para poder hacer el fetch desde el navegador
         const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
         const resp = await fetch(proxyUrl);
         if (!resp.ok) throw new Error('No se pudo cargar la página.');
+        
         const buffer = await resp.arrayBuffer();
-        const decoder = new TextDecoder('windows-1252');
+        // CifraClub usa UTF-8; LaCuerda usa Windows-1252
+        const encoding = isCifraClub ? 'utf-8' : 'windows-1252';
+        const decoder = new TextDecoder(encoding);
         const html = decoder.decode(buffer);
         const doc2 = new DOMParser().parseFromString(html, 'text/html');
 
-        const isCifraClub = url.includes('cifraclub.com');
         let nombre = '';
         let artista = '';
         let letra = '';
@@ -6437,12 +6441,6 @@
           const pre = doc2.querySelector('.cifra_cnt pre') || doc2.querySelector('pre');
           if (pre) letra = pre.textContent.trim();
 
-          textoParaAnalisis = letra || '';
-          const tomEl = doc2.getElementById('cifra_tom');
-          if (tomEl) {
-            const aTom = tomEl.querySelector('a');
-            if (aTom) textoParaAnalisis += " " + aTom.textContent.trim();
-          }
         } else {
           // --- LaCuerda Parser ---
           const h1 = doc2.querySelector('h1');
@@ -6472,47 +6470,57 @@
             const tBody = doc2.getElementById('t_body');
             if (tBody) letra = tBody.innerText.trim();
           }
-
-          textoParaAnalisis = letra || '';
-          const odesMatch = html.match(/odes\s*=\s*['"]([^'"]+)['"]/);
-          if (odesMatch) {
-            const cleanOdes = odesMatch[1].replace(/@/g, '#');
-            textoParaAnalisis += " " + cleanOdes;
-          } else {
-            const bodyText = doc2.body?.innerText || html;
-            const tonoMatch = bodyText.match(/[Tt]ono[:\s]+([A-Ga-gDdoReeMiiFaaSollLasiSI#bm]+)/i);
-            if (tonoMatch) {
-              textoParaAnalisis += " " + tonoMatch[1];
-            }
-          }
         }
-
-        // Ejecutar algoritmo de análisis de tonalidad avanzado
-        const analisis = analizarTonalidadAvanzado(textoParaAnalisis, []);
-        let tonoBase = normalizarTono(analisis.tonalidad);
 
         // --- Rellenar el formulario ---
         if (nombre) document.getElementById('song-name-input').value = fixCorruptedText(nombre);
         if (artista) document.getElementById('song-artist-input').value = fixCorruptedText(artista);
 
-        const keySelect = document.getElementById('song-key-input');
-        if (keySelect) {
-          const opt = Array.from(keySelect.options).find(o => o.value === tonoBase);
-          if (opt) keySelect.value = tonoBase;
+        if (letra) {
+          // Convertir notación de acordes en español (DO, RE, MI...) a internacional (C, D, E...)
+          if (typeof window.convertirTextoEspañolAIngles === 'function') {
+            letra = window.convertirTextoEspañolAIngles(letra);
+          }
+          document.getElementById('song-lyrics-input').value = fixCorruptedText(letra);
+
+          // Ejecutar análisis armónico automático
+          if (window.ChordReviewEngine) {
+            try {
+              const result = window.ChordReviewEngine.analyze(letra);
+              const data = result.chordData;
+              cachedAnalysisText = letra;
+              cachedAnalysisResult = data;
+
+              const topKeyObj = data.possibleKeys[0];
+              let detectedKey = normalizarTono(topKeyObj.key);
+              const keySelect = document.getElementById('song-key-input');
+              if (detectedKey && keySelect) {
+                const opt = Array.from(keySelect.options).find(o => o.value === detectedKey);
+                if (opt) keySelect.value = detectedKey;
+              }
+
+              const feedback = document.getElementById('chord-engine-feedback');
+              if (feedback) {
+                feedback.style.display = 'block';
+                feedback.innerHTML = `Importado y analizado: <strong>${detectedKey} ${topKeyObj.mode}</strong> (Confianza: ${topKeyObj.confidence}%)<br>` +
+                                     `Secciones: ${data.structure.sections.length} | Acordes únicos: ${data.harmonicAnalysis.chordsUsed.join(', ')}`;
+              }
+            } catch (errEng) {
+              console.warn("Error al analizar canción importada:", errEng);
+            }
+          }
         }
 
-        if (letra) document.getElementById('song-lyrics-input').value = fixCorruptedText(convertirTextoEspañolAIngles(letra));
-
         if (nombre && artista) {
-          statusEl.textContent = `Importado: "${nombre}" de ${artista}`;
+          statusEl.textContent = `Importado exitosamente: "${nombre}" de ${artista}`;
           statusEl.style.color = 'var(--teal)';
           urlInput.value = '';
         } else {
-          statusEl.textContent = 'Se importó pero algunos campos pueden estar vacíos. Verifica.';
+          statusEl.textContent = 'Se importó la canción. Verifica el título y artista.';
           statusEl.style.color = 'var(--gold)';
         }
       } catch (err) {
-        statusEl.textContent = `Error: ${err.message}`;
+        statusEl.textContent = `Error al importar: ${err.message}`;
         statusEl.style.color = 'var(--coral)';
       } finally {
         document.getElementById('btn-fetch-lacuerda').disabled = false;

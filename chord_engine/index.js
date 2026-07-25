@@ -3,7 +3,7 @@ import { parseSong, LINE_TYPES } from './parser.js';
 import { detectSections } from './section_detector.js';
 import { detectKey } from './key_detector.js';
 import { extractProgression, getDetailedChords } from './progression_analyzer.js';
-import { hasFormattingIssues } from './validator.js';
+import { hasFormattingIssues, convertSpanishChordsToEnglish } from './validator.js';
 import { buildJson } from './json_builder.js';
 
 export class ChordReviewEngine {
@@ -47,7 +47,12 @@ export class ChordReviewEngine {
             rawText: text // We never modify the original text
         };
     }
+
+    static convertSpanishChordsToEnglish(text) {
+        return convertSpanishChordsToEnglish(text);
+    }
 }
 
 // Expose globally for index.html
 window.ChordReviewEngine = ChordReviewEngine;
+window.convertirTextoEspañolAIngles = convertSpanishChordsToEnglish;
