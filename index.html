@@ -6257,9 +6257,21 @@
         return { success: false, reason: "Motor no disponible" };
       }
 
+      const _db = window.db || (typeof db !== 'undefined' ? db : null);
+      const _getDocs = window.getDocs || (typeof getDocs !== 'undefined' ? getDocs : null);
+      const _collection = window.collection || (typeof collection !== 'undefined' ? collection : null);
+      const _getDoc = window.getDoc || (typeof getDoc !== 'undefined' ? getDoc : null);
+      const _doc = window.doc || (typeof doc !== 'undefined' ? doc : null);
+      const _updateDoc = window.updateDoc || (typeof updateDoc !== 'undefined' ? updateDoc : null);
+
+      if (!_db || !_getDocs || !_collection) {
+        showToast("Error: Las funciones de base de datos no están disponibles.");
+        return { success: false, reason: "Firebase no inicializado" };
+      }
+
       try {
         showToast("Iniciando auto-corrección masiva...");
-        const songsSnap = await getDocs(collection(db, "biblioteca_canciones"));
+        const songsSnap = await _getDocs(_collection(_db, "biblioteca_canciones"));
         let actualizadas = 0;
         let sinCambio = 0;
         let sinLetra = 0;
@@ -6274,8 +6286,8 @@
 
           try {
             let letraStr = songData.letra || '';
-            if (!letraStr) {
-              const letraDoc = await getDoc(doc(db, "letras_canciones", songId));
+            if (!letraStr && _getDoc && _doc) {
+              const letraDoc = await _getDoc(_doc(_db, "letras_canciones", songId));
               if (letraDoc.exists()) {
                 letraStr = letraDoc.data().letra || '';
               }
@@ -6288,7 +6300,9 @@
                 const nuevoTono = normalizarTono(detectKey);
 
                 if (nuevoTono && nuevoTono !== songData.tonoBase) {
-                  await updateDoc(doc(db, "biblioteca_canciones", songId), { tonoBase: nuevoTono });
+                  if (_updateDoc && _doc) {
+                    await _updateDoc(_doc(_db, "biblioteca_canciones", songId), { tonoBase: nuevoTono });
+                  }
                   actualizadas++;
                   console.log(`[Auto-Tono] "${songData.nombre}": ${songData.tonoBase || 'C'} -> ${nuevoTono}`);
                 } else {
