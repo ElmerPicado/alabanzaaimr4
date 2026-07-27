@@ -4490,7 +4490,9 @@
       doc,
       setDoc,
       getDoc,
+      getDocs,
       collection,
+      query,
       onSnapshot,
       updateDoc,
       deleteDoc,
@@ -4525,6 +4527,12 @@
       });
     }
     window.db = db;
+    window.getDocs = getDocs;
+    window.collection = collection;
+    window.getDoc = getDoc;
+    window.doc = doc;
+    window.updateDoc = updateDoc;
+    window.query = query;
 
     // Lógica de Opciones (Admin Dropdown)
     const leaderAvBtn = document.getElementById('leader-avatar-container');
