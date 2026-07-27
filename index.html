@@ -6249,6 +6249,79 @@
     }
 
     // ====================================================
+    // AUTO-CORREGIR TONO DE TODO EL REPERTORIO
+    // ====================================================
+    window.autoCorregirTodoElRepertorio = async function(onProgress) {
+      if (!window.ChordReviewEngine) {
+        showToast("Error: El motor de análisis (ChordReviewEngine) no está cargado.");
+        return { success: false, reason: "Motor no disponible" };
+      }
+
+      try {
+        showToast("Iniciando auto-corrección masiva...");
+        const songsSnap = await getDocs(collection(db, "biblioteca_canciones"));
+        let actualizadas = 0;
+        let sinCambio = 0;
+        let sinLetra = 0;
+        let errores = 0;
+        let total = songsSnap.docs.length;
+        let procesadas = 0;
+
+        for (const songDoc of songsSnap.docs) {
+          procesadas++;
+          const songData = songDoc.data();
+          const songId = songDoc.id;
+
+          try {
+            let letraStr = songData.letra || '';
+            if (!letraStr) {
+              const letraDoc = await getDoc(doc(db, "letras_canciones", songId));
+              if (letraDoc.exists()) {
+                letraStr = letraDoc.data().letra || '';
+              }
+            }
+
+            if (letraStr && letraStr.trim().length > 0) {
+              const result = window.ChordReviewEngine.analyze(letraStr);
+              if (result && result.chordData && result.chordData.possibleKeys && result.chordData.possibleKeys.length > 0) {
+                const detectKey = result.chordData.possibleKeys[0].key;
+                const nuevoTono = normalizarTono(detectKey);
+
+                if (nuevoTono && nuevoTono !== songData.tonoBase) {
+                  await updateDoc(doc(db, "biblioteca_canciones", songId), { tonoBase: nuevoTono });
+                  actualizadas++;
+                  console.log(`[Auto-Tono] "${songData.nombre}": ${songData.tonoBase || 'C'} -> ${nuevoTono}`);
+                } else {
+                  sinCambio++;
+                }
+              } else {
+                sinCambio++;
+              }
+            } else {
+              sinLetra++;
+            }
+          } catch (errSong) {
+            console.error(`Error procesando "${songData.nombre}":`, errSong);
+            errores++;
+          }
+
+          if (typeof onProgress === 'function') {
+            onProgress(procesadas, total, actualizadas);
+          }
+        }
+
+        const msg = `Auto-corrección finalizada: ${actualizadas} actualizadas, ${sinCambio} sin cambios, ${sinLetra} sin letra.`;
+        console.log(msg);
+        showToast(`✨ ${actualizadas} canciones corregidas de ${total}.`);
+        return { success: true, actualizadas, sinCambio, sinLetra, errores, total };
+      } catch (err) {
+        console.error("Error en autoCorregirTodoElRepertorio:", err);
+        showToast("Error ejecutando auto-corrección masiva.");
+        return { success: false, error: err };
+      }
+    };
+
+    // ====================================================
     // RESPALDO: CRUD MANTENIMIENTOS (REPERTORIO Y MIEMBROS)
     // ====================================================
     let cachedAnalysisText = "";
@@ -6697,16 +6770,31 @@
               }
             }
             if (letraStr.trim().length > 0) {
-              const analisis = analizarTonalidadAvanzado(letraStr);
-              const nuevoTono = normalizarTono(analisis.tonalidad);
-              if (nuevoTono !== s.tonoBase) {
-                await updateDoc(doc(window.db, "biblioteca_canciones", s.id), { tonoBase: nuevoTono });
-                s.tonoBase = nuevoTono;
-                const badge = div.querySelector('.badge-tono-base');
-                if (badge) badge.textContent = `🎵 ${nuevoTono}`;
-                showToast(`✨ ¡Detectado! Tono de "${s.nombre}" → ${nuevoTono}`);
+              let detectKey = null;
+              if (window.ChordReviewEngine) {
+                const result = window.ChordReviewEngine.analyze(letraStr);
+                if (result && result.chordData && result.chordData.possibleKeys && result.chordData.possibleKeys.length > 0) {
+                  detectKey = result.chordData.possibleKeys[0].key;
+                }
+              }
+              if (!detectKey && typeof analizarTonalidadAvanzado === 'function') {
+                const analisis = analizarTonalidadAvanzado(letraStr);
+                detectKey = analisis.tonalidad;
+              }
+
+              if (detectKey) {
+                const nuevoTono = normalizarTono(detectKey);
+                if (nuevoTono !== s.tonoBase) {
+                  await updateDoc(doc(window.db, "biblioteca_canciones", s.id), { tonoBase: nuevoTono });
+                  s.tonoBase = nuevoTono;
+                  const badge = div.querySelector('.badge-tono-base');
+                  if (badge) badge.textContent = `🎵 ${nuevoTono}`;
+                  showToast(`✨ ¡Detectado! Tono de "${s.nombre}" → ${nuevoTono}`);
+                } else {
+                  showToast(`El tono actual ya es correcto (${nuevoTono})`);
+                }
               } else {
-                showToast(`El tono actual ya es correcto (${nuevoTono})`);
+                showToast("No se pudo detectar el tono.");
               }
             } else {
               showToast("No se encontró letra para analizar.");
