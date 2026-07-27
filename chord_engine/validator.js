@@ -1,7 +1,13 @@
 // chord_engine/validator.js
 
-// Matches valid chords including extensions: C, C#m, Dmaj7, Esus4, F#dim, G7/B, DO, RE, SOLm
-const CHORD_REGEX = /^(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])(#|b)?(m|min|maj|M|aug|dim)?(7|9|11|13|sus2|sus4|add9)?(\/(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])(#|b)?)?$/i;
+// Matches valid chords including extensions and power chords:
+// Simple:     C, Cm, C#, Db
+// Quality:    Cmaj7, Cmin, Cdim, Caug, CM
+// Extensions: C2, C4, C5, C6, C7, C9, C11, C13
+// Compounds:  Cmaj7, Cmaj9, Cadd9, Cadd11, Csus2, Csus4, C6/9
+// Minor ext:  Cm7, Bm7, Bm9, Bm11
+// Slash:      C/E, D/F#, G/B, Bm/D
+const CHORD_REGEX = /^(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])(#|b)?(m(?:aj|in)?|M|aug|dim)?(maj(?:7|9|11|13)|add(?:9|11|13)|sus[24]|6\/9|[2-9]|1[013])?(\/(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])(#|b)?)?$/;
 
 const SPANISH_TO_ENGLISH = {
     'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B'
@@ -23,15 +29,19 @@ export function normalizeChord(token) {
         return root + acc + isMinor;
     }
 
-    const match = cleaned.match(/^([A-G][#b]?)(m)?/i);
+    // Case-sensitive: only lowercase 'm' indicates minor; 'M' is explicit Major (not minor)
+    const match = cleaned.match(/^([A-G][#b]?)(m(?:aj|in)?|dim|aug)?/);
     if (match) {
         let root = match[1];
         root = root.charAt(0).toUpperCase() + (root.length > 1 ? root.substring(1).toLowerCase() : '');
-        const isMinor = match[2] ? 'm' : '';
+        // Only flag as minor if quality starts with lowercase 'm' but isn't 'maj' or 'min' (those are major-family)
+        const quality = match[2] || '';
+        const isMinor = (quality === 'm' || quality === 'min' || quality === 'dim') ? 'm' : '';
         return root + isMinor;
     }
     return token;
 }
+
 
 export function convertSpanishChordsToEnglish(text) {
     if (!text) return "";

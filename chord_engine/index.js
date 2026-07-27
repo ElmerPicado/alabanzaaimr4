@@ -31,6 +31,12 @@ export class ChordReviewEngine {
         // 4. Validation & Formatting warnings
         const warnings = hasFormattingIssues(text);
 
+        // 5. Diagnostic: log all parsed chords before key detection
+        console.group('🎸 Parsed chords (pre-key-detection)');
+        console.log(`Total chords found: ${allChords.length}`);
+        console.log('Chord list:', allChords.join(', ') || '(none)');
+        console.groupEnd();
+
         // 5. Key Detection (Returns an array of candidates)
         const possibleKeys = detectKey(allChords);
         const topKey = possibleKeys[0].key;
