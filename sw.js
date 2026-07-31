@@ -1,4 +1,4 @@
-const CACHE_NAME = 'alabanza-imr4-v56';
+const CACHE_NAME = 'alabanza-imr4-v57';
 const ASSETS = [
   './index.html',
   './manifest.json',

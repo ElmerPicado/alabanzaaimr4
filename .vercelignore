@@ -1,0 +1,27 @@
+# Archivos de desarrollo y scripts de scraping - no van a producción
+node_modules/
+serve.js
+scraper.js
+batch_scraper.js
+lacuerda_scraper.js
+
+# Archivos temporales y de prueba
+temp.js
+temp_0.js
+temp_1.js
+temp_2.js
+test_engine.mjs
+test_write.js
+test_syntax.js
+extract.js
+ext.js
+query_db.js
+scratch/
+
+# Editor y git internos
+.vscode/
+.git/
+
+# Dependencias y lock files
+package-lock.json
+package.json
