@@ -10,7 +10,7 @@
         "id": "2",
         "name": "Relative Minor Song",
         "chordsText": "[Verso]\nEm C G D\n[Coro]\nEm C G D",
-        "expectedKey": "E",
+        "expectedKey": "Em",
         "expectedMode": "Menor"
     },
     {
@@ -24,7 +24,7 @@
         "id": "4",
         "name": "Minor with Harmonic Dominant",
         "chordsText": "[Verso]\nAm F E Am\n[Coro]\nAm Dm E Am",
-        "expectedKey": "A",
+        "expectedKey": "Am",
         "expectedMode": "Menor"
     }
 ]

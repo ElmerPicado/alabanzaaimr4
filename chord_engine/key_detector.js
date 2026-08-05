@@ -124,10 +124,13 @@ function evaluateTonalCenter(keyName, isMinorKey, sections, allChordsData) {
         else if (header.includes('outro') || header.includes('final')) weight = 1.5;
         else if (header.includes('verso')) weight = 1.2;
         
-        if (firstChord.root === keyRoot && firstChord.isMinor === isMinorKey) {
+        const firstRoot = firstChord.root.replace(/m$/, '');
+        const lastRoot = lastChord.root.replace(/m$/, '');
+
+        if (firstRoot === keyRoot && firstChord.isMinor === isMinorKey) {
             tonalCenterScore += (1.0 * weight);
         }
-        if (lastChord.root === keyRoot && lastChord.isMinor === isMinorKey) {
+        if (lastRoot === keyRoot && lastChord.isMinor === isMinorKey) {
             tonalCenterScore += (2.0 * weight); // Endings resolve strongly
         }
     });

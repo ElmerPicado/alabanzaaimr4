@@ -1,0 +1,17 @@
+STDOUT:
+
+STDERR:
+
+ERROR:
+Error: Command failed: git check-ignore -v chord_engine/key_detector.js
+
+
+STATUS PORCELAIN:
+STDOUT:
+?? run_git_check.mjs
+?? run_git_debug.mjs
+
+STDERR:
+
+ERROR:
+null

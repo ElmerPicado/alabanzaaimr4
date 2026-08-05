@@ -73,41 +73,44 @@ export function detectCadences(romanSeq) {
     let score = 0;
     const seqStr = romanSeq.join(' ');
     
+    let scores = [0];
+    
     // Perfect authentic cadence (PAC/IAC)
-    if (seqStr.match(/\bV I\b/) || seqStr.match(/\bv i\b/)) score += 3.0;
+    if (seqStr.match(/\bV I\b/) || seqStr.match(/\bv i\b/) || seqStr.match(/\bV i\b/)) scores.push(3.0);
     
     // Plagal cadence
-    if (seqStr.match(/\bIV I\b/) || seqStr.match(/\biv i\b/) || seqStr.match(/\biv I\b/)) score += 2.0;
+    if (seqStr.match(/\bIV I\b/) || seqStr.match(/\biv i\b/) || seqStr.match(/\biv I\b/)) scores.push(2.0);
 
     // Deceptive cadence
-    if (seqStr.match(/\bV vi\b/) || seqStr.match(/\bV VI\b/)) score += 1.0;
+    if (seqStr.match(/\bV vi\b/) || seqStr.match(/\bV VI\b/)) scores.push(1.0);
 
     // Half cadence
-    if (seqStr.endsWith(' V') || seqStr.endsWith(' v')) score += 1.5;
+    if (seqStr.endsWith(' V') || seqStr.endsWith(' v')) scores.push(1.5);
 
-    return score;
+    return Math.max(...scores);
 }
 
 export function matchCommonProgressions(romanSeqStr) {
-    let score = 0;
+    let scores = [0];
+    
     // Four chord pop
-    if (romanSeqStr.includes('I V vi IV')) score += 5.0;
-    if (romanSeqStr.includes('vi IV I V')) score += 5.0;
-    if (romanSeqStr.includes('I vi IV V')) score += 5.0;
-    if (romanSeqStr.includes('IV I V vi')) score += 5.0;
+    if (romanSeqStr.includes('I V vi IV')) scores.push(5.0);
+    if (romanSeqStr.includes('vi IV I V')) scores.push(5.0);
+    if (romanSeqStr.includes('I vi IV V')) scores.push(5.0);
+    if (romanSeqStr.includes('IV I V vi')) scores.push(5.0);
     
     // Minor progressions
-    if (romanSeqStr.includes('i VI III VII')) score += 5.0;
-    if (romanSeqStr.includes('i VII III VI')) score += 4.0; // Eq to vi V I IV
-    if (romanSeqStr.includes('III VI i VII')) score += 4.0; // Eq to I IV vi V
-    if (romanSeqStr.includes('VI VII i')) score += 3.0;
+    if (romanSeqStr.includes('i VI III VII')) scores.push(5.0);
+    if (romanSeqStr.includes('i VII III VI')) scores.push(4.0); // Eq to vi V I IV
+    if (romanSeqStr.includes('III VI i VII')) scores.push(4.0); // Eq to I IV vi V
+    if (romanSeqStr.includes('VI VII i')) scores.push(3.0);
     
     // Worship specific
-    if (romanSeqStr.includes('IV V vi')) score += 3.0;
-    if (romanSeqStr.includes('I IV vi V')) score += 4.0;
-    if (romanSeqStr.includes('ii V I')) score += 3.0;
+    if (romanSeqStr.includes('IV V vi')) scores.push(3.0);
+    if (romanSeqStr.includes('I IV vi V')) scores.push(4.0);
+    if (romanSeqStr.includes('ii V I')) scores.push(3.0);
     
-    return score;
+    return Math.max(...scores);
 }
 
 export function parseChordToken(token) {
