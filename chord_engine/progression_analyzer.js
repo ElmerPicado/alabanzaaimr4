@@ -39,22 +39,23 @@ export function toRomanNumerals(chord, key) {
 
     // More precise mappings for borrowed chords and secondary dominants
     let numeral = "";
+    let isOverride = false;
     if (!isMinorKey) {
-        if (interval === 2 && !isMinorChord) numeral = 'II'; // V/V
-        else if (interval === 4 && !isMinorChord) numeral = 'III'; // V/vi
-        else if (interval === 9 && !isMinorChord) numeral = 'VI'; // V/ii
-        else if (interval === 5 && isMinorChord) numeral = 'iv'; // borrowed
+        if (interval === 2 && !isMinorChord) { numeral = 'II'; isOverride = true; } // V/V
+        else if (interval === 4 && !isMinorChord) { numeral = 'III'; isOverride = true; } // V/vi
+        else if (interval === 9 && !isMinorChord) { numeral = 'VI'; isOverride = true; } // V/ii
+        else if (interval === 5 && isMinorChord) { numeral = 'iv'; isOverride = true; } // borrowed
         else numeral = majorMap[interval];
     } else {
-        if (interval === 7 && !isMinorChord) numeral = 'V'; // harmonic minor
-        else if (interval === 5 && !isMinorChord) numeral = 'IV'; // dorian
+        if (interval === 7 && !isMinorChord) { numeral = 'V'; isOverride = true; } // harmonic minor
+        else if (interval === 5 && !isMinorChord) { numeral = 'IV'; isOverride = true; } // dorian
         else numeral = minorMap[interval];
     }
     
     if (!numeral) numeral = majorMap[interval] || "?";
 
     // Enforce case if the map didn't strictly match the quality
-    if (!['II', 'III', 'VI', 'iv', 'V', 'IV'].includes(numeral)) {
+    if (!isOverride) {
         if (isMinorChord) {
             numeral = numeral.toLowerCase();
         } else {

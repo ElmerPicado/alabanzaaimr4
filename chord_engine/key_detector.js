@@ -100,7 +100,7 @@ function evaluateTonalCenter(keyName, isMinorKey, sections, allChordsData) {
     romanSeq.forEach(r => {
         if (['I', 'i'].includes(r)) diatonicScore += 2.0;
         else if (['IV', 'iv', 'V', 'v', 'VI', 'VII', 'III'].includes(r)) diatonicScore += 1.5;
-        else if (['ii', 'vi', 'ii°'].includes(r)) diatonicScore += 1.0;
+        else if (['ii', 'vi', 'ii°', 'iii', 'vii°'].includes(r)) diatonicScore += 1.0;
         else if (['II', 'III#'].includes(r)) diatonicScore += 0.8; // Secondary dominants / variations
         else if (r !== '?') diatonicScore += 0.5; // Other recognized borrowed chords
     });
@@ -134,6 +134,22 @@ function evaluateTonalCenter(keyName, isMinorKey, sections, allChordsData) {
             tonalCenterScore += (2.0 * weight); // Endings resolve strongly
         }
     });
+
+    // 6. Global First & Last Chord Resolution Gravity
+    if (allChordsData.length > 0) {
+        const globalFirst = allChordsData[0];
+        const globalLast = allChordsData[allChordsData.length - 1];
+        
+        const firstRoot = globalFirst.root.replace(/m$/, '');
+        const lastRoot = globalLast.root.replace(/m$/, '');
+
+        if (firstRoot === keyRoot && globalFirst.isMinor === isMinorKey) {
+            tonalCenterScore += 2.0;
+        }
+        if (lastRoot === keyRoot && globalLast.isMinor === isMinorKey) {
+            tonalCenterScore += 4.0;
+        }
+    }
 
     const totalScore = diatonicScore + tonalCenterScore + progressionScore + cadenceScore;
 
