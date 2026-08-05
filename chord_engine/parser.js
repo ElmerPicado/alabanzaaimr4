@@ -53,7 +53,12 @@ function isSectionHeader(trimmedLine) {
 }
 
 function isChordLine(line) {
-    const tokens = line.trim().split(/\s+/).filter(t => t.length > 0);
+    const trimmed = line.trim();
+    // Ignore guitar tab diagram lines (e.g. "E 0 2 2 1 0", "A | 0 2 2 0", "X 3 2 0 1 0")
+    if (/\b[0-9xX]\s+[0-9xX]\s+[0-9xX]\b/.test(trimmed)) return false;
+    if (/^(?:[eadbge]|acordes|tab)\s*[:|\/]/i.test(trimmed)) return false;
+
+    const tokens = trimmed.split(/\s+/).filter(t => t.length > 0);
     if (tokens.length === 0) return false;
     
     let validCount = 0;

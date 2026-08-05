@@ -59,6 +59,8 @@ export class ChordReviewEngine {
     }
 }
 
-// Expose globally for index.html
-window.ChordReviewEngine = ChordReviewEngine;
-window.convertirTextoEspañolAIngles = convertSpanishChordsToEnglish;
+// Expose globally for index.html if running in browser
+if (typeof window !== 'undefined') {
+    window.ChordReviewEngine = ChordReviewEngine;
+    window.convertirTextoEspañolAIngles = convertSpanishChordsToEnglish;
+}

@@ -1,0 +1,591 @@
+=== STRESS TEST REPORT FOR CHORD ENGINE ===
+Timestamp: 2026-08-05T04:38:30.091Z
+Repertorio files checked: 38
+
+Total Songs Tested: 202
+Exact #1 Match: 105 (51.98%)
+Top 2 Match (Includes relative keys): 139 (68.81%)
+Mismatches / Edge Cases: 97
+
+--- DETAILED MISMATCH / EDGE CASE LOG ---
+1. [Abel Zavala - JESUS MI FIEL AMIGO]
+   Expected: G (G)
+   Got Top:  C Mayor (C)
+   Got #2:   Am Menor
+   Reason:   Mismatch
+
+2. [Abel Zavala - EL PADRE QUE SIEMPRE SOÃ‘E]
+   Expected: Cm (Cm)
+   Got Top:  D# Mayor (D#)
+   Got #2:   D#m Menor
+   Reason:   Mismatch
+
+3. [Abel Zavala - LO UNICO QUE QUIERO]
+   Expected: G (G)
+   Got Top:  C Mayor (C)
+   Got #2:   Cm Menor
+   Reason:   Mismatch
+
+4. [Abel Zavala - QUIERO DECIRLE AL MUNDO]
+   Expected: Dm (Dm)
+   Got Top:  F Mayor (F)
+   Got #2:   Fm Menor
+   Reason:   Mismatch
+
+5. [Abel Zavala - AL UNICO Y SABIO DIOS]
+   Expected: Am (Am)
+   Got Top:  G Mayor (G)
+   Got #2:   C Mayor
+   Reason:   Mismatch
+
+6. [Abel Zavala - ALABEN SU NOMBRE]
+   Expected: C (C)
+   Got Top:  G Mayor (G)
+   Got #2:   C Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+7. [Abel Zavala - ANTE EL SEÃ‘OR]
+   Expected: A (A)
+   Got Top:  Am Menor (Am)
+   Got #2:   A Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+8. [Abel Zavala - DESEADO DE MI ALMA]
+   Expected: Eb (EB)
+   Got Top:  A# Mayor (A#)
+   Got #2:   A#m Menor
+   Reason:   Mismatch
+
+9. [Abel Zavala - EL ES EL UNICO DIOS]
+   Expected: G (G)
+   Got Top:  Em Menor (Em)
+   Got #2:   D Mayor
+   Reason:   Mismatch
+
+10. [Abel Zavala - EL GOZO DEL SEÃ‘OR]
+   Expected: C (C)
+   Got Top:  Dm Menor (Dm)
+   Got #2:   F Mayor
+   Reason:   Mismatch
+
+11. [Abel Zavala - ESTAR CONTIGO]
+   Expected: A (A)
+   Got Top:  E Mayor (E)
+   Got #2:   A Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+12. [Abel Zavala - EXALTAD]
+   Expected: Em (Em)
+   Got Top:  G Mayor (G)
+   Got #2:   Em Menor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+13. [Abel Zavala - GLORIA EN LAS ALTURAS]
+   Expected: Cm (Cm)
+   Got Top:  D# Mayor (D#)
+   Got #2:   Cm Menor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+14. [Abel Zavala - GUARDAME EN TU PRESENCIA]
+   Expected: F (F)
+   Got Top:  Dm Menor (Dm)
+   Got #2:   F Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+15. [Abel Zavala - HASTA EL DESIERTO]
+   Expected: C#m (C#m)
+   Got Top:  E Mayor (E)
+   Got #2:   G#m Menor
+   Reason:   Mismatch
+
+16. [Abel Zavala - HOY TE RINDO MI SER]
+   Expected: G (G)
+   Got Top:  Gm Menor (Gm)
+   Got #2:   G Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+17. [Abel Zavala - LA FLOR MAS HERMOSA]
+   Expected: Em (Em)
+   Got Top:  G Mayor (G)
+   Got #2:   Em Menor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+18. [Abel Zavala - LA NIÃ‘A DE TUS OJOS]
+   Expected: C (C)
+   Got Top:  F Mayor (F)
+   Got #2:   C Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+19. [Abel Zavala - LA ROCA]
+   Expected: G (G)
+   Got Top:  D Mayor (D)
+   Got #2:   G Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+20. [Abel Zavala - NUEVA HISTORIA]
+   Expected: Em (Em)
+   Got Top:  C Mayor (C)
+   Got #2:   Cm Menor
+   Reason:   Mismatch
+
+21. [Abel Zavala - QUIERO ESTAR PRESENTE]
+   Expected: Eb (EB)
+   Got Top:  D# Mayor (D#)
+   Got #2:   Cm Menor
+   Reason:   Mismatch
+
+22. [Abel Zavala - SE OYE UNA NUEVA CANCION]
+   Expected: Em (Em)
+   Got Top:  C Mayor (C)
+   Got #2:   G Mayor
+   Reason:   Mismatch
+
+23. [Abel Zavala - SERVIREMOS AL SEÃ‘OR]
+   Expected: A (A)
+   Got Top:  D Mayor (D)
+   Got #2:   Dm Menor
+   Reason:   Mismatch
+
+24. [Abel Zavala - TE LLAMAS AMOR]
+   Expected: C#m (C#m)
+   Got Top:  E Mayor (E)
+   Got #2:   Bm Menor
+   Reason:   Mismatch
+
+25. [Abel Zavala - TOMAME DE TU MANO]
+   Expected: C (C)
+   Got Top:  D Mayor (D)
+   Got #2:   Dm Menor
+   Reason:   Mismatch
+
+26. [Abel Zavala - VEN A MI CASA]
+   Expected: C (C)
+   Got Top:  G Mayor (G)
+   Got #2:   Em Menor
+   Reason:   Mismatch
+
+27. [Abel Zavala - VIVIRE]
+   Expected: F#m (F#m)
+   Got Top:  A Mayor (A)
+   Got #2:   Am Menor
+   Reason:   Mismatch
+
+28. [Alex Campos - EL SONIDO DEL SILENCIO]
+   Expected: Gm (Gm)
+   Got Top:  A# Mayor (A#)
+   Got #2:   F Mayor
+   Reason:   Mismatch
+
+29. [Alex Campos - COMO EL COLOR DE LA SANGRE]
+   Expected: Bm (Bm)
+   Got Top:  A Mayor (A)
+   Got #2:   Bm Menor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+30. [Alex Campos - SI ESTOY CONTIGO]
+   Expected: D (D)
+   Got Top:  Em Menor (Em)
+   Got #2:   Bm Menor
+   Reason:   Mismatch
+
+31. [Alex Campos - 10 DE SEPTIEMBRE]
+   Expected: G (G)
+   Got Top:  D Mayor (D)
+   Got #2:   G Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+32. [Alex Campos - AHI ESA CRISTO]
+   Expected: Ab (AB)
+   Got Top:  G# Mayor (G#)
+   Got #2:   G#m Menor
+   Reason:   Mismatch
+
+33. [Alex Campos - ALLI ESTA Ã‰L]
+   Expected: F# (F#)
+   Got Top:  D Mayor (D)
+   Got #2:   A Mayor
+   Reason:   Mismatch
+
+34. [Alex Campos - CARA A CARA]
+   Expected: C (C)
+   Got Top:  F Mayor (F)
+   Got #2:   C Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+35. [Alex Campos - COMO LLUVIA]
+   Expected: F (F)
+   Got Top:  C Mayor (C)
+   Got #2:   Cm Menor
+   Reason:   Mismatch
+
+36. [Alex Campos - COMO PODRE ESTAR TRISTE]
+   Expected: D (D)
+   Got Top:  C Mayor (C)
+   Got #2:   G Mayor
+   Reason:   Mismatch
+
+37. [Alex Campos - COMO UN NIÃ‘O]
+   Expected: Bm (Bm)
+   Got Top:  D Mayor (D)
+   Got #2:   Dm Menor
+   Reason:   Mismatch
+
+38. [Alex Campos - CONOCERTE MAS]
+   Expected: B (B)
+   Got Top:  F#m Menor (F#m)
+   Got #2:   Bm Menor
+   Reason:   Mismatch
+
+39. [Alex Campos - CORRO A TI]
+   Expected: G (G)
+   Got Top:  C Mayor (C)
+   Got #2:   Cm Menor
+   Reason:   Mismatch
+
+40. [Alex Campos - CREO EN TI]
+   Expected: C (C)
+   Got Top:  G Mayor (G)
+   Got #2:   Gm Menor
+   Reason:   Mismatch
+
+41. [Alex Campos - DERRAMO MI VIDA]
+   Expected: Am (Am)
+   Got Top:  Dm Menor (Dm)
+   Got #2:   C Mayor
+   Reason:   Mismatch
+
+42. [Alex Campos - DESEO]
+   Expected: C# (C#)
+   Got Top:  G# Mayor (G#)
+   Got #2:   A#m Menor
+   Reason:   Mismatch
+
+43. [Alex Campos - DETENTE ALMA MIA]
+   Expected: E (E)
+   Got Top:  C Mayor (C)
+   Got #2:   Cm Menor
+   Reason:   Mismatch
+
+44. [Alex Campos - DILE A ESE GIGANTE]
+   Expected: Bb (BB)
+   Got Top:  A# Mayor (A#)
+   Got #2:   F Mayor
+   Reason:   Mismatch
+
+45. [Alex Campos - DIMELO]
+   Expected: Fm (Fm)
+   Got Top:  G# Mayor (G#)
+   Got #2:   Fm Menor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+46. [Alex Campos - DIOS CREO]
+   Expected: E (E)
+   Got Top:  B Mayor (B)
+   Got #2:   E Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+47. [Alex Campos - DUELE EL AMOR]
+   Expected: G#m (G#m)
+   Got Top:  F Mayor (F)
+   Got #2:   Fm Menor
+   Reason:   Mismatch
+
+48. [Alex Campos - ECO]
+   Expected: G (G)
+   Got Top:  C Mayor (C)
+   Got #2:   G Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+49. [Alex Campos - ELI]
+   Expected: Em (Em)
+   Got Top:  G Mayor (G)
+   Got #2:   Dm Menor
+   Reason:   Mismatch
+
+50. [Alex Campos - EN TOTALIDAD A TI]
+   Expected: A (A)
+   Got Top:  D Mayor (D)
+   Got #2:   A Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+51. [Alex Campos - ENAMORADO DE TI]
+   Expected: D (D)
+   Got Top:  A Mayor (A)
+   Got #2:   Am Menor
+   Reason:   Mismatch
+
+52. [Alex Campos - ENTREGARME TODO]
+   Expected: F (F)
+   Got Top:  Fm Menor (Fm)
+   Got #2:   F Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+53. [Alex Campos - ERES]
+   Expected: Am (Am)
+   Got Top:  C Mayor (C)
+   Got #2:   Cm Menor
+   Reason:   Mismatch
+
+54. [Alex Campos - ERES MI SOL]
+   Expected: E (E)
+   Got Top:  C Mayor (C)
+   Got #2:   N/A
+   Reason:   Mismatch
+
+55. [Alex Campos - ERES TODO PARA MI]
+   Expected: Am (Am)
+   Got Top:  Gm Menor (Gm)
+   Got #2:   C Mayor
+   Reason:   Mismatch
+
+56. [Alex Campos - ESTE AMOR]
+   Expected: Bm (Bm)
+   Got Top:  D Mayor (D)
+   Got #2:   Dm Menor
+   Reason:   Mismatch
+
+57. [Alex Campos - ESTOY HARTO]
+   Expected: Am (Am)
+   Got Top:  C Mayor (C)
+   Got #2:   Cm Menor
+   Reason:   Mismatch
+
+58. [Alex Campos - JESUS]
+   Expected: Gm (Gm)
+   Got Top:  F Mayor (F)
+   Got #2:   A# Mayor
+   Reason:   Mismatch
+
+59. [Alex Campos - JUNTO A TI]
+   Expected: C (C)
+   Got Top:  D Mayor (D)
+   Got #2:   Dm Menor
+   Reason:   Mismatch
+
+60. [Alex Campos - LA FRUTA PROHIBIDA]
+   Expected: A (A)
+   Got Top:  D Mayor (D)
+   Got #2:   Dm Menor
+   Reason:   Mismatch
+
+61. [Alex Campos - LENGUAJE DE AMOR]
+   Expected: F (F)
+   Got Top:  C Mayor (C)
+   Got #2:   Cm Menor
+   Reason:   Mismatch
+
+62. [Alex Campos - ME AMAS]
+   Expected: Bm (Bm)
+   Got Top:  E Mayor (E)
+   Got #2:   Em Menor
+   Reason:   Mismatch
+
+63. [Alex Campos - MI VIDA]
+   Expected: Am (Am)
+   Got Top:  C Mayor (C)
+   Got #2:   Am Menor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+64. [Alex Campos - MI AMOR Y TU AMOR]
+   Expected: F (F)
+   Got Top:  C Mayor (C)
+   Got #2:   F Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+65. [Alex Campos - MI SEÃ‘OR MI BUEN DIOS]
+   Expected: G (G)
+   Got Top:  D Mayor (D)
+   Got #2:   G Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+66. [Alex Campos - MI VIDA]
+   Expected: Am (Am)
+   Got Top:  C Mayor (C)
+   Got #2:   Am Menor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+67. [Alex Campos - MIL PALABRITAS]
+   Expected: G (G)
+   Got Top:  D Mayor (D)
+   Got #2:   G Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+68. [Alex Campos - MIRARE AL CIELO]
+   Expected: Bm (Bm)
+   Got Top:  D Mayor (D)
+   Got #2:   Bm Menor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+69. [Alex Campos - NADA MAS QUIEN PIENSAS]
+   Expected: D (D)
+   Got Top:  A Mayor (A)
+   Got #2:   Am Menor
+   Reason:   Mismatch
+
+70. [Alex Campos - NO ES UN MISTERIO]
+   Expected: Em (Em)
+   Got Top:  A Mayor (A)
+   Got #2:   Am Menor
+   Reason:   Mismatch
+
+71. [Alex Campos - NO TIENE PRISA]
+   Expected: A (A)
+   Got Top:  E Mayor (E)
+   Got #2:   A Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+72. [Alex Campos - NO VUELVO PA'TRAS]
+   Expected: Dm (Dm)
+   Got Top:  Am Menor (Am)
+   Got #2:   Em Menor
+   Reason:   Mismatch
+
+73. [Alex Campos - NUBE DE COLORES]
+   Expected: A (A)
+   Got Top:  E Mayor (E)
+   Got #2:   Em Menor
+   Reason:   Mismatch
+
+74. [Alex Campos - NUBE GRIS]
+   Expected: D (D)
+   Got Top:  A Mayor (A)
+   Got #2:   D Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+75. [Alex Campos - PERDONAME]
+   Expected: D (D)
+   Got Top:  A Mayor (A)
+   Got #2:   Am Menor
+   Reason:   Mismatch
+
+76. [Alex Campos - PINTA EL MUNDO]
+   Expected: G (G)
+   Got Top:  Em Menor (Em)
+   Got #2:   Bm Menor
+   Reason:   Mismatch
+
+77. [Alex Campos - POR SIEMPRE]
+   Expected: G (G)
+   Got Top:  D Mayor (D)
+   Got #2:   G Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+78. [Alex Campos - PREFIERO]
+   Expected: F (F)
+   Got Top:  C# Mayor (C#)
+   Got #2:   A#m Menor
+   Reason:   Mismatch
+
+79. [Alex Campos - PREFIERO ESTAR CON EL]
+   Expected: F (F)
+   Got Top:  C# Mayor (C#)
+   Got #2:   A#m Menor
+   Reason:   Mismatch
+
+80. [Alex Campos - QUE ERES PARA MI]
+   Expected: Am (Am)
+   Got Top:  C Mayor (C)
+   Got #2:   Cm Menor
+   Reason:   Mismatch
+
+81. [Alex Campos - QUE MAS TE PUEDO DAR?]
+   Expected: C (C)
+   Got Top:  G Mayor (G)
+   Got #2:   Gm Menor
+   Reason:   Mismatch
+
+82. [Alex Campos - QUIERO, SIENTO Y PIENSO]
+   Expected: Am (Am)
+   Got Top:  C Mayor (C)
+   Got #2:   Am Menor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+83. [Alex Campos - QUISIERA SER]
+   Expected: D (D)
+   Got Top:  A Mayor (A)
+   Got #2:   Am Menor
+   Reason:   Mismatch
+
+84. [Alex Campos - RAZONES PA' VIVIR]
+   Expected: Fm (Fm)
+   Got Top:  D# Mayor (D#)
+   Got #2:   G# Mayor
+   Reason:   Mismatch
+
+85. [Alex Campos - REFLEJO DE TI]
+   Expected: G (G)
+   Got Top:  Am Menor (Am)
+   Got #2:   G Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+86. [Alex Campos - SOY QUIEN SOY]
+   Expected: E (E)
+   Got Top:  Am Menor (Am)
+   Got #2:   A Mayor
+   Reason:   Mismatch
+
+87. [Alex Campos - SU DULCE VOZ]
+   Expected: Am (Am)
+   Got Top:  D Mayor (D)
+   Got #2:   Am Menor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+88. [Alex Campos - TE NECESITO MAS QUE AYER]
+   Expected: Am (Am)
+   Got Top:  C Mayor (C)
+   Got #2:   Dm Menor
+   Reason:   Mismatch
+
+89. [Alex Campos - TU AMOR]
+   Expected: A (A)
+   Got Top:  Am Menor (Am)
+   Got #2:   Dm Menor
+   Reason:   Mismatch
+
+90. [Alex Campos - TU AMOR Y MI AMOR]
+   Expected: C (C)
+   Got Top:  G Mayor (G)
+   Got #2:   C Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+91. [Alex Campos - TU ERS MI SOL]
+   Expected: E (E)
+   Got Top:  B Mayor (B)
+   Got #2:   E Mayor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+92. [Alex Campos - TU MI EXISTIR]
+   Expected: Eb (EB)
+   Got Top:  D# Mayor (D#)
+   Got #2:   D#m Menor
+   Reason:   Mismatch
+
+93. [Alex Campos - TU PLANETA]
+   Expected: Em (Em)
+   Got Top:  G Mayor (G)
+   Got #2:   Gm Menor
+   Reason:   Mismatch
+
+94. [Alex Campos - TUYO SOY]
+   Expected: D#m (D#m)
+   Got Top:  C# Mayor (C#)
+   Got #2:   D#m Menor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+95. [Alex Campos - VIVIR EL CIELO]
+   Expected: Em (Em)
+   Got Top:  G Mayor (G)
+   Got #2:   Gm Menor
+   Reason:   Mismatch
+
+96. [Alex Campos - YO ANHELO]
+   Expected: Bm (Bm)
+   Got Top:  A Mayor (A)
+   Got #2:   Bm Menor
+   Reason:   Expected key was 2nd choice (relativa o dominante)
+
+97. [Alex Campos - YO TIERRA TU SEMILLA]
+   Expected: Bbm (BBm)
+   Got Top:  A#m Menor (A#m)
+   Got #2:   A# Mayor
+   Reason:   Mismatch
