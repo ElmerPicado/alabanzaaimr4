@@ -99,9 +99,9 @@ function evaluateTonalCenter(keyName, isMinorKey, sections, allChordsData) {
     // 2. Base Diatonic & Function Score
     romanSeq.forEach(r => {
         if (['I', 'i'].includes(r)) diatonicScore += 2.0;
-        else if (['IV', 'iv', 'V', 'v'].includes(r)) diatonicScore += 1.5;
-        else if (['ii', 'vi', 'III', 'VI'].includes(r)) diatonicScore += 1.0;
-        else if (['II', 'III', 'VI'].includes(r)) diatonicScore += 0.8; // Secondary dominants
+        else if (['IV', 'iv', 'V', 'v', 'VI', 'VII', 'III'].includes(r)) diatonicScore += 1.5;
+        else if (['ii', 'vi', 'ii°'].includes(r)) diatonicScore += 1.0;
+        else if (['II', 'III#'].includes(r)) diatonicScore += 0.8; // Secondary dominants / variations
         else if (r !== '?') diatonicScore += 0.5; // Other recognized borrowed chords
     });
 

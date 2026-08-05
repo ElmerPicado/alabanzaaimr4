@@ -1,0 +1,53 @@
+import { parseSong } from './chord_engine/parser.js';
+import { detectSections } from './chord_engine/section_detector.js';
+import { detectKey } from './chord_engine/key_detector.js';
+
+const text = `Intro Bm A F#m G x2
+
+Bm         A
+Levantamos un clamor
+F#m          G
+por sanidad y redención
+Bm             A
+Muestranos lo que Tu ves
+F#m               G
+los secretos de Tu corazón.
+
+Bm               A
+Un pueblo unido pide hoy
+F#m           G
+Tu libertad y salvación
+Bm           A
+Armanos con Tu valor
+F#m                  G
+lo que deseamos es revolución.
+
+G                         A             G
+Que el cielo se parta en dos... inundanos
+                        A                 Bm
+en el desierto broten rios... vida sopla hoy
+
+  Bm                        D
+// Hossana al Rey de Salvación
+                     Em
+Hossana al Dios Altisimo
+          G            A             Bm
+Hossana, Jesucristo, Jesucristo es Rey //
+
+Solo: G A G A Bm C#m
+
+puente:
+
+G       A       G     A     Bm   C#m
+Hossana Hossana Hossana al rey`;
+
+const parsedLines = parseSong(text);
+const sections = detectSections(parsedLines);
+const results = detectKey(sections, { debug: true });
+
+console.log("Top 3 keys:");
+results.slice(0, 3).forEach(r => {
+    console.log(`\nKey: ${r.key} ${r.mode} (Conf: ${r.confidence}%)`);
+    console.log(`Total Score: ${r.debugInfo.diatonicScore + r.debugInfo.tonalCenterScore + r.debugInfo.cadenceScore + r.debugInfo.progressionScore}`);
+    console.log(JSON.stringify(r.debugInfo, null, 2));
+});

@@ -98,6 +98,8 @@ export function matchCommonProgressions(romanSeqStr) {
     
     // Minor progressions
     if (romanSeqStr.includes('i VI III VII')) score += 5.0;
+    if (romanSeqStr.includes('i VII III VI')) score += 4.0; // Eq to vi V I IV
+    if (romanSeqStr.includes('III VI i VII')) score += 4.0; // Eq to I IV vi V
     if (romanSeqStr.includes('VI VII i')) score += 3.0;
     
     // Worship specific
