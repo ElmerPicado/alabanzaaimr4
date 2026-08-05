@@ -1,0 +1,8 @@
+STDOUT:
+origin	https://github.com/ElmerPicado/alabanzaaimr4.git (fetch)
+origin	https://github.com/ElmerPicado/alabanzaaimr4.git (push)
+
+STDERR:
+
+ERROR:
+null
