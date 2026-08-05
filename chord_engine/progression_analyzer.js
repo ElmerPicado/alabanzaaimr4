@@ -1,16 +1,10 @@
 // chord_engine/progression_analyzer.js
 import { normalizeChord } from './validator.js';
 
-// Absolute scales to determine intervals
-const SCALES = {
-    'C': ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
-    // We'll use sharp notes internally for interval distances
-};
-
 const SHARPS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const FLATS = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
-function getNoteIndex(note) {
+export function getNoteIndex(note) {
     let root = note.replace(/m$/, '');
     let index = SHARPS.indexOf(root);
     if (index === -1) index = FLATS.indexOf(root);
@@ -29,31 +23,43 @@ export function toRomanNumerals(chord, key) {
     const keyIndex = getNoteIndex(keyRoot);
     const chordIndex = getNoteIndex(rootNote);
 
-    if (keyIndex === -1 || chordIndex === -1) return chord; // fallback
+    if (keyIndex === -1 || chordIndex === -1) return chord; 
 
     let interval = (chordIndex - keyIndex + 12) % 12;
 
-    // Major Key Mapping
     const majorMap = {
-        0: 'I', 2: 'II', 4: 'III', 5: 'IV', 7: 'V', 9: 'VI', 11: 'VII',
+        0: 'I', 2: 'ii', 4: 'iii', 5: 'IV', 7: 'V', 9: 'vi', 11: 'vii°',
         1: 'bII', 3: 'bIII', 6: 'bV', 8: 'bVI', 10: 'bVII'
     };
 
-    // Minor Key Mapping (Aeolian)
     const minorMap = {
-        0: 'i', 2: 'ii', 3: 'III', 5: 'iv', 7: 'v', 8: 'VI', 10: 'VII',
-        1: 'bII', 4: 'III#', 6: 'bV', 9: 'vi', 11: 'vii' // Variations
+        0: 'i', 2: 'ii°', 3: 'III', 5: 'iv', 7: 'v', 8: 'VI', 10: 'VII',
+        1: 'bII', 4: 'III#', 6: 'bV', 9: 'vi', 11: 'vii°' 
     };
 
-    let numeral = isMinorKey ? minorMap[interval] : majorMap[interval];
-    
-    if (!numeral) numeral = "?";
-
-    // Adjust case based on chord quality
-    if (isMinorChord) {
-        numeral = numeral.toLowerCase();
+    // More precise mappings for borrowed chords and secondary dominants
+    let numeral = "";
+    if (!isMinorKey) {
+        if (interval === 2 && !isMinorChord) numeral = 'II'; // V/V
+        else if (interval === 4 && !isMinorChord) numeral = 'III'; // V/vi
+        else if (interval === 9 && !isMinorChord) numeral = 'VI'; // V/ii
+        else if (interval === 5 && isMinorChord) numeral = 'iv'; // borrowed
+        else numeral = majorMap[interval];
     } else {
-        numeral = numeral.toUpperCase();
+        if (interval === 7 && !isMinorChord) numeral = 'V'; // harmonic minor
+        else if (interval === 5 && !isMinorChord) numeral = 'IV'; // dorian
+        else numeral = minorMap[interval];
+    }
+    
+    if (!numeral) numeral = majorMap[interval] || "?";
+
+    // Enforce case if the map didn't strictly match the quality
+    if (!['II', 'III', 'VI', 'iv', 'V', 'IV'].includes(numeral)) {
+        if (isMinorChord) {
+            numeral = numeral.toLowerCase();
+        } else {
+            numeral = numeral.toUpperCase();
+        }
     }
 
     return numeral;
@@ -63,9 +69,46 @@ export function extractProgression(chords, key) {
     return chords.map(c => toRomanNumerals(c, key)).join(' - ');
 }
 
+export function detectCadences(romanSeq) {
+    let score = 0;
+    const seqStr = romanSeq.join(' ');
+    
+    // Perfect authentic cadence (PAC/IAC)
+    if (seqStr.match(/\bV I\b/) || seqStr.match(/\bv i\b/)) score += 3.0;
+    
+    // Plagal cadence
+    if (seqStr.match(/\bIV I\b/) || seqStr.match(/\biv i\b/) || seqStr.match(/\biv I\b/)) score += 2.0;
+
+    // Deceptive cadence
+    if (seqStr.match(/\bV vi\b/) || seqStr.match(/\bV VI\b/)) score += 1.0;
+
+    // Half cadence
+    if (seqStr.endsWith(' V') || seqStr.endsWith(' v')) score += 1.5;
+
+    return score;
+}
+
+export function matchCommonProgressions(romanSeqStr) {
+    let score = 0;
+    // Four chord pop
+    if (romanSeqStr.includes('I V vi IV')) score += 5.0;
+    if (romanSeqStr.includes('vi IV I V')) score += 5.0;
+    if (romanSeqStr.includes('I vi IV V')) score += 5.0;
+    if (romanSeqStr.includes('IV I V vi')) score += 5.0;
+    
+    // Minor progressions
+    if (romanSeqStr.includes('i VI III VII')) score += 5.0;
+    if (romanSeqStr.includes('VI VII i')) score += 3.0;
+    
+    // Worship specific
+    if (romanSeqStr.includes('IV V vi')) score += 3.0;
+    if (romanSeqStr.includes('I IV vi V')) score += 4.0;
+    if (romanSeqStr.includes('ii V I')) score += 3.0;
+    
+    return score;
+}
+
 export function parseChordToken(token) {
-    // Regex to capture: Root, Quality, Extension, Bass
-    // e.g. C#m7/G#
     const regex = /^([CDEFGAB][#b]?)(m|min|maj|M|aug|dim)?(7|9|11|13|sus2|sus4|add9)?(\/[CDEFGAB][#b]?)?$/i;
     const match = token.trim().match(regex);
     
@@ -88,13 +131,7 @@ export function parseChordToken(token) {
         bass = bass.charAt(0).toUpperCase() + (bass.length > 1 ? bass.substring(1).toLowerCase() : '');
     }
 
-    return {
-        original: token,
-        root: root,
-        quality: quality,
-        extension: extension,
-        bass: bass
-    };
+    return { original: token, root, quality, extension, bass };
 }
 
 export function getDetailedChords(sections, key) {
@@ -104,13 +141,10 @@ export function getDetailedChords(sections, key) {
             if (item.chords) {
                 item.chords.forEach(c => {
                     const parsed = parseChordToken(c.chord);
-                    // Add roman
                     parsed.roman = toRomanNumerals(c.chord, key);
-                    // Add position
                     parsed.section = sec.header;
                     parsed.lineIndex = c.lineIndex;
                     parsed.charIndex = c.charIndex;
-                    
                     detailed.push(parsed);
                 });
             }

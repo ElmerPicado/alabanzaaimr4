@@ -38,7 +38,7 @@ export class ChordReviewEngine {
         console.groupEnd();
 
         // 5. Key Detection (Returns an array of candidates)
-        const possibleKeys = detectKey(allChords);
+        const possibleKeys = detectKey(sections);
         const topKey = possibleKeys[0].key;
 
         // 6. Harmonic Progression Analysis

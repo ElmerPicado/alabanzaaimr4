@@ -1,0 +1,30 @@
+[
+    {
+        "id": "1",
+        "name": "Simple Major Song",
+        "chordsText": "[Verso]\nG D Em C\n[Coro]\nG D Em C",
+        "expectedKey": "G",
+        "expectedMode": "Mayor"
+    },
+    {
+        "id": "2",
+        "name": "Relative Minor Song",
+        "chordsText": "[Verso]\nEm C G D\n[Coro]\nEm C G D",
+        "expectedKey": "E",
+        "expectedMode": "Menor"
+    },
+    {
+        "id": "3",
+        "name": "Plagal Cadence (I-IV-I)",
+        "chordsText": "[Verso]\nD G D\nD G D\n[Coro]\nA G D",
+        "expectedKey": "D",
+        "expectedMode": "Mayor"
+    },
+    {
+        "id": "4",
+        "name": "Minor with Harmonic Dominant",
+        "chordsText": "[Verso]\nAm F E Am\n[Coro]\nAm Dm E Am",
+        "expectedKey": "A",
+        "expectedMode": "Menor"
+    }
+]

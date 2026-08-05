@@ -1,5 +1,6 @@
 // chord_engine/key_detector.js
 import { normalizeChord } from './validator.js';
+import { toRomanNumerals, detectCadences, matchCommonProgressions, getNoteIndex } from './progression_analyzer.js';
 
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -14,191 +15,135 @@ function enharmonic(chord) {
     return ENHARMONIC_MAP[root] || root;
 }
 
-export function detectKey(chords) {
-    if (!chords || chords.length === 0) {
+export function detectKey(sections, options = { debug: false }) {
+    let allChordsData = [];
+    
+    // Extract chords from sections
+    sections.forEach(sec => {
+        let secChords = [];
+        sec.lines.forEach(item => {
+            if (item.chords) {
+                item.chords.forEach(c => {
+                    const norm = enharmonic(normalizeChord(c.chord));
+                    const isMinor = c.chord.includes('m') && !c.chord.includes('maj');
+                    secChords.push({ original: c.chord, root: norm, isMinor });
+                });
+            }
+        });
+        sec.extractedChords = secChords;
+        allChordsData = allChordsData.concat(secChords);
+    });
+
+    if (allChordsData.length === 0) {
         return [{ key: 'C', confidence: 0, mode: 'Mayor', explanation: 'No chords found' }];
     }
 
-    const normalizedSequence = chords.map(normalizeChord).map(enharmonic);
-    const chordsData = chords.map(c => {
-        const norm = enharmonic(normalizeChord(c));
-        const isMinor = c.includes('m') && !c.includes('maj');
-        return { root: norm, isMinor };
-    });
-
     const candidates = [];
 
+    // Evaluate all 24 keys
     for (let i = 0; i < 12; i++) {
         const majorKey = NOTES[i];
         const minorKey = NOTES[i] + 'm';
 
-        candidates.push(evaluateKey(majorKey, false, chordsData));
-        candidates.push(evaluateKey(minorKey, true, chordsData));
+        candidates.push(evaluateTonalCenter(majorKey, false, sections, allChordsData));
+        candidates.push(evaluateTonalCenter(minorKey, true, sections, allChordsData));
     }
 
-    // Sort by score descending
-    candidates.sort((a, b) => b.score - a.score);
+    // Sort by Total Score descending
+    candidates.sort((a, b) => b.totalScore - a.totalScore);
 
-    // Calculate confidence for top candidate keys
-    // Base max score is relative to sequence length + potential bonuses
-    const maxScore = chordsData.length * 1.8 + 12.0;
-
+    const topCandidateScore = candidates[0].totalScore;
+    
     return candidates.slice(0, 5).map(c => {
-        let conf = Math.round((c.score / maxScore) * 100);
-        conf = Math.min(100, Math.max(0, conf));
+        // Dynamic confidence calculation based on top score relation and absolute strength
+        let conf = 0;
+        if (topCandidateScore > 0) {
+             conf = (c.totalScore / topCandidateScore) * 100;
+             // Scale it down a bit based on absolute max expectation if we want, but relative is good for now.
+             // We can use a baseline: a good song usually scores > 20 points.
+             const maxExpected = Math.max(topCandidateScore, allChordsData.length * 2.5);
+             conf = (c.totalScore / maxExpected) * 100;
+        }
         
-        // If a classic progression is matched, give a guaranteed high confidence
-        if (c.progressionMatch && conf > 50) {
-            conf = Math.max(conf, 96);
+        conf = Math.round(Math.min(100, Math.max(0, conf)));
+        
+        if (c.progressionScore >= 5.0 && conf > 50) {
+            conf = Math.max(conf, 96); // Force high confidence on exact match
         }
 
-        return {
+        const result = {
             key: c.key,
             mode: c.mode,
             confidence: conf
         };
+        
+        if (options.debug) {
+            result.debugInfo = c.debug;
+        }
+        
+        return result;
     });
 }
 
-function evaluateKey(keyName, isMinorKey, chordsData) {
+function evaluateTonalCenter(keyName, isMinorKey, sections, allChordsData) {
+    let diatonicScore = 0;
+    let tonalCenterScore = 0;
+    let progressionScore = 0;
+    let cadenceScore = 0;
+
     const keyRoot = keyName.replace(/m$/, '');
-    const keyRootIdx = NOTES.indexOf(keyRoot);
-
-    let score = 0;
-    let diatonicCount = 0;
-
-    // Track presence of scale degrees for tonic/dominant relationships
-    let hasTonic = false;
-    let hasDominant = false; 
-    let hasSubdominant = false;
-
-    chordsData.forEach(c => {
-        const chordIdx = NOTES.indexOf(c.root.replace(/m$/, ''));
-        if (chordIdx === -1) return;
-
-        const interval = (chordIdx - keyRootIdx + 12) % 12;
-        let chordScore = 0;
-        let isDiatonic = false;
-
-        if (!isMinorKey) {
-            // Major Key Intervals
-            switch (interval) {
-                case 0: // I (Tonic)
-                    if (!c.isMinor) { chordScore = 2.0; isDiatonic = true; hasTonic = true; }
-                    break;
-                case 2: // ii (diatonic) or II (Secondary Dominant V/V)
-                    if (c.isMinor) { chordScore = 1.0; isDiatonic = true; }
-                    else { chordScore = 0.8; } 
-                    break;
-                case 4: // iii (diatonic) or III (Secondary Dominant V/vi)
-                    if (c.isMinor) { chordScore = 1.0; isDiatonic = true; }
-                    else { chordScore = 0.6; } 
-                    break;
-                case 5: // IV (diatonic) or iv (modal interchange minor subdominant)
-                    if (!c.isMinor) { chordScore = 1.2; isDiatonic = true; hasSubdominant = true; }
-                    else { chordScore = 0.9; hasSubdominant = true; } 
-                    break;
-                case 7: // V (diatonic) or vm (Mixolydian modal interchange minor v - e.g. F#m in B Major)
-                    if (!c.isMinor) { chordScore = 1.5; isDiatonic = true; hasDominant = true; }
-                    else { chordScore = 1.1; hasDominant = true; } 
-                    break;
-                case 9: // vi (diatonic) or VI (Secondary Dominant V/ii)
-                    if (c.isMinor) { chordScore = 1.0; isDiatonic = true; }
-                    else { chordScore = 0.8; } 
-                    break;
-                case 11: // vii°
-                    chordScore = 0.5;
-                    isDiatonic = true; 
-                    break;
-                case 10: // bVII (Mixolydian modal interchange)
-                    if (!c.isMinor) { chordScore = 0.9; } 
-                    break;
-                case 3: // bIII
-                    if (!c.isMinor) { chordScore = 0.8; }
-                    break;
-                case 8: // bVI
-                    if (!c.isMinor) { chordScore = 0.8; }
-                    break;
-            }
-        } else {
-            // Minor Key Intervals
-            switch (interval) {
-                case 0: // i (Tonic)
-                    if (c.isMinor) { chordScore = 2.0; isDiatonic = true; hasTonic = true; }
-                    else { chordScore = 0.6; } 
-                    break;
-                case 2: // ii° or ii
-                    chordScore = 0.6;
-                    isDiatonic = true;
-                    break;
-                case 3: // III (Relative Major)
-                    if (!c.isMinor) { chordScore = 1.2; isDiatonic = true; }
-                    break;
-                case 5: // iv (diatonic) or IV (Dorian major subdominant)
-                    if (c.isMinor) { chordScore = 1.2; isDiatonic = true; hasSubdominant = true; }
-                    else { chordScore = 0.8; hasSubdominant = true; } 
-                    break;
-                case 7: // v (diatonic minor) or V (harmonic minor dominant)
-                    if (c.isMinor) { chordScore = 1.2; isDiatonic = true; hasDominant = true; }
-                    else { chordScore = 1.5; isDiatonic = true; hasDominant = true; } 
-                    break;
-                case 8: // VI
-                    if (!c.isMinor) { chordScore = 1.0; isDiatonic = true; }
-                    break;
-                case 10: // VII
-                    if (!c.isMinor) { chordScore = 1.0; isDiatonic = true; }
-                    break;
-            }
-        }
-
-        score += chordScore;
-        if (isDiatonic) diatonicCount++;
+    
+    // 1. Calculate Roman Numerals for all chords
+    const romanSeq = allChordsData.map(c => toRomanNumerals(c.original, keyName));
+    
+    // 2. Base Diatonic & Function Score
+    romanSeq.forEach(r => {
+        if (['I', 'i'].includes(r)) diatonicScore += 2.0;
+        else if (['IV', 'iv', 'V', 'v'].includes(r)) diatonicScore += 1.5;
+        else if (['ii', 'vi', 'III', 'VI'].includes(r)) diatonicScore += 1.0;
+        else if (['II', 'III', 'VI'].includes(r)) diatonicScore += 0.8; // Secondary dominants
+        else if (r !== '?') diatonicScore += 0.5; // Other recognized borrowed chords
     });
 
-    // 1. Tonic-Dominant Relationship Bonus (I <-> V or vm)
-    if (hasTonic && hasDominant) {
-        score += 3.0;
-    }
+    // 3. Cadence Detection
+    cadenceScore = detectCadences(romanSeq);
 
-    // 2. Tonic-Subdominant Relationship Bonus (I <-> IV or iv)
-    if (hasTonic && hasSubdominant) {
-        score += 1.5;
-    }
+    // 4. Progression Match
+    progressionScore = matchCommonProgressions(romanSeq.join(' '));
 
-    // 3. Cadence weight
-    const firstChord = chordsData[0];
-    const lastChord = chordsData[chordsData.length - 1];
-    if (firstChord && firstChord.root === keyRoot && firstChord.isMinor === isMinorKey) score += 1.0;
-    if (lastChord && lastChord.root === keyRoot && lastChord.isMinor === isMinorKey) score += 1.5;
-
-    // 4. Progression Pattern Matching
-    // Convert current sequence to simplified roman representation
-    const romanSeq = chordsData.map(c => {
-        const chordIdx = NOTES.indexOf(c.root.replace(/m$/, ''));
-        const interval = (chordIdx - keyRootIdx + 12) % 12;
-        if (!isMinorKey) {
-            if (interval === 0 && !c.isMinor) return 'I';
-            if (interval === 7) return 'V'; // Accept major V or minor v
-            if (interval === 9 && c.isMinor) return 'vi';
-            if (interval === 5) return 'IV'; // Accept major IV or minor iv
+    // 5. Structure & Tonal Center gravity
+    sections.forEach(sec => {
+        if (sec.extractedChords.length === 0) return;
+        
+        const firstChord = sec.extractedChords[0];
+        const lastChord = sec.extractedChords[sec.extractedChords.length - 1];
+        
+        const header = (sec.header || '').toLowerCase();
+        let weight = 1.0;
+        if (header.includes('coro')) weight = 2.0;
+        else if (header.includes('outro') || header.includes('final')) weight = 1.5;
+        else if (header.includes('verso')) weight = 1.2;
+        
+        if (firstChord.root === keyRoot && firstChord.isMinor === isMinorKey) {
+            tonalCenterScore += (1.0 * weight);
         }
-        return '';
+        if (lastChord.root === keyRoot && lastChord.isMinor === isMinorKey) {
+            tonalCenterScore += (2.0 * weight); // Endings resolve strongly
+        }
     });
 
-    const romanStr = romanSeq.filter(Boolean).join('-');
-    let progressionMatch = false;
-    if (romanStr.includes('I-V-vi-IV') || 
-        romanStr.includes('I-vi-V-IV') || 
-        romanStr.includes('vi-IV-I-V')) {
-        score += 5.0;
-        progressionMatch = true;
-    }
+    const totalScore = diatonicScore + tonalCenterScore + progressionScore + cadenceScore;
 
     return {
         key: keyName,
         mode: isMinorKey ? 'Menor' : 'Mayor',
-        score: score,
-        diatonicMatches: diatonicCount,
-        progressionMatch: progressionMatch
+        totalScore,
+        progressionScore,
+        debug: {
+            diatonicScore,
+            tonalCenterScore,
+            cadenceScore,
+            progressionScore
+        }
     };
 }
