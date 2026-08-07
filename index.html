@@ -5185,25 +5185,42 @@
             const data = letraDoc.data();
             const letra = data.letra || '';
             if (letra.trim().length > 0) {
+              const letraLimpia = convertirTextoEspañolAIngles(fixCorruptedText(letra));
               let nuevoTono = s.tonoBase;
               if (window.ChordReviewEngine) {
                 try {
-                  const analysisResult = window.ChordReviewEngine.analyze(letra);
+                  const analysisResult = window.ChordReviewEngine.analyze(letraLimpia);
                   nuevoTono = analysisResult.chordData.possibleKeys[0].key;
                 } catch (e) {
                   console.error("Error analizando con ChordReviewEngine:", e);
-                  const analisis = analizarTonalidadAvanzado(letra);
+                  const analisis = analizarTonalidadAvanzado(letraLimpia);
                   nuevoTono = normalizarTono(analisis.tonalidad);
                 }
               } else {
-                const analisis = analizarTonalidadAvanzado(letra);
+                const analisis = analizarTonalidadAvanzado(letraLimpia);
                 nuevoTono = normalizarTono(analisis.tonalidad);
               }
 
+              nuevoTono = normalizarTono(nuevoTono);
+
+              const songUpdates = {};
               if (nuevoTono !== s.tonoBase) {
-                await updateDoc(doc(db, "biblioteca_canciones", s.id), { tonoBase: nuevoTono });
-                console.log(`Corregido: ${s.nombre} | Antes: ${s.tonoBase} -> Ahora: ${nuevoTono}`);
+                songUpdates.tonoBase = nuevoTono;
+              }
+
+              const nombreLimpio = fixCorruptedText(s.nombre);
+              const artistaLimpio = fixCorruptedText(s.artista);
+              if (nombreLimpio !== s.nombre) songUpdates.nombre = nombreLimpio;
+              if (artistaLimpio !== s.artista) songUpdates.artista = artistaLimpio;
+
+              if (Object.keys(songUpdates).length > 0) {
+                await updateDoc(doc(db, "biblioteca_canciones", s.id), songUpdates);
+                console.log(`Corregido: ${s.nombre} | Tono: ${s.tonoBase} -> ${nuevoTono}`);
                 corregidos++;
+              }
+
+              if (letraLimpia !== letra) {
+                await updateDoc(doc(db, "letras_canciones", s.id), { letra: letraLimpia });
               }
             }
           }
@@ -5213,7 +5230,7 @@
           console.error(`Error analizando ${s.nombre}:`, err);
         }
       }
-      customAlert(`¡Completado! Se escanearon ${analizados} letras y se corrigió el tono de ${corregidos} canciones.`);
+      customAlert(`¡Completado! Se escanearon ${analizados} letras y se actualizaron ${corregidos} canciones.`);
     };
 
     const btnRecalculateTones = document.getElementById('btn-recalculate-tones');
