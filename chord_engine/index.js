@@ -41,6 +41,11 @@ export class ChordReviewEngine {
         const possibleKeys = detectKey(sections);
         const topKey = possibleKeys[0].key;
 
+        if (possibleKeys[0] && possibleKeys[0].relativeAnalysis && possibleKeys[0].relativeAnalysis.ambiguity) {
+            const rel = possibleKeys[0].relativeAnalysis;
+            warnings.push(`Ambigüedad tonal detectada entre la tonalidad principal (${possibleKeys[0].key}) y su relativa (${rel.relativeKey}).`);
+        }
+
         // 6. Harmonic Progression Analysis
         const progression = extractProgression(allChords, topKey);
         const detailedChords = getDetailedChords(sections, topKey);

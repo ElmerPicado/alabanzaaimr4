@@ -26,5 +26,12 @@
         "chordsText": "[Verso]\nAm F E Am\n[Coro]\nAm Dm E Am",
         "expectedKey": "Am",
         "expectedMode": "Menor"
+    },
+    {
+        "id": "5",
+        "name": "D Minor vs F Major Ambiguity (Dm Bb F C)",
+        "chordsText": "[Verso]\nDm Bb F C\n[Coro]\nDm Bb F C",
+        "expectedKey": "Dm",
+        "expectedMode": "Menor"
     }
 ]
