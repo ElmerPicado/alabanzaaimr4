@@ -2406,6 +2406,9 @@
         </div>
         <button type="submit" class="btn-primary">Entrar al Panel</button>
       </form>
+      <div style="margin-top: 16px; text-align: center;">
+        <button id="btn-open-register" style="background: none; border: none; color: var(--gold); font-family: var(--font-body); font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: underline;">Registrar Nueva Institución</button>
+      </div>
     </div>
   </div>
 
@@ -2420,6 +2423,7 @@
         </svg>app <span>IMR4</span>
       </div>
       <div style="display: flex; gap: 15px; align-items: center; justify-content: flex-start; flex-wrap: wrap;">
+        <button id="btn-back-musico" class="btn-primary" style="display: none; background: var(--teal); color: #0f0e17; padding: 6px 12px; font-size: 12px; width: auto; margin: 0; border-radius: 20px;">Vista Músico</button>
         <span class="role-badge" id="display-role">Cargando...</span>
 
         <div class="user-avatar-container"
@@ -3843,6 +3847,7 @@
         </svg>app <span>IMR4</span>
       </div>
       <div style="display: flex; gap: 15px; align-items: center; justify-content: flex-start; flex-wrap: wrap;">
+        <button id="btn-musico-panel" class="btn-primary" style="display: none; background: var(--gold); color: #0f0e17; padding: 6px 12px; font-size: 12px; width: auto; margin: 0; border-radius: 20px;">Ir a Panel</button>
         <button id="btn-musico-sos" class="sos-btn" title="Pedir Asistencia (S.O.S)"
           style="padding: 8px 14px; font-size: 13px;">S.O.S</button>
         <span id="musico-name-badge" class="role-badge"></span>
@@ -4521,9 +4526,54 @@
     </div>
   </div>
 
+  <!-- MODAL DE REGISTRO INSTITUCION -->
+  <div id="register-church-overlay" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px; width: 95%;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <h3 class="modal-title" style="font-size:20px; margin:0; color:var(--gold);">Registrar Institución</h3>
+        <button id="register-church-close" style="background:none; border:none; color:var(--text2); font-size:26px; cursor:pointer;">&times;</button>
+      </div>
+      <form id="form-register-church">
+        <div class="field">
+          <label>Nombre de la institución o iglesia</label>
+          <input type="text" id="reg-church-name" required placeholder="Ej: Iglesia Central">
+        </div>
+        <div class="field">
+          <label>Dirección</label>
+          <input type="text" id="reg-church-address" required placeholder="Dirección completa">
+        </div>
+        <div class="field">
+          <label>Teléfono</label>
+          <input type="tel" id="reg-church-phone" required placeholder="Ej: 88888888">
+        </div>
+        <div class="field">
+          <label>Correo del Administrador (Para acceso)</label>
+          <input type="email" id="reg-church-email" required placeholder="admin@iglesia.com">
+        </div>
+        
+        <div style="background: rgba(244, 197, 66, 0.08); border: 1px solid var(--gold); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 16px;">
+          <p style="font-size: 13px; color: var(--text); margin-bottom: 8px;">Para activar tu cuenta, debes realizar el pago de la mensualidad (₡5,000).</p>
+          <p style="font-size: 14px; color: var(--gold); font-weight: bold; margin-bottom: 12px;">SINPE Móvil: 89699458</p>
+          <div class="field" style="margin-bottom: 10px;">
+            <label>Nombre del titular de la cuenta origen</label>
+            <input type="text" id="reg-church-holder" required placeholder="A nombre de quién está el pago">
+          </div>
+          <div class="field" style="margin-bottom: 0;">
+            <label>Subir comprobante (Imagen)</label>
+            <input type="file" id="reg-church-receipt" accept="image/*" required style="padding: 8px; font-size: 13px;">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="btn-submit-register">Enviar Registro</button>
+      </form>
+    </div>
+  </div>
+
   <!-- CAPA LOGICA COMPLETA DE FIREBASE V10+ -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+    import { getAuth, sendPasswordResetEmail, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
 
     import {
       initializeFirestore,
@@ -4575,6 +4625,7 @@
     window.getDoc = getDoc;
     window.doc = doc;
     window.updateDoc = updateDoc;
+    window.setDoc = setDoc;
     window.query = query;
 
     // Lógica de Opciones (Admin Dropdown)
@@ -4622,6 +4673,108 @@
     // Nodos DOM globales
     const screenLogin = document.getElementById('screen-login');
     const screenDashboard = document.getElementById('screen-dashboard');
+
+    // Registration UI Logic
+    const btnOpenRegister = document.getElementById('btn-open-register');
+    const registerOverlay = document.getElementById('register-church-overlay');
+    const btnCloseRegister = document.getElementById('register-church-close');
+    
+    if(btnOpenRegister) {
+      btnOpenRegister.addEventListener('click', () => {
+        registerOverlay.classList.add('active');
+      });
+    }
+    if(btnCloseRegister) {
+      btnCloseRegister.addEventListener('click', () => {
+        registerOverlay.classList.remove('active');
+      });
+    }
+
+    const formRegisterChurch = document.getElementById('form-register-church');
+    if(formRegisterChurch) {
+      formRegisterChurch.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const btnSubmit = document.getElementById('btn-submit-register');
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = 'Procesando...';
+
+        try {
+          const name = document.getElementById('reg-church-name').value.trim();
+          const address = document.getElementById('reg-church-address').value.trim();
+          const phone = document.getElementById('reg-church-phone').value.trim();
+          const email = document.getElementById('reg-church-email').value.trim();
+          const holder = document.getElementById('reg-church-holder').value.trim();
+          const fileInput = document.getElementById('reg-church-receipt');
+          
+          if (!fileInput.files || fileInput.files.length === 0) {
+            throw new Error("Debe subir un comprobante");
+          }
+          const file = fileInput.files[0];
+
+          // Generate UUID for church
+          const churchId = crypto.randomUUID();
+
+          // Upload Receipt to Storage
+          const storage = getStorage();
+          const receiptRef = ref(storage, `comprobantes/${churchId}_${file.name}`);
+          await uploadBytes(receiptRef, file);
+          const receiptUrl = await getDownloadURL(receiptRef);
+
+          // Save Church to Firestore
+          await setDoc(doc(db, "churches", churchId), {
+            name, address, phone,
+            adminEmail: email,
+            sinpeHolder: holder,
+            receiptUrl,
+            status: 'activa',
+            createdAt: new Date().toISOString()
+          });
+
+          // Create the admin user for this church
+          const auth = getAuth();
+          
+          try {
+            // Se usa una contraseña temporal segura ya que luego se pedira reset
+            const tempPassword = crypto.randomUUID().slice(0, 8) + "Aa1!";
+            await createUserWithEmailAndPassword(auth, email, tempPassword);
+            
+            // Send Password Reset Email so they can enter
+            await sendPasswordResetEmail(auth, email);
+          } catch(authErr) {
+            console.error("Auth error:", authErr);
+            // It might fail if email is already in use, handle gracefully if needed
+            if (authErr.code !== 'auth/email-already-in-use') {
+               throw authErr;
+            }
+            await sendPasswordResetEmail(auth, email);
+          }
+
+          // Save the admin user mapping in Firestore
+          // Los usuarios ahora estaran vinculados a su iglesia. El admin inicial tiene role 'admin'
+          const userId = email.replace(/[^a-zA-Z0-9]/g, '').toLowerCase(); // basic ID generation for fallback systems
+          await setDoc(doc(db, "usuarios", userId), {
+            nombre: "Admin " + name,
+            role: "admin",
+            usuario: email, // Usamos el correo como el ID real de login visual
+            churchId: churchId,
+            instrumento: "Administrador",
+            type: "admin"
+          });
+
+          alert("Institución registrada exitosamente. Se ha enviado un correo a " + email + " para configurar la contraseña y acceder al sistema.");
+          registerOverlay.classList.remove('active');
+          formRegisterChurch.reset();
+
+        } catch (error) {
+          console.error("Error registrando iglesia:", error);
+          alert("Hubo un error en el registro: " + error.message);
+        } finally {
+          btnSubmit.disabled = false;
+          btnSubmit.textContent = 'Enviar Registro';
+        }
+      });
+    }
 
     // Navegación Swipe Back (History API)
     window.addEventListener('popstate', (e) => {
@@ -4830,24 +4983,50 @@
       screenLogin.classList.remove('active');
       if (window.intentarMostrarPwaBanner) window.intentarMostrarPwaBanner();
 
-      if (currentUserRole === 'lider') {
-        // Vista de Líder
+      if (currentUserRole === 'lider' || currentUserRole === 'admin') {
+        // Ambos (lider legacy y admin multi-tenant) tienen acceso al panel
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-        screenDashboard.classList.add('active');
-        cargarConfiguracion();
+        
+        // Vista principal normal de musicos
+        document.getElementById('musico-name-badge').textContent = userData.nombre;
+        screenMusico.classList.add('active');
+        if (typeof iniciarVistaMusico === 'function') iniciarVistaMusico();
+        
+        const panelBtn = document.getElementById('btn-musico-panel');
+        const backToMusicoBtn = document.getElementById('btn-back-musico');
 
-        // Restore tab
+        if (panelBtn) {
+          panelBtn.style.display = 'inline-block';
+          panelBtn.onclick = () => {
+            screenMusico.classList.remove('active');
+            screenDashboard.classList.add('active');
+            if (typeof cargarConfiguracion === 'function') cargarConfiguracion();
+          };
+        }
+        
+        if (backToMusicoBtn) {
+          backToMusicoBtn.style.display = 'inline-block';
+          backToMusicoBtn.onclick = () => {
+            screenDashboard.classList.remove('active');
+            screenMusico.classList.add('active');
+          };
+        }
+
+        // Restore tab si estaba en el dashboard
         const lastTab = localStorage.getItem('activeLeaderTab');
-        if (lastTab && document.getElementById(lastTab)) {
+        if (lastTab && document.getElementById(lastTab) && screenDashboard.classList.contains('active')) {
           const tabBtn = Array.from(document.querySelectorAll('.nav-tab')).find(t => t.dataset.tab === lastTab);
           if (tabBtn) tabBtn.click();
         }
       } else {
-        // Vista de Músico
+        // Vista estricta de Músico
         document.getElementById('musico-name-badge').textContent = userData.nombre;
         screenMusico.classList.add('active');
-        iniciarVistaMusico();
-
+        if (typeof iniciarVistaMusico === 'function') iniciarVistaMusico();
+        
+        const panelBtn = document.getElementById('btn-musico-panel');
+        if (panelBtn) panelBtn.style.display = 'none';
+        
         // Restore tab
         const lastTab = localStorage.getItem('activeMusicoTab');
         if (lastTab && document.getElementById(lastTab)) {
