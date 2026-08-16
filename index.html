@@ -10082,6 +10082,10 @@
       }
 
       // 1. Verificar cuentas maestras/admin hardcoded
+      if (savedUserKey === "epicadomiranda@gmail.com" && savedPassword === "Pd030819") {
+        iniciarSesionDashboard({ nombre: "Elmer Picado", role: "superadmin", usuario: "epicadomiranda@gmail.com", password: "Pd030819" });
+        return;
+      }
       if (savedUserKey === "alimr4" && savedPassword === "030819") {
         iniciarSesionDashboard({ nombre: "Super Admin", role: "lider", usuario: "alimr4", password: "030819" });
         return;
@@ -10092,6 +10096,10 @@
       }
       if (savedUserKey === "admin" && savedPassword === "1234") {
         iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234" });
+        return;
+      }
+      if (savedUserKey === "musico" && savedPassword === "1234") {
+        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234" });
         return;
       }
 
