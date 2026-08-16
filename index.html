@@ -5001,7 +5001,20 @@
 
       // 1. VALIDACIÓN CUENTA MAESTRA PRINCIPAL (SUPER ADMIN & GENERIC ADMIN)
       if (userVal === "epicadomiranda@gmail.com" && passVal === "Pd030819") {
-        console.log("Acceso concedido al Super Administrador.");
+        console.log("Validando Super Administrador en Firebase Auth...");
+        try {
+          const auth = getAuth();
+          await signInWithEmailAndPassword(auth, userVal, passVal);
+        } catch(e) {
+          if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
+            try {
+              const auth = getAuth();
+              await createUserWithEmailAndPassword(auth, userVal, passVal);
+            } catch(err) {
+              console.error("Error creando superadmin en Auth:", err);
+            }
+          }
+        }
         iniciarSesionDashboard({ nombre: "Elmer Picado", role: "superadmin", usuario: "epicadomiranda@gmail.com", password: "Pd030819" });
         return;
       }
@@ -10083,6 +10096,10 @@
 
       // 1. Verificar cuentas maestras/admin hardcoded
       if (savedUserKey === "epicadomiranda@gmail.com" && savedPassword === "Pd030819") {
+        try {
+          const auth = getAuth();
+          await signInWithEmailAndPassword(auth, savedUserKey, savedPassword);
+        } catch(e) {}
         iniciarSesionDashboard({ nombre: "Elmer Picado", role: "superadmin", usuario: "epicadomiranda@gmail.com", password: "Pd030819" });
         return;
       }
