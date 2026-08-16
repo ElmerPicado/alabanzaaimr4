@@ -2122,12 +2122,12 @@
       max-width: 100% !important;
       text-align: left !important;
       margin: 0 auto !important;
-      font-size: 16px !important;
-      line-height: 1.6 !important;
+      font-size: 22px !important;
+      line-height: 1.65 !important;
       word-break: normal !important;
       word-wrap: normal !important;
-      white-space: pre !important;
-      overflow-x: auto !important;
+      white-space: pre-wrap !important;
+      overflow-x: hidden !important;
     }
 
     .lyrics-modal-footer {
@@ -8352,7 +8352,7 @@
       if (dir === 'up') {
         _currentZoomPercent = Math.min(_currentZoomPercent + 10, 220);
       } else {
-        _currentZoomPercent = Math.max(_currentZoomPercent - 10, 70);
+        _currentZoomPercent = Math.max(_currentZoomPercent - 10, 40);
       }
       const el = document.getElementById(contentId);
       if (el) {
@@ -8435,6 +8435,64 @@
         panZoomDown.dataset.bound = 'true';
         panZoomDown.onclick = () => aplicarZoomLetra('down', 'panel-lyrics-content', 'panel-lyrics-zoom-val');
       }
+
+      // --- Pinch-to-Zoom con 2 dedos en el cuerpo del modal de letra ---
+      function bindPinchZoom(bodyId, contentId, zoomValId) {
+        const body = document.getElementById(bodyId);
+        if (!body || body.dataset.boundPinch) return;
+        body.dataset.boundPinch = 'true';
+
+        let _pinchStartDist = null;
+        let _pinchStartZoom = _currentZoomPercent;
+        let _isPinching = false;
+
+        function getTouchDist(touches) {
+          const dx = touches[0].clientX - touches[1].clientX;
+          const dy = touches[0].clientY - touches[1].clientY;
+          return Math.hypot(dx, dy);
+        }
+
+        body.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 2) {
+            _isPinching = true;
+            _pinchStartDist = getTouchDist(e.touches);
+            _pinchStartZoom = _currentZoomPercent;
+            e.preventDefault();
+          }
+        }, { passive: false });
+
+        body.addEventListener('touchmove', (e) => {
+          if (!_isPinching || e.touches.length !== 2) return;
+          e.preventDefault();
+          const dist = getTouchDist(e.touches);
+          const ratio = dist / _pinchStartDist;
+          let newZoom = Math.round(_pinchStartZoom * ratio);
+          newZoom = Math.min(Math.max(newZoom, 40), 220);
+          _currentZoomPercent = newZoom;
+
+          const el = document.getElementById(contentId);
+          if (el) {
+            if ('zoom' in el.style) {
+              el.style.zoom = (newZoom / 100);
+            } else {
+              el.style.transform = `scale(${newZoom / 100})`;
+              el.style.transformOrigin = 'top left';
+            }
+          }
+          const zv = document.getElementById(zoomValId);
+          if (zv) zv.textContent = newZoom + '%';
+        }, { passive: false });
+
+        body.addEventListener('touchend', (e) => {
+          if (e.touches.length < 2) {
+            _isPinching = false;
+            _pinchStartDist = null;
+          }
+        }, { passive: true });
+      }
+
+      bindPinchZoom('lyrics-modal-body', 'lyrics-modal-content', 'lyrics-modal-zoom-val');
+      bindPinchZoom('panel-lyrics-body', 'panel-lyrics-content', 'panel-lyrics-zoom-val');
     }
 
     window.abrirModalLetraGlobal = async function (cancionId, playlistContext, forceModal = false, preserveScroll = false) {
@@ -9822,7 +9880,7 @@
       window.addEventListener('load', () => {
         let newWorker;
 
-        navigator.serviceWorker.register('./sw.js?v=60')
+        navigator.serviceWorker.register('./sw.js?v=62')
           .then(reg => {
             console.log('PWA Service Worker registrado:', reg.scope);
 
