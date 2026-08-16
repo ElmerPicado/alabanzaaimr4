@@ -3834,6 +3834,44 @@
   <!-- END #screen-dashboard -->
 
   <!-- ========================================================= -->
+  <!-- PANTALLA SUPER ADMIN                                       -->
+  <!-- ========================================================= -->
+  <div id="screen-superadmin" class="screen">
+    <header class="app-header" style="justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap;">
+      <div class="logo">
+        Alaban<svg viewBox="0 0 55 100" fill="currentColor"
+          style="width: 0.55em; height: 1.1em; display: inline-block; vertical-align: middle; transform: translateY(-0.06em); margin: 0 -2px;">
+          <path d="M32.108,45.02C31.428,42.709,30.78,40.425,30.195,38.209C34.229,34.433,37.429,29.413,37.5,21.283C37.536,17.06,37.032,12.006,33.025,6.535C31.843,4.922,29.604,4.519,27.934,5.621C23.985,8.227,20,14.457,20,22.5C20,26.253,20.699,30.663,21.782,35.411C20.949,36.021,20.077,36.63,19.177,37.259C12.86,41.667,5,47.153,5,60C5,74.084,16.44,82.5,27.5,82.5C29.658,82.5,31.729,82.271,33.677,81.841C33.684,82.066,33.688,82.285,33.688,82.5C33.688,85.257,31.445,87.5,28.688,87.5C27.352,87.5,26.096,86.98,25.153,86.036L19.848,91.339C22.209,93.7,25.348,95,28.688,95C35.581,95,41.188,89.393,41.188,82.5C41.188,81.387,41.118,80.206,40.986,78.964C46.528,75.615,50,70.154,50,63.75C50,53.699,42.05,45.47,32.108,45.02ZM29.244,15.311C29.86,17.224,30.017,19.139,30,21.218C29.973,24.421,29.287,26.889,28.125,28.943C27.729,26.582,27.5,24.41,27.5,22.5C27.5,19.607,28.264,17.158,29.244,15.311ZM27.5,75C20.229,75,12.5,69.743,12.5,60C12.5,51.065,17.341,47.686,23.469,43.409C23.573,43.337,23.677,43.264,23.781,43.192C24.103,44.346,24.438,45.509,24.78,46.677C19.873,49.271,16.188,54.53,16.188,60C16.188,63.338,17.488,66.477,19.848,68.838L25.153,63.535C24.209,62.59,23.688,61.335,23.688,59.999C23.688,57.909,25.121,55.645,27.027,54.157C27.096,54.384,27.166,54.611,27.234,54.838C29.303,61.627,31.419,68.566,32.64,74.372C31.05,74.78,29.322,75,27.5,75ZM39.503,70.664C38.239,65.243,36.406,59.209,34.508,52.981C39.128,54.381,42.5,58.679,42.5,63.75C42.5,67.58,41.442,70.932,39.503,70.664Z"></path>
+        </svg>app <span style="color:var(--text2);font-style:italic;font-size:18px;">SuperAdmin</span>
+      </div>
+      <div style="display: flex; gap: 15px; align-items: center; justify-content: flex-start; flex-wrap: wrap;">
+        <span class="role-badge" style="background: var(--purple); color: white;">Super Admin</span>
+        <button id="btn-superadmin-logout" class="sos-btn" style="padding: 8px 14px; font-size: 13px; color: var(--coral); border: 1px solid var(--coral); background:none; border-radius:8px; cursor:pointer;">Cerrar Sesión</button>
+      </div>
+    </header>
+    
+    <main class="content">
+      <h2 class="section-title">Gestión de Cuentas / Iglesias</h2>
+      <p class="section-sub">Visualiza las instituciones registradas, valida los pagos y asigna los planes de suscripción.</p>
+
+      <div class="card" style="margin-bottom: 24px; border-color: var(--purple);">
+        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--purple); margin-bottom: 12px;">Generar Cuenta de Prueba Manual</h3>
+        <form id="form-superadmin-trial">
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 12px;">
+            <input type="text" id="sa-trial-name" required placeholder="Nombre Iglesia/Grupo" style="flex:1; padding:10px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; outline:none;">
+            <input type="email" id="sa-trial-email" required placeholder="Correo del Admin" style="flex:1; padding:10px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; outline:none;">
+          </div>
+          <button type="submit" class="btn-primary" style="background:var(--purple); color:#0f0e17; width:auto; padding:10px 20px; font-size:13px;" id="btn-submit-trial">Generar y Enviar Acceso</button>
+        </form>
+      </div>
+
+      <div id="superadmin-churches-list">
+        <p style="color:var(--text3);font-size:13px;text-align:center;">Cargando instituciones...</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- ========================================================= -->
   <!-- PANTALLA DEL MÚSICO                                        -->
   <!-- ========================================================= -->
   <div id="screen-musico" class="screen">
@@ -4572,7 +4610,7 @@
   <!-- CAPA LOGICA COMPLETA DE FIREBASE V10+ -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-    import { getAuth, sendPasswordResetEmail, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+    import { getAuth, sendPasswordResetEmail, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
 
     import {
@@ -4908,9 +4946,9 @@
       const passVal = document.getElementById('login-password').value.trim();
 
       // 1. VALIDACIÓN CUENTA MAESTRA PRINCIPAL (SUPER ADMIN & GENERIC ADMIN)
-      if (userVal === "alimr4" && passVal === "030819") {
+      if (userVal === "epicadomiranda@gmail.com" && passVal === "Pd030819") {
         console.log("Acceso concedido al Super Administrador.");
-        iniciarSesionDashboard({ nombre: "Super Admin", role: "lider", usuario: "alimr4", password: "030819" });
+        iniciarSesionDashboard({ nombre: "Elmer Picado", role: "superadmin", usuario: "epicadomiranda@gmail.com", password: "Pd030819" });
         return;
       }
       if (userVal === "imr4" && passVal === "222222") {
@@ -4948,10 +4986,77 @@
       };
       const _tryFirebaseLogin = async (retryCount = 0) => {
         try {
-          const uSnap = await getDoc(doc(db, "usuarios", userVal));
-          if (uSnap.exists() && uSnap.data().password === passVal) {
-            iniciarSesionDashboard(uSnap.data());
+          // Primero intentamos Auth de Firebase v10
+          let isAuthenticated = false;
+          let firebaseUser = null;
+          try {
+            const auth = getAuth();
+            const userCredential = await signInWithEmailAndPassword(auth, userVal, passVal);
+            isAuthenticated = true;
+            firebaseUser = userCredential.user;
+          } catch(authErr) {
+            // Fallback silencioso a la lógica de contraseña en el documento
+          }
+          
+          // ID para buscar en `usuarios` (compatibilidad con cuentas legacy o si se generó por correo)
+          let userIdToSearch = userVal;
+          if (isAuthenticated && firebaseUser) {
+             userIdToSearch = firebaseUser.email.replace(/[^a-zA-Z0-9]/g, '').toLowerCase(); 
+          }
+
+          const uSnap = await getDoc(doc(db, "usuarios", userIdToSearch));
+          if (uSnap.exists()) {
+            const uData = uSnap.data();
+            
+            // Validar login por Auth o por password legacy en el doc
+            if (isAuthenticated || uData.password === passVal) {
+              
+              // Verificación de Suscripción si pertenece a un inquilino (churchId)
+              if (uData.churchId) {
+                const churchSnap = await getDoc(doc(db, "churches", uData.churchId));
+                if (churchSnap.exists()) {
+                  const cData = churchSnap.data();
+                  
+                  // Excepción para IMR4 (Gratis ilimitado)
+                  if (cData.name && cData.name.toLowerCase().includes('imr4')) {
+                    uData.churchName = cData.name;
+                    iniciarSesionDashboard(uData);
+                    return;
+                  }
+
+                  // Validar estado
+                  if (cData.status !== 'activa') {
+                    _showLoginMsg("La cuenta de tu institución está inactiva.", true);
+                    return;
+                  }
+
+                  // Validar expiración (30 días desde la aprobación)
+                  if (cData.expireAt) {
+                    const expireDate = new Date(cData.expireAt);
+                    if (new Date() > expireDate) {
+                      _showLoginMsg("El plan de la institución ha expirado.", true);
+                      return;
+                    }
+                  }
+                  
+                  uData.churchName = cData.name;
+                }
+              }
+
+              iniciarSesionDashboard(uData);
+            } else {
+              _showLoginMsg("Usuario o contraseña incorrectos.", true);
+            }
           } else {
+            // Si el usuario no existe en la BD Firestore bajo ese ID, puede que sea legacy
+            // Si isAuthenticated es true pero no esta en BD, fallamos.
+            if (!isAuthenticated) {
+              const legacySnap = await getDoc(doc(db, "usuarios", userVal));
+              if (legacySnap.exists() && legacySnap.data().password === passVal) {
+                iniciarSesionDashboard(legacySnap.data());
+                return;
+              }
+            }
             _showLoginMsg("Usuario o contraseña incorrectos.", true);
           }
         } catch (err) {
@@ -4983,7 +5088,13 @@
       screenLogin.classList.remove('active');
       if (window.intentarMostrarPwaBanner) window.intentarMostrarPwaBanner();
 
-      if (currentUserRole === 'lider' || currentUserRole === 'admin') {
+      if (currentUserRole === 'superadmin') {
+        const screenSuperadmin = document.getElementById('screen-superadmin');
+        if (screenSuperadmin) {
+          screenSuperadmin.classList.add('active');
+          if (typeof renderSuperAdminChurches === 'function') renderSuperAdminChurches();
+        }
+      } else if (currentUserRole === 'lider' || currentUserRole === 'admin') {
         // Ambos (lider legacy y admin multi-tenant) tienen acceso al panel
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
         
@@ -5039,6 +5150,15 @@
       if (typeof actualizarAvatares === 'function') {
         actualizarAvatares();
       }
+      
+      // Actualizar el título dinámico con el nombre de la iglesia
+      const churchName = userData.churchName ? userData.churchName : (userData.nombre === 'Músico de Prueba' ? 'Prueba' : 'IMR4');
+      const logos = document.querySelectorAll('.logo span');
+      logos.forEach(span => {
+        if (!span.textContent.includes('SuperAdmin')) {
+           span.innerHTML = `<span style="color:var(--text2);font-style:italic;font-size:18px;margin-left:4px;">${churchName}</span>`;
+        }
+      });
 
       // Fetch profile pic and favoritos from Firestore asynchronously
       window.misFavoritos = [];
@@ -5091,6 +5211,8 @@
       screenLogin.classList.add('active');
       screenDashboard.classList.remove('active');
       screenMusico.classList.remove('active');
+      const screenSuperadmin = document.getElementById('screen-superadmin');
+      if (screenSuperadmin) screenSuperadmin.classList.remove('active');
       if (window.intentarMostrarPwaBanner) window.intentarMostrarPwaBanner();
       if (unsubscribeService) unsubscribeService();
       if (unsubscribeMusicoService) unsubscribeMusicoService();
@@ -5110,6 +5232,8 @@
     if (btnLogout) btnLogout.addEventListener('click', cerrarSesion);
     const _btnMusicoLogout = document.getElementById('btn-musico-logout');
     if (_btnMusicoLogout) _btnMusicoLogout.addEventListener('click', cerrarSesion);
+    const _btnSuperadminLogout = document.getElementById('btn-superadmin-logout');
+    if (_btnSuperadminLogout) _btnSuperadminLogout.addEventListener('click', cerrarSesion);
 
     const btnAddSongGlobal = document.getElementById('btn-add-song-global');
     if (btnAddSongGlobal) {
@@ -10653,6 +10777,146 @@
       };
       btnConfirm.addEventListener('click', close);
     };
+    // ==========================================
+    // SUPER ADMIN LOGIC
+    // ==========================================
+    window.renderSuperAdminChurches = async function() {
+      const container = document.getElementById('superadmin-churches-list');
+      if (!container) return;
+      container.innerHTML = '<p style="text-align:center;color:var(--text3);">Cargando instituciones...</p>';
+      try {
+        const snap = await getDocs(collection(db, 'churches'));
+        if (snap.empty) {
+          container.innerHTML = '<p style="text-align:center;color:var(--text3);">No hay iglesias registradas.</p>';
+          return;
+        }
+        let html = '';
+        snap.forEach(docSnap => {
+          const data = docSnap.data();
+          const id = docSnap.id;
+          const statusColor = data.status === 'activa' ? 'var(--teal)' : 'var(--coral)';
+          const planColor = data.plan === 'paga' ? 'var(--gold)' : (data.plan === 'gratis' ? 'var(--purple)' : 'var(--text2)');
+          
+          html += `
+          <div class="card" style="margin-bottom: 12px; border-left: 4px solid ${statusColor};">
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+              <div>
+                <h4 style="margin:0; font-size:16px; color:var(--text);">${data.name || 'Sin Nombre'}</h4>
+                <p style="margin:4px 0 0; font-size:12px; color:var(--text2);">Admin: ${data.adminEmail || 'N/A'} | Tel: ${data.phone || 'N/A'}</p>
+                <p style="margin:4px 0 0; font-size:12px; color:var(--text2);">
+                  ID: <span style="font-family:monospace; color:var(--text3);">${id}</span>
+                </p>
+                <p style="margin:4px 0 0; font-size:12px; color:var(--text2);">
+                  Estado: <strong style="color:${statusColor}">${(data.status||'inactiva').toUpperCase()}</strong> | 
+                  Plan: <strong style="color:${planColor}">${(data.plan||'prueba').toUpperCase()}</strong>
+                </p>
+                <p style="margin:4px 0 0; font-size:12px; color:var(--text2);">
+                  Vencimiento: <strong>${data.expireAt ? new Date(data.expireAt).toLocaleDateString() : 'No definido'}</strong>
+                </p>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                ${data.receiptUrl ? `<a href="${data.receiptUrl}" target="_blank" class="btn-secondary" style="font-size:11px; padding:6px; text-align:center;">Ver Comprobante</a>` : '<span style="font-size:11px; color:var(--text3);">Sin Comprobante</span>'}
+                
+                ${data.status === 'inactiva' ? 
+                  `<button class="btn-primary" onclick="saAction('${id}', 'activar')" style="font-size:11px; padding:6px; background:var(--teal); color:#000;">Activar +30 Días</button>` :
+                  `<button class="btn-primary" onclick="saAction('${id}', 'inactivar')" style="font-size:11px; padding:6px; background:var(--coral); color:#fff;">Suspender</button>`
+                }
+              </div>
+            </div>
+          </div>
+          `;
+        });
+        container.innerHTML = html;
+      } catch(e) {
+        console.error(e);
+        container.innerHTML = '<p style="text-align:center;color:var(--coral);">Error cargando iglesias.</p>';
+      }
+    };
+
+    window.saAction = async function(churchId, action) {
+      if(!await customConfirm(`¿Estás seguro de ${action} esta cuenta?`)) return;
+      try {
+        const churchRef = doc(db, 'churches', churchId);
+        if (action === 'activar') {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 30);
+          await updateDoc(churchRef, {
+            status: 'activa',
+            plan: 'paga',
+            expireAt: futureDate.toISOString()
+          });
+        } else if (action === 'inactivar') {
+          await updateDoc(churchRef, {
+            status: 'inactiva'
+          });
+        }
+        await renderSuperAdminChurches();
+      } catch(e) {
+        console.error(e);
+        alert("Error al actualizar cuenta.");
+      }
+    };
+
+    const formTrial = document.getElementById('form-superadmin-trial');
+    if (formTrial) {
+      formTrial.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-submit-trial');
+        btn.disabled = true;
+        btn.textContent = "Procesando...";
+        try {
+          const name = document.getElementById('sa-trial-name').value.trim();
+          const email = document.getElementById('sa-trial-email').value.trim();
+          
+          const churchId = crypto.randomUUID();
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 15); // 15 dias de prueba
+          
+          // Crear tenant
+          await setDoc(doc(db, "churches", churchId), {
+            name,
+            adminEmail: email,
+            phone: 'N/A',
+            status: 'activa',
+            plan: 'prueba',
+            expireAt: futureDate.toISOString(),
+            createdAt: new Date().toISOString()
+          });
+
+          // Crear Auth user y send reset email
+          const auth = getAuth();
+          try {
+            const tempPassword = crypto.randomUUID().slice(0, 8) + "Aa1!";
+            await createUserWithEmailAndPassword(auth, email, tempPassword);
+            await sendPasswordResetEmail(auth, email);
+          } catch(authErr) {
+            if (authErr.code !== 'auth/email-already-in-use') throw authErr;
+            await sendPasswordResetEmail(auth, email);
+          }
+
+          // Crear admin
+          const userId = email.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+          await setDoc(doc(db, "usuarios", userId), {
+            nombre: "Admin " + name,
+            role: "admin",
+            usuario: email,
+            churchId: churchId,
+            instrumento: "Administrador",
+            type: "admin"
+          });
+
+          alert("Cuenta de prueba creada. Se envió un correo a " + email);
+          formTrial.reset();
+          renderSuperAdminChurches();
+        } catch(err) {
+          console.error(err);
+          alert("Error: " + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Generar y Enviar Acceso";
+        }
+      });
+    }
   </script>
   <script type="module" src="chord_engine/index.js"></script>
 </body>
