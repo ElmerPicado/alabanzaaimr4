@@ -2407,7 +2407,7 @@
         <button type="submit" class="btn-primary">Entrar al Panel</button>
       </form>
       <div style="margin-top: 16px; text-align: center;">
-        <button id="btn-open-register" style="background: none; border: none; color: var(--gold); font-family: var(--font-body); font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: underline;">Registrar Nueva Institución</button>
+        <button id="btn-open-register" style="background: none; border: none; color: var(--gold); font-family: var(--font-body); font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: underline;">Registrar Nueva Cuenta</button>
       </div>
     </div>
   </div>
@@ -4568,12 +4568,12 @@
   <div id="register-church-overlay" class="modal-overlay">
     <div class="modal-box" style="max-width: 500px; width: 95%;">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-        <h3 class="modal-title" style="font-size:20px; margin:0; color:var(--gold);">✨ Crear Cuenta Nueva</h3>
+        <h3 class="modal-title" style="font-size:20px; margin:0; color:var(--gold);">Crear Cuenta Nueva</h3>
         <button id="register-church-close" style="background:none; border:none; color:var(--text2); font-size:26px; cursor:pointer;">&times;</button>
       </div>
       <form id="form-register-church">
         <div class="field">
-          <label>Nombre de la institución o iglesia</label>
+          <label>Nombre de la cuenta</label>
           <input type="text" id="reg-church-name" required placeholder="Ej: Iglesia Central">
         </div>
         <div class="field">
@@ -10856,7 +10856,7 @@
       if (!container) return;
       container.innerHTML = '<p style="text-align:center;color:var(--text3);">Cargando instituciones...</p>';
       try {
-        const snap = await getDocs(collection(db, 'churches'));
+        const snap = await window.getDocs(window.collection(window.db, 'churches'));
         if (snap.empty) {
           container.innerHTML = '<p style="text-align:center;color:var(--text3);">No hay iglesias registradas.</p>';
           return;
