@@ -4568,7 +4568,7 @@
   <div id="register-church-overlay" class="modal-overlay">
     <div class="modal-box" style="max-width: 500px; width: 95%;">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-        <h3 class="modal-title" style="font-size:20px; margin:0; color:var(--gold);">Registrar Institución</h3>
+        <h3 class="modal-title" style="font-size:20px; margin:0; color:var(--gold);">✨ Crear Cuenta Nueva</h3>
         <button id="register-church-close" style="background:none; border:none; color:var(--text2); font-size:26px; cursor:pointer;">&times;</button>
       </div>
       <form id="form-register-church">
@@ -4643,7 +4643,8 @@
       addDoc,
       arrayUnion,
       arrayRemove,
-      writeBatch
+      writeBatch,
+      where
     } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
     const firebaseConfig = {
       apiKey: "AIzaSyDjA2d8zn02Iu9Nm-Jy2mVw6GgbjeKUEJ4",
@@ -4846,7 +4847,14 @@
             type: "admin"
           });
 
-          alert("Institución registrada exitosamente. Se ha enviado un correo a " + email + " para configurar la contraseña y acceder al sistema.");
+          alert(`¡Registro de Institución Completado con Éxito! 🎉\n\n` +
+                `1. Configuración de Acceso:\n` +
+                `Se ha enviado un correo a: ${email}\n` +
+                `Por favor, abre el enlace recibido para definir tu contraseña e ingresar al sistema.\n` +
+                `⚠️ NOTA IMPORTANTE: Si no lo ves en unos minutos, revisa tu carpeta de SPAM o Correo no deseado.\n\n` +
+                `2. Estado de la Suscripción:\n` +
+                `Tu cuenta se ha creado en estado ACTIVA de manera temporal. Queda sujeta a la posterior verificación manual del comprobante de SINPE Móvil subido.\n\n` +
+                `Al continuar e ingresar a la aplicación, aceptas los términos de servicio y las políticas de uso de AlabanApp.`);
           registerOverlay.classList.remove('active');
           formRegisterChurch.reset();
 
@@ -6016,14 +6024,22 @@
     // ESCUCHA DE DATOS BASE Y ENLACE DE EVENTOS
     // ====================================================
     function escucharBaseDatosGlobal() {
-      onSnapshot(collection(db, "biblioteca_canciones"), (snap) => {
+      // Multi-tenant: todas las consultas filtran por el churchId del usuario en sesión
+      const churchId = activeSessionUser && activeSessionUser.churchId ? activeSessionUser.churchId : null;
+
+      // Si no hay churchId (ej: usuarios legacy de IMR4), consultamos sin filtro para mantener compatibilidad
+      const songsQuery = churchId
+        ? query(collection(db, "biblioteca_canciones"), where("churchId", "==", churchId))
+        : collection(db, "biblioteca_canciones");
+
+      onSnapshot(songsQuery, (snap) => {
         cacheSongs = [];
         snap.forEach(doc => cacheSongs.push({ id: doc.id, ...doc.data() }));
         window.cacheSongs = cacheSongs;
         if (typeof window.actualizarListaAutoresDatalist === 'function') {
           window.actualizarListaAutoresDatalist();
         }
-        if (currentUserRole === 'lider') {
+        if (currentUserRole === 'lider' || currentUserRole === 'admin') {
           renderizarMantenimientoCanciones();
           sincronizarPanelArmado();
           migrarBaseDatosLetras();
@@ -6037,11 +6053,15 @@
         if (typeof showToast === 'function') showToast("⚠️ Error al cargar el repertorio. Revisa tu conexión.", { duration: 5000 });
       });
 
-      onSnapshot(collection(db, "usuarios"), (snap) => {
+      const membersQuery = churchId
+        ? query(collection(db, "usuarios"), where("churchId", "==", churchId))
+        : collection(db, "usuarios");
+
+      onSnapshot(membersQuery, (snap) => {
         cacheMembers = [];
         snap.forEach(doc => cacheMembers.push({ id: doc.id, ...doc.data() }));
         window.cacheMembers = cacheMembers;
-        if (currentUserRole === 'lider') {
+        if (currentUserRole === 'lider' || currentUserRole === 'admin') {
           renderizarMantenimientoMiembros();
           sincronizarPanelArmado();
         } else if (currentUserRole === 'musico') {
@@ -6059,12 +6079,16 @@
         console.error("Error cargando usuarios:", err);
       });
 
-      onSnapshot(collection(db, "planes_servicio"), (snap) => {
+      const planesQuery = churchId
+        ? query(collection(db, "planes_servicio"), where("churchId", "==", churchId))
+        : collection(db, "planes_servicio");
+
+      onSnapshot(planesQuery, (snap) => {
         cacheHistorial = [];
         snap.forEach(doc => cacheHistorial.push({ id: doc.id, ...doc.data() }));
         cacheHistorial.sort((a, b) => b.fecha.localeCompare(a.fecha));
         window.cacheHistorial = cacheHistorial;
-        if (currentUserRole === 'lider') renderizarHistorialServicios();
+        if (currentUserRole === 'lider' || currentUserRole === 'admin') renderizarHistorialServicios();
       }, (err) => {
         console.error("Error cargando planes_servicio:", err);
       });
@@ -6948,7 +6972,8 @@
         artista: fixCorruptedText(artista),
         tonoBase: finalTonoBase,
         tipo: document.getElementById('song-type-input').value,
-        youtube: document.getElementById('song-youtube-input').value.trim()
+        youtube: document.getElementById('song-youtube-input').value.trim(),
+        churchId: activeSessionUser && activeSessionUser.churchId ? activeSessionUser.churchId : null
       };
 
       if (chordData) {
@@ -7642,7 +7667,8 @@
         instrumento: instVal,
         usuario: userKey,
         password: document.getElementById('member-pass-input').value.trim(),
-        role: document.getElementById('member-role-input').value
+        role: document.getElementById('member-role-input').value,
+        churchId: activeSessionUser && activeSessionUser.churchId ? activeSessionUser.churchId : null
       };
       await setDoc(doc(db, "usuarios", userKey), payload);
 
