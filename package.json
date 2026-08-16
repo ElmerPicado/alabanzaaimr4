@@ -1,6 +1,7 @@
 {
   "type": "module",
   "dependencies": {
+    "google-auth-library": "^11.0.2",
     "jsdom": "^29.1.1"
   }
 }
