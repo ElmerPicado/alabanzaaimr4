@@ -4088,6 +4088,19 @@
                       </button>
                     </div>
 
+                    <!-- Botones +/- Semitono panel -->
+                    <div style="display: inline-flex; align-items: center; gap: 2px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 2px 3px;">
+                      <button id="panel-lyrics-semi-down2" title="Bajar 1 tono"
+                        style="background:none; border:none; color:var(--coral); font-weight:700; cursor:pointer; padding:3px 5px; font-size:10px; line-height:1;">-1</button>
+                      <button id="panel-lyrics-semi-down1" title="Bajar ½ tono"
+                        style="background:none; border:none; color:var(--coral); font-weight:700; cursor:pointer; padding:3px 5px; font-size:10px; line-height:1;">-½</button>
+                      <span style="font-size:9px; color:var(--text3); padding:0 1px;">|</span>
+                      <button id="panel-lyrics-semi-up1" title="Subir ½ tono"
+                        style="background:none; border:none; color:var(--teal); font-weight:700; cursor:pointer; padding:3px 5px; font-size:10px; line-height:1;">+½</button>
+                      <button id="panel-lyrics-semi-up2" title="Subir 1 tono"
+                        style="background:none; border:none; color:var(--teal); font-weight:700; cursor:pointer; padding:3px 5px; font-size:10px; line-height:1;">+1</button>
+                    </div>
+
                     <!-- AutoScroll -->
                     <div style="display: inline-flex; align-items: center; gap: 4px;">
                       <button id="panel-lyrics-autoscroll-btn"
@@ -4280,6 +4293,19 @@
                 <circle cx="18" cy="16" r="3"></circle>
               </svg> <span id="lyrics-modal-tone-display">C</span> ▼
             </button>
+          </div>
+
+          <!-- Botones +/- Semitono -->
+          <div style="display: inline-flex; align-items: center; gap: 2px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 3px 4px;">
+            <button id="lyrics-modal-semi-down2" title="Bajar 1 tono"
+              style="background:none; border:none; color:var(--coral); font-weight:700; cursor:pointer; padding:4px 6px; font-size:11px; line-height:1;">-1</button>
+            <button id="lyrics-modal-semi-down1" title="Bajar ½ tono"
+              style="background:none; border:none; color:var(--coral); font-weight:700; cursor:pointer; padding:4px 6px; font-size:11px; line-height:1;">-½</button>
+            <span style="font-size:10px; color:var(--text3); padding:0 2px;">|</span>
+            <button id="lyrics-modal-semi-up1" title="Subir ½ tono"
+              style="background:none; border:none; color:var(--teal); font-weight:700; cursor:pointer; padding:4px 6px; font-size:11px; line-height:1;">+½</button>
+            <button id="lyrics-modal-semi-up2" title="Subir 1 tono"
+              style="background:none; border:none; color:var(--teal); font-weight:700; cursor:pointer; padding:4px 6px; font-size:11px; line-height:1;">+1</button>
           </div>
 
           <!-- AutoScroll -->
@@ -8493,6 +8519,78 @@
 
       bindPinchZoom('lyrics-modal-body', 'lyrics-modal-content', 'lyrics-modal-zoom-val');
       bindPinchZoom('panel-lyrics-body', 'panel-lyrics-content', 'panel-lyrics-zoom-val');
+
+      // --- Botones de +/- semitono y tono completo ---
+      // Escala cromática mayor y menor (24 tonos)
+      const _CHROMATICMAJ = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+      const _CHROMATICMIN = ['Cm','C#m','Dm','D#m','Em','Fm','F#m','Gm','G#m','Am','A#m','Bm'];
+
+      function transponerSemitonos(steps, contentId, toneDisplayId, metaId) {
+        const song = window._lyricsCache && window._lyricsCache[window._currentLyricsSongId];
+        if (!song) return;
+
+        const currentTone = song.tonoServicio || song.tonoBase;
+        const isMinor = currentTone.endsWith('m');
+        const scale = isMinor ? _CHROMATICMIN : _CHROMATICMAJ;
+        const idx = scale.indexOf(currentTone);
+        if (idx === -1) return; // tono no reconocido
+
+        const newIdx = ((idx + steps) % 12 + 12) % 12;
+        const newTone = scale[newIdx];
+
+        // Re-renderizar letra con nuevo tono
+        const el = document.getElementById(contentId);
+        if (el && song.letra && song.letra.trim()) {
+          el.innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, newTone);
+        }
+
+        // Actualizar display de tono
+        const td = document.getElementById(toneDisplayId);
+        if (td) td.textContent = newTone;
+
+        // Actualizar meta
+        const metaEl = document.getElementById(metaId);
+        if (metaEl) metaEl.textContent = `Tono Original: ${song.tonoBase} | Tono Actual: ${newTone}`;
+
+        // Guardar nuevo tono en el cache
+        song.tonoServicio = newTone;
+        window._lyricsCache[window._currentLyricsSongId] = song;
+        window._currentLyricsToneDisplayed = newTone;
+
+        // Sincronizar con Firebase si hay contexto de servicio
+        const dateStr = window._currentLyricsPlaylistContext;
+        if (dateStr && dateStr.includes('-')) {
+          const cancionId = window._currentLyricsSongId;
+          const path = `cancionesSeleccionadas.${cancionId}`;
+          const cambioPath = `cambiosTono.${cancionId}`;
+          updateDoc(doc(db, 'planes_servicio', dateStr), {
+            [path]: newTone,
+            [cambioPath]: {
+              usuario: (activeSessionUser ? activeSessionUser.nombre : 'Usuario'),
+              tono: newTone,
+              timestamp: Date.now()
+            }
+          }).catch(e => console.error('Error sincronizando tono:', e));
+        }
+      }
+
+      // Enlazar botones modal móvil
+      ['lyrics-modal-semi-up1','lyrics-modal-semi-up2','lyrics-modal-semi-down1','lyrics-modal-semi-down2'].forEach(btnId => {
+        const btn = document.getElementById(btnId);
+        if (!btn || btn.dataset.bound) return;
+        btn.dataset.bound = 'true';
+        const steps = btnId.includes('up2') ? 2 : btnId.includes('up1') ? 1 : btnId.includes('down2') ? -2 : -1;
+        btn.onclick = () => transponerSemitonos(steps, 'lyrics-modal-content', 'lyrics-modal-tone-display', 'lyrics-modal-meta');
+      });
+
+      // Enlazar botones panel PC
+      ['panel-lyrics-semi-up1','panel-lyrics-semi-up2','panel-lyrics-semi-down1','panel-lyrics-semi-down2'].forEach(btnId => {
+        const btn = document.getElementById(btnId);
+        if (!btn || btn.dataset.bound) return;
+        btn.dataset.bound = 'true';
+        const steps = btnId.includes('up2') ? 2 : btnId.includes('up1') ? 1 : btnId.includes('down2') ? -2 : -1;
+        btn.onclick = () => transponerSemitonos(steps, 'panel-lyrics-content', 'panel-lyrics-tone-display', 'panel-lyrics-meta');
+      });
     }
 
     window.abrirModalLetraGlobal = async function (cancionId, playlistContext, forceModal = false, preserveScroll = false) {
@@ -9880,7 +9978,7 @@
       window.addEventListener('load', () => {
         let newWorker;
 
-        navigator.serviceWorker.register('./sw.js?v=62')
+        navigator.serviceWorker.register('./sw.js?v=63')
           .then(reg => {
             console.log('PWA Service Worker registrado:', reg.scope);
 
