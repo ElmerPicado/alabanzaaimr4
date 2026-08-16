@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Música - IMR4</title>
   <!-- PWA & SEO Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -36,11 +36,25 @@
       --font-body: 'DM Sans', sans-serif;
     }
 
+    html, body {
+      touch-action: manipulation;
+      overscroll-behavior: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* Permitir selección de texto en acordes y letras */
+    .lyrics-content, .lyrics-modal-body, input, textarea, select {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     body {
@@ -50,6 +64,7 @@
       font-size: 15px;
       min-height: 100vh;
       overflow-x: hidden;
+      overscroll-behavior-y: none;
     }
 
     body::before {
@@ -974,7 +989,7 @@
     }
 
     .lyrics-modal {
-      background: var(--bg2);
+      background: #1E1E1E;
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       width: 100%;
@@ -994,7 +1009,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: var(--bg);
+      background: #1E1E1E;
       flex-shrink: 0;
     }
 
@@ -1030,7 +1045,7 @@
       flex: 1 1 auto;
       min-height: 0;
       max-height: 100%;
-      background: #000000;
+      background: #1E1E1E;
     }
 
     .lyrics-modal.immersive .lyrics-modal-header,
@@ -2107,11 +2122,12 @@
       max-width: 100% !important;
       text-align: left !important;
       margin: 0 auto !important;
-      font-size: 14px !important;
+      font-size: 16px !important;
       line-height: 1.6 !important;
       word-break: normal !important;
-      word-wrap: break-word !important;
-      white-space: pre-wrap !important;
+      word-wrap: normal !important;
+      white-space: pre !important;
+      overflow-x: auto !important;
     }
 
     .lyrics-modal-footer {
@@ -2257,6 +2273,7 @@
       overflow-y: auto;
       margin-top: 15px;
       padding-right: 5px;
+      background: #1E1E1E;
     }
 
     .artist-row-item {
@@ -4098,7 +4115,7 @@
                         style="background:none; border:none; color:var(--text3); font-weight:bold; cursor:pointer; padding: 0 6px; font-size: 11px;"
                         title="Reducir letra">A-</button>
                       <span id="panel-lyrics-zoom-val"
-                        style="font-size: 10px; color: var(--text2); font-weight: 600;">14</span>
+                        style="font-size: 10px; color: var(--text2); font-weight: 600;">100%</span>
                       <button id="panel-lyrics-zoom-up"
                         style="background:none; border:none; color:var(--text3); font-weight:bold; cursor:pointer; padding: 0 6px; font-size: 11px;"
                         title="Agrandar letra">A+</button>
@@ -4179,7 +4196,7 @@
         <div style="display: flex; gap: 10px; margin-bottom: 12px;">
           <div class="field" style="flex: 1; margin-bottom: 0;">
             <label style="font-size: 10px;">Artista (Opcional)</label>
-            <input type="text" id="musico-custom-artist" placeholder="Ej: Autor">
+            <input type="text" id="musico-custom-artist" list="existing-artists-list" placeholder="Ej: Autor">
           </div>
           <div class="field" style="width: 100px; margin-bottom: 0;">
             <label style="font-size: 10px;">Tono sugerido</label>
@@ -4292,7 +4309,7 @@
               style="background: transparent; border: none; color:var(--text); font-weight:bold; cursor:pointer; padding: 6px 12px; font-size: 14px;"
               title="Reducir letra">A-</button>
             <span id="lyrics-modal-zoom-val"
-              style="font-size: 13px; color: var(--gold); font-weight: 700; min-width: 24px; text-align: center;">26</span>
+              style="font-size: 13px; color: var(--gold); font-weight: 700; min-width: 24px; text-align: center;">100%</span>
             <button id="lyrics-modal-zoom-up"
               style="background: transparent; border: none; color:var(--text); font-weight:bold; cursor:pointer; padding: 6px 12px; font-size: 14px;"
               title="Agrandar letra">A+</button>
@@ -4305,7 +4322,7 @@
         <div id="lyrics-modal-content" class="lyrics-content"></div>
       </div>
       <div class="lyrics-modal-footer"
-        style="padding: 16px 20px; border-top: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(180deg, var(--bg2) 0%, var(--bg3) 100%); flex-shrink: 0; gap: 8px; box-shadow: 0 -4px 20px rgba(0,0,0,0.3);">
+        style="padding: 16px 20px; border-top: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; background: #1E1E1E; flex-shrink: 0; gap: 8px; box-shadow: 0 -4px 20px rgba(0,0,0,0.3);">
         <!-- Bloque Anterior -->
         <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
           <button id="lyrics-modal-prev"
@@ -4894,6 +4911,9 @@
       btnAddSongGlobal.addEventListener('click', () => {
         editingSongId = null;
         document.getElementById('form-add-song').reset();
+        if (typeof window.actualizarListaAutoresDatalist === 'function') {
+          window.actualizarListaAutoresDatalist();
+        }
         const btnSubmit = document.querySelector('#form-add-song button[type="submit"]');
         if (btnSubmit) {
           btnSubmit.textContent = "Guardar en Repertorio";
@@ -5598,6 +5618,26 @@
       };
     }
 
+    window.actualizarListaAutoresDatalist = function () {
+      const datalist = document.getElementById('existing-artists-list');
+      if (!datalist) return;
+      const songs = window.cacheSongs || [];
+      const artistMap = new Map();
+
+      songs.forEach(s => {
+        const art = (s.artista || '').trim();
+        if (art && art.toLowerCase() !== 'desconocido' && art.toLowerCase() !== 'personalizada') {
+          const key = art.toLowerCase();
+          if (!artistMap.has(key)) {
+            artistMap.set(key, art);
+          }
+        }
+      });
+
+      const sortedArtists = Array.from(artistMap.values()).sort((a, b) => a.localeCompare(b));
+      datalist.innerHTML = sortedArtists.map(art => `<option value="${art}"></option>`).join('');
+    };
+
     // ====================================================
     // ESCUCHA DE DATOS BASE Y ENLACE DE EVENTOS
     // ====================================================
@@ -5606,6 +5646,9 @@
         cacheSongs = [];
         snap.forEach(doc => cacheSongs.push({ id: doc.id, ...doc.data() }));
         window.cacheSongs = cacheSongs;
+        if (typeof window.actualizarListaAutoresDatalist === 'function') {
+          window.actualizarListaAutoresDatalist();
+        }
         if (currentUserRole === 'lider') {
           renderizarMantenimientoCanciones();
           sincronizarPanelArmado();
@@ -6455,7 +6498,18 @@
         .replace(/\s+/g, ' ')
         .trim();
 
-      const artista = document.getElementById('song-artist-input').value.trim();
+      let artista = document.getElementById('song-artist-input').value.trim();
+
+      // Vincular automáticamente al artista existente si coincide (sin importar mayúsculas, minúsculas o tildes)
+      if (window.cacheSongs) {
+        const match = window.cacheSongs.find(s =>
+          (s.artista || '').trim().toLowerCase() === artista.toLowerCase() ||
+          (typeof removeAccents === 'function' && removeAccents(s.artista || '').trim().toLowerCase() === removeAccents(artista).toLowerCase())
+        );
+        if (match && match.artista) {
+          artista = match.artista.trim();
+        }
+      }
 
       // Verificar duplicado solo al AGREGAR (no al editar)
       if (!editingSongId) {
@@ -8226,8 +8280,7 @@
 
     let _scrollInterval = null;
     let _scrollSpeed = 2; // 1 a 5
-    let _currentZoom = window.innerWidth >= 768 ? 22 : 22; // default tablet: 32, mobile: 28
-
+    let _currentZoomPercent = 100; // porcentaje 100%
 
     function detenerAutoscroll() {
       if (_scrollInterval) {
@@ -8297,15 +8350,22 @@
 
     function aplicarZoomLetra(dir, contentId, zoomValId) {
       if (dir === 'up') {
-        _currentZoom = Math.min(_currentZoom + 2, 80);
+        _currentZoomPercent = Math.min(_currentZoomPercent + 10, 220);
       } else {
-        _currentZoom = Math.max(_currentZoom - 2, 12);
+        _currentZoomPercent = Math.max(_currentZoomPercent - 10, 70);
       }
       const el = document.getElementById(contentId);
-      if (el) el.style.setProperty('font-size', _currentZoom + 'px', 'important');
+      if (el) {
+        if ('zoom' in el.style) {
+          el.style.zoom = (_currentZoomPercent / 100);
+        } else {
+          el.style.transform = `scale(${_currentZoomPercent / 100})`;
+          el.style.transformOrigin = 'top left';
+        }
+      }
 
       const zoomVal = document.getElementById(zoomValId);
-      if (zoomVal) zoomVal.textContent = _currentZoom;
+      if (zoomVal) zoomVal.textContent = _currentZoomPercent + '%';
     }
 
 
@@ -8392,15 +8452,23 @@
         if (panBody) panBody.scrollTop = 0;
       }
 
-      const mobContent = document.getElementById('lyrics-modal-content');
-      if (mobContent) mobContent.style.setProperty('font-size', _currentZoom + 'px', 'important');
-      const panContent = document.getElementById('panel-lyrics-content');
-      if (panContent) panContent.style.setProperty('font-size', _currentZoom + 'px', 'important');
+      const applyZoomToElem = (el) => {
+        if (!el) return;
+        if ('zoom' in el.style) {
+          el.style.zoom = (_currentZoomPercent / 100);
+        } else {
+          el.style.transform = `scale(${_currentZoomPercent / 100})`;
+          el.style.transformOrigin = 'top left';
+        }
+      };
+
+      applyZoomToElem(document.getElementById('lyrics-modal-content'));
+      applyZoomToElem(document.getElementById('panel-lyrics-content'));
 
       const mobZoomVal = document.getElementById('lyrics-modal-zoom-val');
-      if (mobZoomVal) mobZoomVal.textContent = _currentZoom;
+      if (mobZoomVal) mobZoomVal.textContent = _currentZoomPercent + '%';
       const panZoomVal = document.getElementById('panel-lyrics-zoom-val');
-      if (panZoomVal) panZoomVal.textContent = _currentZoom;
+      if (panZoomVal) panZoomVal.textContent = _currentZoomPercent + '%';
 
 
       const cache = window._lyricsCache || {};
@@ -9357,7 +9425,16 @@
     if (btnAddCustomSong) {
       btnAddCustomSong.addEventListener('click', async () => {
         const customName = document.getElementById('musico-custom-name').value.trim();
-        const customArtist = document.getElementById('musico-custom-artist').value.trim() || "Personalizada";
+        let customArtist = document.getElementById('musico-custom-artist').value.trim() || "Personalizada";
+        if (window.cacheSongs && customArtist !== "Personalizada") {
+          const match = window.cacheSongs.find(s =>
+            (s.artista || '').trim().toLowerCase() === customArtist.toLowerCase() ||
+            (typeof removeAccents === 'function' && removeAccents(s.artista || '').trim().toLowerCase() === removeAccents(customArtist).toLowerCase())
+          );
+          if (match && match.artista) {
+            customArtist = match.artista.trim();
+          }
+        }
         const customTone = document.getElementById('musico-custom-tone').value;
         const type = window._targetAddSongType;
 
@@ -9745,7 +9822,7 @@
       window.addEventListener('load', () => {
         let newWorker;
 
-        navigator.serviceWorker.register('./sw.js?v=56')
+        navigator.serviceWorker.register('./sw.js?v=60')
           .then(reg => {
             console.log('PWA Service Worker registrado:', reg.scope);
 
@@ -9957,8 +10034,8 @@
 
         <div class="field"><label>Nombre de la Canción</label><input type="text" id="song-name-input" required
             placeholder="Ej: Grande y Fuerte"></div>
-        <div class="field"><label>Artista / Ministerio</label><input type="text" id="song-artist-input" required
-            placeholder="Ej: Miel San Marcos"></div>
+        <div class="field"><label>Artista / Ministerio</label><input type="text" id="song-artist-input" list="existing-artists-list" required
+            placeholder="Ej: Miel San Marcos" autocomplete="off"><datalist id="existing-artists-list"></datalist></div>
 
         <div class="field" style="display:none;">
           <label>Tipo de Canción</label>
@@ -10051,7 +10128,7 @@
   <!-- Modal Preview de Letra -->
   <div id="preview-lyrics-modal" class="modal-overlay" style="z-index: 999990;">
     <div class="modal-box"
-      style="text-align: left; border-color: var(--teal); max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
+      style="text-align: left; border-color: var(--teal); max-width: 500px; max-height: 85vh; display: flex; flex-direction: column; background: #1E1E1E;">
       <div
         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
         <div>
