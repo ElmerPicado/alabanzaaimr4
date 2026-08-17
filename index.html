@@ -4719,6 +4719,7 @@
     window.updateDoc = updateDoc;
     window.setDoc = setDoc;
     window.query = query;
+    window.where = where;
 
     // Lógica de Opciones (Admin Dropdown)
     const leaderAvBtn = document.getElementById('leader-avatar-container');
@@ -5159,13 +5160,33 @@
             // Fallback silencioso a la lógica de contraseña en el documento
           }
           
-          // ID para buscar en `usuarios` (compatibilidad con cuentas legacy o si se generó por correo)
+          // ID para buscar en `usuarios`
+          // Los documentos se guardan con el email como ID (ej: "joselinedelb@gmail.com")
+          // Si autenticado con Firebase, buscamos primero por email exacto, luego por alias (usuario field)
           let userIdToSearch = userVal;
           if (isAuthenticated && firebaseUser) {
-             userIdToSearch = firebaseUser.email.replace(/[^a-zA-Z0-9]/g, '').toLowerCase(); 
+            userIdToSearch = firebaseUser.email; // usar email exacto, no stripear
           }
 
-          const uSnap = await getDoc(doc(db, "usuarios", userIdToSearch));
+          let uSnap = await getDoc(doc(db, "usuarios", userIdToSearch));
+
+          // Si no encontró por ID directo, buscar por campo `usuario` (para login con alias)
+          if (!uSnap.exists()) {
+            // Intentar con el valor ingresado directamente (legacy o alias como ID)
+            const altSnap = await getDoc(doc(db, "usuarios", userVal));
+            if (altSnap.exists()) {
+              uSnap = altSnap;
+            } else {
+              // Buscar por campo `usuario` (alias) usando funciones ya importadas
+              const aliasQuery = query(collection(db, "usuarios"), where("usuario", "==", userVal));
+              const aliasSnap = await getDocs(aliasQuery);
+              if (!aliasSnap.empty) {
+                const fakeSnap = { exists: () => true, data: () => aliasSnap.docs[0].data() };
+                uSnap = fakeSnap;
+              }
+            }
+          }
+
           if (uSnap.exists()) {
             const uData = uSnap.data();
             
@@ -5209,15 +5230,6 @@
               _showLoginMsg("Usuario o contraseña incorrectos.", true);
             }
           } else {
-            // Si el usuario no existe en la BD Firestore bajo ese ID, puede que sea legacy
-            // Si isAuthenticated es true pero no esta en BD, fallamos.
-            if (!isAuthenticated) {
-              const legacySnap = await getDoc(doc(db, "usuarios", userVal));
-              if (legacySnap.exists() && legacySnap.data().password === passVal) {
-                iniciarSesionDashboard(legacySnap.data());
-                return;
-              }
-            }
             _showLoginMsg("Usuario o contraseña incorrectos.", true);
           }
         } catch (err) {
@@ -5254,7 +5266,10 @@
         const screenSuperadmin = document.getElementById('screen-superadmin');
         if (screenSuperadmin) {
           screenSuperadmin.classList.add('active');
-          if (typeof window.renderSuperAdminChurches === 'function') window.renderSuperAdminChurches();
+          // Pequeño delay para asegurar que window.getDocs esté listo
+          setTimeout(() => {
+            if (typeof window.renderSuperAdminChurches === 'function') window.renderSuperAdminChurches();
+          }, 300);
         }
       } else if (currentUserRole === 'lider' || currentUserRole === 'admin') {
         // Ambos (lider legacy y admin multi-tenant) tienen acceso al panel
@@ -7767,7 +7782,9 @@
       const userInput = document.getElementById('member-user-input').value.trim();
       const passInput = document.getElementById('member-pass-input').value.trim();
 
-      const userKey = editingUserKey || emailInput;
+      // El ID del documento es el email si existe, si no el alias (usuario)
+      // Así el usuario puede iniciar sesión tanto con correo como con alias
+      const userKey = editingUserKey || (emailInput ? emailInput : userInput);
 
       // Obtener los instrumentos seleccionados de los checkboxes
       const selectedChips = Array.from(msCheckboxes).filter(c => c.checked).map(c => c.value);
@@ -7797,17 +7814,16 @@
       };
 
       try {
-        if (!editingUserKey) {
-          // Es un usuario nuevo, crearlo en Firebase Auth
+        // Solo crear en Firebase Auth si hay un email válido
+        if (!editingUserKey && emailInput && emailInput.includes('@')) {
           const { getAuth, createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js");
           const auth = getAuth();
           try {
             await createUserWithEmailAndPassword(auth, emailInput, passInput);
           } catch (authErr) {
             if (authErr.code !== 'auth/email-already-in-use') {
-              console.error(authErr);
-              customAlert("Hubo un error al crear la cuenta en Firebase Auth: " + authErr.message);
-              return; // Si no se puede crear en Auth, cancelamos la creación en Firestore
+              console.warn("Auth creation skipped:", authErr.message);
+              // No bloqueamos la creación — el usuario podrá entrar con alias+contraseña
             }
           }
         }
@@ -7816,7 +7832,7 @@
         
         const wasEditing = !!editingUserKey;
         resetMemberForm();
-        customAlert(wasEditing ? "Integrante actualizado exitosamente." : "Integrante guardado exitosamente. Ya puede iniciar sesión con su correo o alias.");
+        customAlert(wasEditing ? "Integrante actualizado exitosamente." : "Integrante guardado exitosamente. Ya puede iniciar sesión con su usuario y contraseña.");
       } catch (err) {
         console.error(err);
         customAlert("Hubo un problema al guardar el integrante: " + err.message);
