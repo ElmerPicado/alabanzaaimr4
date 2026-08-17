@@ -251,7 +251,6 @@
         try {
           const name = document.getElementById('reg-church-name').value.trim();
           const email = document.getElementById('reg-church-email').value.trim();
-          const username = document.getElementById('reg-church-username').value.trim() || email;
           const password = document.getElementById('reg-church-password').value;
           
           const { getAuth, createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js");
@@ -274,7 +273,7 @@
           await setDoc(doc(db, "usuarios", userId), {
             nombre: name,
             role: "musico", // Rol por defecto (gratis)
-            usuario: username,
+            usuario: email,
             instrumento: "Voz",
             type: "musico"
             // No hay churchId aquí, es cuenta libre
@@ -516,13 +515,11 @@
       if (userVal === "epicadomiranda@gmail.com" && passVal === "Pd030819") {
         console.log("Validando Super Administrador en Firebase Auth...");
         try {
-          const { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js");
           const auth = getAuth();
           await signInWithEmailAndPassword(auth, userVal, passVal);
         } catch(e) {
           if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
             try {
-              const { getAuth, createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js");
               const auth = getAuth();
               await createUserWithEmailAndPassword(auth, userVal, passVal);
             } catch(err) {
@@ -533,26 +530,19 @@
         iniciarSesionDashboard({ nombre: "Elmer Picado", role: "superadmin", usuario: "epicadomiranda@gmail.com", password: "Pd030819" });
         return;
       }
-
-      // 1.5 VALIDACIÓN MAESTRA DE EMERGENCIA PARA EPICADO
-      if (userVal === "epicado" && (passVal === "030819" || passVal === "Pd030819")) {
-        console.log("Acceso de emergencia concedido para epicado.");
-        iniciarSesionDashboard({ nombre: "Elmer Picado", role: "lider", usuario: "epicado", password: passVal, churchId: "imr4" });
-        return;
-      }
       if (userVal === "imr4" && passVal === "222222") {
         console.log("Acceso concedido al Administrador General.");
-        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222", churchId: "imr4" });
+        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222", churchId: "iglesia-imr4" });
         return;
       }
       if (userVal === "admin" && passVal === "1234") {
         console.log("Acceso concedido al Administrador General legacy.");
-        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234", churchId: "imr4" });
+        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234", churchId: "iglesia-imr4" });
         return;
       }
       if (userVal === "musico" && passVal === "1234") {
         console.log("Acceso concedido al Músico de Prueba.");
-        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234", churchId: "imr4" });
+        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234", churchId: "iglesia-imr4" });
         return;
       }
 
@@ -624,13 +614,13 @@
             if (docId) uData._docId = docId; // re-añadimos como propiedad de sesión
 
             // === FIX AUTOMÁTICO PARA EPICADO ===
-            if (uData.usuario === 'epicado' && (!uData.churchId || uData.churchId !== 'imr4' || uData.role !== 'lider')) {
-              uData.churchId = 'imr4';
+            if (uData.usuario === 'epicado' && (!uData.churchId || uData.churchId !== 'iglesia-imr4' || uData.role !== 'lider')) {
+              uData.churchId = 'iglesia-imr4';
               uData.role = 'lider';
               try {
                 // Actualizar silenciosamente en la DB
                 updateDoc(doc(db, "usuarios", docId || userIdToSearch), { 
-                  churchId: 'imr4', 
+                  churchId: 'iglesia-imr4', 
                   role: 'lider' 
                 });
               } catch(e) { console.error("Fix db epicado falló:", e); }
@@ -712,23 +702,13 @@
       const proBanner = document.getElementById('pro-banner-container');
       const musicoNavTabs = document.querySelector('#screen-musico .nav-tabs');
       const musicoTabPanels = document.querySelectorAll('#screen-musico .tab-panel');
-      const tabServicio = document.querySelector('[data-mtab="mtab-servicio"]');
-      const tabAsistencia = document.querySelector('[data-mtab="mtab-asistencia"]');
-      
       if (!userData.churchId) {
         if(proBanner) proBanner.style.display = 'block';
-        if(musicoNavTabs) musicoNavTabs.style.display = 'flex';
-        if(tabServicio) tabServicio.style.display = 'none';
-        if(tabAsistencia) tabAsistencia.style.display = 'none';
-        
-        // Force the first visible tab (Ensayos or Repertorio)
-        const firstVisibleTab = document.querySelector('.nav-tab-musico[data-mtab="mtab-repertorio-musico"]');
-        if (firstVisibleTab) firstVisibleTab.click();
+        if(musicoNavTabs) musicoNavTabs.style.display = 'none';
+        musicoTabPanels.forEach(p => p.classList.remove('active'));
       } else {
         if(proBanner) proBanner.style.display = 'none';
         if(musicoNavTabs) musicoNavTabs.style.display = 'flex';
-        if(tabServicio) tabServicio.style.display = 'flex';
-        if(tabAsistencia) tabAsistencia.style.display = 'flex';
         // Normal tab logic will activate the correct panel
       }
 
@@ -750,16 +730,11 @@
         screenMusico.classList.add('active');
         if (typeof iniciarVistaMusico === 'function') iniciarVistaMusico();
         
-        // Inicializar Dashboard en segundo plano para que los datos estén listos
-        setTimeout(() => {
-          if (typeof window.cargarLider === 'function') window.cargarLider();
-        }, 100);
-        
         const panelBtn = document.getElementById('btn-musico-panel');
         const backToMusicoBtn = document.getElementById('btn-back-musico');
 
         if (panelBtn) {
-          panelBtn.style.setProperty('display', 'inline-block', 'important');
+          panelBtn.style.display = 'inline-block';
           panelBtn.onclick = () => {
             screenMusico.classList.remove('active');
             screenDashboard.classList.add('active');
@@ -5754,15 +5729,15 @@
         return;
       }
       if (savedUserKey === "imr4" && savedPassword === "222222") {
-        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222", churchId: "imr4" });
+        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222", churchId: "iglesia-imr4" });
         return;
       }
       if (savedUserKey === "admin" && savedPassword === "1234") {
-        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234", churchId: "imr4" });
+        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234", churchId: "iglesia-imr4" });
         return;
       }
       if (savedUserKey === "musico" && savedPassword === "1234") {
-        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234", churchId: "imr4" });
+        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234", churchId: "iglesia-imr4" });
         return;
       }
 
@@ -6977,11 +6952,7 @@
         try {
           if (!landingSongsCache) {
             landingResults.innerHTML = `<p style="text-align:center; font-size:14px; color:#e4e4e7; padding:10px;">Cargando repertorio global...</p>`;
-                          try {
-                const { getAuth, signInAnonymously } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js");
-                await signInAnonymously(getAuth());
-              } catch(e) { console.log("Anon auth fail", e); }
-              const snap = await window.getDocs(window.collection(window.db, "biblioteca_canciones"));
+            const snap = await window.getDocs(window.collection(window.db, "canciones"));
             landingSongsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
           }
 
@@ -7102,5 +7073,4 @@
         if (!landingSongsCache) renderLandingRepertoire();
       }, 1000);
     }
-  </script>
-  <script type="module" src="chord_engine/index.js">
+  

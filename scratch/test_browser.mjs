@@ -1,0 +1,16 @@
+import { chromium } from 'playwright';
+(async () => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  page.on('console', msg => console.log('BROWSER CONSOLE:', msg.text()));
+  page.on('pageerror', err => console.log('BROWSER ERROR:', err.message));
+  await page.goto('http://127.0.0.1:5501');
+  await page.waitForTimeout(2000);
+  
+  await page.fill('#login-email', 'epicado');
+  await page.fill('#login-password', '030819');
+  await page.click('#login-form button[type="submit"]');
+  await page.waitForTimeout(2000);
+
+  await browser.close();
+})();

@@ -5794,6 +5794,7 @@
     let activeSessionUser = null;
     let unsubscribeService = null;
     let editingUserKey = null;
+    let unsubscribeMusicoService = null; // Declarada arriba para evitar TDZ ReferenceError (Fase E)
     let editingSongId = null;
     let currentAutoMsg = "";
     window._whatsappGroupLink = "";
@@ -5897,17 +5898,17 @@
       }
       if (userVal === "imr4" && passVal === "222222") {
         console.log("Acceso concedido al Administrador General.");
-        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222", churchId: "iglesia-imr4" });
+        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222", churchId: "imr4" });
         return;
       }
       if (userVal === "admin" && passVal === "1234") {
         console.log("Acceso concedido al Administrador General legacy.");
-        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234", churchId: "iglesia-imr4" });
+        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234", churchId: "imr4" });
         return;
       }
       if (userVal === "musico" && passVal === "1234") {
         console.log("Acceso concedido al Músico de Prueba.");
-        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234", churchId: "iglesia-imr4" });
+        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234", churchId: "imr4" });
         return;
       }
 
@@ -5980,6 +5981,48 @@
             
             // Validar login por Auth o por password legacy en el doc
             if (isAuthenticated || uData.password === passVal) {
+              // Autenticación Transparente (Fase E/Firestore Rules):
+              // Si validó por contraseña de Firestore pero no estaba autenticado en Firebase Auth (ej: alias),
+              // iniciar sesión o crear su cuenta virtual de forma transparente para que request.auth no sea null.
+              if (!isAuthenticated) {
+                try {
+                  const { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js");
+                  const auth = getAuth();
+                  const virtualEmail = userVal.includes('@') ? userVal : `${userVal.toLowerCase()}@alabanapp.com`;
+                  try {
+                    await signInWithEmailAndPassword(auth, virtualEmail, passVal);
+                    isAuthenticated = true;
+                  } catch (loginErr) {
+                    if (loginErr.code === 'auth/user-not-found' || loginErr.code === 'auth/invalid-credential') {
+                      try {
+                        await createUserWithEmailAndPassword(auth, virtualEmail, passVal);
+                        isAuthenticated = true;
+                      } catch (createErr) {
+                        console.error("No se pudo crear usuario virtual Auth:", createErr);
+                      }
+                    } else {
+                      console.error("Error al autenticar usuario virtual Auth:", loginErr);
+                    }
+                  }
+                } catch (authModErr) {
+                  console.error("Error importando Firebase Auth para alias:", authModErr);
+                }
+              }
+
+              // Cargar rol e instrumento contextual de la membresía (Fase E)
+              if (uData.churchId) {
+                try {
+                  const mSnap = await getDoc(doc(db, "memberships", `${uData._docId || uData.usuario}_${uData.churchId}`));
+                  if (mSnap.exists()) {
+                    const mData = mSnap.data();
+                    uData.role = mData.role || uData.role || "musico";
+                    uData.instrumento = mData.instrumento || uData.instrumento || "Voz";
+                  }
+                } catch(e) {
+                  console.error("Error al cargar rol de membresía:", e);
+                }
+              }
+              
               
               // Verificación de Suscripción si pertenece a un inquilino (churchId)
               if (uData.churchId) {
@@ -5987,8 +6030,9 @@
                 if (churchSnap.exists()) {
                   const cData = churchSnap.data();
                   
-                  // Excepción para IMR4 (Gratis ilimitado)
-                  if (cData.name && cData.name.toLowerCase().includes('imr4')) {
+                  // Excepción: Plan permanente (expireAt = null) — acceso libre indefinido
+                  // Aplica a IMR4 y cualquier iglesia con plan perpetuo
+                  if (!cData.expireAt || cData.expireAt === null) {
                     uData.churchName = cData.name;
                     iniciarSesionDashboard(uData);
                     return;
@@ -6977,36 +7021,69 @@
         if (typeof showToast === 'function') showToast("Error al cargar el repertorio. Revisa tu conexión.", { duration: 5000 });
       });
 
-      // Consulta de miembros: filtrada SIEMPRE por churchId de la cuenta activa.
-      // Si el usuario no tiene churchId asignado (cuenta sin iglesia) solo se carga su propio documento.
-      let membersQuery;
+      // Consulta de miembros basada en la colección memberships
+      let membershipsQuery;
       if (churchId) {
-        membersQuery = query(collection(db, "usuarios"), where("churchId", "==", churchId));
+        membershipsQuery = query(collection(db, "memberships"), where("churchId", "==", churchId));
       } else {
-        // Fallback seguro: solo el propio usuario (no exponer toda la base)
-        membersQuery = query(collection(db, "usuarios"), where("usuario", "==", activeSessionUser.usuario));
+        const uId = activeSessionUser && (activeSessionUser._docId || activeSessionUser.usuario);
+        membershipsQuery = query(collection(db, "memberships"), where("userId", "==", uId || ""));
       }
 
-      onSnapshot(membersQuery, (snap) => {
-        cacheMembers = [];
-        snap.forEach(doc => cacheMembers.push({ id: doc.id, ...doc.data() }));
+      window._globalUsersCache = window._globalUsersCache || {};
+
+      onSnapshot(membershipsQuery, async (snap) => {
+        const memberships = [];
+        snap.forEach(doc => memberships.push({ id: doc.id, ...doc.data() }));
+
+        const userPromises = memberships.map(async (m) => {
+          const uId = m.userId;
+          if (!window._globalUsersCache[uId]) {
+            try {
+              const uSnap = await getDoc(doc(db, "usuarios", uId));
+              if (uSnap.exists()) {
+                window._globalUsersCache[uId] = uSnap.data();
+              }
+            } catch (e) {
+              console.error("Error cargando usuario global:", uId, e);
+            }
+          }
+          const globalUser = window._globalUsersCache[uId] || {};
+          return {
+            id: uId,
+            nombre: globalUser.nombre || "Integrante",
+            usuario: globalUser.usuario || uId,
+            correo: globalUser.correo || "",
+            password: globalUser.password || "",
+            profilePic: globalUser.profilePic || "",
+            churchId: m.churchId,
+            role: m.role || "musico",
+            instrumento: m.instrumento || "Voz",
+            type: m.type || "musico"
+          };
+        });
+
+        const resolvedMembers = await Promise.all(userPromises);
+        cacheMembers = resolvedMembers;
         window.cacheMembers = cacheMembers;
+
         if (currentUserRole === 'lider' || currentUserRole === 'admin') {
           renderizarMantenimientoMiembros();
           sincronizarPanelArmado();
         } else if (currentUserRole === 'musico') {
-          const msDate = document.getElementById('musico-service-date').value;
-          const maDate = document.getElementById('musico-avail-date').value;
+          const msDateEl = document.getElementById('musico-service-date');
+          const maDateEl = document.getElementById('musico-avail-date');
+          const msDate = msDateEl ? msDateEl.value : null;
+          const maDate = maDateEl ? maDateEl.value : null;
           if (msDate) cargarServicioMusico(msDate);
           if (maDate) cargarAsistenciaMusico(maDate);
         }
 
-        // Setup rehearsal members when members change
         if (window.renderEnsayoMembers) {
           window.renderEnsayoMembers();
         }
       }, (err) => {
-        console.error("Error cargando usuarios:", err);
+        console.error("Error cargando memberships:", err);
       });
 
       // Consulta de planes de servicio: por churchId si existe
@@ -7162,6 +7239,7 @@
           // Inicializar estructura limpia de la fecha en Firestore para todos
           await setDoc(serviceDocRef, {
             fecha: targetDate,
+            churchId: (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : null,
             cancionesSeleccionadas: {}, // id_cancion: tono_elegido
             cancionesSeleccionadasTipos: {}, // id_cancion: tipo
             ordenCanciones: [],
@@ -7190,7 +7268,13 @@
       const objetoFecha = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
       const fechaLegible = objetoFecha.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 
-      let msg = `*PROGRAMACIÓN DE ALABANZA - IMR4*\n*${fechaLegible.toUpperCase()}*\n\n`;
+      // Usar el nombre de la iglesia dinámicamente (multi-tenant)
+      const churchDisplayName = (activeSessionUser && activeSessionUser.churchName)
+        ? activeSessionUser.churchName
+        : (activeSessionUser && activeSessionUser.churchId
+          ? activeSessionUser.churchId.toUpperCase()
+          : 'ALABANZA');
+      let msg = `*PROGRAMACIÓN DE ALABANZA - ${churchDisplayName}*\n*${fechaLegible.toUpperCase()}*\n\n`;
 
       if (dataServicio.nota_adicional && dataServicio.nota_adicional.trim() !== "") {
         msg += `*NOTA DEL LÍDER:*\n_${dataServicio.nota_adicional}_\n\n`;
@@ -7561,26 +7645,32 @@
       actualizarLetraSiAbierta();
     }
 
-    // Eventos de Disponibilidad del Músico
-    document.getElementById('btn-avail-confirm').addEventListener('click', async () => {
-      const targetDate = serviceDateSelect.value;
-      if (!targetDate || !activeSessionUser) return;
-      const path = `disponibilidad.${activeSessionUser.usuario}`;
-      await updateDoc(doc(db, "planes_servicio", targetDate), {
-        [path]: 'confirmado'
+    // Eventos de Disponibilidad del Músico (protegidos contra elementos nulos)
+    const btnAvailConfirm = document.getElementById('btn-avail-confirm');
+    if (btnAvailConfirm) {
+      btnAvailConfirm.addEventListener('click', async () => {
+        const targetDate = serviceDateSelect.value;
+        if (!targetDate || !activeSessionUser) return;
+        const path = `disponibilidad.${activeSessionUser.usuario}`;
+        await updateDoc(doc(db, "planes_servicio", targetDate), {
+          [path]: 'confirmado'
+        });
       });
-    });
+    }
 
-    document.getElementById('btn-avail-decline').addEventListener('click', async () => {
-      const targetDate = serviceDateSelect.value;
-      if (!targetDate || !activeSessionUser) return;
-      const path = `disponibilidad.${activeSessionUser.usuario}`;
-      const pathAsignado = `musicosAsignados.${activeSessionUser.usuario}`;
-      await updateDoc(doc(db, "planes_servicio", targetDate), {
-        [path]: 'ausente',
-        [pathAsignado]: false
+    const btnAvailDecline = document.getElementById('btn-avail-decline');
+    if (btnAvailDecline) {
+      btnAvailDecline.addEventListener('click', async () => {
+        const targetDate = serviceDateSelect.value;
+        if (!targetDate || !activeSessionUser) return;
+        const path = `disponibilidad.${activeSessionUser.usuario}`;
+        const pathAsignado = `musicosAsignados.${activeSessionUser.usuario}`;
+        await updateDoc(doc(db, "planes_servicio", targetDate), {
+          [path]: 'ausente',
+          [pathAsignado]: false
+        });
       });
-    });
+    }
 
 
     // ====================================================
@@ -8604,6 +8694,99 @@
         ? activeSessionUser.churchId
         : (existingMember && existingMember.churchId ? existingMember.churchId : null);
 
+      // ================================================================
+      // FASE C: BUSCAR USUARIO EXISTENTE ANTES DE CREAR (ANTI-DUPLICADOS)
+      // Si el usuario ya existe en el sistema global, vincular en vez de crear.
+      // ================================================================
+      if (!editingUserKey) {
+        let foundDoc = null;
+        let foundDocId = null;
+
+        // 1. Buscar por email como docId (usuarios con correo)
+        if (emailInput && emailInput.includes('@')) {
+          try {
+            const snapEmail = await getDoc(doc(db, "usuarios", emailInput));
+            if (snapEmail.exists()) {
+              foundDoc = snapEmail.data();
+              foundDocId = emailInput;
+            }
+          } catch(_) {}
+        }
+
+        // 2. Si no encontró por email, buscar por alias como docId (usuarios sin correo)
+        if (!foundDoc && userInput) {
+          try {
+            const snapAlias = await getDoc(doc(db, "usuarios", userInput));
+            if (snapAlias.exists()) {
+              foundDoc = snapAlias.data();
+              foundDocId = userInput;
+            }
+          } catch(_) {}
+        }
+
+        if (foundDoc) {
+          const yaEnEstaIglesia = foundDoc.churchId && foundDoc.churchId === memberChurchId;
+          const enOtraIglesia = foundDoc.churchId && foundDoc.churchId !== memberChurchId;
+
+          if (yaEnEstaIglesia) {
+            customAlert(`"${foundDoc.nombre}" ya es miembro activo de esta comunidad.`);
+            return;
+          }
+
+          const pregunta = enOtraIglesia
+            ? `"${foundDoc.nombre}" ya existe en el sistema y pertenece a otra comunidad.\n\n` +
+              `¿Deseas vincularlo a tu comunidad? Sus credenciales de acceso no cambiarán.\n\n` +
+              `⚠️ Nota: su comunidad activa cambiará a la tuya.`
+            : `"${foundDoc.nombre}" ya existe en el sistema (sin comunidad asignada).\n\n` +
+              `¿Deseas añadirlo a tu comunidad como miembro?`;
+
+          const confirmado = await customConfirm(pregunta);
+          if (!confirmado) return;
+
+          // Verificar límite del plan antes de vincular
+          if (memberChurchId) {
+            try {
+              const cSnap = await window.getDoc(window.doc(window.db, "churches", memberChurchId));
+              const cPlan = cSnap.exists() ? (cSnap.data().plan || 'gratis') : 'gratis';
+              const cCount = (window.cacheMembers || []).filter(m => m.churchId === memberChurchId).length;
+              const cLimit = cPlan === 'basico' ? 10 : (cPlan === 'pro' || cPlan === 'prueba') ? 25 : 1;
+              if (cCount >= cLimit) {
+                customAlert(`Límite alcanzado: Tu plan (${cPlan.toUpperCase()}) permite máximo ${cLimit} miembros (tienes ${cCount}).`);
+                return;
+              }
+            } catch(_) {}
+          }
+
+          // Vincular: crear membresía en la colección memberships
+          try {
+            const membershipDocId = `${foundDocId}_${memberChurchId}`;
+            await setDoc(doc(db, "memberships", membershipDocId), {
+              userId: foundDocId,
+              churchId: memberChurchId,
+              role: document.getElementById('member-role-input').value,
+              instrumento: instVal,
+              type: isCoro ? 'corista' : 'musico',
+              joinedAt: new Date().toISOString()
+            }, { merge: true });
+            
+            // También actualizar churchId en el usuario global por retrocompatibilidad
+            await setDoc(doc(db, "usuarios", foundDocId), {
+              churchId: memberChurchId,
+              role: document.getElementById('member-role-input').value,
+              instrumento: instVal,
+              type: isCoro ? 'corista' : 'musico'
+            }, { merge: true });
+
+            resetMemberForm();
+            customAlert(`"${foundDoc.nombre}" fue vinculado a tu comunidad exitosamente. ¡Ya puede acceder con sus credenciales actuales!`);
+          } catch (err) {
+            customAlert('Error al vincular usuario: ' + err.message);
+          }
+          return; // No continuar con la creación normal
+        }
+      }
+      // FIN FASE C
+
       // --- VALIDACIÓN DE LÍMITES POR PLAN ---
       if (!editingUserKey && memberChurchId) {
         try {
@@ -8626,33 +8809,53 @@
         }
       }
 
-      const payload = {
+      const userPayload = {
         nombre: document.getElementById('member-name-input').value.trim(),
-        type: isCoro ? 'corista' : 'musico',
-        instrumento: instVal,
         usuario: userInput,
         correo: emailInput,
         password: passInput,
+        // Compatibilidad con versiones legacy
+        type: isCoro ? 'corista' : 'musico',
+        instrumento: instVal,
         role: document.getElementById('member-role-input').value,
         churchId: memberChurchId
       };
 
+      const membershipPayload = {
+        userId: userKey,
+        churchId: memberChurchId,
+        role: document.getElementById('member-role-input').value,
+        instrumento: instVal,
+        type: isCoro ? 'corista' : 'musico',
+        joinedAt: new Date().toISOString()
+      };
+
       try {
-        // Solo crear en Firebase Auth si hay un email válido
-        if (!editingUserKey && emailInput && emailInput.includes('@')) {
+        // Crear en Firebase Auth de forma transparente para permitir autenticación real (evitar permission-denied)
+        if (!editingUserKey) {
           const { getAuth, createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js");
           const auth = getAuth();
+          const targetAuthEmail = emailInput && emailInput.includes('@') ? emailInput : `${userInput.toLowerCase()}@alabanapp.com`;
           try {
-            await createUserWithEmailAndPassword(auth, emailInput, passInput);
+            await createUserWithEmailAndPassword(auth, targetAuthEmail, passInput);
           } catch (authErr) {
             if (authErr.code !== 'auth/email-already-in-use') {
               console.warn("Auth creation skipped:", authErr.message);
-              // No bloqueamos la creación — el usuario podrá entrar con alias+contraseña
             }
           }
         }
         
-        await setDoc(doc(db, "usuarios", userKey), payload, { merge: true });
+        // 1. Guardar usuario global
+        await setDoc(doc(db, "usuarios", userKey), userPayload, { merge: true });
+
+        // 2. Guardar membresía
+        const membershipDocId = `${userKey}_${memberChurchId}`;
+        await setDoc(doc(db, "memberships", membershipDocId), membershipPayload, { merge: true });
+
+        // Forzar actualización en caché local
+        if (window._globalUsersCache) {
+          delete window._globalUsersCache[userKey];
+        }
         
         const wasEditing = !!editingUserKey;
         resetMemberForm();
@@ -8700,7 +8903,7 @@
       `;
         if (canManage) {
           div.querySelector('.click-edit-member').addEventListener('click', () => {
-            editingUserKey = m.usuario;
+            editingUserKey = m.id || m.usuario;
             document.getElementById('member-name-input').value = m.nombre;
             document.getElementById('member-user-input').value = m.usuario;
             document.getElementById('member-user-input').disabled = true;
@@ -8745,7 +8948,6 @@
     // ====================================================
     // LOGICA DE LA VISTA EXCLUSIVA DEL MÚSICO
     // ====================================================
-    let unsubscribeMusicoService = null;
     const btnMusicoConfirm = document.getElementById('btn-musico-confirm');
     const btnMusicoDecline = document.getElementById('btn-musico-decline');
     const btnMusicoMaybe = document.getElementById('btn-musico-maybe');
@@ -11081,15 +11283,15 @@
         return;
       }
       if (savedUserKey === "imr4" && savedPassword === "222222") {
-        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222", churchId: "iglesia-imr4" });
+        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222", churchId: "imr4" });
         return;
       }
       if (savedUserKey === "admin" && savedPassword === "1234") {
-        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234", churchId: "iglesia-imr4" });
+        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234", churchId: "imr4" });
         return;
       }
       if (savedUserKey === "musico" && savedPassword === "1234") {
-        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234", churchId: "iglesia-imr4" });
+        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234", churchId: "imr4" });
         return;
       }
 
@@ -11098,6 +11300,33 @@
         const uSnap = await getDoc(doc(db, "usuarios", savedUserKey));
         if (uSnap.exists() && uSnap.data().password === savedPassword) {
           const userData = { ...uSnap.data(), _docId: uSnap.id };
+          
+          // Autenticación Transparente en auto-login (Fase E / Firestore Rules)
+          const auth = getAuth();
+          if (!auth.currentUser) {
+            const virtualEmail = savedUserKey.includes('@') ? savedUserKey : `${savedUserKey.toLowerCase()}@alabanapp.com`;
+            try {
+              await signInWithEmailAndPassword(auth, virtualEmail, savedPassword);
+            } catch (e) {
+              try {
+                await createUserWithEmailAndPassword(auth, virtualEmail, savedPassword);
+              } catch (e2) {}
+            }
+          }
+
+          // Cargar rol e instrumento contextual de la membresía (Fase E)
+          if (userData.churchId) {
+            try {
+              const mSnap = await getDoc(doc(db, "memberships", `${userData._docId || userData.usuario}_${userData.churchId}`));
+              if (mSnap.exists()) {
+                const mData = mSnap.data();
+                userData.role = mData.role || userData.role || "musico";
+                userData.instrumento = mData.instrumento || userData.instrumento || "Voz";
+              }
+            } catch(e) {
+              console.error("Error al cargar rol de membresía en auto-login:", e);
+            }
+          }
           iniciarSesionDashboard(userData);
         } else {
           console.warn("Sesión local caducada o usuario modificado.");
@@ -11694,6 +11923,17 @@
   </div>
 
   <script>
+    // Función debounce local para evitar ReferenceError por carga asíncrona de módulos
+    function debounce(func, delay = 300) {
+      let timeoutId;
+      return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          func.apply(this, args);
+        }, delay);
+      };
+    }
+
     window.openPreviewLyrics = async function (songId) {
       if (!window._cacheSongsForPreview) return;
       const song = window._cacheSongsForPreview.find(s => s.id === songId);
@@ -11879,8 +12119,19 @@
       }
 
       try {
-        await deleteDoc(doc(db, "usuarios", username));
-        showToast(`Usuario "${userNombre}" eliminado exitosamente.`);
+        const currentChurchId = (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : null;
+        if (currentChurchId) {
+          const membershipDocId = `${username}_\n${currentChurchId}`;
+          await deleteDoc(doc(db, "memberships", membershipDocId));
+          // Limpiar el churchId del usuario global para compatibilidad
+          try {
+            await setDoc(doc(db, "usuarios", username), { churchId: "" }, { merge: true });
+          } catch(e) {}
+          showToast(`Integrante "${userNombre}" removido de esta comunidad exitosamente.`);
+        } else {
+          await deleteDoc(doc(db, "usuarios", username));
+          showToast(`Usuario "${userNombre}" eliminado definitivamente del sistema.`);
+        }
         if (typeof window.renderSuperAdminChurches === 'function') window.renderSuperAdminChurches();
         if (typeof renderizarMantenimientoMiembros === 'function') renderizarMantenimientoMiembros();
       } catch (err) {
@@ -12247,6 +12498,7 @@
           btn.textContent = "Generar y Enviar Acceso";
         }
       });
+    } // <-- Cierre del if (formTrial)
     const btnSaDeleteUser = document.getElementById('btn-sa-delete-user');
     if (btnSaDeleteUser) {
       btnSaDeleteUser.addEventListener('click', () => {
