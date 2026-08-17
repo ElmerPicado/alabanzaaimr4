@@ -3777,7 +3777,7 @@
               <label>Nivel de Permiso</label>
               <select id="member-role-input">
                 <option value="musico">Músico (Solo lectura del servicio)</option>
-                <option value="lider">Líder (Control total de armado)</option>
+                <option value="lider">Admin (Control total de armado)</option>
               </select>
             </div>
             <button type="submit" class="btn-primary" style="background: var(--purple); color: #0f0e17;">Agregar
@@ -3816,17 +3816,12 @@
           <p id="whatsapp-link-status" style="font-size:12px;color:var(--teal);margin-top:8px;min-height:18px;"></p>
         </div>
 
-        <div class="card" style="border-color: var(--gold); margin-bottom: 20px;">
-          <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin-bottom: 6px;">🛠️
-            Mantenimiento de Biblioteca</h3>
+        <div class="card" style="border-color: var(--teal); margin-bottom: 20px;">
+          <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--teal); margin-bottom: 6px;">
+            Ajustes del Sistema</h3>
           <p style="font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55;">
-            Si notas que algunas canciones tienen el "Tono Original" equivocado en la base de datos (por ejemplo, porque
-            el sistema analizó mal la letra en el pasado), usa este botón. Analizará <b>todas</b> las canciones con el
-            nuevo algoritmo corregido (ignorando tablaturas y palabras) y reparará su tono base automáticamente.
+            Configuración general del grupo de alabanza.
           </p>
-          <button id="btn-recalculate-tones" class="btn-primary"
-            style="background:var(--gold);color:#0f0e17;width:auto;padding:10px 24px;font-size:13px;margin-top:6px;font-weight:bold;">🔄
-            Recalcular Tonos Base</button>
         </div>
       </div>
 
@@ -3852,40 +3847,74 @@
     </header>
     
     <main class="content">
-      <h2 class="section-title">Gestión de Cuentas / Iglesias</h2>
-      <p class="section-sub">Visualiza las instituciones registradas, valida los pagos y asigna los planes de suscripción.</p>
+      <!-- Menú de Secciones de SuperAdmin -->
+      <div class="sa-tab-buttons" style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; flex-wrap: wrap;">
+        <button class="sa-tab-btn active" data-satab="sa-tab-cuentas" style="padding: 10px 18px; font-size: 13px; font-weight: 700; color: var(--gold); background: var(--bg2); border: 1px solid var(--gold); border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-body);">
+          🏛️ Gestión de Cuentas / Iglesias
+        </button>
+        <button class="sa-tab-btn" data-satab="sa-tab-biblioteca" style="padding: 10px 18px; font-size: 13px; font-weight: 700; color: var(--text2); background: var(--bg3); border: 1px solid var(--border2); border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-body);">
+          🎵 Biblioteca de Canciones Global
+        </button>
+      </div>
 
-      <div class="card" style="margin-bottom: 24px; border-color: var(--purple);">
-        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--purple); margin-bottom: 12px;">Generar Cuenta de Prueba Manual</h3>
-        <form id="form-superadmin-trial">
-          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 12px;">
-            <input type="text" id="sa-trial-name" required placeholder="Nombre Iglesia/Grupo" style="flex:1; padding:10px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; outline:none;">
-            <input type="email" id="sa-trial-email" required placeholder="Correo del Admin" style="flex:1; padding:10px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; outline:none;">
+      <!-- SECCIÓN 1: GESTIÓN DE CUENTAS E IGLESIAS -->
+      <div id="sa-tab-cuentas" class="sa-tab-panel">
+        <h2 class="section-title">Gestión de Cuentas e Iglesias</h2>
+        <p class="section-sub">Visualiza las instituciones registradas, valida los pagos y asigna los planes de suscripción.</p>
+
+        <div class="card" style="margin-bottom: 20px; border-color: var(--purple);">
+          <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--purple); margin-bottom: 12px;">Generar Cuenta de Prueba Manual</h3>
+          <form id="form-superadmin-trial">
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 12px;">
+              <input type="text" id="sa-trial-name" required placeholder="Nombre Iglesia/Grupo" style="flex:1; padding:10px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; outline:none;">
+              <input type="email" id="sa-trial-email" required placeholder="Correo del Admin" style="flex:1; padding:10px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; outline:none;">
+            </div>
+            <button type="submit" class="btn-primary" style="background:var(--purple); color:#0f0e17; width:auto; padding:10px 20px; font-size:13px;" id="btn-submit-trial">Generar y Enviar Acceso</button>
+          </form>
+        </div>
+
+        <div class="card" style="margin-bottom: 20px; border-color: var(--coral);">
+          <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--coral); margin-bottom: 8px;">🔑 Purga / Eliminación de Usuario por Clave</h3>
+          <p style="font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55;">
+            Elimina permanentemente cualquier cuenta de usuario o registro huérfano introduciendo su identificador de usuario y confirmando con la clave maestra de SuperAdmin.
+          </p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            <input type="text" id="sa-delete-user-input" placeholder="Nombre de usuario o correo (ej: joselinedelb)" style="flex:1; min-width:200px; padding:10px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; outline:none;">
+            <button id="btn-sa-delete-user" class="btn-primary" style="background:var(--coral); color:#fff; width:auto; margin-top:0; padding:10px 18px; font-weight:600;">🗑️ Eliminar Usuario</button>
           </div>
-          <button type="submit" class="btn-primary" style="background:var(--purple); color:#0f0e17; width:auto; padding:10px 20px; font-size:13px;" id="btn-submit-trial">Generar y Enviar Acceso</button>
-        </form>
-      <div class="card" style="margin-bottom: 24px; border-color: var(--coral);">
-        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--coral); margin-bottom: 8px;">🔑 Purga / Eliminación de Usuario por Clave</h3>
-        <p style="font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55;">
-          Elimina permanentemente cualquier cuenta de usuario o registro huérfano (ej: <b>joselinedelb</b>) introduciendo su identificador de usuario y la clave de seguridad.
-        </p>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-          <input type="text" id="sa-delete-user-input" placeholder="Nombre de usuario o correo (ej: joselinedelb)" style="flex:1; min-width:200px; padding:10px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; outline:none;">
-          <button id="btn-sa-delete-user" class="btn-primary" style="background:var(--coral); color:#fff; width:auto; margin-top:0; padding:10px 18px; font-weight:600;">🗑️ Eliminar Usuario</button>
+        </div>
+
+        <div id="superadmin-churches-list">
+          <p style="color:var(--text3);font-size:13px;text-align:center;">Cargando instituciones...</p>
         </div>
       </div>
 
-      <div class="card" style="margin-bottom: 24px; border-color: var(--gold);">
-        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin-bottom: 12px;">Gestionar Biblioteca Global</h3>
-        <p style="font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55;">
-          Estas herramientas son exclusivas del Super Administrador. Las canciones agregadas aquí estarán disponibles para TODAS las cuentas de la plataforma.
-        </p>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <button id="btn-import-songs" class="btn-primary"
-            style="background: var(--purple); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600;">📥
-            Importar JSON</button>
-          <input type="file" id="import-songs-file" accept=".json" style="display:none;">
-          <button id="btn-import-link-sa" class="btn-primary" style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600;" onclick="alert('Función de agregar por link (LaCuerda) estará conectada al scraper local.');">🔗 Agregar por Link (LaCuerda)</button>
+      <!-- SECCIÓN 2: BIBLIOTECA DE CANCIONES GLOBAL -->
+      <div id="sa-tab-biblioteca" class="sa-tab-panel" style="display: none;">
+        <h2 class="section-title">Gestión de Biblioteca Global</h2>
+        <p class="section-sub">Administra las canciones de acceso global para todas las iglesias y ejecuta herramientas de mantenimiento.</p>
+
+        <div class="card" style="margin-bottom: 20px; border-color: var(--gold);">
+          <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin-bottom: 12px;">Carga de Canciones Globales</h3>
+          <p style="font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55;">
+            Las canciones agregadas aquí estarán disponibles para TODAS las cuentas de la plataforma.
+          </p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="btn-import-songs" class="btn-primary"
+              style="background: var(--purple); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600;">📥
+              Importar JSON</button>
+            <input type="file" id="import-songs-file" accept=".json" style="display:none;">
+            <button id="btn-import-link-sa" class="btn-primary" style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600;" onclick="alert('Función de agregar por link (LaCuerda) estará conectada al scraper local.');">🔗 Agregar por Link (LaCuerda)</button>
+          </div>
+        </div>
+
+        <div class="card" style="border-color: var(--gold); margin-bottom: 20px;">
+          <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin-bottom: 6px;">🛠️ Mantenimiento y Autocorrección de Biblioteca</h3>
+          <p style="font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55;">
+            Analizará <b>todas</b> las canciones con el algoritmo de detección armónica (ignorando tablaturas y palabras) y reparará su tono base automáticamente en la base de datos global.
+          </p>
+          <button id="btn-recalculate-tones" class="btn-primary"
+            style="background:var(--gold);color:#0f0e17;width:auto;padding:10px 24px;font-size:13px;margin-top:6px;font-weight:bold;">🔄 Recalcular Tonos Base</button>
         </div>
       </div>
 
@@ -5168,7 +5197,7 @@
     function iniciarSesionDashboard(userData) {
       activeSessionUser = userData;
       currentUserRole = userData.role;
-      displayRole.textContent = currentUserRole === 'lider' ? 'Líder' : 'Músico';
+      displayRole.textContent = (currentUserRole === 'lider' || currentUserRole === 'admin') ? 'Admin' : 'Músico';
 
       // Cargar y aplicar tema individual del usuario
       if (userData.usuario && typeof window.aplicarTemaPorUsuario === 'function') {
@@ -7738,7 +7767,7 @@
         <div style="display:flex; align-items:center; gap:10px;">
           <div class="avatar av-purple" style="${avatarPicStyle}">${avatarInitials}</div>
           <div class="member-info">
-            <div class="member-name">${m.nombre} ${m.role === 'lider' ? '<b style="color:var(--gold)">[Líder]</b>' : ''}</div>
+            <div class="member-name">${m.nombre} ${m.role === 'lider' || m.role === 'admin' ? '<b style="color:var(--gold)">[Admin]</b>' : ''}</div>
             <div class="member-role">User: ${m.usuario} | Clave: ${m.password} | Instrumento: ${m.instrumento}</div>
           </div>
         </div>
@@ -11017,8 +11046,9 @@
                 
                 ${data.status === 'inactiva' ? 
                   `<button class="btn-primary" onclick="saAction('${id}', 'activar')" style="font-size:11px; padding:6px; background:var(--teal); color:#000;">Activar +30 Días</button>` :
-                  `<button class="btn-primary" onclick="saAction('${id}', 'inactivar')" style="font-size:11px; padding:6px; background:var(--coral); color:#fff;">Suspender</button>`
+                  `<button class="btn-primary" onclick="saAction('${id}', 'inactivar')" style="font-size:11px; padding:6px; background:rgba(255,255,255,0.08); color:var(--text2);">Suspender</button>`
                 }
+                <button class="btn-primary" onclick="deleteChurchSa('${id}', '${(data.name || 'Sin Nombre').replace(/'/g, "\\'")}')" style="font-size:11px; padding:6px; background:var(--coral); color:#fff; font-weight:bold;">🗑️ Eliminar</button>
               </div>
             </div>
           </div>
@@ -11028,6 +11058,28 @@
       } catch(e) {
         console.error(e);
         container.innerHTML = '<p style="text-align:center;color:var(--coral);">Error cargando iglesias.</p>';
+      }
+    };
+
+    window.deleteChurchSa = async function(churchId, churchName) {
+      const inputPass = await customPrompt(
+        `Para eliminar definitivamente la institución "${churchName}" (ID: ${churchId}) y sus accesos, ingresa la clave de SuperAdmin:`,
+        "",
+        "🔑 Confirmar Eliminación por Clave",
+        true
+      );
+      if (inputPass === null) return;
+      if (inputPass !== "Pd030819") {
+        customAlert("❌ Clave incorrecta. No se realizaron cambios.", "Error de Autenticación");
+        return;
+      }
+      try {
+        await deleteDoc(doc(db, 'churches', churchId));
+        showToast(`🗑️ Institución "${churchName}" eliminada correctamente.`);
+        renderSuperAdminChurches();
+      } catch(e) {
+        console.error(e);
+        customAlert("Error al eliminar la institución: " + e.message, "Error");
       }
     };
 
@@ -11148,7 +11200,27 @@
         }
         deleteUserProtected(inputVal, inputVal);
       });
-    }
+    document.querySelectorAll('.sa-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.sa-tab-btn').forEach(b => {
+          b.classList.remove('active');
+          b.style.color = 'var(--text2)';
+          b.style.background = 'var(--bg3)';
+          b.style.borderColor = 'var(--border2)';
+        });
+        document.querySelectorAll('.sa-tab-panel').forEach(p => p.style.display = 'none');
+
+        const target = e.currentTarget;
+        target.classList.add('active');
+        target.style.color = 'var(--gold)';
+        target.style.background = 'var(--bg2)';
+        target.style.borderColor = 'var(--gold)';
+
+        const panelId = target.dataset.satab;
+        const panel = document.getElementById(panelId);
+        if (panel) panel.style.display = 'block';
+      });
+    });
   </script>
   <script type="module" src="chord_engine/index.js"></script>
 </body>
