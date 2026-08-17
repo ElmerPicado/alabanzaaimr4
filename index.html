@@ -16,9 +16,9 @@
   <link href="https://googleapis.com" rel="stylesheet">
   <style>
     :root {
-      --bg: #1a1828;
-      --bg2: #211e33;
-      --bg3: #2a2742;
+      --bg: #1e1e1e;
+      --bg2: #252526;
+      --bg3: #2d2d30;
       --border: rgba(255, 255, 255, 0.08);
       --border2: rgba(255, 255, 255, 0.14);
       --gold: #e5b43c;
@@ -5290,7 +5290,7 @@
         const screenSuperadmin = document.getElementById('screen-superadmin');
         if (screenSuperadmin) {
           screenSuperadmin.classList.add('active');
-          if (typeof renderSuperAdminChurches === 'function') renderSuperAdminChurches();
+          if (typeof window.renderSuperAdminChurches === 'function') window.renderSuperAdminChurches();
         }
       } else if (currentUserRole === 'lider' || currentUserRole === 'admin') {
         // Ambos (lider legacy y admin multi-tenant) tienen acceso al panel
@@ -11071,7 +11071,7 @@
       try {
         await deleteDoc(doc(db, "usuarios", username));
         showToast(`🗑️ Usuario "${userNombre}" eliminado exitosamente.`);
-        if (typeof renderSuperAdminChurches === 'function') renderSuperAdminChurches();
+        if (typeof window.renderSuperAdminChurches === 'function') window.renderSuperAdminChurches();
         if (typeof renderizarMantenimientoMiembros === 'function') renderizarMantenimientoMiembros();
       } catch (err) {
         console.error("Error al eliminar usuario:", err);
@@ -11263,7 +11263,7 @@
           updatedAt: new Date().toISOString(),
         });
         showToast(`✅ Plan actualizado a "${newPlan.toUpperCase()}" correctamente.`);
-        renderSuperAdminChurches();
+        window.renderSuperAdminChurches();
       } catch(e) {
         console.error(e);
         customAlert('Error al actualizar el plan: ' + e.message);
@@ -11351,7 +11351,7 @@
             status: 'inactiva'
           });
         }
-        await renderSuperAdminChurches();
+        await window.renderSuperAdminChurches();
       } catch(e) {
         console.error(e);
         alert("Error al actualizar cuenta.");
@@ -11413,7 +11413,7 @@
             `3. El plan quedó activo por 15 días de prueba, sujeto a verificación y políticas de AlabanApp.`
           );
           formTrial.reset();
-          renderSuperAdminChurches();
+          window.renderSuperAdminChurches();
         } catch(err) {
           console.error(err);
           alert("Error: " + err.message);
