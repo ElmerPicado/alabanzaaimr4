@@ -2459,8 +2459,7 @@
                 <circle cx="12" cy="13" r="4"></circle>
               </svg> Cambiar foto</button>
             <button id="btn-leader-theme"
-              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">☀️
-              Cambiar Tema</button>
+              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">Cambiar Tema</button>
             <button id="btn-leader-update"
               style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--gold); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px; font-weight: 600;"><svg
                 width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -2468,11 +2467,9 @@
                 <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-13.51l5.39 5.39" />
               </svg> Buscar actualización</button>
             <button id="btn-leader-change-username"
-              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">✏️
-              Cambiar Usuario (Alias)</button>
+              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">Cambiar Usuario (Alias)</button>
             <button id="btn-leader-change-password"
-              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">🔑
-              Restablecer Contraseña</button>
+              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">Restablecer Contraseña</button>
             <button id="btn-leader-logout-dropdown"
               style="width: 100%; text-align: left; background: none; border: none; padding: 10px; color: #ff5252; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; border-radius: 4px;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -2724,7 +2721,7 @@
               if (notifyVal === 'both') {
                 let msg = `*CONVOCATORIA A ENSAYO*\n\n`;
                 msg += `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> *Ensayo:* ${etiqueta}\n`;
-                msg += `📅 *Fecha:* ${fecha}\n`;
+                msg += `*Fecha:* ${fecha}\n`;
                 msg += `⏰ *Hora:* ${hora ? hora : 'No especificada'}\n\n`;
 
                 const mList = window.cacheMembers || [];
@@ -2988,14 +2985,14 @@
             <div class="ensayo-card-wrapper">
               <div class="ensayo-card-info">
                 <div class="ensayo-card-title"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> ${e.nombre}</div>
-                <div class="ensayo-card-date">📅 ${(e.fecha || '').split('-').reverse().join('/')}${e.hora ? ' &nbsp;⏰ ' + e.hora : ''}</div>
+                <div class="ensayo-card-date">${(e.fecha || '').split('-').reverse().join('/')}${e.hora ? ' &nbsp;⏰ ' + e.hora : ''}</div>
                 <div class="ensayo-card-confirmations">👥 ${confirmados}/${totalMiembros} confirmados</div>
                 <div class="ensayo-card-songs"> ${songNames}</div>
               </div>
               <div class="ensayo-card-actions">
                 <button class="btn-ver-conf chip chip-teal">👁 Confirmaciones</button>
-                <button class="btn-edit-ensayo chip chip-gold">✏️ Editar</button>
-                ${currentUserRole === 'superadmin' ? `<button class="btn-del-ensayo chip chip-coral" data-id="${e.id}">🗑 Eliminar</button>` : ''}
+                <button class="btn-edit-ensayo chip chip-gold">Editar</button>
+                ${canManage ? `<button class="btn-del-ensayo chip chip-coral" data-id="${e.id}">Eliminar</button>` : ''}
               </div>
             </div>
           `;
@@ -3083,7 +3080,7 @@
             card.querySelector('.btn-del-ensayo').addEventListener('click', async () => {
               if (await customConfirm(`¿Eliminar el ensayo "${e.nombre}"?`)) {
                 await deleteDoc(doc(db, 'ensayos', e.id));
-                showToast('🗑 Ensayo eliminado');
+                showToast('Ensayo eliminado');
               }
             });
             cont.appendChild(card);
@@ -3202,14 +3199,14 @@
               <div class="musico-card-header">
                 <div class="ensayo-card-info">
                   <div class="ensayo-card-title"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> ${e.nombre}</div>
-                  <div class="ensayo-card-date">📅 ${(e.fecha || '').split('-').reverse().join('/')}${e.hora ? ' &nbsp;⏰ <b>' + e.hora + '</b>' : ''}</div>
+                  <div class="ensayo-card-date">${(e.fecha || '').split('-').reverse().join('/')}${e.hora ? ' &nbsp;⏰ <b>' + e.hora + '</b>' : ''}</div>
                 </div>
               </div>
               
               ${songsSummaryHtml}
 
               <button class="btn-practice-ensayo btn-primary musico-ensayo-practice-btn">
-                🎸 Entrar a Ensayo / Practicar Letras
+                Entrar a Ensayo / Practicar Letras
               </button>
 
               <div class="musico-card-attendance-section">
@@ -3238,7 +3235,7 @@
             cont.appendChild(card);
           });
 
-          // 🔴 Update tab badge for pending rehearsals (only if status is undefined/null)
+          // Update tab badge for pending rehearsals (only if status is undefined/null)
           const hasUnconfirmed = filtered.some(e => {
             const v = e.confirmaciones && e.confirmaciones[musicoId];
             return v === undefined || v === null;
@@ -3304,14 +3301,14 @@
                 if (isConfirmed) {
                   msgHtml += `Recuerda tu ensayo confirmado:<br><br>`;
                   msgHtml += `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> <b>${ensayoToShow.nombre}</b><br>`;
-                  msgHtml += `📅 <b>Fecha:</b> ${(ensayoToShow.fecha || '').split('-').reverse().join('/')}<br>`;
+                  msgHtml += `<b>Fecha:</b> ${(ensayoToShow.fecha || '').split('-').reverse().join('/')}<br>`;
                   msgHtml += `⏰ <b>Hora:</b> ${ensayoToShow.hora || 'No especificada'}<br><br>`;
                   msgHtml += `<i>¡Nos vemos pronto!</i>`;
                   if (confirmBtn) confirmBtn.style.display = 'none';
                 } else {
                   msgHtml += `Tienes un ensayo programado pendiente de confirmar:<br><br>`;
                   msgHtml += `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> <b>${ensayoToShow.nombre}</b><br>`;
-                  msgHtml += `📅 <b>Fecha:</b> ${(ensayoToShow.fecha || '').split('-').reverse().join('/')}<br>`;
+                  msgHtml += `<b>Fecha:</b> ${(ensayoToShow.fecha || '').split('-').reverse().join('/')}<br>`;
                   msgHtml += `⏰ <b>Hora:</b> ${ensayoToShow.hora || 'No especificada'}<br><br>`;
                   msgHtml += `<span style="color:var(--coral); font-weight:bold; font-size:14px;">${daysText}</span><br><br>`;
                   msgHtml += `Por favor, confirma tu asistencia para que podamos coordinar.`;
@@ -3480,15 +3477,7 @@
         </svg>
         <span class="nav-label">Historial</span>
       </button>
-      <button class="nav-tab" data-tab="tab-repertorio">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 18V5l12-2v13"></path>
-          <circle cx="6" cy="18" r="3"></circle>
-          <circle cx="18" cy="16" r="3"></circle>
-        </svg>
-        <span class="nav-label">Repertorio</span>
-      </button>
+
       <button class="nav-tab" data-tab="tab-ensayos">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
@@ -3537,25 +3526,7 @@
           </div>
         </div>
 
-        <!-- Card de Disponibilidad del Músico Logueado -->
-        <div id="my-availability-card" class="card"
-          style="border-color: var(--teal); display: none; background: linear-gradient(135deg, rgba(78,205,196,0.08) 0%, rgba(26,24,40,0.8) 100%);">
-          <h4
-            style="font-size: 14px; text-transform: uppercase; color: var(--teal); letter-spacing: 0.5px; margin-bottom: 8px;">
-            Mi Disponibilidad para esta fecha</h4>
-          <p style="font-size: 13px; color: var(--text2); margin-bottom: 12px;">Confirma si estarás disponible para
-            tocar/cantar en este servicio.</p>
-          <div style="display: flex; gap: 10px;">
-            <button id="btn-avail-confirm" class="btn-primary"
-              style="margin-top: 0; background: var(--teal); color: #0f0e17; font-size: 13px; padding: 10px 16px; flex: 1;">Voy
-              a Asistir</button>
-            <button id="btn-avail-decline" class="btn-primary"
-              style="margin-top: 0; background: var(--coral); color: #0f0e17; font-size: 13px; padding: 10px 16px; flex: 1;">No
-              Disponible</button>
-          </div>
-          <p id="my-avail-status"
-            style="font-size: 13px; font-weight: 600; color: var(--gold); margin-top: 10px; text-align: center;"></p>
-        </div>
+        <!-- Card de Disponibilidad - Solo visible para músicos desde su panel, no aplica aquí -->
 
 
         <!-- SECCIÓN DE MÚSICOS (Filtrados por disponibilidad real) -->
@@ -3626,7 +3597,7 @@
         </div>
 
         <!-- ORDEN DEL REPERTORIO SELECCIONADO (Líder) -->
-        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin: 24px 0 10px;">📋 Orden
+        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin: 24px 0 10px;">Orden
           del Repertorio</h3>
         <p class="section-sub">Usa las flechas ▲ y ▼ para ordenar las canciones y cambia el tono de cada una.</p>
         <div id="admin-selected-songs-container" style="margin-bottom: 24px;">
@@ -3670,8 +3641,7 @@
                 style="background: var(--bg3); color: var(--text); border: 1px solid var(--border); flex: 1; font-size:12px; padding: 12px;">🔄
                 Restaurar Auto</button>
               <button class="btn-primary" id="btn-save-draft"
-                style="background: var(--purple); color: #0f0e17; flex: 1; font-size:12px; padding: 12px;">💾
-                Guardar</button>
+                style="background: var(--purple); color: #0f0e17; flex: 1; font-size:12px; padding: 12px;">Guardar</button>
               <button class="btn-primary" id="btn-copy-whatsapp"
                 style="background: var(--teal); color: #0f0e17; width: 100%; margin-top: 0;">💬 Enviar por WhatsApp
               </button>
@@ -3784,15 +3754,15 @@
             </div>
             <div class="field"><label>Correo Electrónico (Requerido)</label><input type="email" id="member-email-input" required
                 placeholder="Ej: musico@iglesia.com"></div>
-            <div class="field"><label>Usuario (Alias visible)</label><input type="text" id="member-user-input" required
+            <div class="field"><label>Usuario (Nombre de usuario para iniciar sesión)</label><input type="text" id="member-user-input" required
                 placeholder="Ej: carlos12"></div>
-            <div class="field"><label>Contraseña Asignada</label><input type="text" id="member-pass-input" required
-                placeholder="Clave para Netlify"></div>
+            <div class="field"><label>Contraseña Temporal</label><input type="text" id="member-pass-input" required
+                placeholder="Ej: iglesia2024"></div>
             <div class="field">
-              <label>Nivel de Permiso</label>
+              <label>Nivel de Acceso</label>
               <select id="member-role-input">
-                <option value="musico">Músico (Solo lectura del servicio)</option>
-                <option value="lider">Admin (Control total de armado)</option>
+                <option value="musico">Integrante (Solo puede ver el servicio y su repertorio)</option>
+                <option value="lider">Administrador (Puede armar servicios y gestionar la cuenta)</option>
               </select>
             </div>
             <button type="submit" class="btn-primary" style="background: var(--purple); color: #0f0e17;">Agregar
@@ -3826,8 +3796,7 @@
               style="font-size:14px;">
           </div>
           <button id="btn-save-whatsapp-link" class="btn-primary"
-            style="background:var(--teal);color:#0f0e17;width:auto;padding:10px 24px;font-size:13px;margin-top:6px;">💾
-            Guardar Enlace</button>
+            style="background:var(--teal);color:#0f0e17;width:auto;padding:10px 24px;font-size:13px;margin-top:6px;">Guardar Enlace</button>
           <p id="whatsapp-link-status" style="font-size:12px;color:var(--teal);margin-top:8px;min-height:18px;"></p>
         </div>
 
@@ -3868,7 +3837,7 @@
           🏛️ Gestión de Cuentas / Iglesias
         </button>
         <button class="sa-tab-btn" data-satab="sa-tab-biblioteca" style="padding: 10px 18px; font-size: 13px; font-weight: 700; color: var(--text2); background: var(--bg3); border: 1px solid var(--border2); border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-body);">
-          🎵 Biblioteca de Canciones Global
+          Biblioteca de Canciones Global
         </button>
       </div>
 
@@ -3889,13 +3858,13 @@
         </div>
 
         <div class="card" style="margin-bottom: 20px; border-color: var(--coral);">
-          <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--coral); margin-bottom: 8px;">🔑 Purga / Eliminación de Usuario por Clave</h3>
+          <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--coral); margin-bottom: 8px;">Purga / Eliminación de Usuario por Clave</h3>
           <p style="font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55;">
             Elimina permanentemente cualquier cuenta de usuario o registro huérfano introduciendo su identificador de usuario y confirmando con la clave maestra de SuperAdmin.
           </p>
           <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
             <input type="text" id="sa-delete-user-input" placeholder="Nombre de usuario o correo (ej: joselinedelb)" style="flex:1; min-width:200px; padding:10px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; outline:none;">
-            <button id="btn-sa-delete-user" class="btn-primary" style="background:var(--coral); color:#fff; width:auto; margin-top:0; padding:10px 18px; font-weight:600;">🗑️ Eliminar Usuario</button>
+            <button id="btn-sa-delete-user" class="btn-primary" style="background:var(--coral); color:#fff; width:auto; margin-top:0; padding:10px 18px; font-weight:600;">Eliminar Usuario</button>
           </div>
         </div>
 
@@ -3982,8 +3951,7 @@
                 <circle cx="12" cy="13" r="4"></circle>
               </svg> Cambiar foto</button>
             <button id="btn-musico-theme"
-              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">☀️
-              Cambiar Tema</button>
+              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">Cambiar Tema</button>
             <button id="btn-musico-update"
               style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--gold); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px; font-weight: 600;"><svg
                 width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -3991,11 +3959,9 @@
                 <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-13.51l5.39 5.39" />
               </svg> Buscar actualización</button>
             <button id="btn-musico-change-username"
-              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">✏️
-              Cambiar Usuario (Alias)</button>
+              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">Cambiar Usuario (Alias)</button>
             <button id="btn-musico-change-password"
-              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">🔑
-              Restablecer Contraseña</button>
+              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">Restablecer Contraseña</button>
             <button id="btn-musico-logout-dropdown"
               style="width: 100%; text-align: left; background: none; border: none; padding: 10px; color: #ff5252; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; border-radius: 4px;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -4061,8 +4027,7 @@
 
         <div style="position: relative; margin-bottom: 20px;">
           <label
-            style="display:block; font-size:10px; color:var(--text3); text-transform:uppercase; text-align:center; position:absolute; top: 8px; left: 0; right: 0; pointer-events:none; z-index:10;">🗓️
-            Tocar para cambiar fecha</label>
+            style="display:block; font-size:10px; color:var(--text3); text-transform:uppercase; text-align:center; position:absolute; top: 8px; left: 0; right: 0; pointer-events:none; z-index:10;">Tocar para cambiar fecha</label>
           <input type="date" id="musico-service-date" class="date-btn">
         </div>
 
@@ -4080,8 +4045,7 @@
 
         <div style="position: relative; margin-bottom: 12px;">
           <label
-            style="display:block; font-size:10px; color:var(--text3); text-transform:uppercase; text-align:center; position:absolute; top: 8px; left: 0; right: 0; pointer-events:none; z-index:10;">🗓️
-            Tocar para cambiar fecha</label>
+            style="display:block; font-size:10px; color:var(--text3); text-transform:uppercase; text-align:center; position:absolute; top: 8px; left: 0; right: 0; pointer-events:none; z-index:10;">Tocar para cambiar fecha</label>
           <input type="date" id="musico-avail-date" class="date-btn">
         </div>
 
@@ -4607,7 +4571,7 @@
         <div style="font-weight:700; font-size:14px; color:var(--teal); margin-bottom:2px;">Instalar AlabanApp
         </div>
         <div style="font-size:12px; color:var(--text2); line-height:1.4;">Agrégala a tu pantalla de inicio y úsala como
-          una app nativa 📱</div>
+          una app nativa </div>
       </div>
       <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
         <button id="pwa-install-btn" style="
@@ -4981,7 +4945,7 @@
                 `1. Configuración de Acceso:\n` +
                 `Se ha enviado un correo a: ${email}\n` +
                 `Por favor, abre el enlace recibido para definir tu contraseña e ingresar al sistema.\n` +
-                `⚠️ NOTA IMPORTANTE: Si no lo ves en unos minutos, revisa tu carpeta de SPAM o Correo no deseado.\n\n` +
+                `NOTA IMPORTANTE: Si no lo ves en unos minutos, revisa tu carpeta de SPAM o Correo no deseado.\n\n` +
                 `2. Estado de la Suscripción:\n` +
                 `Tu cuenta se ha creado en estado ACTIVA de manera temporal. Queda sujeta a la posterior verificación manual del comprobante de SINPE Móvil subido.\n\n` +
                 `Al continuar e ingresar a la aplicación, aceptas los términos de servicio y las políticas de uso de AlabanApp.`);
@@ -5589,8 +5553,8 @@
       } else {
         document.body.classList.remove('theme-light');
       }
-      if (btnMusicoTheme) btnMusicoTheme.textContent = isLight ? '🌙' : '☀️';
-      if (btnLeaderTheme) btnLeaderTheme.textContent = isLight ? '🌙' : '☀️';
+      if (btnMusicoTheme) btnMusicoTheme.innerHTML = 'Cambiar Tema';
+      if (btnLeaderTheme) btnLeaderTheme.innerHTML = 'Cambiar Tema';
     };
 
     // Inicialización del tema en base al último usuario con sesión activa o por defecto oscuro
@@ -5697,7 +5661,7 @@
     }
 
     window.dangerouslyDeleteAllSongs = async function () {
-      if (!await customConfirm("⚠️ ATENCIÓN: Esto borrará permanentemente TODAS las canciones de la biblioteca y sus letras. ¿Estás seguro?")) return;
+      if (!await customConfirm("ATENCIÓN: Esto borrará permanentemente TODAS las canciones de la biblioteca y sus letras. ¿Estás seguro?")) return;
       if (!await customConfirm("¿Seguro al 100%? Esta acción NO se puede deshacer.")) return;
 
       const songs = [...(window.cacheSongs || [])];
@@ -5716,10 +5680,10 @@
     };
 
     window.dangerouslyRecalculateAllTones = async function () {
-      if (!await customConfirm("⚠️ ATENCIÓN: Esto descargará y analizará las letras de TODAS las canciones para corregir su tono base usando el nuevo algoritmo. Puede tomar un par de minutos. ¿Estás seguro?")) return;
+      if (!await customConfirm("ATENCIÓN: Esto descargará y analizará las letras de TODAS las canciones para corregir su tono base usando el nuevo algoritmo. Puede tomar un par de minutos. ¿Estás seguro?")) return;
 
       console.log("Iniciando recálculo de tonos...");
-      if (typeof showToast === 'function') showToast("🎵 Analizando tonos de todas las canciones. Revisa la consola...");
+      if (typeof showToast === 'function') showToast("Analizando tonos de todas las canciones. Revisa la consola...");
 
       const songs = [...(window.cacheSongs || [])];
       let corregidos = 0;
@@ -5786,7 +5750,7 @@
     }
 
     window.dangerouslyFixAllCorruptedTexts = async function () {
-      if (!await customConfirm("⚠️ ATENCIÓN: Esto buscará y corregirá caracteres corruptos (Mojibake) en TODAS las canciones y letras de la base de datos. ¿Estás seguro?")) return;
+      if (!await customConfirm("ATENCIÓN: Esto buscará y corregirá caracteres corruptos (Mojibake) en TODAS las canciones y letras de la base de datos. ¿Estás seguro?")) return;
 
       console.log("Iniciando escaneo y reparación de textos corruptos...");
       if (typeof showToast === 'function') {
@@ -6193,7 +6157,7 @@
         }
       }, (err) => {
         console.error("Error cargando biblioteca_canciones:", err);
-        if (typeof showToast === 'function') showToast("⚠️ Error al cargar el repertorio. Revisa tu conexión.", { duration: 5000 });
+        if (typeof showToast === 'function') showToast("Error al cargar el repertorio. Revisa tu conexión.", { duration: 5000 });
       });
 
       // Consulta de miembros: filtrada SIEMPRE por churchId de la cuenta activa.
@@ -6293,7 +6257,7 @@
         div.style.alignItems = "flex-start";
         div.innerHTML = `
         <div style="display:flex; align-items:center; gap:12px;">
-          <div style="font-size:24px;">🗓️</div>
+          <div style="font-size:24px;"></div>
           <div class="member-info">
             <div class="member-name" style="font-size:15px; margin-bottom:5px;">Servicio: ${s.fecha}</div>
             <div class="member-role" style="margin-bottom:4px;">${badge}</div>
@@ -6302,7 +6266,7 @@
         </div>
         <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
           <button class="chip chip-purple btn-load-historial" style="cursor:pointer; border:none; padding:7px 14px; font-weight:600; white-space:nowrap;" data-date="${s.fecha}">
-            ${isSent ? '✏️ Ver / Editar' : '📤 Abrir y Enviar'}
+            ${isSent ? 'Ver / Editar' : 'Abrir y Enviar'}
           </button>
         </div>
       `;
@@ -6409,10 +6373,10 @@
       const objetoFecha = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
       const fechaLegible = objetoFecha.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 
-      let msg = `*PROGRAMACIÓN DE ALABANZA - IMR4*\n🗓️ *${fechaLegible.toUpperCase()}*\n\n`;
+      let msg = `*PROGRAMACIÓN DE ALABANZA - IMR4*\n*${fechaLegible.toUpperCase()}*\n\n`;
 
       if (dataServicio.nota_adicional && dataServicio.nota_adicional.trim() !== "") {
-        msg += `✏️ *NOTA DEL LÍDER:*\n_${dataServicio.nota_adicional}_\n\n`;
+        msg += `*NOTA DEL LÍDER:*\n_${dataServicio.nota_adicional}_\n\n`;
       }
 
       // Combinar canciones de la biblioteca y personalizadas
@@ -6462,7 +6426,7 @@
       const adoraciones = allSelected.filter(s => s.tipo === 'adoracion');
       const alabanzas = allSelected.filter(s => s.tipo === 'alabanza');
 
-      msg += `🎵 *REPERTORIO SELECCIONADO:*\n`;
+      msg += `*REPERTORIO SELECCIONADO:*\n`;
 
       // Adoración primero
       msg += `\n🌟 *ADORACIÓN (Lentas):*\n`;
@@ -7026,7 +6990,7 @@
                              `Secciones: ${data.structure.sections.length} | Acordes únicos: ${data.harmonicAnalysis.chordsUsed.join(', ')}`;
                              
         if (data.warnings && data.warnings.length > 0) {
-            feedback.innerHTML += `<br><span style="color:var(--coral);">⚠️ ${data.warnings.join(' ')}</span>`;
+            feedback.innerHTML += `<br><span style="color:var(--coral);">${data.warnings.join(' ')}</span>`;
         }
         
         showToast('Análisis armónico completado');
@@ -7382,7 +7346,7 @@
 
         <div style="display:flex; align-items:center; gap: 6px; flex-wrap: wrap; margin-left: 4px; padding-right: 4px;">
           <div class="badge-tono-base" style="background:var(--bg3); border:1px solid rgba(244,197,66,0.4); color:var(--gold); border-radius:6px; padding:4px 8px; font-size:11px; font-family:var(--font-body); font-weight:600;" title="Tono Original (Guardado en base de datos)">
-            🎵 ${s.tonoBase || 'C'}
+            ${s.tonoBase || 'C'}
           </div>
           <button class="chip btn-auto-tone" style="cursor:pointer; border:1px solid rgba(244,197,66,0.5); background:rgba(244,197,66,0.15); color:var(--gold); padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Auto-detectar tono base">
             Auto-Tono
@@ -7392,7 +7356,7 @@
               ${s.oficial ? 'Oficial' : 'Hacer Oficial'}
             </button>
             <button class="chip chip-teal click-edit-song" style="cursor:pointer; border:none; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Editar">Editar</button>
-            ${currentUserRole === 'superadmin' ? `<button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Eliminar">Eliminar</button>` : ''}
+            ${canManage ? `<button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Eliminar">Eliminar</button>` : ''}
           ` : ''}
         </div>
       `;
@@ -7453,7 +7417,7 @@
                   await updateDoc(doc(window.db, "biblioteca_canciones", s.id), { tonoBase: nuevoTono });
                   s.tonoBase = nuevoTono;
                   const badge = div.querySelector('.badge-tono-base');
-                  if (badge) badge.textContent = `🎵 ${nuevoTono}`;
+                  if (badge) badge.textContent = `${nuevoTono}`;
                   showToast(`✨ ¡Detectado! Tono de "${s.nombre}" → ${nuevoTono}`);
                 } else {
                   showToast(`El tono actual ya es correcto (${nuevoTono})`);
@@ -7615,7 +7579,7 @@
             <span class="artist-row-name">${art}</span>
             <div style="display:flex; align-items:center; gap:12px;">
               <span class="artist-row-count">${artistCounts[art]} ${artistCounts[art] === 1 ? 'canción' : 'canciones'}</span>
-              ${currentUserRole === 'superadmin' ? `<button class="btn-delete-artist admin-only" data-artist="${art}" style="background:var(--coral); color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:600; cursor:pointer;">Eliminar</button>` : ''}
+              ${canManage ? `<button class="btn-delete-artist admin-only" data-artist="${art}" style="background:var(--coral); color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:600; cursor:pointer;">Eliminar</button>` : ''}
             </div>
           `;
 
@@ -7630,7 +7594,7 @@
               if (!confirmed) return;
 
               // Segunda capa de seguridad con código PIN (usando modal personalizado)
-              const verifyName = await customPrompt(`ZONA DE PELIGRO\n\nEstás a punto de borrar TODAS las ${artistSongs.length} canciones de ${art}.\nPara confirmar, ingresa el PIN de seguridad:`, "⚠️ Acción Destructiva", "Ej: 1234");
+              const verifyName = await customPrompt(`ZONA DE PELIGRO\n\nEstás a punto de borrar TODAS las ${artistSongs.length} canciones de ${art}.\nPara confirmar, ingresa el PIN de seguridad:`, "Acción Destructiva", "Ej: 1234");
               if (verifyName !== '030819') {
                 if (verifyName !== null) { // Si no le dio a cancelar
                   customAlert("PIN incorrecto. Operación cancelada por seguridad.");
@@ -8299,12 +8263,12 @@
         if (!snap.exists()) {
           content.innerHTML = `
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; background: rgba(255, 255, 255, 0.02); border: 1px dashed var(--border2); border-radius: var(--radius); margin-top: 10px;">
-              <span style="font-size: 40px; margin-bottom: 12px; display: block;">🗓️</span>
+              <span style="font-size: 40px; margin-bottom: 12px; display: block;"></span>
               <p style="color: var(--text2); font-size: 14px; font-weight: 500; margin-bottom: 18px; max-width: 280px; line-height: 1.5;">
                 Aún no hay programación creada para el <b>${dateStr}</b>.
               </p>
               <button id="btn-crear-servicio-musico" class="btn-primary" style="margin-top: 0; max-width: 220px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <span>➕</span> Agregar Servicio
+                <span></span> Agregar Servicio
               </button>
             </div>
           `;
@@ -11054,7 +11018,7 @@
       const inputPass = await customPrompt(
         `Escribe la clave maestra para confirmar la eliminación definitiva del usuario "${userNombre}" (${username}):`,
         "",
-        "🔑 Confirmar Eliminación por Clave",
+        "Confirmar Eliminación por Clave",
         true
       );
 
@@ -11070,7 +11034,7 @@
 
       try {
         await deleteDoc(doc(db, "usuarios", username));
-        showToast(`🗑️ Usuario "${userNombre}" eliminado exitosamente.`);
+        showToast(`Usuario "${userNombre}" eliminado exitosamente.`);
         if (typeof window.renderSuperAdminChurches === 'function') window.renderSuperAdminChurches();
         if (typeof renderizarMantenimientoMiembros === 'function') renderizarMantenimientoMiembros();
       } catch (err) {
@@ -11145,7 +11109,7 @@
           const data = docSnap.data();
           const id = docSnap.id;
           const statusColor = data.status === 'activa' ? 'var(--teal)' : 'var(--coral)';
-          const planLabel = data.plan === 'paga' ? '💎 PAGO' : data.plan === 'gratis' ? '♾️ GRATIS' : '🔬 PRUEBA';
+          const planLabel = data.plan === 'paga' ? 'PAGO' : data.plan === 'gratis' ? 'GRATIS' : 'PRUEBA';
           const planColor = data.plan === 'paga' ? 'var(--gold)' : data.plan === 'gratis' ? 'var(--purple)' : 'var(--text2)';
 
           // Calcular vencimiento
@@ -11164,7 +11128,7 @@
           }
 
           const expColor = isExpired ? 'var(--coral)' : isExpiringSoon ? '#f59e0b' : 'var(--text)';
-          const expBadge = isExpired ? '🔴 VENCIDO' : isExpiringSoon ? `⚠️ ${daysLeft}d restantes` : '';
+          const expBadge = isExpired ? 'VENCIDO' : isExpiringSoon ? `${daysLeft}d restantes` : '';
 
           html += `
           <div class="card" style="margin-bottom: 14px; border-left: 4px solid ${statusColor}; ${isExpiringSoon ? 'box-shadow: 0 0 14px rgba(245,158,11,0.2);' : ''}${isExpired ? 'box-shadow: 0 0 14px rgba(244,63,94,0.2);' : ''}">
@@ -11176,10 +11140,10 @@
                   <span style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; background:${planColor}22; color:${planColor}; border:1px solid ${planColor}44;">${planLabel}</span>
                   <span style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; background:${statusColor}22; color:${statusColor}; border:1px solid ${statusColor}44;">${(data.status||'inactiva').toUpperCase()}</span>
                 </div>
-                <p style="margin:2px 0; font-size:12px; color:var(--text2);">📧 ${data.adminEmail || 'N/A'} | 📱 ${data.phone || 'N/A'}</p>
+                <p style="margin:2px 0; font-size:12px; color:var(--text2);">${data.adminEmail || 'N/A'} | ${data.phone || 'N/A'}</p>
                 <p style="margin:2px 0; font-size:11px; color:var(--text3); font-family:monospace;">ID: ${id}</p>
                 <p style="margin:4px 0 0; font-size:12px; color:${expColor}; font-weight:600;">
-                  📅 Vence: ${expireLabel} ${expBadge}
+                  Vence: ${expireLabel} ${expBadge}
                 </p>
               </div>
 
@@ -11188,22 +11152,22 @@
                 <!-- Editar Plan -->
                 <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
                   <select id="plan-select-${id}" style="font-size:11px; padding:5px 8px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-family:var(--font-body); cursor:pointer;">
-                    <option value="gratis" ${data.plan === 'gratis' ? 'selected' : ''}>♾️ Gratis</option>
-                    <option value="prueba" ${data.plan === 'prueba' ? 'selected' : ''}>🔬 Prueba</option>
-                    <option value="paga" ${data.plan === 'paga' ? 'selected' : ''}>💎 Pago</option>
+                    <option value="gratis" ${data.plan === 'gratis' ? 'selected' : ''}>Gratis</option>
+                    <option value="prueba" ${data.plan === 'prueba' ? 'selected' : ''}>Prueba</option>
+                    <option value="paga" ${data.plan === 'paga' ? 'selected' : ''}>Pago</option>
                   </select>
                   <input type="date" id="expire-input-${id}" value="${data.expireAt ? new Date(data.expireAt).toISOString().split('T')[0] : ''}" style="font-size:11px; padding:5px 8px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-family:var(--font-body);">
-                  <button onclick="saUpdatePlan('${id}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:var(--purple); color:#fff; white-space:nowrap;">💾 Guardar Plan</button>
+                  <button onclick="saUpdatePlan('${id}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:var(--purple); color:#fff; white-space:nowrap;">Guardar Plan</button>
                 </div>
 
                 <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
-                  ${data.receiptUrl ? `<button onclick="verComprobanteSa('${id}')" class="btn-secondary" style="font-size:11px; padding:5px 10px;">🧾 Comprobante</button>` : ''}
+                  ${data.receiptUrl ? `<button onclick="verComprobanteSa('${id}')" class="btn-secondary" style="font-size:11px; padding:5px 10px;">Comprobante</button>` : ''}
                   ${data.status === 'inactiva'
-                    ? `<button class="btn-primary" onclick="saAction('${id}', 'activar')" style="font-size:11px; padding:5px 10px; background:var(--teal); color:#000;">▶️ Activar +30d</button>`
-                    : `<button class="btn-primary" onclick="saAction('${id}', 'inactivar')" style="font-size:11px; padding:5px 10px; background:rgba(255,255,255,0.08); color:var(--text2);">⏸ Suspender</button>`
+                    ? `<button class="btn-primary" onclick="saAction('${id}', 'activar')" style="font-size:11px; padding:5px 10px; background:var(--teal); color:#000;">Activar +30d</button>`
+                    : `<button class="btn-primary" onclick="saAction('${id}', 'inactivar')" style="font-size:11px; padding:5px 10px; background:rgba(255,255,255,0.08); color:var(--text2);">Suspender</button>`
                   }
-                  ${(isExpiringSoon || isExpired) ? `<button onclick="saEnviarRecordatorio('${id}','${(data.name||'').replace(/'/g,"\\'")}','${data.adminEmail||''}','${data.phone||''}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:#f59e0b; color:#000; font-weight:700;">📩 Recordatorio</button>` : ''}
-                  <button onclick="deleteChurchSa('${id}','${(data.name||'Sin Nombre').replace(/'/g,"\\'")}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:var(--coral); color:#fff; font-weight:700;">🗑️ Eliminar</button>
+                  ${(isExpiringSoon || isExpired) ? `<button onclick="saEnviarRecordatorio('${id}','${(data.name||'').replace(/'/g,"\\'")}','${data.adminEmail||''}','${data.phone||''}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:#f59e0b; color:#000; font-weight:700;">Recordatorio</button>` : ''}
+                  <button onclick="deleteChurchSa('${id}','${(data.name||'Sin Nombre').replace(/'/g,"\\'")}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:var(--coral); color:#fff; font-weight:700;">Eliminar</button>
                 </div>
               </div>
             </div>
@@ -11218,7 +11182,7 @@
             alertsContainer.style.display = 'block';
             alertsContainer.innerHTML = `
               <div class="card" style="border-color:#f59e0b; background:rgba(245,158,11,0.06);">
-                <h4 style="color:#f59e0b; margin:0 0 10px; font-size:14px;">⚠️ ${expiringSoon.length} cuenta(s) próxima(s) a vencer</h4>
+                <h4 style="color:#f59e0b; margin:0 0 10px; font-size:14px;">${expiringSoon.length} cuenta(s) próxima(s) a vencer</h4>
                 ${expiringSoon.map(c => `
                   <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:8px;">
                     <div>
@@ -11227,7 +11191,7 @@
                     </div>
                     <button onclick="saEnviarRecordatorio('${c.id}','${(c.name||'').replace(/'/g,"\\'")}','${c.adminEmail||''}','${c.phone||''}')"
                       style="font-size:11px; padding:5px 12px; background:#f59e0b; color:#000; border:none; border-radius:8px; font-weight:700; cursor:pointer;">
-                      📩 Enviar recordatorio
+                      Enviar recordatorio
                     </button>
                   </div>
                 `).join('')}
@@ -11262,7 +11226,7 @@
           expireAt: expireToSave,
           updatedAt: new Date().toISOString(),
         });
-        showToast(`✅ Plan actualizado a "${newPlan.toUpperCase()}" correctamente.`);
+        showToast(`Plan actualizado a "${newPlan.toUpperCase()}" correctamente.`);
         window.renderSuperAdminChurches();
       } catch(e) {
         console.error(e);
@@ -11272,7 +11236,7 @@
 
     // Enviar recordatorio de vencimiento
     window.saEnviarRecordatorio = function(churchId, churchName, adminEmail, phone) {
-      const msg = `Hola, te recordamos que tu suscripción de *${churchName}* en AlabanApp está próxima a vencer. Para renovar contacta al administrador del sistema o realiza tu pago. ¡Gracias por confiar en nosotros! 🎵`;
+      const msg = `Hola, te recordamos que tu suscripción de *${churchName}* en AlabanApp está próxima a vencer. Para renovar contacta al administrador del sistema o realiza tu pago. ¡Gracias por confiar en nosotros! `;
       const waLink = phone
         ? `https://wa.me/${phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`
         : null;
@@ -11287,12 +11251,12 @@
       const btnCancel = document.getElementById('custom-dialog-cancel');
       const inputField = document.getElementById('custom-dialog-input');
 
-      titleEl.textContent = '📩 Enviar Recordatorio de Vencimiento';
+      titleEl.textContent = 'Enviar Recordatorio de Vencimiento';
       msgEl.style.textAlign = 'left';
       msgEl.innerHTML = `
         <p style="font-size:13px; color:var(--text2); margin-bottom:12px;">Elige cómo enviar el recordatorio a <strong style="color:var(--text);">${churchName}</strong>:</p>
-        ${waLink ? `<a href="${waLink}" target="_blank" style="display:block; padding:10px 14px; background:rgba(51,179,166,0.12); border:1px solid var(--teal); border-radius:10px; color:var(--teal); text-decoration:none; font-weight:700; margin-bottom:8px; font-size:13px;">📱 WhatsApp: ${phone}</a>` : ''}
-        ${mailLink ? `<a href="${mailLink}" style="display:block; padding:10px 14px; background:rgba(129,140,248,0.12); border:1px solid var(--purple); border-radius:10px; color:var(--purple); text-decoration:none; font-weight:700; margin-bottom:8px; font-size:13px;">📧 Correo: ${adminEmail}</a>` : ''}
+        ${waLink ? `<a href="${waLink}" target="_blank" style="display:block; padding:10px 14px; background:rgba(51,179,166,0.12); border:1px solid var(--teal); border-radius:10px; color:var(--teal); text-decoration:none; font-weight:700; margin-bottom:8px; font-size:13px;">WhatsApp: ${phone}</a>` : ''}
+        ${mailLink ? `<a href="${mailLink}" style="display:block; padding:10px 14px; background:rgba(129,140,248,0.12); border:1px solid var(--purple); border-radius:10px; color:var(--purple); text-decoration:none; font-weight:700; margin-bottom:8px; font-size:13px;">Correo: ${adminEmail}</a>` : ''}
         ${!waLink && !mailLink ? '<p style="color:var(--coral); font-size:13px;">No hay datos de contacto disponibles para esta institución.</p>' : ''}
         <p style="font-size:11px; color:var(--text3); margin-top:10px; line-height:1.6;">Mensaje: "${msg.substring(0, 80)}..."</p>
       `;
