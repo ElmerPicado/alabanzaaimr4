@@ -21,8 +21,8 @@
       --bg3: #2d2d30;
       --border: rgba(255, 255, 255, 0.08);
       --border2: rgba(255, 255, 255, 0.14);
-      --gold: #e5b43c;
-      --gold2: #c8931b;
+      --gold: #38bdf8;
+      --gold2: #0284c7;
       --teal: #20D2A3;
       --coral: #f43f5e;
       --purple: #818cf8;
@@ -146,7 +146,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 40px;
+      padding: max(20px, env(safe-area-inset-top)) 40px 20px;
       background: rgba(9, 14, 26, 0.8);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
@@ -155,7 +155,21 @@
       z-index: 100;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
-    @media (max-width: 600px) { .landing-navbar { padding: 16px 20px; } }
+    @media (max-width: 600px) { 
+      .landing-navbar { 
+        padding: max(24px, env(safe-area-inset-top)) 20px 16px; 
+        flex-direction: column; 
+        gap: 16px; 
+      }
+      .landing-nav-buttons {
+        width: 100%;
+        justify-content: center;
+      }
+      .landing-nav-btn {
+        flex: 1;
+        text-align: center;
+      }
+    }
 
     .landing-nav-logo {
       font-size: 20px;
@@ -178,19 +192,22 @@
     .landing-nav-btn {
       padding: 10px 20px;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
       border-radius: 99px;
       cursor: pointer;
       font-family: inherit;
       transition: all 0.2s ease;
     }
     .landing-nav-btn.login {
-      background: transparent;
-      color: #94a3b8;
-      border: 1px solid transparent;
+      background: #20D2A3;
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 4px 14px rgba(32, 210, 163, 0.2);
     }
     .landing-nav-btn.login:hover {
+      background: #1cb58d;
       color: #ffffff;
+      transform: scale(1.02);
     }
     .landing-nav-btn.register {
       background: #ffffff;
@@ -207,7 +224,7 @@
       width: 100%;
       max-width: 900px;
       margin: 0 auto;
-      padding: 100px 24px 60px;
+      padding: 60px 24px 60px;
       text-align: center;
       display: flex;
       flex-direction: column;
@@ -2880,9 +2897,35 @@
         <span>NUEVO</span> Repertorio dinámico colaborativo
       </div>
       <div class="landing-hero-logo">
-        Gestión <span class="accent">inteligente</span><br>para tu ministerio
+        Gestión <span class="accent">organizada</span><br>para tu Grupo
       </div>
-      <p class="landing-tagline">La plataforma número 1 para organizar tus servicios, asignar canciones, notificar a los músicos y transponer acordes automáticamente. Simple, rápido y sin complicaciones.</p>
+      
+      <div class="landing-hero-checklist" style="text-align: left; margin: 0 auto 48px; color: #cbd5e1; font-size: clamp(16px, 2.5vw, 18px); line-height: 1.6; max-width: 500px; display: flex; flex-direction: column; gap: 12px; font-weight: 400;">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+          <svg style="width:22px; height:22px; color:#20D2A3; flex-shrink:0; margin-top:2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          <span>Organiza tus servicios desde antes.</span>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+          <svg style="width:22px; height:22px; color:#20D2A3; flex-shrink:0; margin-top:2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          <span>Crea un repertorio para tu grupo.</span>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+          <svg style="width:22px; height:22px; color:#20D2A3; flex-shrink:0; margin-top:2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          <span>Planifica un ensayo.</span>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+          <svg style="width:22px; height:22px; color:#20D2A3; flex-shrink:0; margin-top:2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          <span>No más errores de versiones en las canciones.</span>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+          <svg style="width:22px; height:22px; color:#20D2A3; flex-shrink:0; margin-top:2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          <span>Confirma asistencia.</span>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+          <svg style="width:22px; height:22px; color:#20D2A3; flex-shrink:0; margin-top:2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          <span>Crea tu mensaje dinámico y más organizado para enviar por whatsapp.</span>
+        </div>
+      </div>
       <div class="landing-cta-row">
         <button class="btn-landing-primary" id="btn-landing-register">
           Comenzar Gratis 
@@ -5854,17 +5897,17 @@
       }
       if (userVal === "imr4" && passVal === "222222") {
         console.log("Acceso concedido al Administrador General.");
-        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222" });
+        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222", churchId: "iglesia-imr4" });
         return;
       }
       if (userVal === "admin" && passVal === "1234") {
         console.log("Acceso concedido al Administrador General legacy.");
-        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234" });
+        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234", churchId: "iglesia-imr4" });
         return;
       }
       if (userVal === "musico" && passVal === "1234") {
         console.log("Acceso concedido al Músico de Prueba.");
-        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234" });
+        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234", churchId: "iglesia-imr4" });
         return;
       }
 
@@ -11038,15 +11081,15 @@
         return;
       }
       if (savedUserKey === "imr4" && savedPassword === "222222") {
-        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222" });
+        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222", churchId: "iglesia-imr4" });
         return;
       }
       if (savedUserKey === "admin" && savedPassword === "1234") {
-        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234" });
+        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234", churchId: "iglesia-imr4" });
         return;
       }
       if (savedUserKey === "musico" && savedPassword === "1234") {
-        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234" });
+        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234", churchId: "iglesia-imr4" });
         return;
       }
 
@@ -12244,56 +12287,134 @@
     let landingSongsCache = null;
 
     if (landingSearch && landingResults) {
-      landingSearch.addEventListener('input', debounce(async (e) => {
-        const queryVal = removeAccents(e.target.value).toLowerCase().trim();
+      let landingSelectedArtist = null;
+
+      async function renderLandingRepertoire() {
+        const queryVal = removeAccents(landingSearch.value).toLowerCase().trim();
         
-        if (queryVal.length < 2) {
-          landingResults.innerHTML = `<p style="text-align:center; font-size:14px; color:#71717a; padding:10px;">Escribe al menos 2 letras para buscar...</p>`;
-          return;
-        }
-
-        landingResults.innerHTML = `<p style="text-align:center; font-size:14px; color:#e4e4e7; padding:10px;">Buscando...</p>`;
-
         try {
           if (!landingSongsCache) {
-            const snap = await getDocs(collection(db, "canciones"));
+            landingResults.innerHTML = `<p style="text-align:center; font-size:14px; color:#e4e4e7; padding:10px;">Cargando repertorio global...</p>`;
+            const snap = await window.getDocs(window.collection(window.db, "canciones"));
             landingSongsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
           }
 
-          const filtradas = landingSongsCache.filter(s => {
-            const sNombre = removeAccents(s.nombre || '').toLowerCase();
-            const sArtista = removeAccents(s.artista || '').toLowerCase();
-            return sNombre.includes(queryVal) || sArtista.includes(queryVal);
-          });
+          if (queryVal.length >= 2) {
+            // SHOW FLAT RESULTS
+            landingSelectedArtist = null;
+            const filtradas = landingSongsCache.filter(s => {
+              const sNombre = removeAccents(s.nombre || '').toLowerCase();
+              const sArtista = removeAccents(s.artista || '').toLowerCase();
+              return sNombre.includes(queryVal) || sArtista.includes(queryVal);
+            });
 
-          if (filtradas.length === 0) {
-            landingResults.innerHTML = `<p style="text-align:center; font-size:14px; color:#71717a; padding:10px;">No se encontraron resultados.</p>`;
-            return;
-          }
+            if (filtradas.length === 0) {
+              landingResults.innerHTML = `<p style="text-align:center; font-size:14px; color:#71717a; padding:10px;">No se encontraron resultados.</p>`;
+              return;
+            }
 
-          let html = '';
-          filtradas.slice(0, 5).forEach(s => {
-            html += `
-              <div class="ls-song-card">
-                <div>
-                  <div class="ls-song-title">${s.nombre}</div>
-                  <div class="ls-song-artist">${s.artista || 'Desconocido'}</div>
+            let html = '';
+            filtradas.slice(0, 5).forEach(s => {
+              html += `
+                <div class="ls-song-card">
+                  <div>
+                    <div class="ls-song-title">${s.nombre}</div>
+                    <div class="ls-song-artist">${s.artista || 'Desconocido'}</div>
+                  </div>
+                  <div class="ls-song-badge">Ver Acordes</div>
                 </div>
-                <div class="ls-song-badge">Ver Acordes</div>
-              </div>
-            `;
-          });
-          
-          if(filtradas.length > 5) {
-             html += `<p style="text-align:center; font-size:13px; color:#71717a; margin-top:16px;">+ ${filtradas.length - 5} resultados más. Regístrate para verlos.</p>`;
-          }
+              `;
+            });
+            
+            if(filtradas.length > 5) {
+               html += `<p style="text-align:center; font-size:13px; color:#71717a; margin-top:16px;">+ ${filtradas.length - 5} resultados más. Regístrate para verlos.</p>`;
+            }
+            landingResults.innerHTML = html;
+          } else {
+            // SHOW ARTISTS ACCORDION
+            const artistCounts = {};
+            landingSongsCache.forEach(s => {
+              const art = s.artista || 'Desconocido';
+              artistCounts[art] = (artistCounts[art] || 0) + 1;
+            });
+            const sortedArtists = Object.keys(artistCounts).sort((a, b) => a.localeCompare(b));
+            
+            if (sortedArtists.length === 0) {
+              landingResults.innerHTML = `<p style="text-align:center; font-size:14px; color:#71717a; padding:10px;">Repertorio vacío.</p>`;
+              return;
+            }
 
-          landingResults.innerHTML = html;
+            landingResults.innerHTML = '';
+            sortedArtists.slice(0, 15).forEach(art => { // limit to top 15 artists
+              const artistGroup = document.createElement('div');
+              artistGroup.className = 'artist-accordion-group';
+              artistGroup.style.marginBottom = '6px';
+              
+              const isExpanded = landingSelectedArtist === art;
+              if (isExpanded) artistGroup.classList.add('expanded');
+
+              const header = document.createElement('div');
+              header.className = 'artist-row-item';
+              if (isExpanded) {
+                header.style.borderColor = 'var(--teal)';
+                header.style.background = 'rgba(32, 210, 163, 0.08)';
+              }
+              header.innerHTML = `
+                <span class="artist-row-name">${art}</span>
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <span class="artist-row-count">${artistCounts[art]} ${artistCounts[art] === 1 ? 'canción' : 'canciones'}</span>
+                </div>
+              `;
+
+              const collapseDiv = document.createElement('div');
+              collapseDiv.className = 'artist-songs-collapse';
+              collapseDiv.style.display = isExpanded ? 'block' : 'none';
+              collapseDiv.style.padding = '4px 0 8px 0';
+
+              if (isExpanded) {
+                const artistSongs = landingSongsCache.filter(s => (s.artista || 'Desconocido') === art).slice(0, 5);
+                artistSongs.forEach(s => {
+                  collapseDiv.innerHTML += `
+                    <div class="ls-song-card" style="margin-left:12px; margin-right:12px; transform: scale(0.98);">
+                      <div>
+                        <div class="ls-song-title">${s.nombre}</div>
+                        <div class="ls-song-artist">${s.artista || 'Desconocido'}</div>
+                      </div>
+                      <div class="ls-song-badge">Ver Acordes</div>
+                    </div>
+                  `;
+                });
+              }
+
+              header.onclick = () => {
+                landingSelectedArtist = isExpanded ? null : art;
+                renderLandingRepertoire();
+              };
+
+              artistGroup.appendChild(header);
+              artistGroup.appendChild(collapseDiv);
+              landingResults.appendChild(artistGroup);
+            });
+            
+            if (sortedArtists.length > 15) {
+               const moreMsg = document.createElement('p');
+               moreMsg.style = "text-align:center; font-size:13px; color:#71717a; margin-top:16px;";
+               moreMsg.textContent = `+ ${sortedArtists.length - 15} artistas más. Busca por nombre o regístrate para explorar todo.`;
+               landingResults.appendChild(moreMsg);
+            }
+          }
         } catch (err) {
-          console.error("Error buscando canciones:", err);
-          landingResults.innerHTML = `<p style="text-align:center; font-size:13px; color:#ff5252; padding:10px;">Error al buscar canciones.</p>`;
+          console.error("Error cargando repertorio:", err);
+          landingResults.innerHTML = `<p style="text-align:center; font-size:13px; color:#ff5252; padding:10px;">Error al cargar repertorio.</p>`;
         }
-      }, 400));
+      }
+
+      landingSearch.addEventListener('input', debounce(renderLandingRepertoire, 400));
+      
+      // Auto-load repertoire after a short delay
+      setTimeout(() => {
+        if (!landingSongsCache) renderLandingRepertoire();
+      }, 1000);
     }
   </script>
   <script type="module" src="chord_engine/index.js"></script>
