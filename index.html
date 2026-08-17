@@ -5934,9 +5934,20 @@
           // Primero intentamos Auth de Firebase v10
           let isAuthenticated = false;
           let firebaseUser = null;
+          
+          // Pre-convertir alias a email virtual y asegurar clave >= 6 (Fase E / Evitar Deadlock de Permisos)
+          let loginEmail = userVal;
+          if (loginEmail && !loginEmail.includes('@')) {
+            loginEmail = `${loginEmail.toLowerCase()}@alabanapp.com`;
+          }
+          let loginPassword = passVal;
+          if (loginPassword && loginPassword.length < 6) {
+            loginPassword = loginPassword.padEnd(6, '0');
+          }
+
           try {
             const auth = getAuth();
-            const userCredential = await signInWithEmailAndPassword(auth, userVal, passVal);
+            const userCredential = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
             isAuthenticated = true;
             firebaseUser = userCredential.user;
           } catch(authErr) {
@@ -5944,11 +5955,13 @@
           }
           
           // ID para buscar en `usuarios`
-          // Los documentos se guardan con el email como ID (ej: "joselinedelb@gmail.com")
-          // Si autenticado con Firebase, buscamos primero por email exacto, luego por alias (usuario field)
           let userIdToSearch = userVal;
           if (isAuthenticated && firebaseUser) {
-            userIdToSearch = firebaseUser.email; // usar email exacto, no stripear
+            if (firebaseUser.email.endsWith('@alabanapp.com')) {
+              userIdToSearch = firebaseUser.email.split('@')[0];
+            } else {
+              userIdToSearch = firebaseUser.email;
+            }
           }
 
           let uSnap = await getDoc(doc(db, "usuarios", userIdToSearch));
@@ -5981,6 +5994,20 @@
             
             // Validar login por Auth o por password legacy en el doc
             if (isAuthenticated || uData.password === passVal) {
+              // Cargar rol e instrumento contextual de la membresía (Fase E)
+              if (uData.churchId) {
+                try {
+                  const mSnap = await getDoc(doc(db, "memberships", `${uData._docId || uData.usuario}_${uData.churchId}`));
+                  if (mSnap.exists()) {
+                    const mData = mSnap.data();
+                    uData.role = mData.role || uData.role || "musico";
+                    uData.instrumento = mData.instrumento || uData.instrumento || "Voz";
+                  }
+                } catch(e) {
+                  console.error("Error al cargar rol de membresía:", e);
+                }
+              }
+              
               // Autenticación Transparente (Fase E/Firestore Rules):
               // Si validó por contraseña de Firestore pero no estaba autenticado en Firebase Auth (ej: alias),
               // iniciar sesión o crear su cuenta virtual de forma transparente para que request.auth no sea null.
@@ -8787,6 +8814,99 @@
       }
       // FIN FASE C
 
+      // ================================================================
+      // FASE C: BUSCAR USUARIO EXISTENTE ANTES DE CREAR (ANTI-DUPLICADOS)
+      // Si el usuario ya existe en el sistema global, vincular en vez de crear.
+      // ================================================================
+      if (!editingUserKey) {
+        let foundDoc = null;
+        let foundDocId = null;
+
+        // 1. Buscar por email como docId (usuarios con correo)
+        if (emailInput && emailInput.includes('@')) {
+          try {
+            const snapEmail = await getDoc(doc(db, "usuarios", emailInput));
+            if (snapEmail.exists()) {
+              foundDoc = snapEmail.data();
+              foundDocId = emailInput;
+            }
+          } catch(_) {}
+        }
+
+        // 2. Si no encontró por email, buscar por alias como docId (usuarios sin correo)
+        if (!foundDoc && userInput) {
+          try {
+            const snapAlias = await getDoc(doc(db, "usuarios", userInput));
+            if (snapAlias.exists()) {
+              foundDoc = snapAlias.data();
+              foundDocId = userInput;
+            }
+          } catch(_) {}
+        }
+
+        if (foundDoc) {
+          const yaEnEstaIglesia = foundDoc.churchId && foundDoc.churchId === memberChurchId;
+          const enOtraIglesia = foundDoc.churchId && foundDoc.churchId !== memberChurchId;
+
+          if (yaEnEstaIglesia) {
+            customAlert(`"${foundDoc.nombre}" ya es miembro activo de esta comunidad.`);
+            return;
+          }
+
+          const pregunta = enOtraIglesia
+            ? `"${foundDoc.nombre}" ya existe en el sistema y pertenece a otra comunidad.\n\n` +
+              `¿Deseas vincularlo a tu comunidad? Sus credenciales de acceso no cambiarán.\n\n` +
+              `⚠️ Nota: su comunidad activa cambiará a la tuya.`
+            : `"${foundDoc.nombre}" ya existe en el sistema (sin comunidad asignada).\n\n` +
+              `¿Deseas añadirlo a tu comunidad como miembro?`;
+
+          const confirmado = await customConfirm(pregunta);
+          if (!confirmado) return;
+
+          // Verificar límite del plan antes de vincular
+          if (memberChurchId) {
+            try {
+              const cSnap = await window.getDoc(window.doc(window.db, "churches", memberChurchId));
+              const cPlan = cSnap.exists() ? (cSnap.data().plan || 'gratis') : 'gratis';
+              const cCount = (window.cacheMembers || []).filter(m => m.churchId === memberChurchId).length;
+              const cLimit = cPlan === 'basico' ? 10 : (cPlan === 'pro' || cPlan === 'prueba') ? 25 : 1;
+              if (cCount >= cLimit) {
+                customAlert(`Límite alcanzado: Tu plan (${cPlan.toUpperCase()}) permite máximo ${cLimit} miembros (tienes ${cCount}).`);
+                return;
+              }
+            } catch(_) {}
+          }
+
+          // Vincular: crear membresía en la colección memberships
+          try {
+            const membershipDocId = `${foundDocId}_${memberChurchId}`;
+            await setDoc(doc(db, "memberships", membershipDocId), {
+              userId: foundDocId,
+              churchId: memberChurchId,
+              role: document.getElementById('member-role-input').value,
+              instrumento: instVal,
+              type: isCoro ? 'corista' : 'musico',
+              joinedAt: new Date().toISOString()
+            }, { merge: true });
+            
+            // También actualizar churchId en el usuario global por retrocompatibilidad
+            await setDoc(doc(db, "usuarios", foundDocId), {
+              churchId: memberChurchId,
+              role: document.getElementById('member-role-input').value,
+              instrumento: instVal,
+              type: isCoro ? 'corista' : 'musico'
+            }, { merge: true });
+
+            resetMemberForm();
+            customAlert(`"${foundDoc.nombre}" fue vinculado a tu comunidad exitosamente. ¡Ya puede acceder con sus credenciales actuales!`);
+          } catch (err) {
+            customAlert('Error al vincular usuario: ' + err.message);
+          }
+          return; // No continuar con la creación normal
+        }
+      }
+      // FIN FASE C
+
       // --- VALIDACIÓN DE LÍMITES POR PLAN ---
       if (!editingUserKey && memberChurchId) {
         try {
@@ -11295,24 +11415,42 @@
         return;
       }
 
-      // 2. Verificar en Firestore en tiempo real
+      // 2. Autenticación Transparente en Firebase Auth primero (Evita deadlock de permisos en Firestore)
+      let isAuthenticated = false;
+      let firebaseUser = null;
+      
+      let loginEmail = savedUserKey;
+      if (loginEmail && !loginEmail.includes('@')) {
+        loginEmail = `${loginEmail.toLowerCase()}@alabanapp.com`;
+      }
+      let loginPassword = savedPassword;
+      if (loginPassword && loginPassword.length < 6) {
+        loginPassword = loginPassword.padEnd(6, '0');
+      }
+
       try {
-        const uSnap = await getDoc(doc(db, "usuarios", savedUserKey));
+        const auth = getAuth();
+        const userCredential = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
+        isAuthenticated = true;
+        firebaseUser = userCredential.user;
+      } catch (e) {
+        console.warn("Auto-login Auth pre-auth failed:", e.message);
+      }
+
+      // 3. Verificar en Firestore en tiempo real
+      try {
+        let userIdToSearch = savedUserKey;
+        if (isAuthenticated && firebaseUser) {
+          if (firebaseUser.email.endsWith('@alabanapp.com')) {
+            userIdToSearch = firebaseUser.email.split('@')[0];
+          } else {
+            userIdToSearch = firebaseUser.email;
+          }
+        }
+
+        const uSnap = await getDoc(doc(db, "usuarios", userIdToSearch));
         if (uSnap.exists() && uSnap.data().password === savedPassword) {
           const userData = { ...uSnap.data(), _docId: uSnap.id };
-          
-          // Autenticación Transparente en auto-login (Fase E / Firestore Rules)
-          const auth = getAuth();
-          if (!auth.currentUser) {
-            const virtualEmail = savedUserKey.includes('@') ? savedUserKey : `${savedUserKey.toLowerCase()}@alabanapp.com`;
-            try {
-              await signInWithEmailAndPassword(auth, virtualEmail, savedPassword);
-            } catch (e) {
-              try {
-                await createUserWithEmailAndPassword(auth, virtualEmail, savedPassword);
-              } catch (e2) {}
-            }
-          }
 
           // Cargar rol e instrumento contextual de la membresía (Fase E)
           if (userData.churchId) {

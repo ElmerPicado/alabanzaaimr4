@@ -1,7 +1,7 @@
 /**
  * SCRIPT: apply_modifications.mjs
  * =================================
- * Aplica todas las modificaciones necesarias (Fases B, C, D, E y corrección de errores de JS y Auth) a index.html.
+ * Aplica todas las modificaciones necesarias (Fases B, C, D, E y corrección de errores de JS, Auth y Deadlocks) a index.html.
  * Normaliza los saltos de línea a \n para asegurar un reemplazo exacto e infalible.
  */
 
@@ -250,8 +250,12 @@ applyReplace(
           const { getAuth, createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js");
           const auth = getAuth();
           const targetAuthEmail = emailInput && emailInput.includes('@') ? emailInput : \`\${userInput.toLowerCase()}@alabanapp.com\`;
+          let targetAuthPassword = passInput;
+          if (targetAuthPassword && targetAuthPassword.length < 6) {
+            targetAuthPassword = targetAuthPassword.padEnd(6, '0');
+          }
           try {
-            await createUserWithEmailAndPassword(auth, targetAuthEmail, passInput);
+            await createUserWithEmailAndPassword(auth, targetAuthEmail, targetAuthPassword);
           } catch (authErr) {
             if (authErr.code !== 'auth/email-already-in-use') {
               console.warn("Auth creation skipped:", authErr.message);
@@ -399,7 +403,7 @@ applyReplace(
   `      try {
         const currentChurchId = (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : null;
         if (currentChurchId) {
-          const membershipDocId = \`\${username}_\\n\${currentChurchId}\`;
+          const membershipDocId = \`\${username}_\${currentChurchId}\`;
           await deleteDoc(doc(db, "memberships", membershipDocId));
           // Limpiar el churchId del usuario global para compatibilidad
           try {
@@ -416,7 +420,7 @@ applyReplace(
 );
 
 // -------------------------------------------------------------
-// FASE E: Cargar rol contextual de membership en login manual (+ Autenticación Transparente en Firebase Auth)
+// FASE E: Cargar rol contextual de membership en login manual (+ Autenticación Transparente Pre-convertida)
 // -------------------------------------------------------------
 applyReplace(
   "Cargar rol contextual en login manual",
@@ -424,21 +428,23 @@ applyReplace(
             if (isAuthenticated || uData.password === passVal) {`,
   `            // Validar login por Auth o por password legacy en el doc
             if (isAuthenticated || uData.password === passVal) {
-              // Autenticación Transparente (Fase E/Firestore Rules):
-              // Si validó por contraseña de Firestore pero no estaba autenticado en Firebase Auth (ej: alias),
-              // iniciar sesión o crear su cuenta virtual de forma transparente para que request.auth no sea null.
+              // Autenticación Transparente en el login manual (Fase E / Firestore Rules)
               if (!isAuthenticated) {
                 try {
                   const { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js");
                   const auth = getAuth();
                   const virtualEmail = userVal.includes('@') ? userVal : \`\${userVal.toLowerCase()}@alabanapp.com\`;
+                  let virtualPassword = passVal;
+                  if (virtualPassword && virtualPassword.length < 6) {
+                    virtualPassword = virtualPassword.padEnd(6, '0');
+                  }
                   try {
-                    await signInWithEmailAndPassword(auth, virtualEmail, passVal);
+                    await signInWithEmailAndPassword(auth, virtualEmail, virtualPassword);
                     isAuthenticated = true;
                   } catch (loginErr) {
                     if (loginErr.code === 'auth/user-not-found' || loginErr.code === 'auth/invalid-credential') {
                       try {
-                        await createUserWithEmailAndPassword(auth, virtualEmail, passVal);
+                        await createUserWithEmailAndPassword(auth, virtualEmail, virtualPassword);
                         isAuthenticated = true;
                       } catch (createErr) {
                         console.error("No se pudo crear usuario virtual Auth:", createErr);
@@ -469,7 +475,7 @@ applyReplace(
 );
 
 // -------------------------------------------------------------
-// FASE E: Cargar rol contextual de membership en auto-login (+ Autenticación Transparente en Firebase Auth)
+// FASE E: Cargar rol contextual de membership en auto-login (+ Autenticación Transparente Pre-convertida)
 // -------------------------------------------------------------
 applyReplace(
   "Cargar rol contextual en auto-login",
@@ -483,11 +489,15 @@ applyReplace(
           const auth = getAuth();
           if (!auth.currentUser) {
             const virtualEmail = savedUserKey.includes('@') ? savedUserKey : \`\${savedUserKey.toLowerCase()}@alabanapp.com\`;
+            let virtualPassword = savedPassword;
+            if (virtualPassword && virtualPassword.length < 6) {
+              virtualPassword = virtualPassword.padEnd(6, '0');
+            }
             try {
-              await signInWithEmailAndPassword(auth, virtualEmail, savedPassword);
+              await signInWithEmailAndPassword(auth, virtualEmail, virtualPassword);
             } catch (e) {
               try {
-                await createUserWithEmailAndPassword(auth, virtualEmail, savedPassword);
+                await createUserWithEmailAndPassword(auth, virtualEmail, virtualPassword);
               } catch (e2) {}
             }
           }
@@ -670,6 +680,53 @@ applyReplace(
     }
 
     window.openPreviewLyrics = async function (songId) {`
+);
+
+// -------------------------------------------------------------
+// EVITAR DEADLOCKS: Pre-convertir alias en el cliente antes de signInWithEmailAndPassword en el login principal
+// -------------------------------------------------------------
+applyReplace(
+  "Pre-convertir alias en el login principal para evitar deadlock",
+  `          let emailVal = userVal.trim();
+          let passVal = passwordInput.value;
+          let firebaseUser = null;
+          let isAuthenticated = false;
+
+          if (emailVal && emailVal.includes('@')) {
+            try {
+              const auth = getAuth();
+              const userCredential = await signInWithEmailAndPassword(auth, emailVal, passVal);
+              firebaseUser = userCredential.user;
+              isAuthenticated = true;
+            } catch (err) {
+              console.warn("Firebase Auth login skipped/failed:", err.message);
+            }
+          }`,
+  `          let emailVal = userVal.trim();
+          let passVal = passwordInput.value;
+          let firebaseUser = null;
+          let isAuthenticated = false;
+
+          // Pre-convertir alias a email virtual y asegurar largo de clave >= 6 (Fase E / Evitar Deadlock de Permisos)
+          let loginEmail = emailVal;
+          if (loginEmail && !loginEmail.includes('@')) {
+            loginEmail = \`\${loginEmail.toLowerCase()}@alabanapp.com\`;
+          }
+          let loginPassword = passVal;
+          if (loginPassword && loginPassword.length < 6) {
+            loginPassword = loginPassword.padEnd(6, '0');
+          }
+
+          if (loginEmail && loginEmail.includes('@')) {
+            try {
+              const auth = getAuth();
+              const userCredential = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
+              firebaseUser = userCredential.user;
+              isAuthenticated = true;
+            } catch (err) {
+              console.warn("Firebase Auth login failed:", err.message);
+            }
+          }`
 );
 
 // ==========================================
