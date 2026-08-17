@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Setup IMR4 + Migrar Usuarios</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #1a1828; color: #f0eeff; font-family: 'Segoe UI', sans-serif; padding: 30px; min-height: 100vh; }
+    h1 { color: #e5b43c; margin-bottom: 8px; }
+    h2 { color: #33b3a6; margin: 20px 0 8px; font-size: 18px; }
+    .card { background: #211e33; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    button { padding: 12px 24px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; margin: 6px 4px 6px 0; }
+    .btn-1 { background: #818cf8; color: #fff; }
+    .btn-2 { background: #33b3a6; color: #000; }
+    .btn-danger { background: #f43f5e; color: #fff; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    #log { background: #0f0e17; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px; margin-top: 16px; font-family: 'Consolas', monospace; font-size: 13px; line-height: 1.7; max-height: 500px; overflow-y: auto; white-space: pre-wrap; }
+    .ok { color: #33b3a6; }
+    .warn { color: #f59e0b; }
+    .err { color: #f43f5e; }
+    .info { color: #818cf8; }
+    .dim { color: #6b6890; }
+  </style>
+</head>
+<body>
+
+  <h1>🏛️ Setup Cuenta IMR4 + Migración de Usuarios</h1>
+  <p style="color:#a09cc0; margin-bottom: 20px;">
+    Esta herramienta crea la cuenta IMR4 en Firestore y migra todos los usuarios existentes a esa cuenta.
+    <br>Usa la misma conexión de Firebase que tu app.
+  </p>
+
+  <div class="card">
+    <h2>Paso 1: Crear la cuenta IMR4</h2>
+    <p style="color:#a09cc0; font-size:13px; margin-bottom:12px;">
+      Crea (o actualiza) el documento <code>churches/imr4</code> en Firestore con plan <strong>gratis indefinido</strong>.
+    </p>
+    <button class="btn-1" id="btn-step1" onclick="step1()">🏛️ Crear Cuenta IMR4</button>
+  </div>
+
+  <div class="card">
+    <h2>Paso 2: Migrar usuarios existentes</h2>
+    <p style="color:#a09cc0; font-size:13px; margin-bottom:12px;">
+      Asigna <code>churchId = "imr4"</code> a todos los usuarios que aún no tengan uno.
+      <br>No toca usuarios que ya tengan <code>churchId</code> asignado. Excluye al superadmin.
+    </p>
+    <button class="btn-2" id="btn-step2" onclick="step2()">👥 Migrar Usuarios a IMR4</button>
+  </div>
+
+  <div class="card">
+    <h2>Paso 3 (Opcional): Ver estado actual</h2>
+    <p style="color:#a09cc0; font-size:13px; margin-bottom:12px;">
+      Consulta la base de datos para ver cómo quedó todo.
+    </p>
+    <button class="btn-1" id="btn-step3" onclick="step3()">🔍 Ver Iglesias</button>
+    <button class="btn-2" id="btn-step3b" onclick="step3b()">👥 Ver Usuarios</button>
+  </div>
+
+  <div id="log"></div>
+
+  <!-- Firebase SDK (mismo que usa tu app) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+    import {
+      getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where, writeBatch
+    } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDjA2d8zn02Iu9Nm-Jy2mVw6GgbjeKUEJ4",
+      authDomain: "alabanza-d2185.firebaseapp.com",
+      projectId: "alabanza-d2185",
+      storageBucket: "alabanza-d2185.firebasestorage.app",
+      messagingSenderId: "696632316366",
+      appId: "1:696632316366:web:8727b4bb633f35995f1b9f",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const logEl = document.getElementById('log');
+    function log(msg, cls = '') {
+      logEl.innerHTML += `<span class="${cls}">${msg}</span>\n`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    // ─── AUTENTICACIÓN SUPERADMIN ──────────────────────────────────
+    async function loginSuperAdmin() {
+      try {
+        if (auth.currentUser) return true; // Ya está logueado
+        log('🔑 Iniciando sesión como SuperAdmin...', 'info');
+        await signInWithEmailAndPassword(auth, "epicadomiranda@gmail.com", "Pd030819");
+        log('✅ Sesión iniciada correctamente.', 'ok');
+        return true;
+      } catch (error) {
+        log(`❌ Error de autenticación: ${error.message}`, 'err');
+        return false;
+      }
+    }
+
+    // ─── PASO 1: CREAR CUENTA IMR4 ──────────────────────────────────
+    window.step1 = async function() {
+      const btn = document.getElementById('btn-step1');
+      btn.disabled = true;
+      log('═══════════════════════════════════════════', 'dim');
+      log('🏛️  PASO 1: Creando cuenta IMR4...', 'info');
+      log('═══════════════════════════════════════════', 'dim');
+
+      const IMR4_ID = 'imr4';
+      const data = {
+        name: "Iglesia Ministerio de Restauración (IMR4)",
+        shortName: "IMR4",
+        adminEmail: "epicadomiranda@gmail.com",
+        adminUser: "epicado",
+        phone: "",
+        plan: "gratis",
+        status: "activa",
+        expireAt: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        notes: "Cuenta principal. Licencia gratuita indefinida.",
+      };
+
+      try {
+        const ref = doc(db, 'churches', IMR4_ID);
+        const existing = await getDoc(ref);
+
+        if (existing.exists()) {
+          log('⚠️  El documento churches/imr4 ya existe. Actualizando...', 'warn');
+          await setDoc(ref, { ...data, updatedAt: new Date().toISOString() }, { merge: true });
+          log('✅ Documento actualizado (merge).', 'ok');
+        } else {
+          await setDoc(ref, data);
+          log('✅ Documento churches/imr4 CREADO exitosamente.', 'ok');
+        }
+
+        log('');
+        log('📄 Datos guardados:', 'info');
+        Object.entries(data).forEach(([k, v]) => {
+          log(`   ${k}: ${v === null ? '(null - indefinido)' : v}`, 'dim');
+        });
+        log('');
+        log('👉 Ahora ejecuta el Paso 2 para migrar los usuarios.', 'info');
+      } catch(e) {
+        log(`❌ Error: ${e.message}`, 'err');
+        console.error(e);
+      }
+      btn.disabled = false;
+    };
+
+    // ─── PASO 2: MIGRAR USUARIOS ────────────────────────────────────
+    window.step2 = async function() {
+      const btn = document.getElementById('btn-step2');
+      btn.disabled = true;
+      log('');
+      log('═══════════════════════════════════════════', 'dim');
+      log('👥  PASO 2: Migrando usuarios a IMR4...', 'info');
+      log('═══════════════════════════════════════════', 'dim');
+
+      const IMR4_ID = 'imr4';
+      const EXCLUDE = ['epicadomiranda@gmail.com', 'superadmin'];
+
+      try {
+        const snap = await getDocs(collection(db, 'usuarios'));
+        if (snap.empty) {
+          log('⚠️  No hay usuarios en la colección.', 'warn');
+          btn.disabled = false;
+          return;
+        }
+
+        let total = 0, migrated = 0, skipped = 0, alreadyOk = 0;
+        const migratedList = [];
+
+        // Firestore web SDK batch limit = 500
+        let batch = writeBatch(db);
+        let batchCount = 0;
+
+        snap.forEach(userDoc => {
+          total++;
+          const data = userDoc.data();
+          const uid = userDoc.id;
+
+          if (EXCLUDE.includes(uid) || EXCLUDE.includes(data.usuario)) {
+            log(`   🚫 Excluido (sistema): ${uid}`, 'dim');
+            skipped++;
+            return;
+          }
+
+          if (data.churchId && data.churchId !== '') {
+            log(`   ✓ Ya tiene churchId="${data.churchId}": ${uid}`, 'dim');
+            alreadyOk++;
+            return;
+          }
+
+          // Migrar
+          const ref = doc(db, 'usuarios', uid);
+          batch.update(ref, {
+            churchId: IMR4_ID,
+            migratedAt: new Date().toISOString(),
+          });
+          batchCount++;
+          migratedList.push({ uid, nombre: data.nombre || uid, role: data.role || 'musico' });
+          migrated++;
+
+          if (batchCount >= 400) {
+            // Commit parcial (se hará al final)
+          }
+        });
+
+        if (batchCount > 0) {
+          log(`   📤 Guardando ${batchCount} cambios en Firestore...`, 'info');
+          await batch.commit();
+          log(`   ✅ Batch committed.`, 'ok');
+        }
+
+        log('');
+        log('═══════════════════════════════════════════', 'dim');
+        log('📊 REPORTE DE MIGRACIÓN', 'info');
+        log('═══════════════════════════════════════════', 'dim');
+        log(`   Total usuarios:            ${total}`);
+        log(`   ✅ Migrados a imr4:         ${migrated}`, 'ok');
+        log(`   ⏭️  Ya tenían churchId:      ${alreadyOk}`, 'dim');
+        log(`   🚫 Excluidos (sistema):     ${skipped}`, 'dim');
+
+        if (migratedList.length > 0) {
+          log('');
+          log('👥 Usuarios migrados:', 'ok');
+          migratedList.forEach(u => {
+            log(`   • [${u.role}] ${u.nombre} (${u.uid})`, 'ok');
+          });
+        }
+
+        log('');
+        log('✅ ¡Migración completada! Todos los usuarios están vinculados a IMR4.', 'ok');
+
+      } catch(e) {
+        log(`❌ Error: ${e.message}`, 'err');
+        console.error(e);
+      }
+      btn.disabled = false;
+    };
+
+    // ─── PASO 3: VER ESTADO ─────────────────────────────────────────
+    window.step3 = async function() {
+      log('');
+      log('🔍 Consultando colección churches...', 'info');
+      try {
+        const snap = await getDocs(collection(db, 'churches'));
+        if (snap.empty) {
+          log('   (vacía)', 'dim');
+          return;
+        }
+        snap.forEach(d => {
+          const data = d.data();
+          log(`   🏛️ ${d.id}: ${data.name || '?'} | Plan: ${data.plan} | Estado: ${data.status} | Vence: ${data.expireAt || 'Indefinido'}`, '');
+        });
+      } catch(e) {
+        log(`❌ ${e.message}`, 'err');
+      }
+    };
+
+    window.step3b = async function() {
+      log('');
+      log('👥 Consultando colección usuarios...', 'info');
+      try {
+        const snap = await getDocs(collection(db, 'usuarios'));
+        if (snap.empty) {
+          log('   (vacía)', 'dim');
+          return;
+        }
+        let count = 0;
+        snap.forEach(d => {
+          count++;
+          const data = d.data();
+          const church = data.churchId || '❌ SIN CHURCH';
+          log(`   ${count}. ${d.id} → ${data.nombre || '?'} [${data.role || '?'}] → churchId: ${church}`, data.churchId ? '' : 'warn');
+        });
+        log(`   Total: ${count} usuarios`, 'dim');
+      } catch(e) {
+        log(`❌ ${e.message}`, 'err');
+      }
+    };
+
+    log('🔌 Firebase conectado al proyecto: alabanza-d2185', 'ok');
+    log('📋 Listo. Ejecuta los pasos en orden.', 'info');
+    log('', '');
+  </script>
+
+</body>
+</html>

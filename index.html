@@ -3891,6 +3891,9 @@
           </div>
         </div>
 
+        <!-- Alertas de vencimiento próximo (5 días) -->
+        <div id="sa-expiry-alerts" style="display:none; margin-bottom: 20px;"></div>
+
         <div id="superadmin-churches-list">
           <p style="color:var(--text3);font-size:13px;text-align:center;">Cargando instituciones...</p>
         </div>
@@ -11028,79 +11031,195 @@
     // ==========================================
     window.renderSuperAdminChurches = async function() {
       const container = document.getElementById('superadmin-churches-list');
+      const alertsContainer = document.getElementById('sa-expiry-alerts');
       if (!container) return;
       container.innerHTML = '<p style="text-align:center;color:var(--text3);">Cargando instituciones...</p>';
       try {
         const snap = await window.getDocs(window.collection(window.db, 'churches'));
         if (snap.empty) {
-          container.innerHTML = '<p style="text-align:center;color:var(--text3);">No hay iglesias registradas.</p>';
+          container.innerHTML = '<p style="text-align:center;color:var(--text3);">No hay iglesias registradas. Usa el formulario de arriba para crear una.</p>';
+          if (alertsContainer) alertsContainer.style.display = 'none';
           return;
         }
+
+        const now = new Date();
+        const ALERT_DAYS = 5;
+        const expiringSoon = [];
         let html = '';
+
         snap.forEach(docSnap => {
           const data = docSnap.data();
           const id = docSnap.id;
           const statusColor = data.status === 'activa' ? 'var(--teal)' : 'var(--coral)';
-          const planColor = data.plan === 'paga' ? 'var(--gold)' : (data.plan === 'gratis' ? 'var(--purple)' : 'var(--text2)');
-          
+          const planLabel = data.plan === 'paga' ? '💎 PAGO' : data.plan === 'gratis' ? '♾️ GRATIS' : '🔬 PRUEBA';
+          const planColor = data.plan === 'paga' ? 'var(--gold)' : data.plan === 'gratis' ? 'var(--purple)' : 'var(--text2)';
+
+          // Calcular vencimiento
+          let expireLabel = 'Indefinido';
+          let daysLeft = null;
+          let isExpired = false;
+          let isExpiringSoon = false;
+
+          if (data.expireAt) {
+            const expDate = new Date(data.expireAt);
+            daysLeft = Math.ceil((expDate - now) / (1000 * 60 * 60 * 24));
+            isExpired = daysLeft < 0;
+            isExpiringSoon = daysLeft >= 0 && daysLeft <= ALERT_DAYS;
+            expireLabel = expDate.toLocaleDateString('es-CR', { day: '2-digit', month: 'short', year: 'numeric' });
+            if (isExpiringSoon) expiringSoon.push({ id, name: data.name, daysLeft, adminEmail: data.adminEmail, phone: data.phone });
+          }
+
+          const expColor = isExpired ? 'var(--coral)' : isExpiringSoon ? '#f59e0b' : 'var(--text)';
+          const expBadge = isExpired ? '🔴 VENCIDO' : isExpiringSoon ? `⚠️ ${daysLeft}d restantes` : '';
+
           html += `
-          <div class="card" style="margin-bottom: 12px; border-left: 4px solid ${statusColor};">
-            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-              <div>
-                <h4 style="margin:0; font-size:16px; color:var(--text);">${data.name || 'Sin Nombre'}</h4>
-                <p style="margin:4px 0 0; font-size:12px; color:var(--text2);">Admin: ${data.adminEmail || 'N/A'} | Tel: ${data.phone || 'N/A'}</p>
-                <p style="margin:4px 0 0; font-size:12px; color:var(--text2);">
-                  ID: <span style="font-family:monospace; color:var(--text3);">${id}</span>
-                </p>
-                <p style="margin:4px 0 0; font-size:12px; color:var(--text2);">
-                  Estado: <strong style="color:${statusColor}">${(data.status||'inactiva').toUpperCase()}</strong> | 
-                  Plan: <strong style="color:${planColor}">${(data.plan||'prueba').toUpperCase()}</strong>
-                </p>
-                <p style="margin:4px 0 0; font-size:12px; color:var(--text2);">
-                  Vencimiento: <strong>${data.expireAt ? new Date(data.expireAt).toLocaleDateString() : 'No definido'}</strong>
+          <div class="card" style="margin-bottom: 14px; border-left: 4px solid ${statusColor}; ${isExpiringSoon ? 'box-shadow: 0 0 14px rgba(245,158,11,0.2);' : ''}${isExpired ? 'box-shadow: 0 0 14px rgba(244,63,94,0.2);' : ''}">
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; align-items:flex-start;">
+              <!-- INFO IZQUIERDA -->
+              <div style="flex:1; min-width:200px;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                  <h4 style="margin:0; font-size:16px; color:var(--text);">${data.name || 'Sin Nombre'}</h4>
+                  <span style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; background:${planColor}22; color:${planColor}; border:1px solid ${planColor}44;">${planLabel}</span>
+                  <span style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; background:${statusColor}22; color:${statusColor}; border:1px solid ${statusColor}44;">${(data.status||'inactiva').toUpperCase()}</span>
+                </div>
+                <p style="margin:2px 0; font-size:12px; color:var(--text2);">📧 ${data.adminEmail || 'N/A'} | 📱 ${data.phone || 'N/A'}</p>
+                <p style="margin:2px 0; font-size:11px; color:var(--text3); font-family:monospace;">ID: ${id}</p>
+                <p style="margin:4px 0 0; font-size:12px; color:${expColor}; font-weight:600;">
+                  📅 Vence: ${expireLabel} ${expBadge}
                 </p>
               </div>
-              <div style="display:flex; flex-direction:column; gap:6px;">
-                ${data.receiptUrl ? `<button onclick="verComprobanteSa('${id}')" class="btn-secondary" style="font-size:11px; padding:6px; text-align:center; cursor:pointer;">Ver Comprobante</button>` : '<span style="font-size:11px; color:var(--text3);">Sin Comprobante</span>'}
-                
-                ${data.status === 'inactiva' ? 
-                  `<button class="btn-primary" onclick="saAction('${id}', 'activar')" style="font-size:11px; padding:6px; background:var(--teal); color:#000;">Activar +30 Días</button>` :
-                  `<button class="btn-primary" onclick="saAction('${id}', 'inactivar')" style="font-size:11px; padding:6px; background:rgba(255,255,255,0.08); color:var(--text2);">Suspender</button>`
-                }
-                <button class="btn-primary" onclick="deleteChurchSa('${id}', '${(data.name || 'Sin Nombre').replace(/'/g, "\\'")}')" style="font-size:11px; padding:6px; background:var(--coral); color:#fff; font-weight:bold;">🗑️ Eliminar</button>
+
+              <!-- ACCIONES DERECHA -->
+              <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+                <!-- Editar Plan -->
+                <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+                  <select id="plan-select-${id}" style="font-size:11px; padding:5px 8px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-family:var(--font-body); cursor:pointer;">
+                    <option value="gratis" ${data.plan === 'gratis' ? 'selected' : ''}>♾️ Gratis</option>
+                    <option value="prueba" ${data.plan === 'prueba' ? 'selected' : ''}>🔬 Prueba</option>
+                    <option value="paga" ${data.plan === 'paga' ? 'selected' : ''}>💎 Pago</option>
+                  </select>
+                  <input type="date" id="expire-input-${id}" value="${data.expireAt ? new Date(data.expireAt).toISOString().split('T')[0] : ''}" style="font-size:11px; padding:5px 8px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-family:var(--font-body);">
+                  <button onclick="saUpdatePlan('${id}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:var(--purple); color:#fff; white-space:nowrap;">💾 Guardar Plan</button>
+                </div>
+
+                <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
+                  ${data.receiptUrl ? `<button onclick="verComprobanteSa('${id}')" class="btn-secondary" style="font-size:11px; padding:5px 10px;">🧾 Comprobante</button>` : ''}
+                  ${data.status === 'inactiva'
+                    ? `<button class="btn-primary" onclick="saAction('${id}', 'activar')" style="font-size:11px; padding:5px 10px; background:var(--teal); color:#000;">▶️ Activar +30d</button>`
+                    : `<button class="btn-primary" onclick="saAction('${id}', 'inactivar')" style="font-size:11px; padding:5px 10px; background:rgba(255,255,255,0.08); color:var(--text2);">⏸ Suspender</button>`
+                  }
+                  ${(isExpiringSoon || isExpired) ? `<button onclick="saEnviarRecordatorio('${id}','${(data.name||'').replace(/'/g,"\\'")}','${data.adminEmail||''}','${data.phone||''}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:#f59e0b; color:#000; font-weight:700;">📩 Recordatorio</button>` : ''}
+                  <button onclick="deleteChurchSa('${id}','${(data.name||'Sin Nombre').replace(/'/g,"\\'")}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:var(--coral); color:#fff; font-weight:700;">🗑️ Eliminar</button>
+                </div>
               </div>
             </div>
-          </div>
-          `;
+          </div>`;
         });
+
         container.innerHTML = html;
+
+        // Renderizar alertas de vencimiento
+        if (alertsContainer) {
+          if (expiringSoon.length > 0) {
+            alertsContainer.style.display = 'block';
+            alertsContainer.innerHTML = `
+              <div class="card" style="border-color:#f59e0b; background:rgba(245,158,11,0.06);">
+                <h4 style="color:#f59e0b; margin:0 0 10px; font-size:14px;">⚠️ ${expiringSoon.length} cuenta(s) próxima(s) a vencer</h4>
+                ${expiringSoon.map(c => `
+                  <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:8px;">
+                    <div>
+                      <span style="font-size:13px; font-weight:700; color:var(--text);">${c.name}</span>
+                      <span style="font-size:12px; color:#f59e0b; margin-left:8px;">${c.daysLeft === 0 ? 'Vence HOY' : `${c.daysLeft}d restantes`}</span>
+                    </div>
+                    <button onclick="saEnviarRecordatorio('${c.id}','${(c.name||'').replace(/'/g,"\\'")}','${c.adminEmail||''}','${c.phone||''}')"
+                      style="font-size:11px; padding:5px 12px; background:#f59e0b; color:#000; border:none; border-radius:8px; font-weight:700; cursor:pointer;">
+                      📩 Enviar recordatorio
+                    </button>
+                  </div>
+                `).join('')}
+              </div>`;
+          } else {
+            alertsContainer.style.display = 'none';
+          }
+        }
+
       } catch(e) {
         console.error(e);
         container.innerHTML = '<p style="text-align:center;color:var(--coral);">Error cargando iglesias.</p>';
       }
     };
 
-    window.deleteChurchSa = async function(churchId, churchName) {
-      const inputPass = await customPrompt(
-        `Para eliminar definitivamente la institución "${churchName}" (ID: ${churchId}) y sus accesos, ingresa la clave de SuperAdmin:`,
-        "",
-        "🔑 Confirmar Eliminación por Clave",
-        true
-      );
-      if (inputPass === null) return;
-      if (inputPass !== "Pd030819") {
-        customAlert("❌ Clave incorrecta. No se realizaron cambios.", "Error de Autenticación");
-        return;
-      }
+    // Actualizar plan y fecha de vencimiento de una iglesia
+    window.saUpdatePlan = async function(churchId) {
+      const planSel = document.getElementById(`plan-select-${churchId}`);
+      const expireInput = document.getElementById(`expire-input-${churchId}`);
+      if (!planSel) return;
+
+      const newPlan = planSel.value;
+      const newExpireRaw = expireInput ? expireInput.value : '';
+      const newExpireAt = newExpireRaw ? new Date(newExpireRaw).toISOString() : null;
+
+      // Plan gratis no necesita fecha
+      const expireToSave = newPlan === 'gratis' ? null : newExpireAt;
+
       try {
-        await deleteDoc(doc(db, 'churches', churchId));
-        showToast(`🗑️ Institución "${churchName}" eliminada correctamente.`);
+        await window.updateDoc(window.doc(window.db, 'churches', churchId), {
+          plan: newPlan,
+          expireAt: expireToSave,
+          updatedAt: new Date().toISOString(),
+        });
+        showToast(`✅ Plan actualizado a "${newPlan.toUpperCase()}" correctamente.`);
         renderSuperAdminChurches();
       } catch(e) {
         console.error(e);
-        customAlert("Error al eliminar la institución: " + e.message, "Error");
+        customAlert('Error al actualizar el plan: ' + e.message);
       }
     };
+
+    // Enviar recordatorio de vencimiento
+    window.saEnviarRecordatorio = function(churchId, churchName, adminEmail, phone) {
+      const msg = `Hola, te recordamos que tu suscripción de *${churchName}* en AlabanApp está próxima a vencer. Para renovar contacta al administrador del sistema o realiza tu pago. ¡Gracias por confiar en nosotros! 🎵`;
+      const waLink = phone
+        ? `https://wa.me/${phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`
+        : null;
+      const mailLink = adminEmail
+        ? `mailto:${adminEmail}?subject=Renovación%20de%20Suscripción%20AlabanApp&body=${encodeURIComponent(msg)}`
+        : null;
+
+      const overlay = document.getElementById('custom-dialog-overlay');
+      const titleEl = document.getElementById('custom-dialog-title');
+      const msgEl = document.getElementById('custom-dialog-message');
+      const btnConfirm = document.getElementById('custom-dialog-confirm');
+      const btnCancel = document.getElementById('custom-dialog-cancel');
+      const inputField = document.getElementById('custom-dialog-input');
+
+      titleEl.textContent = '📩 Enviar Recordatorio de Vencimiento';
+      msgEl.style.textAlign = 'left';
+      msgEl.innerHTML = `
+        <p style="font-size:13px; color:var(--text2); margin-bottom:12px;">Elige cómo enviar el recordatorio a <strong style="color:var(--text);">${churchName}</strong>:</p>
+        ${waLink ? `<a href="${waLink}" target="_blank" style="display:block; padding:10px 14px; background:rgba(51,179,166,0.12); border:1px solid var(--teal); border-radius:10px; color:var(--teal); text-decoration:none; font-weight:700; margin-bottom:8px; font-size:13px;">📱 WhatsApp: ${phone}</a>` : ''}
+        ${mailLink ? `<a href="${mailLink}" style="display:block; padding:10px 14px; background:rgba(129,140,248,0.12); border:1px solid var(--purple); border-radius:10px; color:var(--purple); text-decoration:none; font-weight:700; margin-bottom:8px; font-size:13px;">📧 Correo: ${adminEmail}</a>` : ''}
+        ${!waLink && !mailLink ? '<p style="color:var(--coral); font-size:13px;">No hay datos de contacto disponibles para esta institución.</p>' : ''}
+        <p style="font-size:11px; color:var(--text3); margin-top:10px; line-height:1.6;">Mensaje: "${msg.substring(0, 80)}..."</p>
+      `;
+      inputField.style.display = 'none';
+      btnCancel.style.display = 'block';
+      btnCancel.textContent = 'Cerrar';
+      btnConfirm.style.display = 'none';
+      overlay.classList.add('active');
+
+      const close = () => {
+        overlay.classList.remove('active');
+        btnConfirm.style.display = 'block';
+        btnCancel.textContent = 'Cancelar';
+        msgEl.style.textAlign = 'center';
+        btnCancel.removeEventListener('click', close);
+      };
+      btnCancel.addEventListener('click', close);
+    };
+
+
+
 
     window.verComprobanteSa = async function(churchId) {
       try {

@@ -1,6 +1,7 @@
 {
   "type": "module",
   "dependencies": {
+    "firebase-admin": "^14.2.0",
     "google-auth-library": "^11.0.2",
     "jsdom": "^29.1.1"
   }
