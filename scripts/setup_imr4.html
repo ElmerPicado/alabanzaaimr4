@@ -103,6 +103,11 @@
     window.step1 = async function() {
       const btn = document.getElementById('btn-step1');
       btn.disabled = true;
+      if (!(await loginSuperAdmin())) {
+        btn.disabled = false;
+        return;
+      }
+      
       log('═══════════════════════════════════════════', 'dim');
       log('🏛️  PASO 1: Creando cuenta IMR4...', 'info');
       log('═══════════════════════════════════════════', 'dim');
@@ -111,8 +116,8 @@
       const data = {
         name: "Iglesia Ministerio de Restauración (IMR4)",
         shortName: "IMR4",
-        adminEmail: "epicadomiranda@gmail.com",
-        adminUser: "epicado",
+        adminEmail: "iglesiametodistar4@gmail.com",
+        adminUser: "imr4",
         phone: "",
         plan: "gratis",
         status: "activa",
@@ -153,6 +158,11 @@
     window.step2 = async function() {
       const btn = document.getElementById('btn-step2');
       btn.disabled = true;
+      if (!(await loginSuperAdmin())) {
+        btn.disabled = false;
+        return;
+      }
+
       log('');
       log('═══════════════════════════════════════════', 'dim');
       log('👥  PASO 2: Migrando usuarios a IMR4...', 'info');
@@ -243,6 +253,7 @@
 
     // ─── PASO 3: VER ESTADO ─────────────────────────────────────────
     window.step3 = async function() {
+      if (!(await loginSuperAdmin())) return;
       log('');
       log('🔍 Consultando colección churches...', 'info');
       try {
@@ -261,6 +272,7 @@
     };
 
     window.step3b = async function() {
+      if (!(await loginSuperAdmin())) return;
       log('');
       log('👥 Consultando colección usuarios...', 'info');
       try {

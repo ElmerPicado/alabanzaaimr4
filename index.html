@@ -2409,8 +2409,8 @@
       <p class="login-sub">Panel de Coordinación de tu Grupo</p>
       <form id="login-form" onsubmit="event.preventDefault();">
         <div class="field">
-          <label>Usuario / Correo</label>
-          <input type="text" id="login-email" required placeholder="admin o tu usuario">
+          <label>Usuario o Correo</label>
+          <input type="text" id="login-email" required placeholder="tu@correo.com o tu usuario">
         </div>
         <div class="field">
           <label>Contraseña</label>
@@ -2467,6 +2467,12 @@
                 stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-13.51l5.39 5.39" />
               </svg> Buscar actualización</button>
+            <button id="btn-leader-change-username"
+              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">✏️
+              Cambiar Usuario (Alias)</button>
+            <button id="btn-leader-change-password"
+              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">🔑
+              Restablecer Contraseña</button>
             <button id="btn-leader-logout-dropdown"
               style="width: 100%; text-align: left; background: none; border: none; padding: 10px; color: #ff5252; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; border-radius: 4px;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -2989,7 +2995,7 @@
               <div class="ensayo-card-actions">
                 <button class="btn-ver-conf chip chip-teal">👁 Confirmaciones</button>
                 <button class="btn-edit-ensayo chip chip-gold">✏️ Editar</button>
-                <button class="btn-del-ensayo chip chip-coral" data-id="${e.id}">🗑 Eliminar</button>
+                ${currentUserRole === 'superadmin' ? `<button class="btn-del-ensayo chip chip-coral" data-id="${e.id}">🗑 Eliminar</button>` : ''}
               </div>
             </div>
           `;
@@ -3776,7 +3782,9 @@
                 </div>
               </div>
             </div>
-            <div class="field"><label>Usuario de Acceso</label><input type="text" id="member-user-input" required
+            <div class="field"><label>Correo Electrónico (Requerido)</label><input type="email" id="member-email-input" required
+                placeholder="Ej: musico@iglesia.com"></div>
+            <div class="field"><label>Usuario (Alias visible)</label><input type="text" id="member-user-input" required
                 placeholder="Ej: carlos12"></div>
             <div class="field"><label>Contraseña Asignada</label><input type="text" id="member-pass-input" required
                 placeholder="Clave para Netlify"></div>
@@ -3982,6 +3990,12 @@
                 stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-13.51l5.39 5.39" />
               </svg> Buscar actualización</button>
+            <button id="btn-musico-change-username"
+              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">✏️
+              Cambiar Usuario (Alias)</button>
+            <button id="btn-musico-change-password"
+              style="width: 100%; text-align: left; padding: 10px; background: transparent; border: none; color: var(--text); font-size: 13px; cursor: pointer; border-radius: 4px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 8px;">🔑
+              Restablecer Contraseña</button>
             <button id="btn-musico-logout-dropdown"
               style="width: 100%; text-align: left; background: none; border: none; padding: 10px; color: #ff5252; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; border-radius: 4px;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -4759,6 +4773,59 @@
         if (typeof window._cerrarSesion === 'function') window._cerrarSesion();
       });
     }
+
+    const _handleChangeUsername = async () => {
+      if (!activeSessionUser) return;
+      const nuevoUsuario = await customPrompt(`Ingresa tu nuevo Usuario (Alias visible):\n(Tu correo o ID de acceso seguirá siendo el mismo)`, "Cambiar Usuario", activeSessionUser.usuario);
+      if (!nuevoUsuario || nuevoUsuario.trim() === '' || nuevoUsuario.trim() === activeSessionUser.usuario) return;
+      
+      try {
+        await updateDoc(doc(db, "usuarios", activeSessionUser.id || activeSessionUser.usuario), {
+          usuario: nuevoUsuario.trim()
+        });
+        activeSessionUser.usuario = nuevoUsuario.trim();
+        customAlert("Usuario actualizado exitosamente. Los cambios se reflejarán inmediatamente.");
+        document.getElementById('musico-avatar-dropdown').style.display = 'none';
+        const leaderDrop = document.getElementById('leader-avatar-dropdown');
+        if (leaderDrop) leaderDrop.style.display = 'none';
+      } catch (e) {
+        console.error(e);
+        customAlert("Error al actualizar usuario: " + e.message);
+      }
+    };
+
+    const _handleChangePassword = async () => {
+      if (!activeSessionUser) return;
+      const currentId = activeSessionUser.id || activeSessionUser.usuario;
+      if (!currentId.includes('@')) {
+        customAlert("Tu cuenta es una cuenta antigua (legacy) que no utiliza correo electrónico.\n\nPara cambiar tu contraseña, por favor contacta al administrador de tu iglesia.");
+        return;
+      }
+      
+      const conf = await customConfirm(`Se enviará un correo a ${currentId} con un enlace para restablecer tu contraseña.\n\n¿Deseas continuar?`);
+      if (!conf) return;
+
+      try {
+        const { getAuth, sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js");
+        const auth = getAuth();
+        await sendPasswordResetEmail(auth, currentId);
+        customAlert("¡Correo enviado!\n\nRevisa tu bandeja de entrada o la carpeta de spam para restablecer tu contraseña.");
+        if (typeof window._cerrarSesion === 'function') window._cerrarSesion();
+      } catch (e) {
+        console.error(e);
+        customAlert("Error al enviar el correo de restablecimiento: " + e.message);
+      }
+    };
+
+    const btnLeaderChangeUser = document.getElementById('btn-leader-change-username');
+    if (btnLeaderChangeUser) btnLeaderChangeUser.addEventListener('click', _handleChangeUsername);
+    const btnLeaderChangePass = document.getElementById('btn-leader-change-password');
+    if (btnLeaderChangePass) btnLeaderChangePass.addEventListener('click', _handleChangePassword);
+    
+    const btnMusicoChangeUser = document.getElementById('btn-musico-change-username');
+    if (btnMusicoChangeUser) btnMusicoChangeUser.addEventListener('click', _handleChangeUsername);
+    const btnMusicoChangePass = document.getElementById('btn-musico-change-password');
+    if (btnMusicoChangePass) btnMusicoChangePass.addEventListener('click', _handleChangePassword);
 
     // Músico avatar dropdown
     const musicoAvBtn = document.getElementById('musico-avatar-container');
@@ -7325,7 +7392,7 @@
               ${s.oficial ? 'Oficial' : 'Hacer Oficial'}
             </button>
             <button class="chip chip-teal click-edit-song" style="cursor:pointer; border:none; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Editar">Editar</button>
-            <button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Eliminar">Eliminar</button>
+            ${currentUserRole === 'superadmin' ? `<button class="chip chip-coral click-del-song" style="cursor:pointer; border:none; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Eliminar">Eliminar</button>` : ''}
           ` : ''}
         </div>
       `;
@@ -7548,7 +7615,7 @@
             <span class="artist-row-name">${art}</span>
             <div style="display:flex; align-items:center; gap:12px;">
               <span class="artist-row-count">${artistCounts[art]} ${artistCounts[art] === 1 ? 'canción' : 'canciones'}</span>
-              <button class="btn-delete-artist admin-only" data-artist="${art}" style="background:var(--coral); color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:600; cursor:pointer;">Eliminar</button>
+              ${currentUserRole === 'superadmin' ? `<button class="btn-delete-artist admin-only" data-artist="${art}" style="background:var(--coral); color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:600; cursor:pointer;">Eliminar</button>` : ''}
             </div>
           `;
 
@@ -7731,7 +7798,12 @@
     // Envío Formulario Nuevo Integrante / Editar
     document.getElementById('form-add-member').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const userKey = editingUserKey || document.getElementById('member-user-input').value.trim().toLowerCase();
+      
+      const emailInput = document.getElementById('member-email-input').value.trim().toLowerCase();
+      const userInput = document.getElementById('member-user-input').value.trim();
+      const passInput = document.getElementById('member-pass-input').value.trim();
+
+      const userKey = editingUserKey || emailInput;
 
       // Obtener los instrumentos seleccionados de los checkboxes
       const selectedChips = Array.from(msCheckboxes).filter(c => c.checked).map(c => c.value);
@@ -7744,7 +7816,7 @@
       const instVal = selectedChips.join(', ');
       const isCoro = !selectedChips.some(val => ["Batería", "Bajo", "Teclado", "Guitarra Eléctrica", "Guitarra Acústica", "Percusión"].includes(val));
 
-      const existingMember = (window.cacheMembers || []).find(m => m.usuario === userKey);
+      const existingMember = (window.cacheMembers || []).find(m => m.id === userKey);
       const memberChurchId = (activeSessionUser && activeSessionUser.churchId)
         ? activeSessionUser.churchId
         : (existingMember && existingMember.churchId ? existingMember.churchId : null);
@@ -7753,16 +7825,38 @@
         nombre: document.getElementById('member-name-input').value.trim(),
         type: isCoro ? 'corista' : 'musico',
         instrumento: instVal,
-        usuario: userKey,
-        password: document.getElementById('member-pass-input').value.trim(),
+        usuario: userInput,
+        correo: emailInput,
+        password: passInput,
         role: document.getElementById('member-role-input').value,
         churchId: memberChurchId
       };
-      await setDoc(doc(db, "usuarios", userKey), payload);
 
-      const wasEditing = !!editingUserKey;
-      resetMemberForm();
-      customAlert(wasEditing ? "Integrante actualizado exitosamente." : "Integrante guardado exitosamente.");
+      try {
+        if (!editingUserKey) {
+          // Es un usuario nuevo, crearlo en Firebase Auth
+          const { getAuth, createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js");
+          const auth = getAuth();
+          try {
+            await createUserWithEmailAndPassword(auth, emailInput, passInput);
+          } catch (authErr) {
+            if (authErr.code !== 'auth/email-already-in-use') {
+              console.error(authErr);
+              customAlert("Hubo un error al crear la cuenta en Firebase Auth: " + authErr.message);
+              return; // Si no se puede crear en Auth, cancelamos la creación en Firestore
+            }
+          }
+        }
+        
+        await setDoc(doc(db, "usuarios", userKey), payload, { merge: true });
+        
+        const wasEditing = !!editingUserKey;
+        resetMemberForm();
+        customAlert(wasEditing ? "Integrante actualizado exitosamente." : "Integrante guardado exitosamente. Ya puede iniciar sesión con su correo o alias.");
+      } catch (err) {
+        console.error(err);
+        customAlert("Hubo un problema al guardar el integrante: " + err.message);
+      }
     });
 
 
@@ -11338,6 +11432,8 @@
         }
         deleteUserProtected(inputVal, inputVal);
       });
+    } // <-- Faltaba cerrar el IF
+
     document.querySelectorAll('.sa-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         document.querySelectorAll('.sa-tab-btn').forEach(b => {
