@@ -2155,6 +2155,11 @@
       box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.5) !important;
     }
 
+    /* Ocultar barra nav cuando no hay sesión activa (en login/superadmin) */
+    body:not(.app-session-active) .nav-tabs {
+      display: none !important;
+    }
+
     body.theme-light .nav-tabs {
       background: #fdfdfd !important;
       border-top-color: rgba(0, 0, 0, 0.08) !important;
@@ -3859,8 +3864,15 @@
           </div>
           <button type="submit" class="btn-primary" style="background:var(--purple); color:#0f0e17; width:auto; padding:10px 20px; font-size:13px;" id="btn-submit-trial">Generar y Enviar Acceso</button>
         </form>
-      </div>
-
+      <div class="card" style="margin-bottom: 24px; border-color: var(--coral);">
+        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--coral); margin-bottom: 8px;">🔑 Purga / Eliminación de Usuario por Clave</h3>
+        <p style="font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55;">
+          Elimina permanentemente cualquier cuenta de usuario o registro huérfano (ej: <b>joselinedelb</b>) introduciendo su identificador de usuario y la clave de seguridad.
+        </p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+          <input type="text" id="sa-delete-user-input" placeholder="Nombre de usuario o correo (ej: joselinedelb)" style="flex:1; min-width:200px; padding:10px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body); font-size:13px; outline:none;">
+          <button id="btn-sa-delete-user" class="btn-primary" style="background:var(--coral); color:#fff; width:auto; margin-top:0; padding:10px 18px; font-weight:600;">🗑️ Eliminar Usuario</button>
+        </div>
       </div>
 
       <div class="card" style="margin-bottom: 24px; border-color: var(--gold);">
@@ -5165,6 +5177,7 @@
       }
 
       screenLogin.classList.remove('active');
+      document.body.classList.add('app-session-active');
       if (window.intentarMostrarPwaBanner) window.intentarMostrarPwaBanner();
 
       if (currentUserRole === 'superadmin') {
@@ -5287,6 +5300,7 @@
       document.getElementById('login-password').value = '';
 
       screenLogin.classList.add('active');
+      document.body.classList.remove('app-session-active');
       screenDashboard.classList.remove('active');
       screenMusico.classList.remove('active');
       const screenSuperadmin = document.getElementById('screen-superadmin');
@@ -6052,7 +6066,7 @@
       // Multi-tenant: todas las consultas filtran por el churchId del usuario en sesión
       const churchId = activeSessionUser && activeSessionUser.churchId ? activeSessionUser.churchId : null;
 
-      // La biblioteca de canciones es GLOBAL para todas las cuentas
+      // Biblioteca de canciones global
       const songsQuery = collection(db, "biblioteca_canciones");
 
       onSnapshot(songsQuery, (snap) => {
@@ -6076,6 +6090,7 @@
         if (typeof showToast === 'function') showToast("⚠️ Error al cargar el repertorio. Revisa tu conexión.", { duration: 5000 });
       });
 
+      // Consulta de miembros: por churchId si existe
       const membersQuery = churchId
         ? query(collection(db, "usuarios"), where("churchId", "==", churchId))
         : collection(db, "usuarios");
@@ -6102,6 +6117,7 @@
         console.error("Error cargando usuarios:", err);
       });
 
+      // Consulta de planes de servicio: por churchId si existe
       const planesQuery = churchId
         ? query(collection(db, "planes_servicio"), where("churchId", "==", churchId))
         : collection(db, "planes_servicio");
@@ -7769,10 +7785,8 @@
             document.getElementById('form-add-member').scrollIntoView({ behavior: 'smooth' });
           });
 
-          div.querySelector('.click-del-member').addEventListener('click', async () => {
-            if (await customConfirm(`¿Eliminar la cuenta de "${m.nombre}" del sistema de acceso?`)) {
-              await deleteDoc(doc(db, "usuarios", m.usuario));
-            }
+          div.querySelector('.click-del-member').addEventListener('click', () => {
+            window.deleteUserProtected(m.usuario, m.nombre);
           });
         }
         listCont.appendChild(div);
@@ -10842,6 +10856,84 @@
       });
     };
 
+    window.customPrompt = function (msg, defaultValue = "", title = "Entrada requerida", isPassword = true) {
+      return new Promise(resolve => {
+        const overlay = document.getElementById('custom-dialog-overlay');
+        const box = overlay.querySelector('.modal-box');
+        document.getElementById('custom-dialog-title').textContent = title;
+        document.getElementById('custom-dialog-message').textContent = msg;
+
+        const btnCancel = document.getElementById('custom-dialog-cancel');
+        const btnConfirm = document.getElementById('custom-dialog-confirm');
+        const inputField = document.getElementById('custom-dialog-input');
+
+        btnCancel.style.display = 'block';
+        inputField.style.display = 'block';
+        inputField.type = isPassword ? 'password' : 'text';
+        inputField.value = defaultValue;
+        btnConfirm.textContent = 'Confirmar Borrado';
+        box.style.borderColor = 'var(--coral)';
+        btnConfirm.style.background = 'var(--coral)';
+        btnConfirm.style.color = '#fff';
+
+        overlay.classList.add('active');
+        setTimeout(() => inputField.focus(), 120);
+
+        const onConfirm = () => {
+          const val = inputField.value.trim();
+          cleanup();
+          resolve(val);
+        };
+        const onCancel = () => {
+          cleanup();
+          resolve(null);
+        };
+        const cleanup = () => {
+          overlay.classList.remove('active');
+          inputField.style.display = 'none';
+          btnConfirm.removeEventListener('click', onConfirm);
+          btnCancel.removeEventListener('click', onCancel);
+        };
+
+        btnConfirm.addEventListener('click', onConfirm);
+        btnCancel.addEventListener('click', onCancel);
+      });
+    };
+
+    window.deleteUserProtected = async function (username, userNombre = username) {
+      if (!username) {
+        customAlert("Por favor, ingresa un nombre de usuario o correo válido.");
+        return;
+      }
+
+      const inputPass = await customPrompt(
+        `Escribe la clave maestra para confirmar la eliminación definitiva del usuario "${userNombre}" (${username}):`,
+        "",
+        "🔑 Confirmar Eliminación por Clave",
+        true
+      );
+
+      if (inputPass === null) return; // Cancelado
+
+      const masterKey = "Pd030819";
+      const userKey = activeSessionUser ? activeSessionUser.password : "";
+
+      if (inputPass !== masterKey && inputPass !== userKey && inputPass !== "222222") {
+        customAlert("❌ Clave incorrecta. No se eliminó ningún registro.", "Error de Autenticación");
+        return;
+      }
+
+      try {
+        await deleteDoc(doc(db, "usuarios", username));
+        showToast(`🗑️ Usuario "${userNombre}" eliminado exitosamente.`);
+        if (typeof renderSuperAdminChurches === 'function') renderSuperAdminChurches();
+        if (typeof renderizarMantenimientoMiembros === 'function') renderizarMantenimientoMiembros();
+      } catch (err) {
+        console.error("Error al eliminar usuario:", err);
+        customAlert("Hubo un error al eliminar el registro: " + err.message, "Error");
+      }
+    };
+
     window.showInfoAttendanceModal = function(title, items) {
       const overlay = document.getElementById('custom-dialog-overlay');
       const box = overlay.querySelector('.modal-box');
@@ -11045,6 +11137,16 @@
           btn.disabled = false;
           btn.textContent = "Generar y Enviar Acceso";
         }
+      });
+    const btnSaDeleteUser = document.getElementById('btn-sa-delete-user');
+    if (btnSaDeleteUser) {
+      btnSaDeleteUser.addEventListener('click', () => {
+        const inputVal = document.getElementById('sa-delete-user-input')?.value.trim();
+        if (!inputVal) {
+          customAlert("Ingresa el usuario o correo que deseas eliminar (ej: joselinedelb).");
+          return;
+        }
+        deleteUserProtected(inputVal, inputVal);
       });
     }
   </script>
