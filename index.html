@@ -23,7 +23,7 @@
       --border2: rgba(255, 255, 255, 0.14);
       --gold: #e5b43c;
       --gold2: #c8931b;
-      --teal: #33b3a6;
+      --teal: #20D2A3;
       --coral: #f43f5e;
       --purple: #818cf8;
       --text: #f0eeff;
@@ -123,6 +123,467 @@
       border-radius: 20px;
       font-weight: 500;
     }
+    /* ===== PREMIUM SAAS LANDING PAGE ===== */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    
+    #screen-landing {
+      justify-content: flex-start;
+      align-items: center;
+      padding: 0;
+      background: #090e1a;
+      color: #fafafa;
+      overflow-y: auto;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    
+    #screen-landing * {
+      box-sizing: border-box;
+    }
+
+    /* Navbar Landing */
+    .landing-navbar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: rgba(9, 14, 26, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    @media (max-width: 600px) { .landing-navbar { padding: 16px 20px; } }
+
+    .landing-nav-logo {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.5px;
+    }
+    .landing-nav-logo svg {
+      width: 26px;
+      height: 26px;
+      color: #20D2A3;
+    }
+    .landing-nav-buttons {
+      display: flex;
+      gap: 12px;
+    }
+    .landing-nav-btn {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 99px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+    .landing-nav-btn.login {
+      background: transparent;
+      color: #94a3b8;
+      border: 1px solid transparent;
+    }
+    .landing-nav-btn.login:hover {
+      color: #ffffff;
+    }
+    .landing-nav-btn.register {
+      background: #ffffff;
+      color: #090e1a;
+      border: none;
+    }
+    .landing-nav-btn.register:hover {
+      background: #e2e8f0;
+      transform: scale(1.02);
+    }
+
+    /* Hero Section */
+    .landing-hero {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 100px 24px 60px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .landing-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 99px;
+      background: rgba(32, 210, 163, 0.1);
+      border: 1px solid rgba(32, 210, 163, 0.2);
+      font-size: 13px;
+      font-weight: 500;
+      color: #20D2A3;
+      margin-bottom: 32px;
+      letter-spacing: 0.2px;
+    }
+    .landing-hero-badge span {
+      background: #20D2A3;
+      color: #090e1a;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .landing-hero-logo {
+      font-size: clamp(48px, 8vw, 72px);
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 24px;
+      line-height: 1.05;
+      letter-spacing: -2px;
+    }
+    .landing-hero-logo span {
+      background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .landing-hero-logo .accent {
+      background: linear-gradient(135deg, #20D2A3 0%, #14b8a6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .landing-tagline {
+      font-size: clamp(18px, 3vw, 22px);
+      color: #94a3b8;
+      margin-bottom: 48px;
+      line-height: 1.5;
+      max-width: 650px;
+      font-weight: 400;
+      letter-spacing: -0.2px;
+    }
+    .landing-cta-row {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+      width: 100%;
+    }
+    .btn-landing-primary {
+      background: #20D2A3;
+      color: #090e1a;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 18px 36px;
+      border: none;
+      border-radius: 99px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 0 1px rgba(32, 210, 163, 0.1), 0 8px 20px rgba(32, 210, 163, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-landing-primary:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 0 0 1px rgba(32, 210, 163, 0.2), 0 12px 24px rgba(32, 210, 163, 0.3); 
+    }
+    
+    /* Global Library Hook */
+    .landing-search-container {
+      width: 100%;
+      max-width: 700px;
+      margin: 0 auto 100px;
+      padding: 0 24px;
+    }
+    .landing-search-box {
+      background: #111827;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 24px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    .landing-search-title {
+      font-size: 24px;
+      color: #ffffff;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    .landing-search-subtitle {
+      font-size: 15px;
+      color: #94a3b8;
+      margin-bottom: 32px;
+    }
+    .landing-search-input-wrapper {
+      position: relative;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .landing-search-input-wrapper input {
+      width: 100%;
+      padding: 16px 24px 16px 52px;
+      background: #1f2937;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      color: #ffffff;
+      font-size: 16px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s ease;
+    }
+    .landing-search-input-wrapper input:focus {
+      border-color: #20D2A3;
+    }
+    .landing-search-input-wrapper svg {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      width: 20px;
+      height: 20px;
+    }
+    .landing-search-results {
+      max-height: 280px;
+      overflow-y: auto;
+      text-align: left;
+      margin-top: 16px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .landing-search-results::-webkit-scrollbar { width: 4px; }
+    .landing-search-results::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+    
+    .ls-song-card {
+      background: #1f2937;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.2s ease;
+    }
+    .ls-song-card:hover {
+      background: #374151;
+    }
+    .ls-song-title { font-weight: 600; color: #ffffff; font-size: 15px; margin-bottom: 4px; }
+    .ls-song-artist { font-size: 13px; color: #94a3b8; }
+    .ls-song-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      background: rgba(32, 210, 163, 0.1);
+      color: #20D2A3;
+      border-radius: 99px;
+    }
+
+    /* Features Grid */
+    .landing-features {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto 100px;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: #111827;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 20px;
+      padding: 32px;
+      text-align: left;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .feature-card:hover { 
+      border-color: rgba(32, 210, 163, 0.3); 
+      transform: translateY(-4px); 
+    }
+    .feature-card-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(32, 210, 163, 0.1);
+      border: 1px solid rgba(32, 210, 163, 0.2);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #20D2A3;
+      margin-bottom: 24px;
+    }
+    .feature-card-icon svg { width: 24px; height: 24px; stroke-width: 1.5; }
+    .feature-card-title { font-size: 18px; color: #ffffff; margin-bottom: 12px; font-weight: 600; letter-spacing: -0.3px; }
+    .feature-card-desc { font-size: 15px; color: #94a3b8; line-height: 1.6; }
+    
+    /* Plans Grid */
+    .landing-plans {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+    .landing-plans-title {
+      text-align: center;
+      font-size: 40px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 48px;
+      letter-spacing: -1px;
+    }
+    .plans-grid {
+      display: flex;
+      gap: 24px;
+      align-items: stretch;
+      justify-content: center;
+      flex-wrap: wrap; /* Allows wrapping on smaller screens if needed instead of cutting off */
+    }
+    @media (max-width: 900px) {
+      .plans-grid {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding-bottom: 24px;
+        -webkit-overflow-scrolling: touch;
+      }
+      /* Prevent the last card from getting cut off on mobile by adding a fake padding via after */
+      .plans-grid::after {
+        content: '';
+        padding-right: 24px;
+      }
+    }
+    .plans-grid::-webkit-scrollbar { height: 6px; display: none; }
+    .plan-card {
+      flex: 1;
+      min-width: 300px;
+      max-width: 400px;
+      scroll-snap-align: center;
+      background: #111827;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 24px;
+      padding: 40px 32px;
+      text-align: left;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.3s ease;
+    }
+    .plan-card:hover { border-color: rgba(255,255,255,0.15); }
+    .plan-card.featured {
+      background: #111827;
+      border: 2px solid #20D2A3;
+      transform: scale(1.02);
+    }
+    @media (max-width: 900px) {
+      .plan-card.featured { transform: none; }
+    }
+    .plan-card.featured::before {
+      content: 'MÁS POPULAR';
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #20D2A3;
+      color: #090e1a;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      padding: 6px 14px;
+      border-radius: 99px;
+    }
+    .plan-icon {
+      width: 42px;
+      height: 42px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      margin-bottom: 24px;
+    }
+    .plan-card.featured .plan-icon {
+      background: rgba(32, 210, 163, 0.1);
+      border-color: rgba(32, 210, 163, 0.2);
+      color: #20D2A3;
+    }
+    .plan-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+    }
+    .plan-name { font-size: 24px; color: #ffffff; margin-bottom: 8px; font-weight: 700; letter-spacing: -0.5px; }
+    .plan-period { font-size: 14px; color: #64748b; margin-bottom: 16px; font-weight: 400;}
+    .plan-price { font-size: 48px; font-weight: 800; color: #ffffff; margin-bottom: 24px; display: flex; align-items: baseline; gap: 4px; letter-spacing: -1px;}
+    .plan-price span { font-size: 18px; color: #64748b; font-weight: 500; }
+    .plan-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 0 0 24px; }
+    .plan-features-list { list-style:none; padding:0; margin: 0 0 32px; flex-grow:1; }
+    .plan-features-list li { margin-bottom: 16px; display: flex; align-items: flex-start; gap: 12px; font-size: 14px; color: #94a3b8; line-height: 1.5; font-weight: 500;}
+    .plan-features-list li svg { width: 18px; height: 18px; flex-shrink: 0; color: #20D2A3; margin-top: 2px;}
+    .plan-features-list li.disabled { color: #475569; }
+    .plan-features-list li.disabled svg { color: #475569; }
+    
+    .btn-plan {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .btn-plan.primary { background: #20D2A3; color: #090e1a; border: none; }
+    .btn-plan.primary:hover { background: #14b8a6; transform: translateY(-2px); }
+    .btn-plan.secondary { background: #1f2937; color: #ffffff; border: none; }
+    .btn-plan.secondary:hover { background: #374151; }
+
+    .landing-footer {
+      width: 100%;
+      padding: 40px 24px;
+      text-align: center;
+      font-size: 14px;
+      color: #71717a;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    /* ===== PRO BANNER ===== */
+    .pro-upgrade-banner {
+      margin: 16px;
+      background: linear-gradient(135deg, rgba(244,197,66,0.10) 0%, rgba(78,205,196,0.07) 100%);
+      border: 1px solid rgba(244,197,66,0.4);
+      border-radius: 18px;
+      padding: 22px 20px;
+      text-align: center;
+    }
+    .pro-upgrade-banner h3 { font-family: var(--font-display); font-size: 19px; color: var(--gold); margin-bottom: 8px; }
+    .pro-upgrade-banner p { font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55; }
+    .pro-features-list { list-style: none; padding: 0; margin: 0 0 18px; text-align: left; display: inline-block; }
+    .pro-features-list li { font-size: 12px; color: var(--text); padding: 4px 0; }
+    .pro-price-note { font-size: 12px; color: var(--text3); margin-bottom: 16px; }
+    .btn-pro { background: linear-gradient(135deg, var(--gold) 0%, #f0a500 100%); color: #0f0e17; font-family: var(--font-body); font-weight: 700; font-size: 14px; padding: 12px 24px; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 16px rgba(244,197,66,0.3); transition: transform 0.15s; }
+    .btn-pro:hover { transform: translateY(-2px); }
+    /* ===== CREATE GROUP MODAL ===== */
+    .plan-radio-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+    .plan-radio-option { flex: 1; min-width: 130px; }
+    .plan-radio-option input[type=radio] { display: none; }
+    .plan-radio-option label {
+      display: block; padding: 14px 10px; background: var(--bg3); border: 2px solid var(--border2);
+      border-radius: 12px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s;
+      font-size: 13px; color: var(--text);
+    }
+    .plan-radio-option input[type=radio]:checked + label { border-color: var(--gold); background: rgba(244,197,66,0.1); color: var(--gold); }
+    .plan-radio-price { font-size: 18px; font-weight: 700; color: var(--gold); display: block; margin-bottom: 2px; }
+    .plan-radio-limit { font-size: 11px; color: var(--text3); display: block; }
 
     .btn-logout {
       background: none;
@@ -2395,8 +2856,154 @@
 
 <body>
 
+  <!-- ===== LANDING PAGE ===== -->
+  <div id="screen-landing" class="screen active">
+    <!-- NAVBAR -->
+    <nav class="landing-navbar">
+      <div class="landing-nav-logo">
+        <svg viewBox="0 0 55 100" fill="currentColor"><path d="M32.108,45.02C31.428,42.709,30.78,40.425,30.195,38.209C34.229,34.433,37.429,29.413,37.5,21.283C37.536,17.06,37.032,12.006,33.025,6.535C31.843,4.922,29.604,4.519,27.934,5.621C23.985,8.227,20,14.457,20,22.5C20,26.253,20.699,30.663,21.782,35.411C20.949,36.021,20.077,36.63,19.177,37.259C12.86,41.667,5,47.153,5,60C5,74.084,16.44,82.5,27.5,82.5C29.658,82.5,31.729,82.271,33.677,81.841C33.684,82.066,33.688,82.285,33.688,82.5C33.688,85.257,31.445,87.5,28.688,87.5C27.352,87.5,26.096,86.98,25.153,86.036L19.848,91.339C22.209,93.7,25.348,95,28.688,95C35.581,95,41.188,89.393,41.188,82.5C41.188,81.387,41.118,80.206,40.986,78.964C46.528,75.615,50,70.154,50,63.75C50,53.699,42.05,45.47,32.108,45.02ZM29.244,15.311C29.86,17.224,30.017,19.139,30,21.218C29.973,24.421,29.287,26.889,28.125,28.943C27.729,26.582,27.5,24.41,27.5,22.5C27.5,19.607,28.264,17.158,29.244,15.311ZM27.5,75C20.229,75,12.5,69.743,12.5,60C12.5,51.065,17.341,47.686,23.469,43.409C23.573,43.337,23.677,43.264,23.781,43.192C24.103,44.346,24.438,45.509,24.78,46.677C19.873,49.271,16.188,54.53,16.188,60C16.188,63.338,17.488,66.477,19.848,68.838L25.153,63.535C24.209,62.59,23.688,61.335,23.688,59.999C23.688,57.909,25.121,55.645,27.027,54.157C27.096,54.384,27.166,54.611,27.234,54.838C29.303,61.627,31.419,68.566,32.64,74.372C31.05,74.78,29.322,75,27.5,75ZM39.503,70.664C38.239,65.243,36.406,59.209,34.508,52.981C39.128,54.381,42.5,58.679,42.5,63.75C42.5,67.58,41.442,70.932,39.503,70.664Z"/></svg>
+        AlabanzAPP
+      </div>
+      <div class="landing-nav-buttons">
+        <button class="landing-nav-btn login" id="btn-landing-nav-login">Iniciar Sesión</button>
+        <button class="landing-nav-btn register" id="btn-landing-nav-register">Crear cuenta</button>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="landing-hero">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 24px;">
+        <svg viewBox="0 0 55 100" fill="currentColor" style="width:40px;height:40px;color:#20D2A3;"><path d="M32.108,45.02C31.428,42.709,30.78,40.425,30.195,38.209C34.229,34.433,37.429,29.413,37.5,21.283C37.536,17.06,37.032,12.006,33.025,6.535C31.843,4.922,29.604,4.519,27.934,5.621C23.985,8.227,20,14.457,20,22.5C20,26.253,20.699,30.663,21.782,35.411C20.949,36.021,20.077,36.63,19.177,37.259C12.86,41.667,5,47.153,5,60C5,74.084,16.44,82.5,27.5,82.5C29.658,82.5,31.729,82.271,33.677,81.841C33.684,82.066,33.688,82.285,33.688,82.5C33.688,85.257,31.445,87.5,28.688,87.5C27.352,87.5,26.096,86.98,25.153,86.036L19.848,91.339C22.209,93.7,25.348,95,28.688,95C35.581,95,41.188,89.393,41.188,82.5C41.188,81.387,41.118,80.206,40.986,78.964C46.528,75.615,50,70.154,50,63.75C50,53.699,42.05,45.47,32.108,45.02ZM29.244,15.311C29.86,17.224,30.017,19.139,30,21.218C29.973,24.421,29.287,26.889,28.125,28.943C27.729,26.582,27.5,24.41,27.5,22.5C27.5,19.607,28.264,17.158,29.244,15.311ZM27.5,75C20.229,75,12.5,69.743,12.5,60C12.5,51.065,17.341,47.686,23.469,43.409C23.573,43.337,23.677,43.264,23.781,43.192C24.103,44.346,24.438,45.509,24.78,46.677C19.873,49.271,16.188,54.53,16.188,60C16.188,63.338,17.488,66.477,19.848,68.838L25.153,63.535C24.209,62.59,23.688,61.335,23.688,59.999C23.688,57.909,25.121,55.645,27.027,54.157C27.096,54.384,27.166,54.611,27.234,54.838C29.303,61.627,31.419,68.566,32.64,74.372C31.05,74.78,29.322,75,27.5,75ZM39.503,70.664C38.239,65.243,36.406,59.209,34.508,52.981C39.128,54.381,42.5,58.679,42.5,63.75C42.5,67.58,41.442,70.932,39.503,70.664Z"/></svg>
+        <span style="font-size:28px; font-weight:800; color:#fff; letter-spacing:-1px;">Alabanz<span style="color:#20D2A3">APP</span></span>
+      </div>
+      <div class="landing-hero-badge">
+        <span>NUEVO</span> Repertorio dinámico colaborativo
+      </div>
+      <div class="landing-hero-logo">
+        Gestión <span class="accent">inteligente</span><br>para tu ministerio
+      </div>
+      <p class="landing-tagline">La plataforma número 1 para organizar tus servicios, asignar canciones, notificar a los músicos y transponer acordes automáticamente. Simple, rápido y sin complicaciones.</p>
+      <div class="landing-cta-row">
+        <button class="btn-landing-primary" id="btn-landing-register">
+          Comenzar Gratis 
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- REPERTORIO GLOBAL HOOK -->
+    <div class="landing-search-container">
+      <div class="landing-search-box">
+        <h3 class="landing-search-title">Explora el Repertorio Global</h3>
+        <p class="landing-search-subtitle">Busca tonos, acordes y letras para tu próximo servicio sin necesidad de cuenta.</p>
+        <div class="landing-search-input-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="landing-search-global" placeholder="Buscar canción o artista (ej. Cuan grande)..." autocomplete="off">
+        </div>
+        <div id="landing-search-results" class="landing-search-results">
+          <!-- Resultados dinámicos se inyectan aquí -->
+        </div>
+      </div>
+    </div>
+
+    <!-- FEATURES -->
+    <div class="landing-features">
+      <div class="feature-card">
+        <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></div>
+        <div class="feature-card-title">Repertorio Colaborativo</div>
+        <div class="feature-card-desc">Arma el repertorio del servicio en tiempo real. Cada músico ve su rol y tono asignado.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+        <div class="feature-card-title">Gestión del Equipo</div>
+        <div class="feature-card-desc">Agrega miembros, asigna roles e instrumentos y coordina quién asiste cada semana.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+        <div class="feature-card-title">Historial de Servicios</div>
+        <div class="feature-card-desc">Guarda y consulta todos los servicios anteriores. Nunca pierdas qué cantaron.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M12 18v-6"></path><path d="M8 15h8"></path></svg></div>
+        <div class="feature-card-title">Tonos Automáticos</div>
+        <div class="feature-card-desc">El sistema transpone acordes automáticamente según el tono que necesite cada músico.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></div>
+        <div class="feature-card-title">Ensayos</div>
+        <div class="feature-card-desc">Programa ensayos, registra asistencia y notifica al equipo por WhatsApp.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+        <div class="feature-card-title">Confirmación de Asistencia</div>
+        <div class="feature-card-desc">Cada músico confirma si puede ir. El líder arma el equipo con los disponibles.</div>
+      </div>
+    </div>
+
+    <!-- PLANES -->
+    <div class="landing-plans">
+      <div class="landing-plans-title">Elige tu Plan</div>
+      <div class="plans-grid">
+        <div class="plan-card">
+          <div class="plan-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          </div>
+          <div class="plan-name">Personal</div>
+          <div class="plan-period">Perfecto para músicos individuales.</div>
+          <div class="plan-price">₡0<span>/mes</span></div>
+          <div class="plan-divider"></div>
+          <ul class="plan-features-list">
+             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> 1 Perfil Personal</li>
+             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Búsqueda Global de Canciones</li>
+             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Unirse a un grupo Pro</li>
+             <li class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Panel de administración</li>
+             <li class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Planeación de servicios</li>
+          </ul>
+          <button class="btn-plan secondary" onclick="document.getElementById('btn-landing-register').click()">Empezar Gratis</button>
+        </div>
+        
+        <div class="plan-card featured">
+          <div class="plan-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          </div>
+          <div class="plan-name">Básico</div>
+          <div class="plan-period">Ideal para equipos pequeños.</div>
+          <div class="plan-price">₡5,000<span>/mes</span></div>
+          <div class="plan-divider"></div>
+          <ul class="plan-features-list">
+             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Hasta 10 miembros</li>
+             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Panel de Administrador Completo</li>
+             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Repertorio Privado del Grupo</li>
+             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Planeación de Servicios</li>
+             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Transposición automática</li>
+          </ul>
+          <button class="btn-plan primary" onclick="document.getElementById('btn-landing-register').click()">Elegir Básico</button>
+        </div>
+
+        <div class="plan-card">
+          <div class="plan-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          </div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-period">Potencia total para ministerios grandes.</div>
+          <div class="plan-price">₡7,000<span>/mes</span></div>
+          <div class="plan-divider"></div>
+          <ul class="plan-features-list">
+             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Hasta 25 miembros</li>
+             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Todo lo del Plan Básico</li>
+             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Ideal para grupos grandes</li>
+             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Soporte Prioritario 24/7</li>
+          </ul>
+          <button class="btn-plan secondary" onclick="document.getElementById('btn-landing-register').click()">Elegir Pro</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="landing-footer">© 2025 AlabanApp · Hecho con ❤️ para ministerios de alabanza</div>
+  </div>
+
   <!-- PANTALLA DE ACCESO -->
-  <div id="screen-login" class="screen active">
+  <div id="screen-login" class="screen">
     <div class="login-card">
       <h1 class="login-title" style="text-align: center;">
         Alaban<svg viewBox="0 0 55 100" fill="currentColor"
@@ -2406,7 +3013,7 @@
           </path>
         </svg>app
       </h1>
-      <p class="login-sub">Panel de Coordinación de tu Grupo</p>
+      <p class="login-sub">Panel de Coordinación</p>
       <form id="login-form" onsubmit="event.preventDefault();">
         <div class="field">
           <label>Usuario o Correo</label>
@@ -2416,10 +3023,10 @@
           <label>Contraseña</label>
           <input type="password" id="login-password" required placeholder="••••••••">
         </div>
-        <button type="submit" class="btn-primary">Entrar al Panel</button>
+        <button type="submit" class="btn-primary">Ingresar</button>
       </form>
       <div style="margin-top: 16px; text-align: center;">
-        <button id="btn-open-register" style="background: none; border: none; color: var(--gold); font-family: var(--font-body); font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: underline;">Registrar Nueva Cuenta</button>
+        <button id="btn-login-back-landing" style="background: none; border: none; color: var(--text3); font-family: var(--font-body); font-size: 13px; cursor: pointer;">← Volver al inicio</button>
       </div>
     </div>
   </div>
@@ -3978,7 +4585,7 @@
     </header>
 
     <nav class="nav-tabs">
-      <button class="nav-tab-musico active" data-mtab="mtab-servicio">
+      <button class="nav-tab-musico active" data-mtab="mtab-servicio" id="nav-tab-musico-servicio">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -3986,7 +4593,7 @@
           <line x1="8" y1="2" x2="8" y2="6"></line>
           <line x1="3" y1="10" x2="21" y2="10"></line>
         </svg>
-        <span class="nav-label">Servicio</span>
+        <span class="nav-label">Repertorio</span>
       </button>
       <button class="nav-tab-musico" data-mtab="mtab-asistencia">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -4019,6 +4626,22 @@
     </nav>
 
     <main class="content">
+
+      <!-- PRO BANNER (Oculto por defecto, se muestra si no tiene groupId) -->
+      <div id="pro-banner-container" style="display: none;">
+        <div class="pro-upgrade-banner">
+          <h3>🎵 Desbloquea la Experiencia Pro</h3>
+          <p>Crea tu grupo, agrega a tu equipo y coordina cada servicio con facilidad.</p>
+          <ul class="pro-features-list">
+            <li>✅ Repertorio colaborativo en tiempo real</li>
+            <li>✅ Gestión de miembros y roles</li>
+            <li>✅ Ensayos, historial y disponibilidad</li>
+            <li>✅ Tonos automáticos por músico</li>
+          </ul>
+          <p class="pro-price-note">Desde <strong>₡5,000/mes</strong> · Primer pago con comprobante</p>
+          <button id="btn-create-group-banner" class="btn-pro">Crear mi Grupo</button>
+        </div>
+      </div>
 
       <!-- PESTAÑA 1: VER EL SERVICIO -->
       <div id="mtab-servicio" class="tab-panel active">
@@ -4605,45 +5228,80 @@
     </div>
   </div>
 
-  <!-- MODAL DE REGISTRO INSTITUCION -->
+  <!-- MODAL REGISTRO CUENTA PERSONAL -->
   <div id="register-church-overlay" class="modal-overlay">
-    <div class="modal-box" style="max-width: 500px; width: 95%;">
+    <div class="modal-box" style="max-width: 420px; width: 95%;">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-        <h3 class="modal-title" style="font-size:20px; margin:0; color:var(--gold);">Crear Cuenta Nueva</h3>
+        <h3 class="modal-title" style="font-size:20px; margin:0; color:var(--gold);">Crear Cuenta Gratis</h3>
         <button id="register-church-close" style="background:none; border:none; color:var(--text2); font-size:26px; cursor:pointer;">&times;</button>
       </div>
+      <p style="font-size:13px; color:var(--text2); margin-bottom:20px; line-height:1.55;">Crea tu perfil personal gratuito. Cuando quieras gestionar tu grupo de alabanza, puedes crear un grupo Pro.</p>
       <form id="form-register-church">
         <div class="field">
-          <label>Nombre de la cuenta</label>
-          <input type="text" id="reg-church-name" required placeholder="Ej: Iglesia Central">
+          <label>Nombre completo</label>
+          <input type="text" id="reg-church-name" required placeholder="Tu nombre">
         </div>
         <div class="field">
-          <label>Dirección</label>
-          <input type="text" id="reg-church-address" required placeholder="Dirección completa">
+          <label>Correo electrónico</label>
+          <input type="email" id="reg-church-email" required placeholder="tu@correo.com">
         </div>
         <div class="field">
-          <label>Teléfono</label>
-          <input type="tel" id="reg-church-phone" required placeholder="Ej: 88888888">
+          <label>Contraseña</label>
+          <input type="password" id="reg-church-password" required placeholder="Mínimo 6 caracteres" minlength="6">
         </div>
-        <div class="field">
-          <label>Correo del Administrador (Para acceso)</label>
-          <input type="email" id="reg-church-email" required placeholder="admin@iglesia.com">
-        </div>
-        
-        <div style="background: rgba(244, 197, 66, 0.08); border: 1px solid var(--gold); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 16px;">
-          <p style="font-size: 13px; color: var(--text); margin-bottom: 8px;">Para activar tu cuenta, debes realizar el pago de la mensualidad (₡5,000).</p>
-          <p style="font-size: 14px; color: var(--gold); font-weight: bold; margin-bottom: 12px;">SINPE Móvil: 89699458</p>
-          <div class="field" style="margin-bottom: 10px;">
-            <label>Nombre del titular de la cuenta origen</label>
-            <input type="text" id="reg-church-holder" required placeholder="A nombre de quién está el pago">
-          </div>
-          <div class="field" style="margin-bottom: 0;">
-            <label>Subir comprobante (Imagen)</label>
-            <input type="file" id="reg-church-receipt" accept="image/*" required style="padding: 8px; font-size: 13px;">
-          </div>
-        </div>
+        <button type="submit" class="btn-primary" id="btn-submit-register">Crear Cuenta</button>
+      </form>
+      <p style="font-size:11px; color:var(--text3); margin-top:12px; text-align:center;">Al registrarte aceptas los términos de uso de AlabanApp.</p>
+    </div>
+  </div>
 
-        <button type="submit" class="btn-primary" id="btn-submit-register">Enviar Registro</button>
+  <!-- MODAL CREAR GRUPO PRO -->
+  <div id="create-group-overlay" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px; width: 95%;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <h3 class="modal-title" style="font-size:20px; margin:0; color:var(--gold);">Crear mi Grupo</h3>
+        <button id="create-group-close" style="background:none; border:none; color:var(--text2); font-size:26px; cursor:pointer;">&times;</button>
+      </div>
+      <form id="form-create-group">
+        <div class="field">
+          <label>Nombre del grupo / ministerio</label>
+          <input type="text" id="cg-name" required placeholder="Ej: Ministerio de Alabanza Central">
+        </div>
+        <div class="field">
+          <label>Teléfono de contacto</label>
+          <input type="tel" id="cg-phone" required placeholder="Ej: 88888888">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:12px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;">Selecciona tu plan</label>
+          <div class="plan-radio-group">
+            <div class="plan-radio-option">
+              <input type="radio" name="cg-plan" id="plan-basico" value="basico" checked>
+              <label for="plan-basico">
+                <span class="plan-radio-price">₡5,000</span>
+                <strong>Plan Básico</strong>
+                <span class="plan-radio-limit">Hasta 10 miembros</span>
+              </label>
+            </div>
+            <div class="plan-radio-option">
+              <input type="radio" name="cg-plan" id="plan-pro" value="pro">
+              <label for="plan-pro">
+                <span class="plan-radio-price">₡7,000</span>
+                <strong>Plan Pro</strong>
+                <span class="plan-radio-limit">Hasta 25 miembros</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div style="background: rgba(244,197,66,0.08); border: 1px solid var(--gold); padding: 14px; border-radius: var(--radius-sm); margin-bottom: 16px;">
+          <p style="font-size: 13px; color: var(--text); margin-bottom: 6px; font-weight:600;">Pago por SINPE Móvil</p>
+          <p style="font-size: 14px; color: var(--gold); font-weight: bold; margin-bottom: 10px;">📱 89699458</p>
+          <p style="font-size: 12px; color: var(--text2); margin-bottom: 12px;">Realiza el pago y sube el comprobante. Tu grupo se activa inmediatamente.</p>
+          <div class="field" style="margin-bottom:0;">
+            <label>Comprobante de pago (imagen)</label>
+            <input type="file" id="cg-receipt" accept="image/*" required style="padding: 8px; font-size: 13px;">
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" id="btn-submit-create-group">Activar mi Grupo 🚀</button>
       </form>
     </div>
   </div>
@@ -4872,6 +5530,36 @@
         reader.onerror = reject;
       });
     }
+    // === LANDING PAGE & NAVIGATION LOGIC ===
+    const screenLanding = document.getElementById('screen-landing');
+    const btnLandingRegister = document.getElementById('btn-landing-register');
+    const btnLandingLogin = document.getElementById('btn-landing-login'); // Might not exist if removed from hero
+    const btnNavLogin = document.getElementById('btn-landing-nav-login');
+    const btnNavRegister = document.getElementById('btn-landing-nav-register');
+    const btnLoginBackLanding = document.getElementById('btn-login-back-landing');
+    
+    function openRegisterModal() {
+      registerOverlay.classList.add('active');
+    }
+
+    function openLoginScreen() {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      screenLogin.classList.add('active');
+    }
+
+    if (btnLandingRegister) btnLandingRegister.addEventListener('click', openRegisterModal);
+    if (btnNavRegister) btnNavRegister.addEventListener('click', openRegisterModal);
+    
+    if (btnLandingLogin) btnLandingLogin.addEventListener('click', openLoginScreen);
+    if (btnNavLogin) btnNavLogin.addEventListener('click', openLoginScreen);
+    
+    
+    if (btnLoginBackLanding) {
+      btnLoginBackLanding.addEventListener('click', () => {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        screenLanding.classList.add('active');
+      });
+    }
 
     const formRegisterChurch = document.getElementById('form-register-church');
     if(formRegisterChurch) {
@@ -4880,85 +5568,136 @@
         
         const btnSubmit = document.getElementById('btn-submit-register');
         btnSubmit.disabled = true;
-        btnSubmit.textContent = 'Procesando...';
+        btnSubmit.textContent = 'Creando cuenta...';
 
         try {
           const name = document.getElementById('reg-church-name').value.trim();
-          const address = document.getElementById('reg-church-address').value.trim();
-          const phone = document.getElementById('reg-church-phone').value.trim();
           const email = document.getElementById('reg-church-email').value.trim();
-          const holder = document.getElementById('reg-church-holder').value.trim();
-          const fileInput = document.getElementById('reg-church-receipt');
+          const password = document.getElementById('reg-church-password').value;
           
-          if (!fileInput.files || fileInput.files.length === 0) {
-            throw new Error("Debe subir un comprobante");
-          }
-          const file = fileInput.files[0];
-
-          // Compress image client-side to fit easily into Firestore 1MB limit (usually results in 40-70kb)
-          const receiptUrl = await compressImage(file);
-
-          // Generate UUID for church
-          const churchId = crypto.randomUUID();
-
-          // Save Church to Firestore with compressed image Base64 in receiptUrl
-          await setDoc(doc(db, "churches", churchId), {
-            name, address, phone,
-            adminEmail: email,
-            sinpeHolder: holder,
-            receiptUrl,
-            status: 'activa',
-            createdAt: new Date().toISOString()
-          });
-
-          // Create the admin user for this church
+          const { getAuth, createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js");
           const auth = getAuth();
           
           try {
-            // Se usa una contraseña temporal segura ya que luego se pedira reset
-            const tempPassword = crypto.randomUUID().slice(0, 8) + "Aa1!";
-            await createUserWithEmailAndPassword(auth, email, tempPassword);
-            
-            // Send Password Reset Email so they can enter
-            await sendPasswordResetEmail(auth, email);
+            await createUserWithEmailAndPassword(auth, email, password);
           } catch(authErr) {
             console.error("Auth error:", authErr);
-            // It might fail if email is already in use, handle gracefully if needed
-            if (authErr.code !== 'auth/email-already-in-use') {
-               throw authErr;
+            if (authErr.code === 'auth/email-already-in-use') {
+              throw new Error("El correo ya está en uso. Intenta iniciar sesión.");
+            } else if (authErr.code === 'auth/weak-password') {
+              throw new Error("La contraseña es muy débil. Usa al menos 6 caracteres.");
             }
-            await sendPasswordResetEmail(auth, email);
+            throw authErr;
           }
 
-          // Save the admin user mapping in Firestore
-          // Los usuarios ahora estaran vinculados a su iglesia. El admin inicial tiene role 'admin'
-          const userId = email.replace(/[^a-zA-Z0-9]/g, '').toLowerCase(); // basic ID generation for fallback systems
+          // Guardar en Firestore usuarios
+          const userId = email.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
           await setDoc(doc(db, "usuarios", userId), {
-            nombre: "Admin " + name,
-            role: "admin",
-            usuario: email, // Usamos el correo como el ID real de login visual
-            churchId: churchId,
-            instrumento: "Administrador",
-            type: "admin"
+            nombre: name,
+            role: "musico", // Rol por defecto (gratis)
+            usuario: email,
+            instrumento: "Voz",
+            type: "musico"
+            // No hay churchId aquí, es cuenta libre
           });
 
-          alert(`¡Registro de Institución Completado con Éxito! 🎉\n\n` +
-                `1. Configuración de Acceso:\n` +
-                `Se ha enviado un correo a: ${email}\n` +
-                `Por favor, abre el enlace recibido para definir tu contraseña e ingresar al sistema.\n` +
-                `NOTA IMPORTANTE: Si no lo ves en unos minutos, revisa tu carpeta de SPAM o Correo no deseado.\n\n` +
-                `2. Estado de la Suscripción:\n` +
-                `Tu cuenta se ha creado en estado ACTIVA de manera temporal. Queda sujeta a la posterior verificación manual del comprobante de SINPE Móvil subido.\n\n` +
-                `Al continuar e ingresar a la aplicación, aceptas los términos de servicio y las políticas de uso de AlabanApp.`);
+          alert(`¡Cuenta Creada con Éxito! 🎉\n\nYa puedes iniciar sesión con tu correo y contraseña.`);
           registerOverlay.classList.remove('active');
           formRegisterChurch.reset();
+          
+          // Redirigir a login
+          document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+          screenLogin.classList.add('active');
 
         } catch (error) {
-          console.error("Error registrando iglesia:", error);
+          console.error("Error registrando usuario:", error);
           alert("Hubo un error en el registro: " + error.message);
         } finally {
           btnSubmit.disabled = false;
-          btnSubmit.textContent = 'Enviar Registro';
+          btnSubmit.textContent = 'Crear Cuenta';
+        }
+      });
+    }
+
+    // === CREAR GRUPO PRO (DESDE LA APP) ===
+    const createGroupOverlay = document.getElementById('create-group-overlay');
+    const btnCreateGroupClose = document.getElementById('create-group-close');
+    const btnCreateGroupBanner = document.getElementById('btn-create-group-banner');
+    const formCreateGroup = document.getElementById('form-create-group');
+
+    if (btnCreateGroupBanner) {
+      btnCreateGroupBanner.addEventListener('click', () => {
+        if (!activeSessionUser) return;
+        createGroupOverlay.classList.add('active');
+      });
+    }
+
+    if (btnCreateGroupClose) {
+      btnCreateGroupClose.addEventListener('click', () => {
+        createGroupOverlay.classList.remove('active');
+      });
+    }
+
+    if (formCreateGroup) {
+      formCreateGroup.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if (!activeSessionUser) return;
+
+        const btnSubmit = document.getElementById('btn-submit-create-group');
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = 'Activando Grupo...';
+
+        try {
+          const name = document.getElementById('cg-name').value.trim();
+          const phone = document.getElementById('cg-phone').value.trim();
+          const plan = document.querySelector('input[name="cg-plan"]:checked').value;
+          const fileInput = document.getElementById('cg-receipt');
+          
+          if (!fileInput.files || fileInput.files.length === 0) {
+            throw new Error("Debe subir un comprobante de pago");
+          }
+          const file = fileInput.files[0];
+
+          const receiptUrl = await compressImage(file);
+          const groupId = crypto.randomUUID();
+          
+          const expireAt = new Date();
+          expireAt.setDate(expireAt.getDate() + 30);
+
+          await setDoc(doc(db, "churches", groupId), {
+            name, phone,
+            plan: plan,
+            memberLimit: plan === 'pro' ? 25 : 10,
+            adminEmail: activeSessionUser.usuario,
+            ownerEmail: activeSessionUser.usuario,
+            receiptUrl,
+            status: 'activa',
+            createdAt: new Date().toISOString(),
+            expireAt: expireAt.toISOString(),
+            members: [activeSessionUser.usuario]
+          });
+
+          const userDocId = activeSessionUser._docId || activeSessionUser.id || activeSessionUser.usuario;
+          await updateDoc(doc(db, "usuarios", userDocId), {
+            churchId: groupId,
+            role: "admin",
+            isOwner: true,
+            instrumento: "Administrador"
+          });
+
+          alert("¡Tu Grupo está ACTIVO! 🚀\n\nTu suscripción ha sido validada temporalmente. Tienes acceso a todas las funciones Pro de inmediato.\n\nPor favor, vuelve a iniciar sesión para que los cambios surtan efecto.");
+          createGroupOverlay.classList.remove('active');
+          formCreateGroup.reset();
+          
+          if (typeof window._cerrarSesion === 'function') window._cerrarSesion();
+
+        } catch (error) {
+          console.error("Error creando grupo:", error);
+          alert("Hubo un error: " + error.message);
+        } finally {
+          btnSubmit.disabled = false;
+          btnSubmit.textContent = 'Activar mi Grupo 🚀';
         }
       });
     }
@@ -5267,6 +6006,20 @@
       screenLogin.classList.remove('active');
       document.body.classList.add('app-session-active');
       if (window.intentarMostrarPwaBanner) window.intentarMostrarPwaBanner();
+
+      // Freemium: Controlar visibilidad del Pro Banner y Navegación Musico
+      const proBanner = document.getElementById('pro-banner-container');
+      const musicoNavTabs = document.querySelector('#screen-musico .nav-tabs');
+      const musicoTabPanels = document.querySelectorAll('#screen-musico .tab-panel');
+      if (!userData.churchId) {
+        if(proBanner) proBanner.style.display = 'block';
+        if(musicoNavTabs) musicoNavTabs.style.display = 'none';
+        musicoTabPanels.forEach(p => p.classList.remove('active'));
+      } else {
+        if(proBanner) proBanner.style.display = 'none';
+        if(musicoNavTabs) musicoNavTabs.style.display = 'flex';
+        // Normal tab logic will activate the correct panel
+      }
 
       if (currentUserRole === 'superadmin') {
         const screenSuperadmin = document.getElementById('screen-superadmin');
@@ -7807,6 +8560,28 @@
       const memberChurchId = (activeSessionUser && activeSessionUser.churchId)
         ? activeSessionUser.churchId
         : (existingMember && existingMember.churchId ? existingMember.churchId : null);
+
+      // --- VALIDACIÓN DE LÍMITES POR PLAN ---
+      if (!editingUserKey && memberChurchId) {
+        try {
+          const churchSnap = await window.getDoc(window.doc(window.db, "churches", memberChurchId));
+          const churchPlan = churchSnap.exists() ? (churchSnap.data().plan || 'gratis') : 'gratis';
+          
+          const currentMembersCount = (window.cacheMembers || []).filter(m => m.churchId === memberChurchId).length;
+          
+          let limit = 1; // Gratis / Personal
+          if (churchPlan === 'basico') limit = 10;
+          if (churchPlan === 'pro') limit = 25;
+          if (churchPlan === 'prueba') limit = 25; // Permite probar todo en el periodo de prueba
+
+          if (currentMembersCount >= limit) {
+            customAlert(`Límite alcanzado: Tu plan actual (${churchPlan.toUpperCase()}) permite un máximo de ${limit} miembros, y ya tienes ${currentMembersCount}. Por favor, mejora tu plan para seguir creciendo.`);
+            return;
+          }
+        } catch(e) {
+          console.error("Error validando límites del plan:", e);
+        }
+      }
 
       const payload = {
         nombre: document.getElementById('member-name-input').value.trim(),
@@ -11033,6 +11808,11 @@
     };
 
     window.deleteUserProtected = async function (username, userNombre = username) {
+      if (!activeSessionUser || (!activeSessionUser.isOwner && activeSessionUser.role !== 'superadmin')) {
+        customAlert("Acceso denegado: Solo el dueño de la cuenta (Owner) puede eliminar miembros.", "Permisos Insuficientes");
+        return;
+      }
+
       if (!username) {
         customAlert("Por favor, ingresa un nombre de usuario o correo válido.");
         return;
@@ -11126,14 +11906,15 @@
         const now = new Date();
         const ALERT_DAYS = 5;
         const expiringSoon = [];
-        let html = '';
+        let htmlNuevos = '';
+        let htmlActivos = '';
 
         snap.forEach(docSnap => {
           const data = docSnap.data();
           const id = docSnap.id;
           const statusColor = data.status === 'activa' ? 'var(--teal)' : 'var(--coral)';
-          const planLabel = data.plan === 'paga' ? 'PAGO' : data.plan === 'gratis' ? 'GRATIS' : 'PRUEBA';
-          const planColor = data.plan === 'paga' ? 'var(--gold)' : data.plan === 'gratis' ? 'var(--purple)' : 'var(--text2)';
+          const planLabel = data.plan === 'pro' ? 'PRO' : data.plan === 'basico' ? 'BÁSICO' : data.plan === 'paga' ? 'PAGO' : data.plan === 'gratis' ? 'GRATIS' : 'PRUEBA';
+          const planColor = (data.plan === 'pro' || data.plan === 'basico' || data.plan === 'paga') ? 'var(--gold)' : data.plan === 'gratis' ? 'var(--purple)' : 'var(--text2)';
 
           // Calcular vencimiento
           let expireLabel = 'Indefinido';
@@ -11152,8 +11933,10 @@
 
           const expColor = isExpired ? 'var(--coral)' : isExpiringSoon ? '#f59e0b' : 'var(--text)';
           const expBadge = isExpired ? 'VENCIDO' : isExpiringSoon ? `${daysLeft}d restantes` : '';
+          
+          const isNuevo = data.plan === 'prueba' || (data.status !== 'activa' && data.receiptUrl);
 
-          html += `
+          const cardHtml = `
           <div class="card" style="margin-bottom: 14px; border-left: 4px solid ${statusColor}; ${isExpiringSoon ? 'box-shadow: 0 0 14px rgba(245,158,11,0.2);' : ''}${isExpired ? 'box-shadow: 0 0 14px rgba(244,63,94,0.2);' : ''}">
             <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; align-items:flex-start;">
               <!-- INFO IZQUIERDA -->
@@ -11177,27 +11960,39 @@
                   <select id="plan-select-${id}" style="font-size:11px; padding:5px 8px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-family:var(--font-body); cursor:pointer;">
                     <option value="gratis" ${data.plan === 'gratis' ? 'selected' : ''}>Gratis</option>
                     <option value="prueba" ${data.plan === 'prueba' ? 'selected' : ''}>Prueba</option>
-                    <option value="paga" ${data.plan === 'paga' ? 'selected' : ''}>Pago</option>
+                    <option value="basico" ${data.plan === 'basico' ? 'selected' : ''}>Básico</option>
+                    <option value="pro" ${data.plan === 'pro' ? 'selected' : ''}>Pro</option>
                   </select>
                   <input type="date" id="expire-input-${id}" value="${data.expireAt ? new Date(data.expireAt).toISOString().split('T')[0] : ''}" style="font-size:11px; padding:5px 8px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-family:var(--font-body);">
                   <button onclick="saUpdatePlan('${id}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:var(--purple); color:#fff; white-space:nowrap;">Guardar Plan</button>
                 </div>
 
                 <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
-                  ${data.receiptUrl ? `<button onclick="verComprobanteSa('${id}')" class="btn-secondary" style="font-size:11px; padding:5px 10px;">Comprobante</button>` : ''}
+                  ${data.receiptUrl ? `<button onclick="verComprobanteSa('${id}')" class="btn-secondary" style="font-size:11px; padding:5px 10px; border-color:var(--gold); color:var(--gold);">Ver Comprobante</button>` : ''}
                   ${data.status === 'inactiva'
-                    ? `<button class="btn-primary" onclick="saAction('${id}', 'activar')" style="font-size:11px; padding:5px 10px; background:var(--teal); color:#000;">Activar +30d</button>`
-                    : `<button class="btn-primary" onclick="saAction('${id}', 'inactivar')" style="font-size:11px; padding:5px 10px; background:rgba(255,255,255,0.08); color:var(--text2);">Suspender</button>`
+                    ? `<button class="btn-primary" onclick="saAction('${id}', 'activar')" style="font-size:11px; padding:5px 10px; background:var(--teal); color:#000;">Activar Grupo</button>`
+                    : `<button class="btn-primary" onclick="saAction('${id}', 'inactivar')" style="font-size:11px; padding:5px 10px; background:rgba(244,63,94,0.15); color:var(--coral); border:1px solid rgba(244,63,94,0.3);">Desactivar Grupo</button>`
                   }
                   ${(isExpiringSoon || isExpired) ? `<button onclick="saEnviarRecordatorio('${id}','${(data.name||'').replace(/'/g,"\\'")}','${data.adminEmail||''}','${data.phone||''}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:#f59e0b; color:#000; font-weight:700;">Recordatorio</button>` : ''}
-                  <button onclick="deleteChurchSa('${id}','${(data.name||'Sin Nombre').replace(/'/g,"\\'")}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:var(--coral); color:#fff; font-weight:700;">Eliminar</button>
+                  <button onclick="deleteChurchSa('${id}','${(data.name||'Sin Nombre').replace(/'/g,"\\'")}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:transparent; color:var(--text3); border:1px solid var(--border2);">Eliminar</button>
                 </div>
               </div>
             </div>
           </div>`;
+          
+          if (isNuevo) htmlNuevos += cardHtml;
+          else htmlActivos += cardHtml;
         });
+        
+        let finalHtml = '';
+        if (htmlNuevos) {
+            finalHtml += `<h3 style="margin-bottom: 12px; color: var(--gold); font-family: var(--font-display); font-size:22px;">⚠️ Nuevos / En Revisión</h3>${htmlNuevos}`;
+        }
+        if (htmlActivos) {
+            finalHtml += `<h3 style="margin: 24px 0 12px; color: var(--teal); font-family: var(--font-display); font-size:22px;">✅ Grupos Activos</h3>${htmlActivos}`;
+        }
 
-        container.innerHTML = html;
+        container.innerHTML = finalHtml || '<p style="text-align:center;color:var(--text3);">No hay instituciones registradas.</p>';
 
         // Renderizar alertas de vencimiento
         if (alertsContainer) {
@@ -11442,6 +12237,64 @@
         if (panel) panel.style.display = 'block';
       });
     });
+
+    // === REPERTORIO GLOBAL EN LANDING PAGE ===
+    const landingSearch = document.getElementById('landing-search-global');
+    const landingResults = document.getElementById('landing-search-results');
+    let landingSongsCache = null;
+
+    if (landingSearch && landingResults) {
+      landingSearch.addEventListener('input', debounce(async (e) => {
+        const queryVal = removeAccents(e.target.value).toLowerCase().trim();
+        
+        if (queryVal.length < 2) {
+          landingResults.innerHTML = `<p style="text-align:center; font-size:14px; color:#71717a; padding:10px;">Escribe al menos 2 letras para buscar...</p>`;
+          return;
+        }
+
+        landingResults.innerHTML = `<p style="text-align:center; font-size:14px; color:#e4e4e7; padding:10px;">Buscando...</p>`;
+
+        try {
+          if (!landingSongsCache) {
+            const snap = await getDocs(collection(db, "canciones"));
+            landingSongsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          }
+
+          const filtradas = landingSongsCache.filter(s => {
+            const sNombre = removeAccents(s.nombre || '').toLowerCase();
+            const sArtista = removeAccents(s.artista || '').toLowerCase();
+            return sNombre.includes(queryVal) || sArtista.includes(queryVal);
+          });
+
+          if (filtradas.length === 0) {
+            landingResults.innerHTML = `<p style="text-align:center; font-size:14px; color:#71717a; padding:10px;">No se encontraron resultados.</p>`;
+            return;
+          }
+
+          let html = '';
+          filtradas.slice(0, 5).forEach(s => {
+            html += `
+              <div class="ls-song-card">
+                <div>
+                  <div class="ls-song-title">${s.nombre}</div>
+                  <div class="ls-song-artist">${s.artista || 'Desconocido'}</div>
+                </div>
+                <div class="ls-song-badge">Ver Acordes</div>
+              </div>
+            `;
+          });
+          
+          if(filtradas.length > 5) {
+             html += `<p style="text-align:center; font-size:13px; color:#71717a; margin-top:16px;">+ ${filtradas.length - 5} resultados más. Regístrate para verlos.</p>`;
+          }
+
+          landingResults.innerHTML = html;
+        } catch (err) {
+          console.error("Error buscando canciones:", err);
+          landingResults.innerHTML = `<p style="text-align:center; font-size:13px; color:#ff5252; padding:10px;">Error al buscar canciones.</p>`;
+        }
+      }, 400));
+    }
   </script>
   <script type="module" src="chord_engine/index.js"></script>
 </body>
