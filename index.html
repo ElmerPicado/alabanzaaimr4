@@ -5595,7 +5595,7 @@
     let _migrationInProgress = false;
     async function migrarBaseDatosLetras() {
       if (_migrationInProgress) return;
-      if (currentUserRole !== 'lider') return;
+      if (currentUserRole !== 'lider' && currentUserRole !== 'admin') return;
 
       const conLetra = (cacheSongs || []).filter(s => s.letra !== undefined && s.letra !== null && s.letra.trim() !== '');
       const cancionesSucias = (cacheSongs || []).filter(s => {
@@ -6518,7 +6518,7 @@
       }
 
       // --- 0. NOTA ADICIONAL DEL LÍDER ---
-      if (currentUserRole === 'lider') {
+      if (currentUserRole === 'lider' || currentUserRole === 'admin') {
         const notaInput = document.getElementById('service-nota-input');
         notaInput.value = dataServicio.nota_adicional || "";
 
@@ -6617,7 +6617,7 @@
           const avatarInitials = m.profilePic ? '' : m.nombre.substring(0, 2).toUpperCase();
 
           let roleHtml = `<div class="member-role">${m.instrumento}</div>`;
-          if (instArr.length > 1 && currentUserRole === 'lider' && isAvailableGroup && isChecked) {
+          if (instArr.length > 1 && (currentUserRole === 'lider' || currentUserRole === 'admin') && isAvailableGroup && isChecked) {
             let options = instArr.map(inst => `<option value="${inst}" ${inst === currentSelectedInst ? 'selected' : ''}>${inst}</option>`).join('');
             roleHtml = `<select class="member-role-select" data-user="${m.usuario}" style="background:transparent; border:1px solid var(--border2); color:var(--teal); font-size:11px; padding:2px; border-radius:4px; margin-top:2px; font-weight: 600; outline: none; cursor: pointer;">${options}</select>`;
           } else if (isChecked && typeof assignedValue === 'string') {
@@ -6631,10 +6631,10 @@
             ${roleHtml}
           </div>
           ${statusBadge}
-          <div class="assign-check ${isChecked ? 'on' : ''} ${(!isAvailableGroup || currentUserRole !== 'lider') ? 'song-locked' : ''}"></div>
+          <div class="assign-check ${isChecked ? 'on' : ''} ${(!isAvailableGroup || (currentUserRole !== 'lider' && currentUserRole !== 'admin')) ? 'song-locked' : ''}"></div>
         `;
 
-          if (currentUserRole === 'lider' && isAvailableGroup) {
+          if ((currentUserRole === 'lider' || currentUserRole === 'admin') && isAvailableGroup) {
             row.querySelector('.assign-check').addEventListener('click', async () => {
               const path = `musicosAsignados.${m.usuario}`;
               const newValue = !isChecked ? instArr[0] : false;
@@ -6688,7 +6688,7 @@
         });
 
         // --- BOTONES INFORMATIVOS DE ASISTENCIA (SOLO VISTA LÍDER) ---
-        if (currentUserRole === 'lider') {
+        if (currentUserRole === 'lider' || currentUserRole === 'admin') {
           const infoButtonsCont = document.createElement('div');
           infoButtonsCont.style.cssText = "display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;";
 
@@ -7366,7 +7366,7 @@
           <button class="chip btn-auto-tone" style="cursor:pointer; border:1px solid rgba(244,197,66,0.5); background:rgba(244,197,66,0.15); color:var(--gold); padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Auto-detectar tono base">
             Auto-Tono
           </button>
-          ${currentUserRole === 'lider' ? `
+          ${(currentUserRole === 'lider' || currentUserRole === 'admin') ? `
             <button class="chip btn-toggle-oficial" style="cursor:pointer; border:1px solid ${s.oficial ? 'rgba(78,205,196,0.5)' : 'rgba(255,255,255,0.1)'}; background:${s.oficial ? 'rgba(78,205,196,0.15)' : 'transparent'}; color:${s.oficial ? 'var(--teal)' : 'var(--text3)'}; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Marcar como oficial">
               ${s.oficial ? 'Oficial' : 'Hacer Oficial'}
             </button>
@@ -7458,7 +7458,7 @@
         });
       }
 
-      if (currentUserRole === 'lider') {
+      if (currentUserRole === 'lider' || currentUserRole === 'admin') {
         const editBtn = div.querySelector('.click-edit-song');
         const delBtn = div.querySelector('.click-del-song');
         const oficialBtn = div.querySelector('.btn-toggle-oficial');
@@ -10404,7 +10404,7 @@
       });
 
       // Refrescar vistas activas que muestren avatares
-      if (currentUserRole === 'lider') {
+      if (currentUserRole === 'lider' || currentUserRole === 'admin') {
         const tabMiembros = document.getElementById('tab-miembros');
         if (tabMiembros && tabMiembros.classList.contains('active') && typeof renderizarMantenimientoMiembros === 'function') {
           renderizarMantenimientoMiembros();
