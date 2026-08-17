@@ -3712,10 +3712,6 @@
             <button id="btn-add-song-global" class="btn-primary admin-only"
               style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">
               Nueva Canción</button>
-            <button id="btn-import-songs" class="btn-primary admin-only"
-              style="background: var(--purple); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600; display: none;">📥
-              Importar JSON</button>
-            <input type="file" id="import-songs-file" accept=".json" style="display:none;">
           </div>
         </div>
 
@@ -3863,6 +3859,22 @@
           </div>
           <button type="submit" class="btn-primary" style="background:var(--purple); color:#0f0e17; width:auto; padding:10px 20px; font-size:13px;" id="btn-submit-trial">Generar y Enviar Acceso</button>
         </form>
+      </div>
+
+      </div>
+
+      <div class="card" style="margin-bottom: 24px; border-color: var(--gold);">
+        <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin-bottom: 12px;">Gestionar Biblioteca Global</h3>
+        <p style="font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55;">
+          Estas herramientas son exclusivas del Super Administrador. Las canciones agregadas aquí estarán disponibles para TODAS las cuentas de la plataforma.
+        </p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button id="btn-import-songs" class="btn-primary"
+            style="background: var(--purple); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600;">📥
+            Importar JSON</button>
+          <input type="file" id="import-songs-file" accept=".json" style="display:none;">
+          <button id="btn-import-link-sa" class="btn-primary" style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600;" onclick="alert('Función de agregar por link (LaCuerda) estará conectada al scraper local.');">🔗 Agregar por Link (LaCuerda)</button>
+        </div>
       </div>
 
       <div id="superadmin-churches-list">
@@ -6040,10 +6052,8 @@
       // Multi-tenant: todas las consultas filtran por el churchId del usuario en sesión
       const churchId = activeSessionUser && activeSessionUser.churchId ? activeSessionUser.churchId : null;
 
-      // Si no hay churchId (ej: usuarios legacy de IMR4), consultamos sin filtro para mantener compatibilidad
-      const songsQuery = churchId
-        ? query(collection(db, "biblioteca_canciones"), where("churchId", "==", churchId))
-        : collection(db, "biblioteca_canciones");
+      // La biblioteca de canciones es GLOBAL para todas las cuentas
+      const songsQuery = collection(db, "biblioteca_canciones");
 
       onSnapshot(songsQuery, (snap) => {
         cacheSongs = [];
@@ -11020,7 +11030,12 @@
             type: "admin"
           });
 
-          alert("Cuenta de prueba creada. Se envió un correo a " + email);
+          window.customAlert(
+            `¡Cuenta Creada Exitosamente!\n\n` +
+            `1. Se ha enviado un correo a ${email} para que configuren su contraseña.\n` +
+            `2. Pídeles que revisen su carpeta de SPAM (Correo No Deseado).\n` +
+            `3. El plan quedó activo por 15 días de prueba, sujeto a verificación y políticas de AlabanApp.`
+          );
           formTrial.reset();
           renderSuperAdminChurches();
         } catch(err) {
