@@ -16,9 +16,9 @@
   <link href="https://googleapis.com" rel="stylesheet">
   <style>
     :root {
-      --bg: #0f0e17;
-      --bg2: #1a1828;
-      --bg3: #23213a;
+      --bg: #1a1828;
+      --bg2: #211e33;
+      --bg3: #2a2742;
       --border: rgba(255, 255, 255, 0.08);
       --border2: rgba(255, 255, 255, 0.14);
       --gold: #e5b43c;
@@ -47,6 +47,12 @@
     .lyrics-content, .lyrics-modal-body, input, textarea, select {
       -webkit-user-select: text;
       user-select: text;
+    }
+
+    /* Estilo de acordes en Turquesa */
+    .chord-highlight {
+      color: var(--teal) !important;
+      font-weight: 700 !important;
     }
 
     * {
@@ -81,6 +87,7 @@
       display: none;
       flex-direction: column;
       min-height: 100vh;
+      background: var(--bg);
     }
 
     .screen.active {
@@ -108,12 +115,12 @@
     }
 
     .role-badge {
-      background: var(--bg3);
-      border: 1px solid var(--border2);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 4px 10px;
       border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 12px;
-      color: var(--text2);
       font-weight: 500;
     }
 
@@ -10736,7 +10743,7 @@
   <!-- Modal Preview de Letra -->
   <div id="preview-lyrics-modal" class="modal-overlay" style="z-index: 999990;">
     <div class="modal-box"
-      style="text-align: left; border-color: var(--teal); max-width: 500px; max-height: 85vh; display: flex; flex-direction: column; background: #1E1E1E;">
+      style="text-align: left; border-color: var(--teal); max-width: 500px; max-height: 85vh; display: flex; flex-direction: column; background: var(--bg2);">
       <div
         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
         <div>
@@ -10785,7 +10792,7 @@
         letra = window._lyricsCache[songId].letra;
       }
 
-      document.getElementById('preview-lyrics-content').textContent = letra ? letra : 'Cargando letra...';
+      document.getElementById('preview-lyrics-content').innerHTML = letra ? renderizarLetraTranspuesta(letra, song.tonoBase, song.tonoBase) : 'Cargando letra...';
       document.getElementById('preview-lyrics-modal').classList.add('active');
 
       if (!letra) {
@@ -10794,7 +10801,7 @@
           const snap = await getDoc(doc(window.db, "letras_canciones", songId));
           if (snap.exists() && snap.data().letra) {
             song.letra = snap.data().letra;
-            document.getElementById('preview-lyrics-content').textContent = song.letra;
+            document.getElementById('preview-lyrics-content').innerHTML = renderizarLetraTranspuesta(song.letra, song.tonoBase, song.tonoBase);
           } else {
             document.getElementById('preview-lyrics-content').textContent = 'Letra no disponible.';
           }
