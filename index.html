@@ -2640,8 +2640,10 @@
       box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.5) !important;
     }
 
-    /* Ocultar barra nav cuando no hay sesión activa (en login/superadmin) */
-    body:not(.app-session-active) .nav-tabs {
+    /* Ocultar barra nav cuando no hay sesión activa o la pantalla no está activa (evitar fuga en landing) */
+    body:not(.app-session-active) .nav-tabs,
+    #screen-dashboard:not(.active) .nav-tabs,
+    #screen-musico:not(.active) .nav-tabs {
       display: none !important;
     }
 
