@@ -4745,7 +4745,7 @@
       if (!nuevoUsuario || nuevoUsuario.trim() === '' || nuevoUsuario.trim() === activeSessionUser.usuario) return;
       
       try {
-        await updateDoc(doc(db, "usuarios", activeSessionUser.id || activeSessionUser.usuario), {
+        await updateDoc(doc(db, "usuarios", activeSessionUser._docId || activeSessionUser.id || activeSessionUser.usuario), {
           usuario: nuevoUsuario.trim()
         });
         activeSessionUser.usuario = nuevoUsuario.trim();
@@ -5181,14 +5181,20 @@
               const aliasQuery = query(collection(db, "usuarios"), where("usuario", "==", userVal));
               const aliasSnap = await getDocs(aliasQuery);
               if (!aliasSnap.empty) {
-                const fakeSnap = { exists: () => true, data: () => aliasSnap.docs[0].data() };
+                const aliasDoc = aliasSnap.docs[0];
+                const fakeSnap = { exists: () => true, data: () => ({ ...aliasDoc.data(), _docId: aliasDoc.id }) };
                 uSnap = fakeSnap;
               }
             }
           }
 
           if (uSnap.exists()) {
-            const uData = uSnap.data();
+            // Incluir el ID del documento en uData para que las operaciones de update funcionen
+            const rawData = uSnap.data();
+            const docId = rawData._docId || (uSnap.id ? uSnap.id : null);
+            const uData = docId ? { ...rawData, _docId: docId } : rawData;
+            delete uData._docId; // limpiamos el campo temporal
+            if (docId) uData._docId = docId; // re-añadimos como propiedad de sesión
             
             // Validar login por Auth o por password legacy en el doc
             if (isAuthenticated || uData.password === passVal) {
@@ -5407,7 +5413,7 @@
     window._cerrarSesion = cerrarSesion;
     // Conectar botones de logout si existen como elementos directos
     if (btnLogout) btnLogout.addEventListener('click', cerrarSesion);
-    const _btnMusicoLogout = document.getElementById('btn-musico-logout');
+    const _btnMusicoLogout = document.getElementById('btn-musico-logout') || document.getElementById('btn-musico-logout-dropdown');
     if (_btnMusicoLogout) _btnMusicoLogout.addEventListener('click', cerrarSesion);
     const _btnSuperadminLogout = document.getElementById('btn-superadmin-logout');
     if (_btnSuperadminLogout) _btnSuperadminLogout.addEventListener('click', cerrarSesion);
@@ -10273,7 +10279,8 @@
       try {
         const uSnap = await getDoc(doc(db, "usuarios", savedUserKey));
         if (uSnap.exists() && uSnap.data().password === savedPassword) {
-          iniciarSesionDashboard(uSnap.data());
+          const userData = { ...uSnap.data(), _docId: uSnap.id };
+          iniciarSesionDashboard(userData);
         } else {
           console.warn("Sesión local caducada o usuario modificado.");
           localStorage.removeItem('sessionUserKey');
