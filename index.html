@@ -6126,10 +6126,15 @@
         if (typeof showToast === 'function') showToast("⚠️ Error al cargar el repertorio. Revisa tu conexión.", { duration: 5000 });
       });
 
-      // Consulta de miembros: por churchId si existe
-      const membersQuery = churchId
-        ? query(collection(db, "usuarios"), where("churchId", "==", churchId))
-        : collection(db, "usuarios");
+      // Consulta de miembros: filtrada SIEMPRE por churchId de la cuenta activa.
+      // Si el usuario no tiene churchId asignado (cuenta sin iglesia) solo se carga su propio documento.
+      let membersQuery;
+      if (churchId) {
+        membersQuery = query(collection(db, "usuarios"), where("churchId", "==", churchId));
+      } else {
+        // Fallback seguro: solo el propio usuario (no exponer toda la base)
+        membersQuery = query(collection(db, "usuarios"), where("usuario", "==", activeSessionUser.usuario));
+      }
 
       onSnapshot(membersQuery, (snap) => {
         cacheMembers = [];
@@ -7736,6 +7741,11 @@
       const instVal = selectedChips.join(', ');
       const isCoro = !selectedChips.some(val => ["Batería", "Bajo", "Teclado", "Guitarra Eléctrica", "Guitarra Acústica", "Percusión"].includes(val));
 
+      const existingMember = (window.cacheMembers || []).find(m => m.usuario === userKey);
+      const memberChurchId = (activeSessionUser && activeSessionUser.churchId)
+        ? activeSessionUser.churchId
+        : (existingMember && existingMember.churchId ? existingMember.churchId : null);
+
       const payload = {
         nombre: document.getElementById('member-name-input').value.trim(),
         type: isCoro ? 'corista' : 'musico',
@@ -7743,7 +7753,7 @@
         usuario: userKey,
         password: document.getElementById('member-pass-input').value.trim(),
         role: document.getElementById('member-role-input').value,
-        churchId: activeSessionUser && activeSessionUser.churchId ? activeSessionUser.churchId : null
+        churchId: memberChurchId
       };
       await setDoc(doc(db, "usuarios", userKey), payload);
 
@@ -7756,9 +7766,11 @@
     function renderizarMantenimientoMiembros() {
       const listCont = document.getElementById('global-members-list');
       listCont.innerHTML = "";
-      const filtrados = cacheMembers.filter(m => m.usuario !== 'admin');
+      const canManage = (currentUserRole === 'lider' || currentUserRole === 'admin');
+      const filtrados = cacheMembers;
+      
       if (filtrados.length === 0) {
-        listCont.innerHTML = "<p style='color:var(--text3);font-size:12px;text-align:center;'>No hay músicos registrados.</p>";
+        listCont.innerHTML = "<p style='color:var(--text3);font-size:12px;text-align:center;'>No hay músicos registrados en este ministerio.</p>";
         return;
       }
       filtrados.forEach(m => {
@@ -7775,30 +7787,30 @@
           <div class="avatar av-purple" style="${avatarPicStyle}">${avatarInitials}</div>
           <div class="member-info">
             <div class="member-name">${m.nombre} ${m.role === 'lider' || m.role === 'admin' ? '<b style="color:var(--gold)">[Admin]</b>' : ''}</div>
-            <div class="member-role">User: ${m.usuario} | Clave: ${m.password} | Instrumento: ${m.instrumento}</div>
+            <div class="member-role">User: ${m.usuario} | Clave: ${m.password || '••••'} | Instrumento: ${m.instrumento}</div>
           </div>
         </div>
-        ${currentUserRole === 'lider' ? `
+        ${canManage ? `
           <div style="display:flex; gap:6px;">
             <button class="chip chip-teal click-edit-member" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Editar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>
             <button class="chip chip-coral click-del-member" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Eliminar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
           </div>
         ` : ''}
       `;
-        if (currentUserRole === 'lider') {
+        if (canManage) {
           div.querySelector('.click-edit-member').addEventListener('click', () => {
             editingUserKey = m.usuario;
             document.getElementById('member-name-input').value = m.nombre;
             document.getElementById('member-user-input').value = m.usuario;
             document.getElementById('member-user-input').disabled = true;
-            document.getElementById('member-pass-input').value = m.password;
-            document.getElementById('member-role-input').value = m.role;
+            document.getElementById('member-pass-input').value = m.password || '';
+            document.getElementById('member-role-input').value = m.role || 'musico';
 
-            const instArr = m.instrumento.split(',').map(s => s.trim());
+            const instArr = (m.instrumento || '').split(',').map(s => s.trim());
             document.querySelectorAll('.inst-cb').forEach(c => {
               c.checked = instArr.includes(c.value);
             });
-            document.getElementById('inst-multiselect-text').textContent = m.instrumento;
+            document.getElementById('inst-multiselect-text').textContent = m.instrumento || 'Seleccionar roles...';
 
             const btnSubmit = document.querySelector('#form-add-member button[type="submit"]');
             btnSubmit.textContent = "Actualizar Integrante";
