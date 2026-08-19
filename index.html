@@ -3337,6 +3337,8 @@
       let deleteDoc = null;
       let onSnapshot = null;
       let showToast = null;
+      let query = null;
+      let where = null;
       let activeSessionUser = null;
       let editingEnsayoId = null;
 
@@ -3351,6 +3353,8 @@
         deleteDoc = firebaseRefs.deleteDoc;
         onSnapshot = firebaseRefs.onSnapshot;
         showToast = firebaseRefs.showToast;
+        query = firebaseRefs.query;
+        where = firebaseRefs.where;
 
         // Bind btn-add-ensayo now that Firebase is ready and DOM is fully loaded
         const btnAddEnsayo = document.getElementById('btn-add-ensayo');
@@ -3536,7 +3540,8 @@
                   miembros: selectedIds,
                   canciones: selectedSongIds,
                   tonos: tonos,
-                  confirmaciones: {}
+                  confirmaciones: {},
+                  churchId: (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : null
                 });
                 showToast(`Ensayo "${etiqueta}" creado`);
               }
@@ -3625,6 +3630,7 @@
 
         // Initialize view rendering
         if (window.renderEnsayosAdmin) window.renderEnsayosAdmin();
+        if (window.renderEnsayosMusico) window.renderEnsayosMusico();
       };
 
       window.updateRehearsalsActiveUser = function (user) {
@@ -3781,11 +3787,15 @@
       // RENDER ENSAYOS – VISTA ADMIN (tarjetas ricas con confirmaciones)
       // ============================================================
       window.renderEnsayosAdmin = function () {
+        if (!db || typeof collection !== 'function' || typeof onSnapshot !== 'function') return;
         const cont = document.getElementById('ensayo-list');
         if (!cont) return;
         cont.innerHTML = '';
-        if (!db || !collection || !onSnapshot) return;
-        onSnapshot(collection(db, 'ensayos'), (snap) => {
+        const churchId = (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : null;
+        const ensayosQuery = (churchId && typeof query === 'function' && typeof where === 'function')
+          ? query(collection(db, 'ensayos'), where('churchId', '==', churchId))
+          : collection(db, 'ensayos');
+        onSnapshot(ensayosQuery, (snap) => {
           const ensayos = [];
           snap.forEach(docSnap => {
             const data = docSnap.data();
@@ -3954,15 +3964,17 @@
       // RENDER ENSAYOS – VISTA MÚSICO (tarjetas con canciones + YouTube)
       // ============================================================
       window.renderEnsayosMusico = function () {
+        if (!db || typeof collection !== 'function' || typeof onSnapshot !== 'function') return;
         const musicoId = activeSessionUser?.usuario;
         if (!musicoId) return;
-        if (activeSessionUser?.role === 'lider') return; // Admins do not need musician rehearsal logic/popups
         const cont = document.getElementById('ensayo-list-musico');
         if (!cont) return;
         cont.innerHTML = '';
-        if (!db || !collection || !onSnapshot) return;
-
-        onSnapshot(collection(db, 'ensayos'), (snap) => {
+        const churchId = (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : null;
+        const ensayosQuery = (churchId && typeof query === 'function' && typeof where === 'function')
+          ? query(collection(db, 'ensayos'), where('churchId', '==', churchId))
+          : collection(db, 'ensayos');
+        onSnapshot(ensayosQuery, (snap) => {
           const ensayos = [];
           snap.forEach(docSnap => {
             const data = docSnap.data();
@@ -4367,6 +4379,17 @@
           Asignación de Equipo</h3>
         <p class="section-sub" style="margin-bottom: 10px;">Solo se muestran los integrantes confirmados mediante su
           asistencia.</p>
+
+        <!-- Botones de consulta de disponibilidad -->
+        <div style="display: flex; gap: 10px; margin-bottom: 12px;" class="admin-only">
+          <button id="btn-show-unconfirmed" class="btn-primary" style="flex: 1; background: rgba(255, 183, 3, 0.15); border: 1px solid var(--gold); color: var(--gold); padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            ⏳ Sin Confirmar
+          </button>
+          <button id="btn-show-absent" class="btn-primary" style="flex: 1; background: rgba(244, 63, 94, 0.15); border: 1px solid var(--coral); color: var(--coral); padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            ❌ No Asistirán / En Duda
+          </button>
+        </div>
+
         <div class="card">
           <div id="service-team-container">
             <p style="color: var(--text3); font-size: 13px; text-align: center; padding: 10px;">Selecciona una fecha
@@ -4376,10 +4399,10 @@
         </div>
 
         <!-- SECCIÓN DE CANCIONES (Restaurada al flujo original) -->
-        <div>
+        <div style="display: none;">
           <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin: 24px 0 10px;">
             Selección de Canciones</h3>
-          <div class="field">
+          <div class="field" style="display: none;">
             <input type="text" id="search-service-songs" placeholder="Buscar canción por nombre o artista...">
           </div>
 
@@ -4396,10 +4419,10 @@
               Alabanza (Rápidas)
             </h4>
             <button class="btn-add-song-trigger admin-only" data-type="alabanza"
-              style="background:none; border:none; color:var(--teal); font-size:12px; font-weight:600; cursor:pointer; display:none;">
-              Agregar Alabanza</button>
+              style="background: rgba(78, 205, 196, 0.15); border: 1px solid var(--teal); color: var(--teal); padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; display: inline-block;">
+              + Agregar Alabanza</button>
           </div>
-          <div id="service-alabanzas-list" class="songs-grid"></div>
+          <div id="service-alabanzas-list" class="songs-grid" style="display: none;"></div>
 
           <!-- Lista dividida por Adoración -->
           <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0 8px;">
@@ -4424,10 +4447,10 @@
               </svg> Adoración (Lentas)
             </h4>
             <button class="btn-add-song-trigger admin-only" data-type="adoracion"
-              style="background:none; border:none; color:var(--purple); font-size:12px; font-weight:600; cursor:pointer; display:none;">
-              Agregar Adoración</button>
+              style="background: rgba(155, 143, 255, 0.15); border: 1px solid var(--purple); color: var(--purple); padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; display: inline-block;">
+              + Agregar Adoración</button>
           </div>
-          <div id="service-adoracion-list" class="songs-grid"></div>
+          <div id="service-adoracion-list" class="songs-grid" style="display: none;"></div>
 
         </div>
 
@@ -5536,6 +5559,32 @@
     </div>
   </div>
 
+  <!-- MODAL INTEGRANTES SIN CONFIRMAR (LÍDER) -->
+  <div id="service-unconfirmed-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 480px; width: 95%; border-color: var(--gold);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 class="modal-title" style="font-size:18px; margin:0; color:var(--gold);">Sin Confirmar (Asignables)</h3>
+        <button onclick="window.cerrarModalConHistorial('service-unconfirmed-modal')" style="background:none; border:none; color:var(--text2); font-size:26px; cursor:pointer;">&times;</button>
+      </div>
+      <div id="modal-unconfirmed-list" class="song-list-scroll" style="max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+        <!-- Integrantes sin confirmar se inyectan aquí -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL INTEGRANTES NO ASISTIRÁN / EN DUDA (LÍDER) -->
+  <div id="service-absent-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 480px; width: 95%; border-color: var(--coral);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 class="modal-title" style="font-size:18px; margin:0; color:var(--coral);">No Asistirán / En Duda</h3>
+        <button onclick="window.cerrarModalConHistorial('service-absent-modal')" style="background:none; border:none; color:var(--text2); font-size:26px; cursor:pointer;">&times;</button>
+      </div>
+      <div id="modal-absent-list" class="song-list-scroll" style="max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+        <!-- Integrantes ausentes se inyectan aquí -->
+      </div>
+    </div>
+  </div>
+
   <!-- CAPA LOGICA COMPLETA DE FIREBASE V10+ -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
@@ -5972,6 +6021,14 @@
 
     let currentUserRole = 'musico';
     let activeSessionUser = null;
+    
+    function getServiceDocId(dateStr) {
+      if (!dateStr) return "";
+      if (dateStr.includes('_')) return dateStr;
+      const churchId = (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : "imr4";
+      return `${churchId}_${dateStr}`;
+    }
+
     let unsubscribeService = null;
     let editingUserKey = null;
     let unsubscribeMusicoService = null; // Declarada arriba para evitar TDZ ReferenceError (Fase E)
@@ -7319,7 +7376,9 @@
           updateDoc: updateDoc,
           deleteDoc: deleteDoc,
           onSnapshot: onSnapshot,
-          showToast: showToast
+          showToast: showToast,
+          query: query,
+          where: where
         });
       }
     }
@@ -7439,7 +7498,7 @@
       const _adminSongsCont = document.getElementById('admin-selected-songs-container');
       if (_adminSongsCont) _adminSongsCont.innerHTML = spinnerHtml;
 
-      const serviceDocRef = doc(db, "planes_servicio", targetDate);
+      const serviceDocRef = doc(db, "planes_servicio", getServiceDocId(targetDate));
 
       unsubscribeService = onSnapshot(serviceDocRef, async (snap) => {
         if (!snap.exists()) {
@@ -7625,7 +7684,7 @@
         newBtnSaveNota.addEventListener('click', async () => {
           const val = notaInput.value.trim();
           // Al guardar nota, borramos el borrador para que el preview se regenere con la nota incluida
-          await updateDoc(doc(db, "planes_servicio", serviceDateSelect.value), {
+          await updateDoc(doc(db, "planes_servicio", getServiceDocId(serviceDateSelect.value)), {
             nota_adicional: val,
             mensajeEditado: deleteField()
           });
@@ -7741,7 +7800,7 @@
               // Recalcular advertencias e interfaz en tiempo real
               renderizarComponentesServicio(dataServicio);
 
-              await updateDoc(doc(db, "planes_servicio", serviceDateSelect.value), {
+              await updateDoc(doc(db, "planes_servicio", getServiceDocId(serviceDateSelect.value)), {
                 [path]: newValue
               });
             });
@@ -7757,7 +7816,7 @@
                 renderizarComponentesServicio(dataServicio);
 
                 const path = `musicosAsignados.${m.usuario}`;
-                await updateDoc(doc(db, "planes_servicio", serviceDateSelect.value), {
+                await updateDoc(doc(db, "planes_servicio", getServiceDocId(serviceDateSelect.value)), {
                   [path]: newInst
                 });
               });
@@ -7785,7 +7844,13 @@
         });
 
 
-        // --- RENDERIZAR TODOS LOS INTEGRANTES (A PEDIDO DEL USUARIO) ---
+        // Clear modal lists
+        const modalUnconfirmedCont = document.getElementById('modal-unconfirmed-list');
+        const modalAbsentCont = document.getElementById('modal-absent-list');
+        if (modalUnconfirmedCont) modalUnconfirmedCont.innerHTML = "";
+        if (modalAbsentCont) modalAbsentCont.innerHTML = "";
+
+        // --- RENDERIZAR INTEGRANTES CONFIRMADOS EN LA VISTA PRINCIPAL ---
         if (disponibles.length > 0) {
           const headerDisp = document.createElement('div');
           headerDisp.className = "block-title";
@@ -7795,136 +7860,40 @@
           headerDisp.textContent = "Confirmados";
           teamCont.appendChild(headerDisp);
           disponibles.forEach(m => teamCont.appendChild(crearFilaMiembro(m, true)));
+        } else {
+          const p = document.createElement('p');
+          p.style.color = "var(--text3)";
+          p.style.fontSize = "12px";
+          p.style.padding = "12px 6px";
+          p.style.textAlign = "center";
+          p.textContent = "Ningún integrante disponible para esta fecha.";
+          teamCont.appendChild(p);
         }
 
-        if (sinConfirmarList.length > 0) {
-          const headerUnc = document.createElement('div');
-          headerUnc.className = "block-title";
-          headerUnc.style.color = "var(--gold)";
-          headerUnc.style.borderBottomColor = "rgba(255,183,3,0.15)";
-          headerUnc.textContent = "Sin Confirmar (Asignables)";
-          teamCont.appendChild(headerUnc);
-          // PASAMOS TRUE AQUÍ TAMBIÉN PARA QUE SEAN ASIGNABLES POR EL LÍDER
-          sinConfirmarList.forEach(item => teamCont.appendChild(crearFilaMiembro(item.member, true)));
+        // --- RENDERIZAR INTEGRANTES SIN CONFIRMAR EN EL MODAL ---
+        if (modalUnconfirmedCont) {
+          if (sinConfirmarList.length > 0) {
+            sinConfirmarList.forEach(item => modalUnconfirmedCont.appendChild(crearFilaMiembro(item.member, true)));
+          } else {
+            modalUnconfirmedCont.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:15px; margin: 0;">Todos han confirmado asistencia.</p>`;
+          }
         }
 
-           if (disponibles.length === 0 && sinConfirmarList.length === 0) {
-            const p = document.createElement('p');
-            p.style.color = "var(--text3)";
-            p.style.fontSize = "12px";
-            p.style.padding = "12px 6px";
-            p.style.textAlign = "center";
-            p.textContent = "Ningún integrante disponible para esta fecha.";
-            teamCont.appendChild(p);
+        // --- RENDERIZAR INTEGRANTES NO ASISTIRÁN / EN DUDA EN EL MODAL ---
+        if (modalAbsentCont) {
+          if (noAsistiranList.length > 0) {
+            noAsistiranList.forEach(item => modalAbsentCont.appendChild(crearFilaMiembro(item.member, false)));
+          } else {
+            modalAbsentCont.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:15px; margin: 0;">Ninguno ha reportado como ausente.</p>`;
+          }
         }
 
         // --- 2. RENDER DE REPERTORIO CON TONO DINÁMICO EN PÁGINA PRINCIPAL ---
+        // (Las listas globales están ocultas y omitimos renderizarlas por rendimiento)
         const contAlabanza = document.getElementById('service-alabanzas-list');
         const contAdoracion = document.getElementById('service-adoracion-list');
         if (contAlabanza) contAlabanza.innerHTML = "";
         if (contAdoracion) contAdoracion.innerHTML = "";
-
-        const cancionesSeleccionadas = dataServicio.cancionesSeleccionadas || {};
-        const filterEl = document.getElementById('search-service-songs');
-        const searchVal = filterEl ? removeAccents(filterEl.value).toLowerCase().trim() : "";
-
-        const filteredSongs = cacheSongs.filter(s => {
-          const sNombre = s.nombre || "";
-          const sArtista = s.artista || "";
-          const matchSearch = removeAccents(sNombre).toLowerCase().includes(searchVal) || removeAccents(sArtista).toLowerCase().includes(searchVal);
-          return matchSearch;
-        });
-
-        filteredSongs.forEach(s => {
-          const isAlabanza = (s.tipo || 'alabanza').trim().toLowerCase() === 'alabanza';
-          const cont = isAlabanza ? contAlabanza : contAdoracion;
-          if (!cont) return;
-
-          const isChecked = cancionesSeleccionadas[s.id] !== undefined && cancionesSeleccionadas[s.id] !== false;
-          
-          const cardBorder = isAlabanza
-            ? 'border-bottom: 1px solid rgba(78, 205, 196, 0.25) !important;'
-            : 'border-bottom: 1px solid rgba(155, 143, 255, 0.25) !important;';
-          const badgeStyle = isAlabanza
-            ? `background: rgba(78, 205, 196, 0.12); color: var(--teal); border: 1.5px solid rgba(78, 205, 196, 0.3);`
-            : `background: rgba(155, 143, 255, 0.12); color: var(--purple); border: 1.5px solid rgba(155, 143, 255, 0.3);`;
-
-          const div = document.createElement('div');
-          div.className = "musico-song-card";
-          div.style.cssText = `background: transparent !important; border: none !important; border-radius: 0 !important; margin-bottom: 0 !important; padding: 14px 4px !important; box-shadow: none !important; cursor: pointer; ${cardBorder}`;
-          
-          div.innerHTML = `
-            <div style="display: flex; flex-direction: column; width: 100%; gap: 6px;">
-              <div class="song-card-name" style="font-weight: 600; white-space: normal; overflow: visible; word-break: break-word; overflow-wrap: break-word; line-height: 1.3; margin-left: 4px;">
-                ${s.nombre} ${s.oficial ? '<span class="badge-oficial" style="display:inline-block; vertical-align:middle; margin-left:6px;">OFICIAL</span>' : ''}
-              </div>
-              <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div class="song-card-artist" style="color: var(--text2); font-size: 12px; margin-left: 4px;">${s.artista}</div>
-                <div style="display:flex; align-items:center; gap: 12px; padding-right: 6px;">
-                  <button class="btn-preview-lyrics" data-song-id="${s.id}" style="background:transparent; border:1px solid var(--border2); color:var(--text2); border-radius:6px; padding:4px 8px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;" title="Ver letra">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
-                    Letra
-                  </button>
-                  <div class="tone-indicator" style="font-size:12px; padding: 4px 10px; cursor:default; margin: 0; ${badgeStyle}">Base: ${s.tonoBase}</div>
-                  <div class="custom-checkbox" style="width:22px; height:22px; border-radius:6px; border:2px solid ${isChecked ? 'var(--teal)' : 'var(--border2)'}; background:${isChecked ? 'var(--teal)' : 'transparent'}; display:flex; align-items:center; justify-content:center; transition: all 0.2s;">
-                    ${isChecked ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f0e17" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-
-          const btnPreview = div.querySelector('.btn-preview-lyrics');
-          if (btnPreview) {
-            btnPreview.addEventListener('click', (e) => {
-              e.stopPropagation();
-              if (window.abrirModalLetraGlobal) window.abrirModalLetraGlobal(s.id, s.tonoBase);
-            });
-          }
-
-          div.addEventListener('click', async () => {
-             if (currentUserRole !== 'lider' && currentUserRole !== 'admin') return;
-
-             const newValue = !isChecked ? s.tonoBase : false;
-             if (!dataServicio.cancionesSeleccionadas) dataServicio.cancionesSeleccionadas = {};
-             dataServicio.cancionesSeleccionadas[s.id] = newValue;
-
-             if (newValue) {
-                if (!dataServicio.ordenCanciones) dataServicio.ordenCanciones = [];
-                if (!dataServicio.ordenCanciones.includes(s.id)) {
-                   dataServicio.ordenCanciones.push(s.id);
-                }
-             } else {
-                if (dataServicio.ordenCanciones) {
-                   dataServicio.ordenCanciones = dataServicio.ordenCanciones.filter(id => id !== s.id);
-                }
-             }
-
-             renderizarComponentesServicio(dataServicio);
-             
-             try {
-               await updateDoc(doc(db, "planes_servicio", serviceDateSelect.value), {
-                 [`cancionesSeleccionadas.${s.id}`]: newValue,
-                 ordenCanciones: dataServicio.ordenCanciones || []
-               });
-             } catch (err) {
-               console.error("Error actualizando canción: ", err);
-             }
-          });
-
-          cont.appendChild(div);
-        });
-
-        if (noAsistiranList.length > 0) {
-          const headerNo = document.createElement('div');
-          headerNo.className = "block-title";
-          headerNo.style.color = "var(--coral)";
-          headerNo.style.borderBottomColor = "rgba(244,63,94,0.15)";
-          headerNo.textContent = "No Asistirán / En Duda";
-          teamCont.appendChild(headerNo);
-          // PASAMOS FALSE AQUÍ PARA QUE NO SE PUEDAN ASIGNAR FACILMENTE (song-locked)
-          noAsistiranList.forEach(item => teamCont.appendChild(crearFilaMiembro(item.member, false)));
-        }
 
         } // end else (miembrosFiltrados.length > 0)
 
@@ -7952,7 +7921,7 @@
         const targetDate = serviceDateSelect.value;
         if (!targetDate || !activeSessionUser) return;
         const path = `disponibilidad.${activeSessionUser.usuario}`;
-        await updateDoc(doc(db, "planes_servicio", targetDate), {
+        await updateDoc(doc(db, "planes_servicio", getServiceDocId(targetDate)), {
           [path]: 'confirmado'
         });
       });
@@ -7965,7 +7934,7 @@
         if (!targetDate || !activeSessionUser) return;
         const path = `disponibilidad.${activeSessionUser.usuario}`;
         const pathAsignado = `musicosAsignados.${activeSessionUser.usuario}`;
-        await updateDoc(doc(db, "planes_servicio", targetDate), {
+        await updateDoc(doc(db, "planes_servicio", getServiceDocId(targetDate)), {
           [path]: 'ausente',
           [pathAsignado]: false
         });
@@ -7986,7 +7955,7 @@
       const targetDate = serviceDateSelect.value;
       if (!targetDate) { customAlert('Primero selecciona una fecha.'); return; }
       const newMsg = document.getElementById('whatsapp-preview').value;
-      await updateDoc(doc(db, "planes_servicio", targetDate), {
+      await updateDoc(doc(db, "planes_servicio", getServiceDocId(targetDate)), {
         mensajeEditado: newMsg,
         estadoEnvio: 'pendiente'
       });
@@ -8031,7 +8000,7 @@
       // Firebase update (no-blocking)
       const targetDate = serviceDateSelect.value;
       if (targetDate) {
-        updateDoc(doc(db, "planes_servicio", targetDate), {
+        updateDoc(doc(db, "planes_servicio", getServiceDocId(targetDate)), {
           mensajeEditado: msg,
           estadoEnvio: 'enviado'
         }).catch(e => console.error(e));
@@ -9695,7 +9664,7 @@
       // Cancelar suscripción anterior y crear nueva (tiempo real)
       if (window._unsubMusicoServicePlan) { window._unsubMusicoServicePlan(); }
 
-      window._unsubMusicoServicePlan = onSnapshot(doc(db, "planes_servicio", dateStr), (snap) => {
+      window._unsubMusicoServicePlan = onSnapshot(doc(db, "planes_servicio", getServiceDocId(dateStr)), (snap) => {
         if (!snap.exists()) {
           content.innerHTML = `
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; background: rgba(255, 255, 255, 0.02); border: 1px dashed var(--border2); border-radius: var(--radius); margin-top: 10px;">
@@ -9716,11 +9685,12 @@
                 btnCrear.textContent = "Creando...";
                 const docData = {
                   fecha: dateStr,
+                  churchId: (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : null,
                   cancionesSeleccionadas: {},
                   musicosAsignados: {},
                   disponibilidad: {}
                 };
-                await setDoc(doc(db, "planes_servicio", dateStr), docData);
+                await setDoc(doc(db, "planes_servicio", getServiceDocId(dateStr)), docData);
                 showToast("Servicio agregado correctamente");
               } catch (err) {
                 console.error(err);
@@ -9922,7 +9892,7 @@
             const sName = cacheSongs.find(s => s.id === songId)?.nombre || (customSongsMetadata[songId]?.nombre) || "Canción";
             if (await customConfirm(`ATENCIÓN:\nSi quitas "${sName}", se eliminará de la vista de TODO el equipo y tendrás que agregarla de nuevo si te equivocas.\n\n¿Quieres continuar y quitarla?`)) {
               const path = `cancionesSeleccionadas.${songId}`;
-              await updateDoc(doc(db, "planes_servicio", dateStr), {
+              await updateDoc(doc(db, "planes_servicio", getServiceDocId(dateStr)), {
                 [path]: false
               });
               showToast(`"${sName}" quitada del servicio`);
@@ -9977,7 +9947,7 @@
 
       if (unsubscribeMusicoService) unsubscribeMusicoService();
 
-      unsubscribeMusicoService = onSnapshot(doc(db, "planes_servicio", dateStr), (snap) => {
+      unsubscribeMusicoService = onSnapshot(doc(db, "planes_servicio", getServiceDocId(dateStr)), (snap) => {
         const data = snap.exists() ? snap.data() : { disponibilidad: {}, musicosAsignados: {} };
         const disp = data.disponibilidad || {};
 
@@ -10062,11 +10032,12 @@
 
     async function actualizarDisponibilidadMusico(dateStr, estado) {
       if (!dateStr) return;
-      const docRef = doc(db, "planes_servicio", dateStr);
+      const docRef = doc(db, "planes_servicio", getServiceDocId(dateStr));
       const snap = await getDoc(docRef);
       if (!snap.exists()) {
         await setDoc(docRef, {
           fecha: dateStr,
+          churchId: (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : null,
           cancionesSeleccionadas: {},
           musicosAsignados: {},
           disponibilidad: { [activeSessionUser.usuario]: estado },
@@ -10711,7 +10682,7 @@
                 const path = `cancionesSeleccionadas.${cancionId}`;
                 const cambioPath = `cambiosTono.${cancionId}`;
 
-                updateDoc(doc(db, "planes_servicio", dateStr), {
+                updateDoc(doc(db, "planes_servicio", getServiceDocId(dateStr)), {
                   [path]: selectedTone,
                   [cambioPath]: {
                     usuario: (activeSessionUser ? activeSessionUser.nombre : "Usuario"),
@@ -10957,7 +10928,7 @@
           overlay.classList.remove('active');
           const path = `cancionesSeleccionadas.${songId}`;
           const cambioPath = `cambiosTono.${songId}`;
-          await updateDoc(doc(db, "planes_servicio", dateStr), {
+          await updateDoc(doc(db, "planes_servicio", getServiceDocId(dateStr)), {
             [path]: newTone,
             [cambioPath]: {
               usuario: activeSessionUser.nombre,
@@ -11021,7 +10992,7 @@
         ? [...ordenFiltered, ...otherOrderFiltered]
         : [...otherOrderFiltered, ...ordenFiltered];
 
-      await updateDoc(doc(db, "planes_servicio", dateStr), { ordenCanciones: finalOrder });
+      await updateDoc(doc(db, "planes_servicio", getServiceDocId(dateStr)), { ordenCanciones: finalOrder });
     }
 
     // --- Configuración: Enlace de WhatsApp ---
@@ -11264,7 +11235,7 @@
           if (!res) return;
 
           try {
-            await updateDoc(doc(db, "planes_servicio", dateStr), {
+            await updateDoc(doc(db, "planes_servicio", getServiceDocId(dateStr)), {
               [`cancionesSeleccionadas.${songId}`]: deleteField()
             });
             showToast(`"${sName}" quitada del servicio`);
@@ -11496,7 +11467,7 @@
         if (!window._selectedSongsToAdd || window._selectedSongsToAdd.size === 0) return;
 
         const dateStr = window._targetAddSongDate || serviceDateSelect.value || document.getElementById('musico-service-date').value;
-        const docRef = doc(db, "planes_servicio", dateStr);
+        const docRef = doc(db, "planes_servicio", getServiceDocId(dateStr));
         const dataServicio = window._currentServiceData || {};
         let currentOrder = dataServicio.ordenCanciones || [];
         const type = window._targetAddSongType;
@@ -11559,7 +11530,7 @@
         const dateStr = window._targetAddSongDate || serviceDateSelect.value || document.getElementById('musico-service-date').value;
         const customId = 'custom_' + Date.now();
 
-        const docRef = doc(db, "planes_servicio", dateStr);
+        const docRef = doc(db, "planes_servicio", getServiceDocId(dateStr));
         const dataServicio = window._currentServiceData || {};
         const currentOrder = dataServicio.ordenCanciones || [];
 
@@ -11625,6 +11596,22 @@
         setTimeout(() => document.getElementById('musico-custom-name').focus(), 100);
       });
     });
+
+    // Mostrar modal sin confirmar
+    const btnShowUnconfirmed = document.getElementById('btn-show-unconfirmed');
+    if (btnShowUnconfirmed) {
+      btnShowUnconfirmed.addEventListener('click', () => {
+        window.abrirModalConHistorial('service-unconfirmed-modal');
+      });
+    }
+
+    // Mostrar modal no asistirán
+    const btnShowAbsent = document.getElementById('btn-show-absent');
+    if (btnShowAbsent) {
+      btnShowAbsent.addEventListener('click', () => {
+        window.abrirModalConHistorial('service-absent-modal');
+      });
+    }
 
     // ====================================================
     // CONFIGURACIÓN Y LISTENER DEL BOTÓN S.O.S (MÚSICOS)
