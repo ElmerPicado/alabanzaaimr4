@@ -2910,6 +2910,66 @@
         order: 3;
       }
     }
+
+    #landing-default-view {
+      overflow-x: hidden;
+      width: 100%;
+      min-width: 0;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    #landing-trending-grid {
+      display: flex;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+      gap: 16px;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      padding-bottom: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--teal) transparent;
+    }
+    #landing-trending-grid .trending-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 0 0 320px;
+      width: 320px;
+      scroll-snap-align: start;
+    }
+    #landing-trending-grid .ls-song-card {
+      flex: 0 0 auto;
+      width: 100%;
+      height: 64px;
+      overflow: hidden;
+    }
+    #landing-trending-grid::-webkit-scrollbar {
+      height: 4px;
+    }
+    #landing-trending-grid::-webkit-scrollbar-thumb {
+      background: var(--teal);
+      border-radius: 4px;
+    }
+    @media (min-width: 1025px) {
+      #landing-trending-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+        overflow: visible;
+      }
+      #landing-trending-grid .trending-column {
+        display: contents;
+      }
+      #landing-trending-grid .ls-song-card {
+        width: auto;
+        height: auto;
+      }
+    }
   </style>
 </head>
 
@@ -2970,7 +3030,7 @@
     <!-- LANDING DEFAULT VIEW (Trending & Artists) -->
     <div id="landing-default-view" class="screen active" style="padding: 40px 24px 80px 24px; max-width: 1200px; margin: 0 auto; display: none;">
       <h2 style="font-size: 26px; color: #fff; margin-bottom: 24px; font-weight: 800; letter-spacing: -0.5px;">Canciones populares</h2>
-      <div id="landing-trending-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 60px;">
+      <div id="landing-trending-grid" style="gap: 16px; margin-bottom: 60px;">
          <!-- JS will populate -->
          <p style="color: var(--text3); font-size: 14px;">Cargando sugerencias...</p>
       </div>
@@ -3197,7 +3257,7 @@
           <div class="plan-price">₡5,000<span>/mes</span></div>
           <div class="plan-divider"></div>
           <ul class="plan-features-list">
-             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Hasta 10 miembros</li>
+             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Hasta 15 miembros</li>
              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Panel de Administrador Completo</li>
              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Repertorio Privado del Grupo</li>
              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Planeación de Servicios</li>
@@ -3210,17 +3270,17 @@
           <div class="plan-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
           </div>
-          <div class="plan-name">Pro</div>
+          <div class="plan-name">Comunidad</div>
           <div class="plan-period">Potencia total para ministerios grandes.</div>
           <div class="plan-price">₡7,000<span>/mes</span></div>
           <div class="plan-divider"></div>
           <ul class="plan-features-list">
-             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Hasta 25 miembros</li>
+             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Hasta 25 usuarios</li>
              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Todo lo del Plan Básico</li>
              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Ideal para grupos grandes</li>
              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Soporte Prioritario 24/7</li>
           </ul>
-          <button class="btn-plan secondary" onclick="document.getElementById('btn-landing-register').click()">Elegir Pro</button>
+          <button class="btn-plan secondary" onclick="document.getElementById('btn-landing-register').click()">Elegir Comunidad</button>
         </div>
       </div>
     </div>
@@ -3242,8 +3302,8 @@
       <p class="login-sub">Panel de Coordinación</p>
       <form id="login-form" onsubmit="event.preventDefault();">
         <div class="field">
-          <label>Usuario o Correo</label>
-          <input type="text" id="login-email" required placeholder="tu@correo.com o tu usuario">
+          <label>Correo</label>
+          <input type="text" id="login-email" required placeholder="tu@correo.com">
         </div>
         <div class="field">
           <label>Contraseña</label>
@@ -3253,6 +3313,10 @@
       </form>
       <div style="margin-top: 16px; text-align: center;">
         <button id="btn-login-back-landing" style="background: none; border: none; color: var(--text3); font-family: var(--font-body); font-size: 13px; cursor: pointer;">← Volver al inicio</button>
+      </div>
+      <div style="margin-top: 14px; text-align: center; font-size: 14px; color: var(--text3);">
+        ¿No tienes cuenta aún?
+        <button id="btn-login-to-register" style="background: none; border: none; color: var(--teal); font-family: var(--font-body); font-size: 14px; font-weight: 700; cursor: pointer; padding: 0; text-decoration: underline;">Regístrate</button>
       </div>
     </div>
   </div>
@@ -3792,9 +3856,12 @@
         if (!cont) return;
         cont.innerHTML = '';
         const churchId = (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : null;
-        const ensayosQuery = (churchId && typeof query === 'function' && typeof where === 'function')
-          ? query(collection(db, 'ensayos'), where('churchId', '==', churchId))
-          : collection(db, 'ensayos');
+        if (!churchId) {
+          cont.innerHTML = `<p style='color:var(--text3);font-size:13px;text-align:center;padding:20px;'>Los ensayos se desbloquean cuando tu grupo esté activo. Crea o únete a un grupo para verlos.</p>`;
+          return;
+        }
+        if (typeof query !== 'function' || typeof where !== 'function') return;
+        const ensayosQuery = query(collection(db, 'ensayos'), where('churchId', '==', churchId));
         onSnapshot(ensayosQuery, (snap) => {
           const ensayos = [];
           snap.forEach(docSnap => {
@@ -3971,9 +4038,12 @@
         if (!cont) return;
         cont.innerHTML = '';
         const churchId = (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : null;
-        const ensayosQuery = (churchId && typeof query === 'function' && typeof where === 'function')
-          ? query(collection(db, 'ensayos'), where('churchId', '==', churchId))
-          : collection(db, 'ensayos');
+        if (!churchId) {
+          cont.innerHTML = `<p style='color:var(--text3);font-size:13px;text-align:center;padding:20px;'>Los ensayos se desbloquean cuando pertenezcas a un grupo.</p>`;
+          return;
+        }
+        if (typeof query !== 'function' || typeof where !== 'function') return;
+        const ensayosQuery = query(collection(db, 'ensayos'), where('churchId', '==', churchId));
         onSnapshot(ensayosQuery, (snap) => {
           const ensayos = [];
           snap.forEach(docSnap => {
@@ -4332,6 +4402,16 @@
         </svg>
         <span class="nav-label">Ensayos</span>
       </button>
+      <button class="nav-tab" data-tab="tab-repertorio">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18V5l12-2v13"></path>
+          <circle cx="6" cy="18" r="3"></circle>
+          <circle cx="18" cy="16" r="3"></circle>
+        </svg>
+        <span class="nav-label">Repertorio</span>
+      </button>
+
       <button class="nav-tab" data-tab="tab-miembros">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
@@ -4585,10 +4665,26 @@
       <div id="tab-miembros" class="tab-panel">
         <div class="card admin-only" id="panel-add-member" style="border-color: var(--purple); margin-bottom: 24px;">
           <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--purple); margin-bottom: 12px;">
-            Registrar Integrante del Equipo</h3>
+            Agregar Miembro al Grupo</h3>
+          <p style="font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55;">
+            Solo puedes agregar cuentas <b>gratuitas ya registradas</b> en la app (huérfanas). Escribe el correo con el
+            que se registró, asígnale un rol y al agregarlo ya será parte de tu grupo.</p>
           <form id="form-add-member">
-            <div class="field"><label>Nombre Completo</label><input type="text" id="member-name-input" required
-                placeholder="Ej: Carlos Ruiz"></div>
+            <div class="field">
+              <label>Correo registrado en el sistema (Requerido)</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="email" id="member-email-input" required placeholder="Ej: musico@gmail.com"
+                  style="flex: 1; min-width: 0;">
+                <button type="button" id="btn-member-search" class="btn-primary"
+                  style="background: var(--teal); color: #0f0e17; width: auto; padding: 10px 14px; font-size: 13px; margin: 0; flex-shrink: 0;">Buscar</button>
+              </div>
+            </div>
+            <div id="member-search-result" style="margin-bottom: 12px;"></div>
+            <p style="font-size: 12px; color: var(--text3); margin: -4px 0 12px; line-height: 1.5;">
+              ¿El usuario aún no se registra?
+              <button type="button" id="btn-member-invite"
+                style="background: none; border: none; color: var(--teal); text-decoration: underline; cursor: pointer; font-size: 12px; padding: 0;">Enviarle invitación por WhatsApp</button>
+            </p>
             <div class="field">
               <label style="margin-bottom: 8px; display: block;">Roles / Instrumentos</label>
               <div class="custom-multiselect" id="inst-multiselect-container">
@@ -4610,12 +4706,6 @@
                 </div>
               </div>
             </div>
-            <div class="field"><label>Correo Electrónico (Requerido)</label><input type="email" id="member-email-input" required
-                placeholder="Ej: musico@iglesia.com"></div>
-            <div class="field"><label>Usuario (Nombre de usuario para iniciar sesión)</label><input type="text" id="member-user-input" required
-                placeholder="Ej: carlos12"></div>
-            <div class="field"><label>Contraseña Temporal</label><input type="text" id="member-pass-input" required
-                placeholder="Ej: iglesia2024"></div>
             <div class="field">
               <label>Nivel de Acceso</label>
               <select id="member-role-input">
@@ -4623,13 +4713,18 @@
                 <option value="lider">Administrador (Puede armar servicios y gestionar la cuenta)</option>
               </select>
             </div>
-            <button type="submit" class="btn-primary" style="background: var(--purple); color: #0f0e17;">Agregar
-              Integrante</button>
+            <button type="submit" class="btn-primary" style="background: var(--purple); color: #0f0e17;">Agregar a mi
+              Grupo</button>
 
           </form>
         </div>
 
-        <h2 class="section-title">Nómina del Ministerio</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <h2 class="section-title" style="margin-bottom:0;">Nómina del Ministerio</h2>
+          <button id="btn-cambiar-grupo-mantenimiento" class="btn-primary"
+            style="background:var(--coral); color:#0f0e17; width:auto; margin:0; padding:9px 16px; font-size:13px;">Cambiar
+            grupo</button>
+        </div>
         <div class="card" id="global-members-list"></div>
       </div>
 
@@ -4664,6 +4759,19 @@
           <p style="font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55;">
             Configuración general del grupo de alabanza.
           </p>
+        </div>
+
+        <div class="card" style="border-color: var(--gold); margin-bottom: 20px;">
+          <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--gold); margin-bottom: 6px;">🏆
+            Plan del Grupo</h3>
+          <p id="current-plan-summary" style="font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55;">
+            Cargando información de tu plan...</p>
+          <p style="font-size: 12px; color: var(--text3); margin-bottom: 12px; line-height: 1.5;">
+            Cambia entre Básico (₡5,000/mes, hasta 15 miembros) y Comunidad (₡7,000/mes, hasta 25 usuarios).
+            Los cambios aplican de inmediato: sube el comprobante del nuevo pago.
+          </p>
+          <button id="btn-change-plan" class="btn-primary"
+            style="background:var(--gold); color:#0f0e17; width:auto; padding:10px 24px; font-size:13px; margin-top:6px;">Cambiar de Plan</button>
         </div>
       </div>
 
@@ -4833,7 +4941,7 @@
           <line x1="8" y1="2" x2="8" y2="6"></line>
           <line x1="3" y1="10" x2="21" y2="10"></line>
         </svg>
-        <span class="nav-label">Repertorio</span>
+        <span class="nav-label">Servicio</span>
       </button>
       <button class="nav-tab-musico" data-mtab="mtab-asistencia">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -5075,7 +5183,7 @@
                         style="background:none; border:none; color:var(--text3); font-weight:bold; cursor:pointer; padding: 0 6px; font-size: 11px;"
                         title="Reducir letra">A-</button>
                       <span id="panel-lyrics-zoom-val"
-                        style="font-size: 10px; color: var(--text2); font-weight: 600;">100%</span>
+                        style="font-size: 10px; color: var(--text2); font-weight: 600;">70%</span>
                       <button id="panel-lyrics-zoom-up"
                         style="background:none; border:none; color:var(--text3); font-weight:bold; cursor:pointer; padding: 0 6px; font-size: 11px;"
                         title="Agrandar letra">A+</button>
@@ -5282,7 +5390,7 @@
               style="background: transparent; border: none; color:var(--text); font-weight:bold; cursor:pointer; padding: 6px 12px; font-size: 14px;"
               title="Reducir letra">A-</button>
             <span id="lyrics-modal-zoom-val"
-              style="font-size: 13px; color: var(--gold); font-weight: 700; min-width: 24px; text-align: center;">100%</span>
+              style="font-size: 13px; color: var(--gold); font-weight: 700; min-width: 24px; text-align: center;">70%</span>
             <button id="lyrics-modal-zoom-up"
               style="background: transparent; border: none; color:var(--text); font-weight:bold; cursor:pointer; padding: 6px 12px; font-size: 14px;"
               title="Agrandar letra">A+</button>
@@ -5519,15 +5627,15 @@
               <label for="plan-basico">
                 <span class="plan-radio-price">₡5,000</span>
                 <strong>Plan Básico</strong>
-                <span class="plan-radio-limit">Hasta 10 miembros</span>
+                <span class="plan-radio-limit">Hasta 15 miembros</span>
               </label>
             </div>
             <div class="plan-radio-option">
-              <input type="radio" name="cg-plan" id="plan-pro" value="pro">
-              <label for="plan-pro">
+              <input type="radio" name="cg-plan" id="plan-comunidad" value="comunidad">
+              <label for="plan-comunidad">
                 <span class="plan-radio-price">₡7,000</span>
-                <strong>Plan Pro</strong>
-                <span class="plan-radio-limit">Hasta 25 miembros</span>
+                <strong>Plan Comunidad</strong>
+                <span class="plan-radio-limit">Hasta 25 usuarios</span>
               </label>
             </div>
           </div>
@@ -5542,6 +5650,49 @@
           </div>
         </div>
         <button type="submit" class="btn-primary" id="btn-submit-create-group">Activar mi Grupo 🚀</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CAMBIAR DE PLAN (DUEÑO) -->
+  <div id="change-plan-overlay" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px; width: 95%;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <h3 class="modal-title" style="font-size:20px; margin:0; color:var(--gold);">Cambiar de Plan</h3>
+        <button id="change-plan-close" style="background:none; border:none; color:var(--text2); font-size:26px; cursor:pointer;">&times;</button>
+      </div>
+      <form id="form-change-plan">
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:12px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;">Nuevo plan de tu grupo</label>
+          <div class="plan-radio-group">
+            <div class="plan-radio-option">
+              <input type="radio" name="cp-plan" id="cp-plan-basico" value="basico" checked>
+              <label for="cp-plan-basico">
+                <span class="plan-radio-price">₡5,000</span>
+                <strong>Plan Básico</strong>
+                <span class="plan-radio-limit">Hasta 15 miembros</span>
+              </label>
+            </div>
+            <div class="plan-radio-option">
+              <input type="radio" name="cp-plan" id="cp-plan-comunidad" value="comunidad">
+              <label for="cp-plan-comunidad">
+                <span class="plan-radio-price">₡7,000</span>
+                <strong>Plan Comunidad</strong>
+                <span class="plan-radio-limit">Hasta 25 usuarios</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div style="background: rgba(244,197,66,0.08); border: 1px solid var(--gold); padding: 14px; border-radius: var(--radius-sm); margin-bottom: 16px;">
+          <p style="font-size: 13px; color: var(--text); margin-bottom: 6px; font-weight:600;">Pago por SINPE Móvil</p>
+          <p style="font-size: 14px; color: var(--gold); font-weight: bold; margin-bottom: 10px;">📱 89699458</p>
+          <p style="font-size: 12px; color: var(--text2); margin-bottom: 12px;">Realiza el pago de tu nuevo plan y sube el comprobante. Se activa inmediatamente.</p>
+          <div class="field" style="margin-bottom:0;">
+            <label>Comprobante del nuevo plan (imagen)</label>
+            <input type="file" id="cp-receipt" accept="image/*" required style="padding: 8px; font-size: 13px;">
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" id="btn-submit-change-plan">Confirmar Cambio de Plan 🚀</button>
       </form>
     </div>
   </div>
@@ -5826,12 +5977,15 @@
     if (btnNavLogin) btnNavLogin.addEventListener('click', openLoginScreen);
     
     
-    if (btnLoginBackLanding) {
+if (btnLoginBackLanding) {
       btnLoginBackLanding.addEventListener('click', () => {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         screenLanding.classList.add('active');
       });
     }
+
+    const btnLoginToRegister = document.getElementById('btn-login-to-register');
+    if (btnLoginToRegister) btnLoginToRegister.addEventListener('click', openRegisterModal);
 
     const formRegisterChurch = document.getElementById('form-register-church');
     if(formRegisterChurch) {
@@ -5934,19 +6088,19 @@
           const receiptUrl = await compressImage(file);
           const groupId = crypto.randomUUID();
           
-          const expireAt = new Date();
-          expireAt.setDate(expireAt.getDate() + 30);
+          const expireAt = window.fechaVencimientoPlan(30);
 
           await setDoc(doc(db, "churches", groupId), {
             name, phone,
             plan: plan,
-            memberLimit: plan === 'pro' ? 25 : 10,
+            memberLimit: window.limiteMiembrosPlan(plan),
             adminEmail: activeSessionUser.usuario,
             ownerEmail: activeSessionUser.usuario,
             receiptUrl,
             status: 'activa',
             createdAt: new Date().toISOString(),
-            expireAt: expireAt.toISOString(),
+            expireAt: expireAt,
+            graceUntil: window.fechaVencimientoPlan(35),
             members: [activeSessionUser.usuario]
           });
 
@@ -5973,6 +6127,117 @@
         }
       });
     }
+
+    // ==================== NOMENCLATURA Y LÍMITES DE PLANES ====================
+    // gratis  = cuenta huérfana (sin grupo) · solo 1 usuario
+    // basico  = 15 miembros · 30 días visibles + 5 de gracia internos (35 reales)
+    // prueba  = idéntico a basico (15 miembros, mismas fechas)
+    // pro     = plan legado → hoy se llama "Comunidad" · hasta 25 usuarios
+    // comunidad = plan Comunidad · hasta 25 usuarios
+    window.nombrePlanBonito = function (plan) {
+      const p = (plan || 'gratis');
+      if (p === 'pro' || p === 'comunidad') return 'COMUNIDAD';
+      if (p === 'basico' || p === 'prueba' || p === 'paga') return 'BÁSICO';
+      return 'GRATIS';
+    };
+    window.limiteMiembrosPlan = function (plan) {
+      const p = (plan || 'gratis');
+      if (p === 'pro' || p === 'comunidad') return 25;
+      if (p === 'basico' || p === 'prueba' || p === 'paga') return 15;
+      return 1;
+    };
+    window.fechaVencimientoPlan = function (dias) {
+      const f = new Date();
+      f.setDate(f.getDate() + dias);
+      return f.toISOString();
+    };
+
+    // ==================== CAMBIAR DE PLAN (DUEÑO) ====================
+    const changePlanOverlay = document.getElementById('change-plan-overlay');
+    const btnChangePlan = document.getElementById('btn-change-plan');
+    const formChangePlan = document.getElementById('form-change-plan');
+
+    async function cargarInfoPlanActual() {
+      const el = document.getElementById('current-plan-summary');
+      if (!el) return;
+      const churchId = activeSessionUser && activeSessionUser.churchId;
+      if (!churchId) {
+        el.textContent = 'Sin grupo activo todavía.';
+        return;
+      }
+      try {
+        const snap = await getDoc(doc(db, "churches", churchId));
+        if (!snap.exists()) {
+          el.textContent = 'Sin grupo activo todavía.';
+          return;
+        }
+        const d = snap.data();
+        const plan = window.nombrePlanBonito(d.plan);
+        const lim = d.memberLimit || window.limiteMiembrosPlan(d.plan);
+        const exp = d.expireAt ? new Date(d.expireAt).toLocaleDateString() : 'sin fecha de vencimiento';
+        el.textContent = `Plan actual: ${plan} · Hasta ${lim} miembros · Vence: ${exp}`;
+      } catch (e) {
+        el.textContent = 'No se pudo cargar la información del plan.';
+      }
+    }
+
+    if (btnChangePlan) {
+      btnChangePlan.addEventListener('click', () => {
+        if (changePlanOverlay) changePlanOverlay.classList.add('active');
+      });
+    }
+    const btnChangePlanClose = document.getElementById('change-plan-close');
+    if (btnChangePlanClose) {
+      btnChangePlanClose.addEventListener('click', () => {
+        if (changePlanOverlay) changePlanOverlay.classList.remove('active');
+      });
+    }
+
+    if (formChangePlan) {
+      formChangePlan.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const churchId = activeSessionUser && activeSessionUser.churchId;
+        if (!churchId) {
+          customAlert("No tienes un grupo activo. Crea tu grupo primero.");
+          return;
+        }
+        const planSel = document.querySelector('input[name="cp-plan"]:checked');
+        if (!planSel) {
+          customAlert("Selecciona el plan al que quieres cambiar.");
+          return;
+        }
+        const fileInput = document.getElementById('cp-receipt');
+        if (!fileInput.files || !fileInput.files[0]) {
+          customAlert("Sube el comprobante de pago de tu nuevo plan.");
+          return;
+        }
+        const btnSubmitPlan = document.getElementById('btn-submit-change-plan');
+        btnSubmitPlan.disabled = true;
+        btnSubmitPlan.textContent = 'Procesando...';
+        try {
+          const receiptUrl = await compressImage(fileInput.files[0]);
+          await setDoc(doc(db, "churches", churchId), {
+            plan: planSel.value,
+            memberLimit: window.limiteMiembrosPlan(planSel.value),
+            receiptUrl: receiptUrl,
+            status: 'activa',
+            expireAt: window.fechaVencimientoPlan(30),
+            graceUntil: window.fechaVencimientoPlan(35)
+          }, { merge: true });
+          formChangePlan.reset();
+          if (changePlanOverlay) changePlanOverlay.classList.remove('active');
+          cargarInfoPlanActual();
+          customAlert("¡Tu plan fue cambiado exitosamente! 🚀\n\nEl nuevo límite de miembros ya está activo para tu grupo.");
+        } catch (err) {
+          console.error("Error cambiando plan:", err);
+          customAlert("Error al cambiar de plan: " + err.message);
+        } finally {
+          btnSubmitPlan.disabled = false;
+          btnSubmitPlan.textContent = 'Confirmar Cambio de Plan 🚀';
+        }
+      });
+    }
+    // ==================== FIN CAMBIAR DE PLAN ====================
 
     // Navegación Swipe Back (History API)
     window.addEventListener('popstate', (e) => {
@@ -6025,7 +6290,8 @@
     function getServiceDocId(dateStr) {
       if (!dateStr) return "";
       if (dateStr.includes('_')) return dateStr;
-      const churchId = (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : "imr4";
+      const churchId = (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : null;
+      if (!churchId) return `_sin_grupo_${dateStr}`;
       return `${churchId}_${dateStr}`;
     }
 
@@ -6106,6 +6372,8 @@
           renderizarHistorialServicios();
         } else if (tab.dataset.tab === 'tab-ensayos' && typeof renderEnsayosAdmin === 'function') {
           renderEnsayosAdmin();
+        } else if (tab.dataset.tab === 'tab-ajustes' && typeof cargarInfoPlanActual === 'function') {
+          cargarInfoPlanActual();
         }
       });
     });
@@ -6308,9 +6576,11 @@
                     return;
                   }
 
-                  // Validar expiración (30 días desde la aprobación)
-                  if (cData.expireAt) {
-                    const expireDate = new Date(cData.expireAt);
+                  // Validar expiración: 30 días visibles (expireAt) + 5 días de gracia internos
+                  // (graceUntil) para revisión manual = 35 días reales antes de cortar el acceso
+                  const vencimientoReal = cData.graceUntil || cData.expireAt;
+                  if (vencimientoReal) {
+                    const expireDate = new Date(vencimientoReal);
                     if (new Date() > expireDate) {
                       _showLoginMsg("El plan de la institución ha expirado.", true);
                       return;
@@ -6363,9 +6633,16 @@
       const musicoNavTabs = document.querySelector('#screen-musico .nav-tabs');
       const musicoTabPanels = document.querySelectorAll('#screen-musico .tab-panel');
       if (!userData.churchId) {
+        // Huérfano: ve el banner y TODAS las pestañas (para ver lo que puede tener),
+        // pero el Repertorio es el primero/activo por defecto en cada inicio de sesión.
         if(proBanner) proBanner.style.display = 'block';
-        if(musicoNavTabs) musicoNavTabs.style.display = 'none';
+        if(musicoNavTabs) musicoNavTabs.style.display = 'flex';
+        document.querySelectorAll('#screen-musico .nav-tab-musico').forEach(t => t.classList.remove('active'));
         musicoTabPanels.forEach(p => p.classList.remove('active'));
+        const orphanRepPanel = document.getElementById('mtab-repertorio-musico');
+        if (orphanRepPanel) orphanRepPanel.classList.add('active');
+        const orphanRepTab = document.querySelector('#screen-musico .nav-tab-musico[data-mtab="mtab-repertorio-musico"]');
+        if (orphanRepTab) orphanRepTab.classList.add('active');
       } else {
         if(proBanner) proBanner.style.display = 'none';
         if(musicoNavTabs) musicoNavTabs.style.display = 'flex';
@@ -6410,10 +6687,10 @@
           };
         }
 
-        // Restore tab si estaba en el dashboard
-        const lastTab = localStorage.getItem('activeLeaderTab');
-        if (lastTab && document.getElementById(lastTab) && screenDashboard.classList.contains('active')) {
-          const tabBtn = Array.from(document.querySelectorAll('.nav-tab')).find(t => t.dataset.tab === lastTab);
+        // El panel de inicio SIEMPRE es el Repertorio, sin importar el plan ni el rol
+        const inicioTab = document.getElementById('tab-repertorio');
+        if (inicioTab && screenDashboard.classList.contains('active')) {
+          const tabBtn = Array.from(document.querySelectorAll('.nav-tab')).find(t => t.dataset.tab === 'tab-repertorio');
           if (tabBtn) tabBtn.click();
         }
       } else {
@@ -6425,10 +6702,10 @@
         const panelBtn = document.getElementById('btn-musico-panel');
         if (panelBtn) panelBtn.style.display = 'none';
         
-        // Restore tab
-        const lastTab = localStorage.getItem('activeMusicoTab');
-        if (lastTab && document.getElementById(lastTab)) {
-          const tabBtn = Array.from(document.querySelectorAll('.nav-tab-musico')).find(t => t.dataset.mtab === lastTab);
+        // El músico SIEMPRE abre el Repertorio al iniciar sesión, tenga o no grupo
+        const inicioMTab = document.getElementById('mtab-repertorio-musico');
+        if (inicioMTab) {
+          const tabBtn = Array.from(document.querySelectorAll('.nav-tab-musico')).find(t => t.dataset.mtab === 'mtab-repertorio-musico');
           if (tabBtn) tabBtn.click();
         }
       }
@@ -8923,30 +9200,116 @@
       });
     });
 
+    let selectedOrphan = null;
+
+    function safeMemberHtml(texto) {
+      return String(texto ?? '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
     function resetMemberForm() {
       editingUserKey = null;
+      selectedOrphan = null;
       document.getElementById('form-add-member').reset();
-      document.getElementById('member-user-input').disabled = false;
+      document.getElementById('member-email-input').disabled = false;
       document.querySelectorAll('.inst-cb').forEach(c => c.checked = false);
       document.getElementById('inst-multiselect-text').textContent = "Seleccionar roles...";
+      const resultBox = document.getElementById('member-search-result');
+      if (resultBox) resultBox.innerHTML = '';
       const btnSubmit = document.querySelector('#form-add-member button[type="submit"]');
-      btnSubmit.textContent = "Agregar Integrante";
+      btnSubmit.textContent = "Agregar a mi Grupo";
       btnSubmit.style.background = "var(--purple)";
       const cancelBtn = document.getElementById('btn-cancel-edit');
       if (cancelBtn) cancelBtn.style.display = 'none';
     }
 
-    // Envío Formulario Nuevo Integrante / Editar
+    async function buscarUsuarioRegistrado(correo) {
+      const email = (correo || '').trim().toLowerCase();
+      if (!email || !email.includes('@')) return null;
+      const unicos = {};
+      const agregar = (idSnap, snap) => {
+        if (snap && snap.exists() && !unicos[idSnap]) {
+          unicos[idSnap] = { id: idSnap, data: snap.data() };
+        }
+      };
+      try {
+        // 1. DocId con el correo crudo (cuentas legacy)
+        agregar(email, await getDoc(doc(db, "usuarios", email)));
+        // 2. DocId normalizado (registro de la app: sin caracteres especiales)
+        const norm = email.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        if (norm !== email) agregar(norm, await getDoc(doc(db, "usuarios", norm)));
+        // 3. Campo "usuario" (correo con el que se registró)
+        const q1 = await getDocs(query(collection(db, "usuarios"), where("usuario", "==", email)));
+        q1.forEach(s => agregar(s.id, s));
+      } catch (_) {}
+      try {
+        // 4. Campo "correo"
+        const q2 = await getDocs(query(collection(db, "usuarios"), where("correo", "==", email)));
+        q2.forEach(s => agregar(s.id, s));
+      } catch (_) {}
+      return Object.keys(unicos).length ? Object.values(unicos)[0] : null;
+    }
+
+    // Botón: Buscar cuenta registrada (huérfana)
+    document.getElementById('btn-member-search').addEventListener('click', async () => {
+      const email = document.getElementById('member-email-input').value.trim().toLowerCase();
+      const box = document.getElementById('member-search-result');
+      if (!email || !email.includes('@')) {
+        customAlert("Escribe el correo con el que el usuario se registró en la app.");
+        return;
+      }
+      box.innerHTML = '<p style="font-size:12px;color:var(--text3);margin:0;">Buscando cuenta registrada...</p>';
+      const found = await buscarUsuarioRegistrado(email);
+      if (!found) {
+        selectedOrphan = null;
+        box.innerHTML = '<p style="font-size:12px;color:var(--text3);margin:0;">No encontramos ninguna cuenta con ese correo todavía. ' +
+          'Envía la invitación por WhatsApp para que se registre como cuenta gratuita y vuelve a buscarlo después.</p>';
+        return;
+      }
+      const d = found.data;
+      const miChurch = activeSessionUser ? activeSessionUser.churchId : null;
+      if (d.churchId) {
+        selectedOrphan = null;
+        if (d.churchId === miChurch) {
+          box.innerHTML = `<p style="font-size:12px;color:var(--coral);margin:0;">"${safeMemberHtml(d.nombre)}" ya pertenece a TU grupo.</p>`;
+        } else {
+          box.innerHTML = `<p style="font-size:12px;color:var(--coral);margin:0;">"${safeMemberHtml(d.nombre)}" ya pertenece a OTRO grupo. ` +
+            'Una cuenta solo puede pertenecer a un grupo: debe usar la opción "Cambiar de grupo" antes de que puedas agregarlo.</p>';
+        }
+        return;
+      }
+      selectedOrphan = found;
+      box.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.03);border:1px solid var(--teal);border-radius:8px;padding:8px 12px;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:13px;">${safeMemberHtml(d.nombre)}</div>
+            <div style="font-size:11px;color:var(--text3);">${safeMemberHtml(d.usuario || email)} · Cuenta gratuita (huérfana)</div>
+          </div>
+          <span style="font-size:10px;background:var(--teal);color:#0f0e17;border-radius:4px;padding:3px 8px;font-weight:700;flex-shrink:0;">DISPONIBLE</span>
+        </div>`;
+    });
+
+    // Botón: Invitación por WhatsApp
+    document.getElementById('btn-member-invite').addEventListener('click', () => {
+      const email = document.getElementById('member-email-input').value.trim();
+      const miNombre = activeSessionUser && activeSessionUser.nombre ? activeSessionUser.nombre : 'Un líder';
+      const urlApp = (window.location.href.indexOf('localhost') !== -1 || window.location.href.indexOf('127.0.0.1') !== -1)
+        ? 'https://alabanza-free.web.app'
+        : window.location.href;
+      const msg = `Hola, ${miNombre} te invita a unirte a su ministerio de alabanza con la app Alabanza.\n\n` +
+        `1. Crea tu cuenta GRATUITA en: ${urlApp}\n` +
+        `2. Regístrate con este correo: ${email || 'el tuyo'}\n` +
+        `3. Cuando estés registrado avísale para que te agregue como integrante de su grupo.`;
+      window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+    });
+
+    // Envío Formulario Agregar Miembro / Editar
     document.getElementById('form-add-member').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      const emailInput = document.getElementById('member-email-input').value.trim().toLowerCase();
-      const userInput = document.getElementById('member-user-input').value.trim();
-      const passInput = document.getElementById('member-pass-input').value.trim();
 
-      // El ID del documento es el email si existe, si no el alias (usuario)
-      // Así el usuario puede iniciar sesión tanto con correo como con alias
-      const userKey = editingUserKey || (emailInput ? emailInput : userInput);
+      const emailInput = document.getElementById('member-email-input').value.trim().toLowerCase();
+      const rolInput = document.getElementById('member-role-input').value;
 
       // Obtener los instrumentos seleccionados de los checkboxes
       const selectedChips = Array.from(msCheckboxes).filter(c => c.checked).map(c => c.value);
@@ -8959,276 +9322,93 @@
       const instVal = selectedChips.join(', ');
       const isCoro = !selectedChips.some(val => ["Batería", "Bajo", "Teclado", "Guitarra Eléctrica", "Guitarra Acústica", "Percusión"].includes(val));
 
-      const existingMember = (window.cacheMembers || []).find(m => m.id === userKey);
-      const memberChurchId = (activeSessionUser && activeSessionUser.churchId)
-        ? activeSessionUser.churchId
-        : (existingMember && existingMember.churchId ? existingMember.churchId : null);
-
-      // ================================================================
-      // FASE C: BUSCAR USUARIO EXISTENTE ANTES DE CREAR (ANTI-DUPLICADOS)
-      // Si el usuario ya existe en el sistema global, vincular en vez de crear.
-      // ================================================================
-      if (!editingUserKey) {
-        let foundDoc = null;
-        let foundDocId = null;
-
-        // 1. Buscar por email como docId (usuarios con correo)
-        if (emailInput && emailInput.includes('@')) {
-          try {
-            const snapEmail = await getDoc(doc(db, "usuarios", emailInput));
-            if (snapEmail.exists()) {
-              foundDoc = snapEmail.data();
-              foundDocId = emailInput;
-            }
-          } catch(_) {}
-        }
-
-        // 2. Si no encontró por email, buscar por alias como docId (usuarios sin correo)
-        if (!foundDoc && userInput) {
-          try {
-            const snapAlias = await getDoc(doc(db, "usuarios", userInput));
-            if (snapAlias.exists()) {
-              foundDoc = snapAlias.data();
-              foundDocId = userInput;
-            }
-          } catch(_) {}
-        }
-
-        if (foundDoc) {
-          const yaEnEstaIglesia = foundDoc.churchId && foundDoc.churchId === memberChurchId;
-          const enOtraIglesia = foundDoc.churchId && foundDoc.churchId !== memberChurchId;
-
-          if (yaEnEstaIglesia) {
-            customAlert(`"${foundDoc.nombre}" ya es miembro activo de esta comunidad.`);
-            return;
-          }
-
-          const pregunta = enOtraIglesia
-            ? `"${foundDoc.nombre}" ya existe en el sistema y pertenece a otra comunidad.\n\n` +
-              `¿Deseas vincularlo a tu comunidad? Sus credenciales de acceso no cambiarán.\n\n` +
-              `⚠️ Nota: su comunidad activa cambiará a la tuya.`
-            : `"${foundDoc.nombre}" ya existe en el sistema (sin comunidad asignada).\n\n` +
-              `¿Deseas añadirlo a tu comunidad como miembro?`;
-
-          const confirmado = await customConfirm(pregunta);
-          if (!confirmado) return;
-
-          // Verificar límite del plan antes de vincular
-          if (memberChurchId) {
-            try {
-              const cSnap = await window.getDoc(window.doc(window.db, "churches", memberChurchId));
-              const cPlan = cSnap.exists() ? (cSnap.data().plan || 'gratis') : 'gratis';
-              const cCount = (window.cacheMembers || []).filter(m => m.churchId === memberChurchId).length;
-              const cLimit = cPlan === 'basico' ? 10 : (cPlan === 'pro' || cPlan === 'prueba') ? 25 : 1;
-              if (cCount >= cLimit) {
-                customAlert(`Límite alcanzado: Tu plan (${cPlan.toUpperCase()}) permite máximo ${cLimit} miembros (tienes ${cCount}).`);
-                return;
-              }
-            } catch(_) {}
-          }
-
-          // Vincular: crear membresía en la colección memberships
-          try {
-            const membershipDocId = `${foundDocId}_${memberChurchId}`;
-            await setDoc(doc(db, "memberships", membershipDocId), {
-              userId: foundDocId,
-              churchId: memberChurchId,
-              role: document.getElementById('member-role-input').value,
-              instrumento: instVal,
-              type: isCoro ? 'corista' : 'musico',
-              joinedAt: new Date().toISOString()
-            }, { merge: true });
-            
-            // También actualizar churchId en el usuario global por retrocompatibilidad
-            await setDoc(doc(db, "usuarios", foundDocId), {
-              churchId: memberChurchId,
-              role: document.getElementById('member-role-input').value,
-              instrumento: instVal,
-              type: isCoro ? 'corista' : 'musico'
-            }, { merge: true });
-
-            resetMemberForm();
-            customAlert(`"${foundDoc.nombre}" fue vinculado a tu comunidad exitosamente. ¡Ya puede acceder con sus credenciales actuales!`);
-          } catch (err) {
-            customAlert('Error al vincular usuario: ' + err.message);
-          }
-          return; // No continuar con la creación normal
-        }
+      const memberChurchId = (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : null;
+      if (!memberChurchId) {
+        customAlert("No tienes un grupo activo todavía. Crea tu grupo antes de agregar integrantes.");
+        return;
       }
-      // FIN FASE C
 
-      // ================================================================
-      // FASE C: BUSCAR USUARIO EXISTENTE ANTES DE CREAR (ANTI-DUPLICADOS)
-      // Si el usuario ya existe en el sistema global, vincular en vez de crear.
-      // ================================================================
-      if (!editingUserKey) {
-        let foundDoc = null;
-        let foundDocId = null;
-
-        // 1. Buscar por email como docId (usuarios con correo)
-        if (emailInput && emailInput.includes('@')) {
-          try {
-            const snapEmail = await getDoc(doc(db, "usuarios", emailInput));
-            if (snapEmail.exists()) {
-              foundDoc = snapEmail.data();
-              foundDocId = emailInput;
-            }
-          } catch(_) {}
-        }
-
-        // 2. Si no encontró por email, buscar por alias como docId (usuarios sin correo)
-        if (!foundDoc && userInput) {
-          try {
-            const snapAlias = await getDoc(doc(db, "usuarios", userInput));
-            if (snapAlias.exists()) {
-              foundDoc = snapAlias.data();
-              foundDocId = userInput;
-            }
-          } catch(_) {}
-        }
-
-        if (foundDoc) {
-          const yaEnEstaIglesia = foundDoc.churchId && foundDoc.churchId === memberChurchId;
-          const enOtraIglesia = foundDoc.churchId && foundDoc.churchId !== memberChurchId;
-
-          if (yaEnEstaIglesia) {
-            customAlert(`"${foundDoc.nombre}" ya es miembro activo de esta comunidad.`);
-            return;
-          }
-
-          const pregunta = enOtraIglesia
-            ? `"${foundDoc.nombre}" ya existe en el sistema y pertenece a otra comunidad.\n\n` +
-              `¿Deseas vincularlo a tu comunidad? Sus credenciales de acceso no cambiarán.\n\n` +
-              `⚠️ Nota: su comunidad activa cambiará a la tuya.`
-            : `"${foundDoc.nombre}" ya existe en el sistema (sin comunidad asignada).\n\n` +
-              `¿Deseas añadirlo a tu comunidad como miembro?`;
-
-          const confirmado = await customConfirm(pregunta);
-          if (!confirmado) return;
-
-          // Verificar límite del plan antes de vincular
-          if (memberChurchId) {
-            try {
-              const cSnap = await window.getDoc(window.doc(window.db, "churches", memberChurchId));
-              const cPlan = cSnap.exists() ? (cSnap.data().plan || 'gratis') : 'gratis';
-              const cCount = (window.cacheMembers || []).filter(m => m.churchId === memberChurchId).length;
-              const cLimit = cPlan === 'basico' ? 10 : (cPlan === 'pro' || cPlan === 'prueba') ? 25 : 1;
-              if (cCount >= cLimit) {
-                customAlert(`Límite alcanzado: Tu plan (${cPlan.toUpperCase()}) permite máximo ${cLimit} miembros (tienes ${cCount}).`);
-                return;
-              }
-            } catch(_) {}
-          }
-
-          // Vincular: crear membresía en la colección memberships
-          try {
-            const membershipDocId = `${foundDocId}_${memberChurchId}`;
-            await setDoc(doc(db, "memberships", membershipDocId), {
-              userId: foundDocId,
-              churchId: memberChurchId,
-              role: document.getElementById('member-role-input').value,
-              instrumento: instVal,
-              type: isCoro ? 'corista' : 'musico',
-              joinedAt: new Date().toISOString()
-            }, { merge: true });
-            
-            // También actualizar churchId en el usuario global por retrocompatibilidad
-            await setDoc(doc(db, "usuarios", foundDocId), {
-              churchId: memberChurchId,
-              role: document.getElementById('member-role-input').value,
-              instrumento: instVal,
-              type: isCoro ? 'corista' : 'musico'
-            }, { merge: true });
-
-            resetMemberForm();
-            customAlert(`"${foundDoc.nombre}" fue vinculado a tu comunidad exitosamente. ¡Ya puede acceder con sus credenciales actuales!`);
-          } catch (err) {
-            customAlert('Error al vincular usuario: ' + err.message);
-          }
-          return; // No continuar con la creación normal
-        }
-      }
-      // FIN FASE C
-
-      // --- VALIDACIÓN DE LÍMITES POR PLAN ---
-      if (!editingUserKey && memberChurchId) {
+      // ===== MODO EDICIÓN: actualizar rol/instrumentos de un integrante existente =====
+      if (editingUserKey) {
         try {
-          const churchSnap = await window.getDoc(window.doc(window.db, "churches", memberChurchId));
-          const churchPlan = churchSnap.exists() ? (churchSnap.data().plan || 'gratis') : 'gratis';
-          
-          const currentMembersCount = (window.cacheMembers || []).filter(m => m.churchId === memberChurchId).length;
-          
-          let limit = 1; // Gratis / Personal
-          if (churchPlan === 'basico') limit = 10;
-          if (churchPlan === 'pro') limit = 25;
-          if (churchPlan === 'prueba') limit = 25; // Permite probar todo en el periodo de prueba
-
-          if (currentMembersCount >= limit) {
-            customAlert(`Límite alcanzado: Tu plan actual (${churchPlan.toUpperCase()}) permite un máximo de ${limit} miembros, y ya tienes ${currentMembersCount}. Por favor, mejora tu plan para seguir creciendo.`);
-            return;
-          }
-        } catch(e) {
-          console.error("Error validando límites del plan:", e);
+          const uDocId = editingUserKey;
+          await setDoc(doc(db, "memberships", `${uDocId}_${memberChurchId}`), {
+            role: rolInput,
+            instrumento: instVal,
+            type: isCoro ? 'corista' : 'musico'
+          }, { merge: true });
+          await setDoc(doc(db, "usuarios", uDocId), {
+            role: rolInput,
+            instrumento: instVal,
+            type: isCoro ? 'corista' : 'musico'
+          }, { merge: true });
+          if (window._globalUsersCache) delete window._globalUsersCache[uDocId];
+          resetMemberForm();
+          customAlert("Integrante actualizado exitosamente.");
+        } catch (err) {
+          customAlert("Error al actualizar el integrante: " + err.message);
         }
+        return;
       }
 
-      const userPayload = {
-        nombre: document.getElementById('member-name-input').value.trim(),
-        usuario: userInput,
-        correo: emailInput,
-        password: passInput,
-        // Compatibilidad con versiones legacy
-        type: isCoro ? 'corista' : 'musico',
-        instrumento: instVal,
-        role: document.getElementById('member-role-input').value,
-        churchId: memberChurchId
-      };
+      // ===== MODO ADOPCIÓN: la cuenta debe existir en el sistema y ser huérfana =====
+      const found = await buscarUsuarioRegistrado(emailInput);
+      if (!found) {
+        customAlert("No se encontró ninguna cuenta registrada con ese correo.\n\nEl usuario primero debe crear su cuenta GRATUITA en la app (regístrate y entra como huérfano). Usa el botón de invitación por WhatsApp para guiarlo.");
+        return;
+      }
+      const d = found.data;
 
-      const membershipPayload = {
-        userId: userKey,
-        churchId: memberChurchId,
-        role: document.getElementById('member-role-input').value,
-        instrumento: instVal,
-        type: isCoro ? 'corista' : 'musico',
-        joinedAt: new Date().toISOString()
-      };
+      // Regla: una cuenta solo puede pertenecer a UN grupo
+      if (d.churchId) {
+        if (d.churchId === memberChurchId) {
+          customAlert(`"${d.nombre}" ya pertenece a tu grupo.`);
+        } else {
+          customAlert(`"${d.nombre}" ya pertenece a OTRO grupo.\n\nRegla: una cuenta solo puede pertenecer a un grupo. Ese usuario debe usar la opción "Cambiar de grupo" antes de que puedas agregarlo.`);
+        }
+        return;
+      }
+
+      // Verificar límite del plan
+      try {
+        const cSnap = await getDoc(doc(db, "churches", memberChurchId));
+        const cPlan = cSnap.exists() ? (cSnap.data().plan || 'gratis') : 'gratis';
+        const cCount = (window.cacheMembers || []).filter(m => m.churchId === memberChurchId).length;
+        const cLimit = window.limiteMiembrosPlan(cPlan);
+        if (cCount >= cLimit) {
+          customAlert(`Límite alcanzado: Tu plan (${window.nombrePlanBonito(cPlan)}) permite máximo ${cLimit} miembros (tienes ${cCount}).`);
+          return;
+        }
+      } catch (_) {}
+
+      const confirmado = await customConfirm(`¿ESTÁS SEGURO de que deseas agregar a "${d.nombre}" como miembro de tu grupo (${rolInput === 'lider' ? 'ADMINISTRADOR' : 'INTEGRANTE'})?\n\nAl iniciar su próxima sesión verá todos los módulos del grupo desbloqueados.`);
+      if (!confirmado) return;
 
       try {
-        // Crear en Firebase Auth de forma transparente para permitir autenticación real (evitar permission-denied)
-        if (!editingUserKey) {
-          const { getAuth, createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js");
-          const auth = getAuth();
-          const targetAuthEmail = emailInput && emailInput.includes('@') ? emailInput : `${userInput.toLowerCase()}@alabanapp.com`;
-          try {
-            await createUserWithEmailAndPassword(auth, targetAuthEmail, passInput);
-          } catch (authErr) {
-            if (authErr.code !== 'auth/email-already-in-use') {
-              console.warn("Auth creation skipped:", authErr.message);
-            }
-          }
-        }
-        
-        // 1. Guardar usuario global
-        await setDoc(doc(db, "usuarios", userKey), userPayload, { merge: true });
+        await setDoc(doc(db, "memberships", `${found.id}_${memberChurchId}`), {
+          userId: found.id,
+          churchId: memberChurchId,
+          role: rolInput,
+          instrumento: instVal,
+          type: isCoro ? 'corista' : 'musico',
+          joinedAt: new Date().toISOString()
+        }, { merge: true });
 
-        // 2. Guardar membresía
-        const membershipDocId = `${userKey}_${memberChurchId}`;
-        await setDoc(doc(db, "memberships", membershipDocId), membershipPayload, { merge: true });
+        await setDoc(doc(db, "usuarios", found.id), {
+          churchId: memberChurchId,
+          role: rolInput,
+          instrumento: instVal,
+          type: isCoro ? 'corista' : 'musico'
+        }, { merge: true });
 
-        // Forzar actualización en caché local
-        if (window._globalUsersCache) {
-          delete window._globalUsersCache[userKey];
-        }
-        
-        const wasEditing = !!editingUserKey;
+        if (window._globalUsersCache) delete window._globalUsersCache[found.id];
+        const nombreOk = d.nombre || 'El usuario';
         resetMemberForm();
-        customAlert(wasEditing ? "Integrante actualizado exitosamente." : "Integrante guardado exitosamente. Ya puede iniciar sesión con su usuario y contraseña.");
+        customAlert(`${nombreOk} ahora es parte de tu grupo.\n\nCuando inicie sesión de nuevo verá el servicio, los ensayos y la asistencia de tu grupo desbloqueados.`);
       } catch (err) {
-        console.error(err);
-        customAlert("Hubo un problema al guardar el integrante: " + err.message);
+        customAlert("Error al agregar el usuario: " + err.message);
       }
     });
-
 
     function renderizarMantenimientoMiembros() {
       const listCont = document.getElementById('global-members-list');
@@ -9259,18 +9439,25 @@
         </div>
         ${canManage ? `
           <div style="display:flex; gap:6px;">
+            <button class="chip chip-gold click-leave-member" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Salir del grupo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 9v-4l-7 7 7 7v-4h4v-6h-4z"></path><rect x="15" y="4" width="6" height="16" rx="1"></rect></svg></button>
             <button class="chip chip-teal click-edit-member" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Editar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>
             <button class="chip chip-coral click-del-member" style="cursor:pointer; border:none; padding: 4px 8px; border-radius: 4px;" title="Eliminar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
           </div>
         ` : ''}
       `;
         if (canManage) {
+          const btnLeaveRow = div.querySelector('.click-leave-member');
+          if (btnLeaveRow) {
+            btnLeaveRow.addEventListener('click', () => {
+              window.salirDelGrupo(m.id, m.churchId, m.nombre);
+            });
+          }
+
           div.querySelector('.click-edit-member').addEventListener('click', () => {
             editingUserKey = m.id || m.usuario;
-            document.getElementById('member-name-input').value = m.nombre;
-            document.getElementById('member-user-input').value = m.usuario;
-            document.getElementById('member-user-input').disabled = true;
-            document.getElementById('member-pass-input').value = m.password || '';
+            selectedOrphan = null;
+            document.getElementById('member-email-input').value = (m.correo || m.usuario || '');
+            document.getElementById('member-email-input').disabled = true;
             document.getElementById('member-role-input').value = m.role || 'musico';
 
             const instArr = (m.instrumento || '').split(',').map(s => s.trim());
@@ -9278,6 +9465,9 @@
               c.checked = instArr.includes(c.value);
             });
             document.getElementById('inst-multiselect-text').textContent = m.instrumento || 'Seleccionar roles...';
+
+            const resultBox = document.getElementById('member-search-result');
+            if (resultBox) resultBox.innerHTML = '';
 
             const btnSubmit = document.querySelector('#form-add-member button[type="submit"]');
             btnSubmit.textContent = "Actualizar Integrante";
@@ -9316,6 +9506,10 @@
     const btnMusicoMaybe = document.getElementById('btn-musico-maybe');
 
     function iniciarVistaMusico() {
+      // El Repertorio con las canciones es SIEMPRE el panel de inicio al entrar,
+      // para todos: huérfanos y miembros con grupo activo.
+      const esHuerfano = !activeSessionUser || !activeSessionUser.churchId;
+
       // Controladores Pestañas Músico
       document.querySelectorAll('.nav-tab-musico').forEach(tab => {
         tab.addEventListener('click', () => {
@@ -9329,7 +9523,11 @@
           scrollActiveTabToCenter(tab);
 
           // Refresh views on tab change
-          if (tab.dataset.mtab === 'mtab-ensayos-musico' && typeof renderEnsayosMusico === 'function') {
+          if (tab.dataset.mtab === 'mtab-servicio' && typeof cargarServicioMusico === 'function') {
+            cargarServicioMusico(document.getElementById('musico-service-date').value);
+          } else if (tab.dataset.mtab === 'mtab-asistencia' && typeof cargarAsistenciaMusico === 'function') {
+            cargarAsistenciaMusico(document.getElementById('musico-avail-date').value);
+          } else if (tab.dataset.mtab === 'mtab-ensayos-musico' && typeof renderEnsayosMusico === 'function') {
             renderEnsayosMusico();
           } else if (tab.dataset.mtab === 'mtab-repertorio-musico' && typeof renderRepertorioMusico === 'function') {
             renderRepertorioMusico();
@@ -9350,6 +9548,19 @@
 
       msDate.addEventListener('change', () => cargarServicioMusico(msDate.value));
       maDate.addEventListener('change', () => cargarAsistenciaMusico(maDate.value));
+
+      if (esHuerfano) {
+        // Por defecto (y en cada inicio de sesión) el Repertorio es el primero que ve.
+        // Servicios/asistencias/ensayos siguen bloqueados (guards muestran el aviso).
+        document.querySelectorAll('#screen-musico .nav-tab-musico').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('#screen-musico .tab-panel').forEach(p => p.classList.remove('active'));
+        const orphanTab = document.querySelector('#screen-musico .nav-tab-musico[data-mtab="mtab-repertorio-musico"]');
+        if (orphanTab) orphanTab.classList.add('active');
+        const orphanPanel = document.getElementById('mtab-repertorio-musico');
+        if (orphanPanel) orphanPanel.classList.add('active');
+        if (typeof renderRepertorioMusico === 'function') renderRepertorioMusico();
+        return;
+      }
 
       cargarServicioMusico(dateStr);
       cargarAsistenciaMusico(dateStr);
@@ -9659,6 +9870,12 @@
     function cargarServicioMusico(dateStr) {
       if (!dateStr) return;
       const content = document.getElementById('musico-service-content');
+      // Huérfano (sin grupo): los servicios están bloqueados hasta pertenecer a un grupo
+      if (!activeSessionUser || !activeSessionUser.churchId) {
+        content.innerHTML = `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; background: rgba(255, 255, 255, 0.02); border: 1px dashed var(--border2); border-radius: var(--radius); margin-top: 10px;"><p style="color: var(--text2); font-size: 14px; font-weight: 500; margin-bottom: 12px; max-width: 280px; line-height: 1.5;">Los servicios se desbloquean cuando pertenezcas a un grupo.</p></div>`;
+        if (window._unsubMusicoServicePlan) { window._unsubMusicoServicePlan(); }
+        return;
+      }
       content.innerHTML = "<div style='display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; gap:12px;'><div style='width:30px; height:30px; border:3px solid rgba(229,180,60,0.2); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite;'></div><p style='color:var(--text3); font-size:13px; margin:0;'>Cargando datos del servicio...</p></div>";
 
       // Cancelar suscripción anterior y crear nueva (tiempo real)
@@ -9943,6 +10160,14 @@
     function cargarAsistenciaMusico(dateStr) {
       if (!dateStr) return;
       const sCard = document.getElementById('musico-avail-status-card');
+      // Huérfano (sin grupo): la asistencia está bloqueada hasta pertenecer a un grupo
+      if (!activeSessionUser || !activeSessionUser.churchId) {
+        sCard.style.display = 'none';
+        if (unsubscribeMusicoService) unsubscribeMusicoService();
+        const tDiv = document.getElementById('musico-team-status');
+        if (tDiv) tDiv.innerHTML = `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; background: rgba(255, 255, 255, 0.02); border: 1px dashed var(--border2); border-radius: var(--radius); margin-top: 10px;"><p style="color: var(--text2); font-size: 14px; font-weight: 500; margin-bottom: 12px; max-width: 280px; line-height: 1.5;">La confirmación de asistencia se desbloquea cuando pertenezcas a un grupo.</p></div>`;
+        return;
+      }
       sCard.style.display = 'block';
 
       if (unsubscribeMusicoService) unsubscribeMusicoService();
@@ -10234,7 +10459,7 @@
 
     let _scrollInterval = null;
     let _scrollSpeed = 2; // 1 a 5
-    let _currentZoomPercent = 100; // porcentaje 100%
+    let _currentZoomPercent = 70; // zoom por defecto 70%
 
     function detenerAutoscroll() {
       if (_scrollInterval) {
@@ -12521,7 +12746,7 @@
       try {
         const currentChurchId = (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : null;
         if (currentChurchId) {
-          const membershipDocId = `${username}_\n${currentChurchId}`;
+          const membershipDocId = `${username}_${currentChurchId}`;
           await deleteDoc(doc(db, "memberships", membershipDocId));
           // Limpiar el churchId del usuario global para compatibilidad
           try {
@@ -12539,6 +12764,77 @@
         customAlert("Hubo un error al eliminar el registro: " + err.message, "Error");
       }
     };
+
+    // Salir del grupo (auto-servicio o por un líder)
+    window.salirDelGrupo = async function (uDocId, churchIdTarget, nombreTarget) {
+      const churchId = churchIdTarget || (activeSessionUser && activeSessionUser.churchId ? activeSessionUser.churchId : null);
+      const uid = uDocId || (activeSessionUser && (activeSessionUser._docId || activeSessionUser.usuario));
+      if (!uid || !churchId) {
+        customAlert("No estás asignado a ningún grupo actualmente.");
+        return;
+      }
+      const esMismoUsuario = !!(activeSessionUser && (activeSessionUser._docId === uid || activeSessionUser.usuario === uid));
+      if (!esMismoUsuario && currentUserRole !== 'lider' && currentUserRole !== 'admin') {
+        customAlert("Acceso denegado: solo un líder puede retirar a otro integrante del grupo.");
+        return;
+      }
+      const nombre = nombreTarget || (activeSessionUser && activeSessionUser.nombre) || 'Este usuario';
+      const confirmado = await customConfirm(`¿Estás seguro de que deseas SALIR del grupo?\n\n"${nombre}" perderá el acceso al servicio, ensayos y asistencia de tu grupo.\n\nComo cuenta gratuita (huérfana) podrá seguir usando la app y, si lo desea, crear su propio plan.`);
+      if (!confirmado) return;
+      try {
+        const membershipDocId = `${uid}_${churchId}`;
+        await deleteDoc(doc(db, "memberships", membershipDocId));
+        await setDoc(doc(db, "usuarios", uid), { churchId: "" }, { merge: true });
+        if (window._globalUsersCache && window._globalUsersCache[uid]) {
+          window._globalUsersCache[uid].churchId = "";
+        }
+        if (esMismoUsuario) {
+          if (activeSessionUser) activeSessionUser.churchId = "";
+          showToast("Saliste del grupo. Tu cuenta ahora es gratuita (huérfana).");
+          setTimeout(() => window.location.reload(), 700);
+        } else {
+          if (typeof renderizarMantenimientoMiembros === 'function') renderizarMantenimientoMiembros();
+          showToast(`"${nombre}" salió del grupo.`);
+        }
+      } catch (err) {
+        console.error("Error al salir del grupo:", err);
+        customAlert("Error al salir del grupo: " + err.message, "Error");
+      }
+    };
+
+    // Cambiar de grupo: salir del grupo actual y elegir su nuevo plan (crear propio grupo)
+    window.cambiarDeGrupo = async function () {
+      const churchId = (activeSessionUser && activeSessionUser.churchId) ? activeSessionUser.churchId : null;
+      const uid = activeSessionUser && (activeSessionUser._docId || activeSessionUser.usuario);
+      if (!uid || !churchId) {
+        customAlert("No estás en ningún grupo actualmente.");
+        return;
+      }
+      const nombre = activeSessionUser.nombre || 'Tu cuenta';
+      const confirmado = await customConfirm(`CAMBIO DE GRUPO\n\n"${nombre}" dejará de pertenecer a "${churchId}".\n\nAl salir:\n- Pierdes el acceso al servicio, ensayos y asistencia de este grupo.\n- NO podrás volver a entrar por tu cuenta: un administrador de este grupo debe agregarte de nuevo como miembro.\n- Podrás elegir tu nuevo plan y crear tu propio grupo.\n\n¿Estás seguro de continuar?`);
+      if (!confirmado) return;
+      try {
+        const membershipDocId = `${uid}_${churchId}`;
+        await deleteDoc(doc(db, "memberships", membershipDocId));
+        await setDoc(doc(db, "usuarios", uid), { churchId: "" }, { merge: true });
+        if (window._globalUsersCache && window._globalUsersCache[uid]) {
+          window._globalUsersCache[uid].churchId = "";
+        }
+        if (activeSessionUser) activeSessionUser.churchId = "";
+        showToast("Saliste del grupo. Ahora elige el plan de tu nuevo grupo.");
+        // Abrir el flujo de creación de grupo para que escoja su nuevo plan
+        const overlay = document.getElementById('create-group-overlay');
+        if (overlay) overlay.classList.add('active');
+      } catch (err) {
+        console.error("Error al cambiar de grupo:", err);
+        customAlert("Error al cambiar de grupo: " + err.message, "Error");
+      }
+    };
+
+    const btnCambiarGrupo = document.getElementById('btn-cambiar-grupo-mantenimiento');
+    if (btnCambiarGrupo) {
+      btnCambiarGrupo.addEventListener('click', () => window.cambiarDeGrupo());
+    }
 
     window.showInfoAttendanceModal = function(title, items) {
       const overlay = document.getElementById('custom-dialog-overlay');
@@ -12607,8 +12903,8 @@
           const data = docSnap.data();
           const id = docSnap.id;
           const statusColor = data.status === 'activa' ? 'var(--teal)' : 'var(--coral)';
-          const planLabel = data.plan === 'pro' ? 'PRO' : data.plan === 'basico' ? 'BÁSICO' : data.plan === 'paga' ? 'PAGO' : data.plan === 'gratis' ? 'GRATIS' : 'PRUEBA';
-          const planColor = (data.plan === 'pro' || data.plan === 'basico' || data.plan === 'paga') ? 'var(--gold)' : data.plan === 'gratis' ? 'var(--purple)' : 'var(--text2)';
+          const planLabel = (data.plan === 'pro' || data.plan === 'comunidad') ? 'COMUNIDAD' : (data.plan === 'basico' || data.plan === 'paga' || data.plan === 'prueba') ? 'BÁSICO' : 'GRATIS';
+          const planColor = (data.plan === 'pro' || data.plan === 'comunidad' || data.plan === 'basico' || data.plan === 'paga') ? 'var(--gold)' : data.plan === 'gratis' ? 'var(--purple)' : 'var(--text2)';
 
           // Calcular vencimiento
           let expireLabel = 'Indefinido';
@@ -12618,10 +12914,15 @@
 
           if (data.expireAt) {
             const expDate = new Date(data.expireAt);
-            daysLeft = Math.ceil((expDate - now) / (1000 * 60 * 60 * 24));
+            // El corte real considera los 5 días de gracia internos (revisión manual)
+            const realDate = data.graceUntil ? new Date(data.graceUntil) : expDate;
+            daysLeft = Math.ceil((realDate - now) / (1000 * 60 * 60 * 24));
             isExpired = daysLeft < 0;
             isExpiringSoon = daysLeft >= 0 && daysLeft <= ALERT_DAYS;
             expireLabel = expDate.toLocaleDateString('es-CR', { day: '2-digit', month: 'short', year: 'numeric' });
+            if (data.graceUntil) {
+              expireLabel += ` · gracia hasta ${realDate.toLocaleDateString('es-CR', { day: '2-digit', month: 'short', year: 'numeric' })}`;
+            }
             if (isExpiringSoon) expiringSoon.push({ id, name: data.name, daysLeft, adminEmail: data.adminEmail, phone: data.phone });
           }
 
@@ -12655,7 +12956,8 @@
                     <option value="gratis" ${data.plan === 'gratis' ? 'selected' : ''}>Gratis</option>
                     <option value="prueba" ${data.plan === 'prueba' ? 'selected' : ''}>Prueba</option>
                     <option value="basico" ${data.plan === 'basico' ? 'selected' : ''}>Básico</option>
-                    <option value="pro" ${data.plan === 'pro' ? 'selected' : ''}>Pro</option>
+                    <option value="pro" ${data.plan === 'pro' ? 'selected' : ''}>Pro (legado)</option>
+                    <option value="comunidad" ${data.plan === 'comunidad' ? 'selected' : ''}>Comunidad</option>
                   </select>
                   <input type="date" id="expire-input-${id}" value="${data.expireAt ? new Date(data.expireAt).toISOString().split('T')[0] : ''}" style="font-size:11px; padding:5px 8px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-family:var(--font-body);">
                   <button onclick="saUpdatePlan('${id}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:var(--purple); color:#fff; white-space:nowrap;">Guardar Plan</button>
@@ -12770,14 +13072,20 @@
 
       // Plan gratis no necesita fecha
       const expireToSave = newPlan === 'gratis' ? null : newExpireAt;
+      // 5 días de gracia internos (invisibles para el usuario) para revisión manual
+      const graceToSave = newPlan !== 'gratis' && newExpireAt
+        ? new Date(new Date(newExpireAt).getTime() + 5 * 24 * 60 * 60 * 1000).toISOString()
+        : null;
 
       try {
         await window.updateDoc(window.doc(window.db, 'churches', churchId), {
           plan: newPlan,
+          memberLimit: window.limiteMiembrosPlan(newPlan),
           expireAt: expireToSave,
+          graceUntil: graceToSave,
           updatedAt: new Date().toISOString(),
         });
-        showToast(`Plan actualizado a "${newPlan.toUpperCase()}" correctamente.`);
+        showToast(`Plan actualizado a "${window.nombrePlanBonito(newPlan)}" correctamente.`);
         window.renderSuperAdminChurches();
       } catch(e) {
         console.error(e);
@@ -12854,12 +13162,16 @@
       try {
         const churchRef = doc(db, 'churches', churchId);
         if (action === 'activar') {
-          const futureDate = new Date();
-          futureDate.setDate(futureDate.getDate() + 30);
+          const expDate = new Date();
+          expDate.setDate(expDate.getDate() + 30);
+          const graciaDate = new Date();
+          graciaDate.setDate(graciaDate.getDate() + 35);
           await updateDoc(churchRef, {
             status: 'activa',
-            plan: 'paga',
-            expireAt: futureDate.toISOString()
+            plan: 'basico',
+            memberLimit: window.limiteMiembrosPlan('basico'),
+            expireAt: expDate.toISOString(),
+            graceUntil: graciaDate.toISOString()
           });
         } else if (action === 'inactivar') {
           await updateDoc(churchRef, {
@@ -12887,7 +13199,9 @@
           const churchId = crypto.randomUUID();
           const futureDate = new Date();
           futureDate.setDate(futureDate.getDate() + 15); // 15 dias de prueba
-          
+          const futureGracia = new Date();
+          futureGracia.setDate(futureGracia.getDate() + 20); // prueba = basico: +5 dias de gracia
+
           // Crear tenant
           await setDoc(doc(db, "churches", churchId), {
             name,
@@ -12895,7 +13209,9 @@
             phone: 'N/A',
             status: 'activa',
             plan: 'prueba',
+            memberLimit: 15,
             expireAt: futureDate.toISOString(),
+            graceUntil: futureGracia.toISOString(),
             createdAt: new Date().toISOString()
           });
 
@@ -13189,22 +13505,23 @@
           let selected = shuffled.slice(0, 12);
           
           let html = '';
-          selected.forEach((s, idx) => {
-            html += `
-              <div class="ls-song-card" onclick="window.openPublicSongViewer('${s.id}')" style="cursor:pointer; display:flex; align-items:center; background:var(--bg2); padding:12px; border-radius:10px; border:1px solid var(--border); transition: transform 0.2s;">
-                <div style="font-weight:700; color:var(--text3); margin-right:16px; font-size:16px; width:24px; text-align:center;">
-                  ${String(idx + 1).padStart(2, '0')}
+          for (let i = 0; i < selected.length; i += 4) {
+            html += `<div class="trending-column">`;
+            selected.slice(i, i + 4).forEach((s) => {
+              html += `
+                <div class="ls-song-card" onclick="window.openPublicSongViewer('${s.id}')" style="cursor:pointer; display:flex; align-items:center; background:var(--bg2); padding:12px; border-radius:10px; border:1px solid var(--border); transition: transform 0.2s;">
+                  <div style="width: 40px; height: 40px; border-radius: 6px; background: var(--bg3); display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0; overflow: hidden;">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--teal)" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                  </div>
+                  <div style="flex-grow:1; min-width:0;">
+                    <div style="color:#fff; font-weight:600; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.nombre}</div>
+                    <div style="color:var(--text3); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.artista || 'Desconocido'}</div>
+                  </div>
                 </div>
-                <div style="width: 40px; height: 40px; border-radius: 6px; background: var(--bg3); display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0; overflow: hidden;">
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--teal)" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-                </div>
-                <div style="flex-grow:1; min-width:0;">
-                  <div style="color:#fff; font-weight:600; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.nombre}</div>
-                  <div style="color:var(--text3); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.artista || 'Desconocido'}</div>
-                </div>
-              </div>
-            `;
-          });
+              `;
+            });
+            html += `</div>`;
+          }
           trendingGrid.innerHTML = html;
         }
 
