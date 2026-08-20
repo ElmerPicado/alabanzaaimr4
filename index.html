@@ -2970,6 +2970,89 @@
         height: auto;
       }
     }
+
+    /* Floating settings on mobile */
+    @media (max-width: 768px) {
+      .floating-tools-container {
+        position: fixed !important;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: rgba(17, 24, 39, 0.95) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--border) !important;
+        border-radius: 100px !important;
+        padding: 12px 20px !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        width: max-content;
+        max-width: calc(100% - 20px);
+        top: auto !important;
+        
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 20px !important;
+      }
+      /* Hide "Ajustes" header row */
+      .ajustes-header {
+        display: none !important;
+      }
+      /* Content wrapper to horizontal */
+      .ajustes-content {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 20px !important;
+      }
+      
+      /* Tone block row */
+      .ajustes-tono-row {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        border-bottom: none !important;
+        padding-bottom: 0 !important;
+        gap: 8px !important;
+      }
+      /* Hide "Tono Actual" text on mobile */
+      .ajustes-tono-label span {
+        display: none !important;
+      }
+      .ajustes-tono-controls {
+        align-self: center !important;
+      }
+      
+      /* Font block row */
+      .ajustes-texto-row {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 8px !important;
+      }
+      /* Hide "Texto" text on mobile */
+      .ajustes-texto-label {
+        display: none !important;
+      }
+
+      .floating-tools-container button {
+        padding: 10px 14px !important;
+        font-size: 14px !important;
+      }
+      .ajustes-texto-row button {
+        width: auto !important;
+        height: auto !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+      }
+
+      .floating-tools-container.auto-hidden {
+        opacity: 0 !important;
+        transform: translate(-50%, 150%) scale(0.9) !important;
+        pointer-events: none !important;
+      }
+    }
   </style>
 </head>
 
@@ -3098,18 +3181,20 @@
         <!-- Columna Derecha: Herramientas y Upsell -->
         <div style="position: sticky; top: 20px; display: flex; flex-direction: column; gap: 20px;">
           <!-- Herramientas -->
-          <div style="background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px;">
-            <h3 style="font-size: 13px; text-transform: uppercase; color: var(--text3); margin: 0 0 16px 0; letter-spacing: 1px; font-weight: 700;">Ajustes</h3>
-            <div style="display: flex; flex-direction: column; gap: 16px;">
-              <div style="display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border2); padding-bottom: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div id="landing-ajustes-panel" class="floating-tools-container" style="background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px;">
+            <div class="ajustes-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h3 style="font-size: 13px; text-transform: uppercase; color: var(--text3); margin: 0; letter-spacing: 1px; font-weight: 700;">Ajustes</h3>
+            </div>
+            <div class="ajustes-content" style="display: flex; flex-direction: column; gap: 16px;">
+              <div class="ajustes-tono-row" style="display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border2); padding-bottom: 12px;">
+                <div class="ajustes-tono-label" style="display: flex; justify-content: space-between; align-items: center;">
                   <span style="font-size: 14px; color: var(--text2); display: flex; align-items: center; gap: 8px;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
-                    Tono Actual
+                    <span>Tono Actual</span>
                   </span>
                   <span id="public-song-tone" style="font-size: 16px; font-weight: 700; color: var(--teal);">C</span>
                 </div>
-                <div style="display: flex; justify-content: flex-end; align-items: center; gap: 2px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 3px 4px; align-self: flex-end;">
+                <div class="ajustes-tono-controls" style="display: flex; justify-content: flex-end; align-items: center; gap: 2px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 3px 4px; align-self: flex-end;">
                   <button id="btn-public-tone-down2" title="Bajar 1 tono" style="background:none; border:none; color:var(--coral); font-weight:700; cursor:pointer; padding:4px 6px; font-size:11px; line-height:1;">-1</button>
                   <button id="btn-public-tone-down1" title="Bajar ½ tono" style="background:none; border:none; color:var(--coral); font-weight:700; cursor:pointer; padding:4px 6px; font-size:11px; line-height:1;">-½</button>
                   <span style="font-size:10px; color:var(--text3); padding:0 2px;">|</span>
@@ -3117,8 +3202,8 @@
                   <button id="btn-public-tone-up2" title="Subir 1 tono" style="background:none; border:none; color:var(--teal); font-weight:700; cursor:pointer; padding:4px 6px; font-size:11px; line-height:1;">+1</button>
                 </div>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 14px; color: var(--text2); display: flex; align-items: center; gap: 8px;">
+              <div class="ajustes-texto-row" style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="ajustes-texto-label" style="font-size: 14px; color: var(--text2); display: flex; align-items: center; gap: 8px;">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
                   Texto
                 </span>
@@ -13353,7 +13438,9 @@ if (btnLoginBackLanding) {
 
         document.getElementById('landing-hero-section').style.display = 'none';
         document.getElementById('public-song-viewer').style.display = 'block';
-        window.scrollTo(0, 0);
+        setTimeout(() => {
+          document.getElementById('public-song-viewer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
 
         // Reset to lyrics view
         document.getElementById('public-lyrics-wrapper').style.display = 'block';
@@ -13733,6 +13820,42 @@ if (btnLoginBackLanding) {
     }
   </script>
   <script type="module" src="chord_engine/index.js"></script>
+  <script>
+    // Auto-hide floating menu on mobile
+    (function() {
+      let hideMenuTimeout;
+      const floatingMenu = document.getElementById('landing-ajustes-panel');
+      const songViewer = document.getElementById('public-song-viewer');
+      
+      function showFloatingMenu() {
+        if (window.innerWidth <= 768 && floatingMenu && songViewer && songViewer.style.display === 'block') {
+          floatingMenu.classList.remove('auto-hidden');
+          clearTimeout(hideMenuTimeout);
+          hideMenuTimeout = setTimeout(() => {
+            floatingMenu.classList.add('auto-hidden');
+          }, 1200);
+        }
+      }
+
+      // Escuchar eventos globales de interacción
+      window.addEventListener('scroll', showFloatingMenu, {passive: true});
+      window.addEventListener('touchstart', showFloatingMenu, {passive: true});
+      window.addEventListener('touchmove', showFloatingMenu, {passive: true});
+      window.addEventListener('click', showFloatingMenu, {passive: true});
+      
+      // Observar mutaciones para disparar inicial cuando se abre la canción
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === 'style') {
+            if (songViewer.style.display === 'block') {
+              showFloatingMenu();
+            }
+          }
+        });
+      });
+      if(songViewer) observer.observe(songViewer, { attributes: true });
+    })();
+  </script>
 </body>
 
 </html>
