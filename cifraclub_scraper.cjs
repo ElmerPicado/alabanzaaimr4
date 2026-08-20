@@ -75,12 +75,19 @@ function analizarTonalidadAvanzado(texto) {
 }
 
 async function scrapeArtist(slug) {
-  const outputFile = path.join(outputDir, `${slug}.json`);
+  // Manejar el caso de que sea un disco, ej: juan-carlos-alvarado/discografia/fuego-en-vivo-2006
+  const fileSlug = slug.replace(/\//g, '_');
+  let artistSlug = slug;
+  if (slug.includes('/')) {
+    artistSlug = slug.split('/')[0];
+  }
+
+  const outputFile = path.join(outputDir, `${fileSlug}.json`);
   if (fs.existsSync(outputFile)) {
     try {
       const stats = fs.statSync(outputFile);
       if (stats.size > 200) {
-        console.log(`⏩ [Saltado] El archivo para "${slug}" ya existe y tiene datos (${outputFile})`);
+        console.log(`⏩ [Saltado] El archivo para "${fileSlug}" ya existe y tiene datos (${outputFile})`);
         return;
       }
     } catch (e) {}
@@ -96,7 +103,8 @@ async function scrapeArtist(slug) {
     // Encontrar todas las canciones del artista
     // Los links suelen estar en <a class="art_music-link" href="/slug/cancion/">
     const songLinks = [];
-    const linkRegex = new RegExp(`href="(/${slug}/[^"]+)"`, 'g');
+    // Usamos artistSlug porque aunque estemos en la página del disco, los links son a la raíz del artista
+    const linkRegex = new RegExp(`href="(/${artistSlug}/[^"]+)"`, 'g');
     let match;
     while ((match = linkRegex.exec(html)) !== null) {
       const link = match[1];
@@ -155,12 +163,12 @@ async function scrapeArtist(slug) {
         let tone = typeof analysis === 'object' ? analysis.tonalidad : analysis;
 
         resultSongs.push({
-          id: `cifraclub_${slug}_${i+1}`,
+          id: `cifraclub_${fileSlug}_${i+1}`,
           nombre: title,
           artista: slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
           fuente: songUrl,
           tonoBase: tone,
-          letra_acordes: rawCifra.trim()
+          letra: rawCifra.trim()
         });
 
         // Esperar para no saturar el servidor

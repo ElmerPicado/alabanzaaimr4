@@ -7007,15 +7007,15 @@ if (btnLoginBackLanding) {
             btnImportSongs.textContent = "Importando...";
             btnImportSongs.disabled = true;
 
-            // Construir set de canciones existentes (nombre+artista en minúsculas) para evitar duplicados
-            const existingKeys = new Set(
-              (cacheSongs || []).map(s =>
-                `${(s.nombre || '').toLowerCase().trim()}||${(s.artista || '').toLowerCase().trim()}`
-              )
-            );
+            // Construir mapa de canciones existentes (nombre+artista -> id) para actualizar en vez de duplicar
+            const existingMap = new Map();
+            (cacheSongs || []).forEach(s => {
+              const key = `${(s.nombre || '').toLowerCase().trim()}||${(s.artista || '').toLowerCase().trim()}`;
+              existingMap.set(key, s.id);
+            });
 
             let importedCount = 0;
-            let skippedCount = 0;
+            let updatedCount = 0;
 
             const itemsToImport = [];
             for (const item of songsArray) {
@@ -7025,11 +7025,15 @@ if (btnLoginBackLanding) {
 
               // Verificar duplicado
               const key = `${nombre.toLowerCase()}||${artista.toLowerCase()}`;
-              if (existingKeys.has(key)) {
-                skippedCount++;
-                continue;
+              if (existingMap.has(key) && existingMap.get(key) !== "new") {
+                item._existingId = existingMap.get(key);
+                updatedCount++;
+              } else if (!existingMap.has(key)) {
+                existingMap.set(key, "new"); // Agregar al map para evitar duplicados dentro del mismo JSON
+                importedCount++;
+              } else {
+                continue; // Ya procesado en el JSON actual
               }
-              existingKeys.add(key); // Agregar al set para evitar duplicados dentro del mismo JSON
               itemsToImport.push(item);
             }
 
@@ -7039,7 +7043,7 @@ if (btnLoginBackLanding) {
               const batch = writeBatch(db);
 
               for (const item of chunk) {
-                const idUnico = "song_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+                const idUnico = item._existingId || ("song_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now() + "_" + Math.floor(Math.random() * 1000));
                 const nombre = fixCorruptedText((item.nombre || item.title || item.titulo || "").trim());
                 const artista = fixCorruptedText((item.artista || item.artist || "").trim() || "Desconocido");
                 const letra = fixCorruptedText(item.letra || item.lyrics || item.content || "");
@@ -7070,19 +7074,17 @@ if (btnLoginBackLanding) {
                 };
 
                 const songRef = doc(db, "biblioteca_canciones", idUnico);
-                batch.set(songRef, payload);
+                batch.set(songRef, payload, { merge: true });
 
                 if (letra) {
                   const letraRef = doc(db, "letras_canciones", idUnico);
-                  batch.set(letraRef, { letra });
+                  batch.set(letraRef, { letra }, { merge: true });
                 }
-
-                importedCount++;
               }
 
               await batch.commit();
             }
-            customAlert(`¡Éxito!\n\nImportadas: ${importedCount} canciones.\nOmitidas (duplicadas): ${skippedCount}.`);
+            customAlert(`¡Éxito!\n\nNuevas: ${importedCount} canciones.\nActualizadas: ${updatedCount} canciones.`);
           } catch (err) {
             customAlert("Error al procesar el archivo JSON: " + err.message);
           } finally {
