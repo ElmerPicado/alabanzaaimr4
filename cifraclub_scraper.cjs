@@ -24,6 +24,17 @@ function decodeHtmlEntities(text) {
 }
 
 async function scrapeArtist(slug) {
+  const outputFile = path.join(outputDir, `${slug}.json`);
+  if (fs.existsSync(outputFile)) {
+    try {
+      const stats = fs.statSync(outputFile);
+      if (stats.size > 200) {
+        console.log(`⏩ [Saltado] El archivo para "${slug}" ya existe y tiene datos (${outputFile})`);
+        return;
+      }
+    } catch (e) {}
+  }
+
   console.log(`Buscando canciones para: ${slug}`);
   const baseUrl = `https://www.cifraclub.com/${slug}/`;
   
@@ -109,7 +120,6 @@ async function scrapeArtist(slug) {
     }
 
     // Guardar el resultado en JSON
-    const outputFile = path.join(outputDir, `${slug}.json`);
     fs.writeFileSync(outputFile, JSON.stringify(resultSongs, null, 2), 'utf8');
     console.log(`\n¡Extracción completa! Se guardaron ${resultSongs.length} canciones en ${outputFile}`);
 
