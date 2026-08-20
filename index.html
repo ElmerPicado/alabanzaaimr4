@@ -3785,6 +3785,11 @@
       window.updateRehearsalsActiveUser = function (user) {
         activeSessionUser = user;
         renderEnsayosMusico();
+        
+        const btnPagos = document.getElementById('nav-btn-pagos');
+        if (btnPagos) {
+           btnPagos.style.display = (user && user.isOwner) ? 'flex' : 'none';
+        }
       };
 
       // ==============================
@@ -4517,6 +4522,12 @@
         </svg>
         <span class="nav-label">Ajustes</span>
       </button>
+      <button class="nav-tab" data-tab="tab-pagos" id="nav-btn-pagos" style="display:none;">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line>
+        </svg>
+        <span class="nav-label">Pagos</span>
+      </button>
     </nav>
 
     <!-- CONTENIDO DE PANELES -->
@@ -4860,6 +4871,26 @@
         </div>
       </div>
 
+      <!-- 5. PANEL: PAGOS Y SUSCRIPCIÓN -->
+      <div id="tab-pagos" class="tab-panel" style="display: none;">
+        <h2 class="section-title">Historial de Pagos y Facturación</h2>
+        <p class="section-sub">Sube comprobantes de pago para renovar y revisa el historial.</p>
+        
+        <div class="card" style="border-color: var(--gold); margin-bottom: 20px;">
+          <h3 style="font-family: var(--font-display); font-size: 18px; color: var(--gold); margin-bottom: 6px;">Estado Actual</h3>
+          <p id="pagos-current-plan-summary" style="font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.55;">
+            Cargando...</p>
+          <button onclick="document.getElementById('change-plan-overlay').classList.add('active')" class="btn-primary"
+            style="background:var(--bg3); color:var(--text); border:1px solid var(--border2); width:auto; padding:10px 24px; font-size:13px; margin-top:6px;">Subir Comprobante / Renovar</button>
+        </div>
+
+        <h3 style="font-family: var(--font-display); font-size: 18px; margin-bottom: 12px; margin-top: 24px;">Historial de Pagos</h3>
+        <div id="pagos-history-list">
+          <p style="color:var(--text3);font-size:13px;text-align:center;">Cargando historial...</p>
+        </div>
+      </div>
+
+
     </main>
   </div>
   <!-- END #screen-dashboard -->
@@ -4887,6 +4918,9 @@
         <button class="sa-tab-btn active" data-satab="sa-tab-cuentas" style="padding: 10px 18px; font-size: 13px; font-weight: 700; color: var(--gold); background: var(--bg2); border: 1px solid var(--gold); border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-body);">
           🏛️ Gestión de Cuentas / Iglesias
         </button>
+        <button class="sa-tab-btn" data-satab="sa-tab-pagos" style="padding: 10px 18px; font-size: 13px; font-weight: 700; color: var(--text2); background: var(--bg3); border: 1px solid var(--border2); border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-body);">
+          💸 Validación de Pagos
+        </button>
         <button class="sa-tab-btn" data-satab="sa-tab-biblioteca" style="padding: 10px 18px; font-size: 13px; font-weight: 700; color: var(--text2); background: var(--bg3); border: 1px solid var(--border2); border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-body);">
           Biblioteca de Canciones Global
         </button>
@@ -4913,6 +4947,16 @@
 
         <div id="superadmin-churches-list">
           <p style="color:var(--text3);font-size:13px;text-align:center;">Cargando instituciones...</p>
+        </div>
+      </div>
+
+      <!-- SECCIÓN X: VALIDACIÓN DE PAGOS -->
+      <div id="sa-tab-pagos" class="sa-tab-panel" style="display: none;">
+        <h2 class="section-title">Validación de Pagos</h2>
+        <p class="section-sub">Revisa los comprobantes de pago subidos por las iglesias para aprobar su renovación o nuevo plan.</p>
+        
+        <div id="superadmin-pagos-list">
+          <p style="color:var(--text3);font-size:13px;text-align:center;">Cargando pagos...</p>
         </div>
       </div>
 
@@ -6189,6 +6233,19 @@ if (btnLoginBackLanding) {
             members: [activeSessionUser.usuario]
           });
 
+          // Registrar en historial de pagos
+          try {
+            const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js");
+            await addDoc(collection(db, "pagos"), {
+              churchId: groupId,
+              churchName: name,
+              planSolicitado: plan,
+              receiptUrl: receiptUrl,
+              estado: 'pendiente',
+              createdAt: new Date().toISOString()
+            });
+          } catch(e) { console.error("Error guardando pago:", e); }
+
           const userDocId = activeSessionUser._docId || activeSessionUser.id || activeSessionUser.usuario;
           await updateDoc(doc(db, "usuarios", userDocId), {
             churchId: groupId,
@@ -6309,6 +6366,19 @@ if (btnLoginBackLanding) {
             expireAt: window.fechaVencimientoPlan(30),
             graceUntil: window.fechaVencimientoPlan(35)
           }, { merge: true });
+
+          // Registrar en historial de pagos
+          try {
+            const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js");
+            await addDoc(collection(db, "pagos"), {
+              churchId: churchId,
+              churchName: (activeSessionUser.churchId === churchId) ? (activeSessionUser.churchName || 'Iglesia Actualizada') : 'Iglesia',
+              planSolicitado: planSel.value,
+              receiptUrl: receiptUrl,
+              estado: 'pendiente',
+              createdAt: new Date().toISOString()
+            });
+          } catch(e) { console.error("Error guardando pago:", e); }
           formChangePlan.reset();
           if (changePlanOverlay) changePlanOverlay.classList.remove('active');
           cargarInfoPlanActual();
@@ -6459,6 +6529,8 @@ if (btnLoginBackLanding) {
           renderEnsayosAdmin();
         } else if (tab.dataset.tab === 'tab-ajustes' && typeof cargarInfoPlanActual === 'function') {
           cargarInfoPlanActual();
+        } else if (tab.dataset.tab === 'tab-pagos' && typeof window.renderHistorialPagosUsuario === 'function') {
+          window.renderHistorialPagosUsuario();
         }
       });
     });
@@ -7647,49 +7719,38 @@ if (btnLoginBackLanding) {
         if (typeof showToast === 'function') showToast("Error al cargar el repertorio. Revisa tu conexión.", { duration: 5000 });
       });
 
-      // Consulta de miembros basada en la colección memberships
-      let membershipsQuery;
+      // Consulta de miembros basada en la colección usuarios (fuente de verdad principal)
+      let usersQuery;
       if (churchId) {
-        membershipsQuery = query(collection(db, "memberships"), where("churchId", "==", churchId));
+        usersQuery = query(collection(db, "usuarios"), where("churchId", "==", churchId));
       } else {
         const uId = activeSessionUser && (activeSessionUser._docId || activeSessionUser.usuario);
-        membershipsQuery = query(collection(db, "memberships"), where("userId", "==", uId || ""));
+        // Si no tiene grupo, lo consultamos a él mismo usando el campo usuario
+        usersQuery = query(collection(db, "usuarios"), where("usuario", "==", uId || ""));
       }
 
       window._globalUsersCache = window._globalUsersCache || {};
 
-      onSnapshot(membershipsQuery, async (snap) => {
-        const memberships = [];
-        snap.forEach(doc => memberships.push({ id: doc.id, ...doc.data() }));
-
-        const userPromises = memberships.map(async (m) => {
-          const uId = m.userId;
-          if (!window._globalUsersCache[uId]) {
-            try {
-              const uSnap = await getDoc(doc(db, "usuarios", uId));
-              if (uSnap.exists()) {
-                window._globalUsersCache[uId] = uSnap.data();
-              }
-            } catch (e) {
-              console.error("Error cargando usuario global:", uId, e);
-            }
-          }
-          const globalUser = window._globalUsersCache[uId] || {};
-          return {
+      onSnapshot(usersQuery, (snap) => {
+        const resolvedMembers = [];
+        snap.forEach(docSnap => {
+          const u = docSnap.data();
+          const uId = docSnap.id;
+          window._globalUsersCache[uId] = u; // Actualizar caché
+          resolvedMembers.push({
             id: uId,
-            nombre: globalUser.nombre || "Integrante",
-            usuario: globalUser.usuario || uId,
-            correo: globalUser.correo || "",
-            password: globalUser.password || "",
-            profilePic: globalUser.profilePic || "",
-            churchId: m.churchId,
-            role: m.role || "musico",
-            instrumento: m.instrumento || "Voz",
-            type: m.type || "musico"
-          };
+            nombre: u.nombre || "Integrante",
+            usuario: u.usuario || uId,
+            correo: u.correo || "",
+            password: u.password || "",
+            profilePic: u.profilePic || "",
+            churchId: u.churchId || churchId,
+            role: u.role || "musico",
+            instrumento: u.instrumento || "Voz",
+            type: u.type || "musico"
+          });
         });
 
-        const resolvedMembers = await Promise.all(userPromises);
         cacheMembers = resolvedMembers;
         window.cacheMembers = cacheMembers;
 
@@ -13017,49 +13078,65 @@ if (btnLoginBackLanding) {
           const isNuevo = data.plan === 'prueba' || (data.status !== 'activa' && data.receiptUrl);
 
           const cardHtml = `
-          <div class="card" style="margin-bottom: 14px; border-left: 4px solid ${statusColor}; ${isExpiringSoon ? 'box-shadow: 0 0 14px rgba(245,158,11,0.2);' : ''}${isExpired ? 'box-shadow: 0 0 14px rgba(244,63,94,0.2);' : ''}">
-            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; align-items:flex-start;">
-              <!-- INFO IZQUIERDA -->
-              <div style="flex:1; min-width:200px;">
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                  <h4 style="margin:0; font-size:16px; color:var(--text);">${data.name || 'Sin Nombre'}</h4>
-                  <span style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; background:${planColor}22; color:${planColor}; border:1px solid ${planColor}44;">${planLabel}</span>
-                  <span style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; background:${statusColor}22; color:${statusColor}; border:1px solid ${statusColor}44;">${(data.status||'inactiva').toUpperCase()}</span>
+          <div class="card" style="margin-bottom: 16px; border-left: 4px solid ${statusColor}; border-radius: 12px; ${isExpiringSoon ? 'box-shadow: 0 0 14px rgba(245,158,11,0.2);' : ''}${isExpired ? 'box-shadow: 0 0 14px rgba(244,63,94,0.2);' : ''} padding: 16px; background: var(--bg2);">
+            
+            <!-- ENCABEZADO -->
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+              <div>
+                <h4 style="margin:0 0 4px 0; font-size:18px; color:var(--text); font-family: var(--font-display);">${data.name || 'Sin Nombre'}</h4>
+                <div style="display:flex; gap: 8px; flex-wrap:wrap;">
+                  <span style="font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; background:${planColor}22; color:${planColor}; border:1px solid ${planColor}44;">${planLabel}</span>
+                  <span style="font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; background:${statusColor}22; color:${statusColor}; border:1px solid ${statusColor}44;">${(data.status||'inactiva').toUpperCase()}</span>
+                  ${isExpired ? `<span style="font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; background:rgba(244,63,94,0.15); color:var(--coral); border:1px solid rgba(244,63,94,0.3);">VENCIDO</span>` : ''}
                 </div>
-                <p style="margin:2px 0; font-size:12px; color:var(--text2);">${data.adminEmail || 'N/A'} | ${data.phone || 'N/A'}</p>
-                <p style="margin:2px 0; font-size:11px; color:var(--text3); font-family:monospace;">ID: ${id}</p>
-                <p style="margin:4px 0 0; font-size:12px; color:${expColor}; font-weight:600;">
-                  Vence: ${expireLabel} ${expBadge}
-                </p>
               </div>
-
-              <!-- ACCIONES DERECHA -->
-              <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
-                <!-- Editar Plan -->
-                <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
-                  <select id="plan-select-${id}" style="font-size:11px; padding:5px 8px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-family:var(--font-body); cursor:pointer;">
-                    <option value="gratis" ${data.plan === 'gratis' ? 'selected' : ''}>Gratis</option>
-                    <option value="prueba" ${data.plan === 'prueba' ? 'selected' : ''}>Prueba</option>
-                    <option value="basico" ${data.plan === 'basico' ? 'selected' : ''}>Básico</option>
-                    <option value="pro" ${data.plan === 'pro' ? 'selected' : ''}>Pro (legado)</option>
-                    <option value="comunidad" ${data.plan === 'comunidad' ? 'selected' : ''}>Comunidad</option>
-                  </select>
-                  <input type="date" id="expire-input-${id}" value="${data.expireAt ? new Date(data.expireAt).toISOString().split('T')[0] : ''}" style="font-size:11px; padding:5px 8px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-family:var(--font-body);">
-                  <button onclick="saUpdatePlan('${id}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:var(--purple); color:#fff; white-space:nowrap;">Guardar Plan</button>
-                </div>
-
-                <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
-                  ${data.receiptUrl ? `<button onclick="verComprobanteSa('${id}')" class="btn-secondary" style="font-size:11px; padding:5px 10px; border-color:var(--gold); color:var(--gold);">Ver Comprobante</button>` : ''}
-                  ${data.status === 'inactiva'
-                    ? `<button class="btn-primary" onclick="saAction('${id}', 'activar')" style="font-size:11px; padding:5px 10px; background:var(--teal); color:#000;">Activar Grupo</button>`
-                    : `<button class="btn-primary" onclick="saAction('${id}', 'inactivar')" style="font-size:11px; padding:5px 10px; background:rgba(244,63,94,0.15); color:var(--coral); border:1px solid rgba(244,63,94,0.3);">Desactivar Grupo</button>`
-                  }
-                  ${(isExpiringSoon || isExpired) ? `<button onclick="saEnviarRecordatorio('${id}','${(data.name||'').replace(/'/g,"\\'")}','${data.adminEmail||''}','${data.phone||''}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:#f59e0b; color:#000; font-weight:700;">Recordatorio</button>` : ''}
-                  <button onclick="window.saEditChurch('${id}', '${(data.name||'').replace(/'/g,"\\'")}', '${data.adminEmail||''}', '${data.phone||''}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:rgba(255,255,255,0.05); color:var(--text); border:1px solid var(--border2);">Editar Datos</button>
-                  <button onclick="window.deleteChurchSa('${id}','${(data.name||'Sin Nombre').replace(/'/g,"\\'")}')" class="btn-primary" style="font-size:11px; padding:5px 10px; background:rgba(244,63,94,0.1); color:var(--coral); border:1px solid rgba(244,63,94,0.3);">Eliminar</button>
-                </div>
+              <div style="text-align:right;">
+                 <p style="margin:0 0 4px 0; font-size:13px; color:var(--text2);">📧 ${data.adminEmail || 'N/A'}</p>
+                 <p style="margin:0; font-size:13px; color:var(--text2);">📱 ${data.phone || 'N/A'}</p>
               </div>
             </div>
+
+            <!-- CUERPO / VENCIMIENTO -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+              <div>
+                <p style="margin:0; font-size:11px; color:var(--text3); font-family:monospace;">ID: ${id}</p>
+                <p style="margin:4px 0 0; font-size:13px; color:${expColor}; font-weight:600;">
+                  ⏳ Vence: ${expireLabel} ${isExpiringSoon ? `(${daysLeft}d restantes)` : ''}
+                </p>
+              </div>
+              
+              <!-- FORMULARIO DE PLAN -->
+              <div style="display:flex; gap:8px; align-items:center; background: var(--bg3); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border2);">
+                <select id="plan-select-${id}" style="font-size:12px; padding:6px 10px; background:var(--bg2); border:1px solid var(--border); border-radius:6px; color:var(--text); cursor:pointer;">
+                  <option value="gratis" ${data.plan === 'gratis' ? 'selected' : ''}>Gratis</option>
+                  <option value="prueba" ${data.plan === 'prueba' ? 'selected' : ''}>Prueba</option>
+                  <option value="basico" ${data.plan === 'basico' ? 'selected' : ''}>Básico</option>
+                  <option value="pro" ${data.plan === 'pro' ? 'selected' : ''}>Pro (legado)</option>
+                  <option value="comunidad" ${data.plan === 'comunidad' ? 'selected' : ''}>Comunidad</option>
+                </select>
+                <input type="date" id="expire-input-${id}" value="${data.expireAt ? new Date(data.expireAt).toISOString().split('T')[0] : ''}" style="font-size:12px; padding:6px 10px; background:var(--bg2); border:1px solid var(--border); border-radius:6px; color:var(--text);">
+                <button onclick="saUpdatePlan('${id}')" class="btn-primary" style="font-size:12px; padding:6px 12px; background:var(--purple); color:#0f0e17; font-weight:700; border-radius: 6px;">💾 Guardar</button>
+              </div>
+            </div>
+
+            <!-- PIE / ACCIONES (DIVIDIDAS) -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding-top:12px; border-top:1px dashed var(--border2);">
+              <div style="display:flex; gap:8px;">
+                <button onclick="window.saEditChurch('${id}', '${(data.name||'').replace(/'/g,"\\'")}', '${data.adminEmail||''}', '${data.phone||''}')" class="btn-primary" style="font-size:12px; padding:6px 14px; background:var(--bg3); color:var(--text); border:1px solid var(--border2); border-radius:6px;">✏️ Editar Datos</button>
+                ${data.receiptUrl ? `<button onclick="verComprobanteSa('${id}')" class="btn-primary" style="font-size:12px; padding:6px 14px; background:rgba(255,188,41,0.1); color:var(--gold); border:1px solid var(--gold); border-radius:6px;">📄 Ver Comprobante</button>` : ''}
+              </div>
+              
+              <div style="display:flex; gap:8px;">
+                ${(isExpiringSoon || isExpired) ? `<button onclick="saEnviarRecordatorio('${id}','${(data.name||'').replace(/'/g,"\\'")}','${data.adminEmail||''}','${data.phone||''}')" class="btn-primary" style="font-size:12px; padding:6px 14px; background:#f59e0b; color:#0f0e17; border-radius:6px; font-weight:700;">🔔 Recordatorio</button>` : ''}
+                
+                ${data.status === 'inactiva'
+                  ? `<button class="btn-primary" onclick="saAction('${id}', 'activar')" style="font-size:12px; padding:6px 14px; background:var(--teal); color:#0f0e17; border-radius:6px; font-weight:700;">🟢 Activar</button>`
+                  : `<button class="btn-primary" onclick="saAction('${id}', 'inactivar')" style="font-size:12px; padding:6px 14px; background:rgba(244,63,94,0.1); color:var(--coral); border:1px solid rgba(244,63,94,0.3); border-radius:6px;">⏸️ Suspender</button>`
+                }
+                <button onclick="window.deleteChurchSa('${id}','${(data.name||'Sin Nombre').replace(/'/g,"\\'")}')" class="btn-primary" style="font-size:12px; padding:6px 14px; background:transparent; color:var(--coral); border:1px solid var(--coral); border-radius:6px;">🗑️ Eliminar</button>
+              </div>
+            </div>
+            
           </div>`;
           
           if (isNuevo) htmlNuevos += cardHtml;
@@ -13107,6 +13184,184 @@ if (btnLoginBackLanding) {
       }
     };
 
+    // ==================== RENDERING PAGOS SUPERADMIN ====================
+    window.renderSuperAdminPagos = async function() {
+      const container = document.getElementById('superadmin-pagos-list');
+      if (!container) return;
+      container.innerHTML = '<p style="text-align:center;color:var(--text3);">Cargando pagos pendientes...</p>';
+      try {
+        const { collection, getDocs, query, where } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js");
+        const q = query(collection(window.db, 'pagos'), where('estado', '==', 'pendiente'));
+        const snap = await getDocs(q);
+        
+        if (snap.empty) {
+          container.innerHTML = '<p style="text-align:center;color:var(--text3);">No hay pagos pendientes de revisión. 🎉</p>';
+          return;
+        }
+
+        let html = '';
+        snap.forEach(docSnap => {
+          const p = docSnap.data();
+          const id = docSnap.id;
+          const dateStr = p.createdAt ? new Date(p.createdAt).toLocaleDateString() : 'Sin fecha';
+          
+          html += `
+          <div class="card" style="margin-bottom: 16px; border-left: 4px solid #f59e0b; border-radius: 12px; padding: 16px; background: var(--bg2);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+              <div>
+                <h4 style="margin:0 0 4px 0; font-size:18px; color:var(--text); font-family: var(--font-display);">${p.churchName || 'Iglesia Desconocida'}</h4>
+                <p style="margin:0; font-size:13px; color:var(--text2);">Plan solicitado: <strong>${(p.planSolicitado||'').toUpperCase()}</strong></p>
+                <p style="margin:2px 0 0; font-size:11px; color:var(--text3);">Subido el: ${dateStr}</p>
+              </div>
+              <div style="text-align:right;">
+                 <button onclick="verComprobanteSa('${id}', '${p.receiptUrl}')" class="btn-primary" style="font-size:12px; padding:6px 14px; background:rgba(255,188,41,0.1); color:var(--gold); border:1px solid var(--gold); border-radius:6px;">📄 Ver Comprobante</button>
+              </div>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+              <button onclick="saAprobarPago('${id}', '${p.churchId}')" class="btn-primary" style="font-size:12px; padding:6px 14px; background:var(--teal); color:#0f0e17; border-radius:6px; font-weight:700;">✅ Aprobar y Renovar 1 Mes</button>
+              <button onclick="saRechazarPago('${id}', '${p.churchId}')" class="btn-primary" style="font-size:12px; padding:6px 14px; background:transparent; color:var(--coral); border:1px solid var(--coral); border-radius:6px;">❌ Rechazar</button>
+            </div>
+          </div>`;
+        });
+        container.innerHTML = html;
+      } catch(e) {
+        console.error(e);
+        container.innerHTML = '<p style="text-align:center;color:var(--coral);">Error cargando pagos pendientes.</p>';
+      }
+    };
+
+    window.verComprobanteSa = function(id, url) {
+      if(!url) { customAlert("No hay comprobante para mostrar"); return; }
+      const img = document.getElementById('sa-receipt-img');
+      if(img) img.src = url;
+      document.getElementById('sa-receipt-modal').classList.add('active');
+    };
+
+    window.saAprobarPago = async function(pagoId, churchId) {
+      if(!await customConfirm("¿Aprobar este pago y renovar la suscripción por 1 mes?")) return;
+      try {
+        const { updateDoc, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js");
+        
+        showToast('Aprobando pago...', {duration: 2000});
+        // 1. Aprobar pago
+        await updateDoc(doc(window.db, 'pagos', pagoId), {
+          estado: 'aprobado',
+          reviewedAt: new Date().toISOString()
+        });
+
+        // 2. Extender vigencia de la iglesia
+        const churchRef = doc(window.db, 'churches', churchId);
+        const churchSnap = await getDoc(churchRef);
+        if(churchSnap.exists()) {
+          const currentExp = churchSnap.data().expireAt ? new Date(churchSnap.data().expireAt) : new Date();
+          // Sumar 1 mes
+          currentExp.setMonth(currentExp.getMonth() + 1);
+          
+          const currentGrace = new Date(currentExp);
+          currentGrace.setDate(currentGrace.getDate() + 5);
+
+          await updateDoc(churchRef, {
+            status: 'activa',
+            suspensionMsg: null,
+            expireAt: currentExp.toISOString(),
+            graceUntil: currentGrace.toISOString()
+          });
+        }
+        showToast("Pago aprobado. Suscripción renovada.");
+        if (typeof window.renderSuperAdminPagos === 'function') window.renderSuperAdminPagos();
+        if (typeof window.renderSuperAdminChurches === 'function') window.renderSuperAdminChurches(); // Refrescar lista de iglesias
+      } catch(e) {
+        console.error(e);
+        customAlert("Error al aprobar: " + e.message);
+      }
+    };
+
+    window.saRechazarPago = async function(pagoId, churchId) {
+      if(!await customConfirm("¿Rechazar este pago y suspender la iglesia?")) return;
+      try {
+        const { updateDoc, doc } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js");
+        
+        showToast('Rechazando pago...', {duration: 2000});
+        // 1. Rechazar pago
+        await updateDoc(doc(window.db, 'pagos', pagoId), {
+          estado: 'rechazado',
+          reviewedAt: new Date().toISOString()
+        });
+
+        // 2. Suspender iglesia
+        const churchRef = doc(window.db, 'churches', churchId);
+        await updateDoc(churchRef, {
+          status: 'inactiva',
+          suspensionMsg: 'Hemos detectado que su transferencia no llegó a nuestras cuentas. Si considera que es un error, contacte a soporte (WhatsApp: +506 89699458).'
+        });
+        
+        showToast("Pago rechazado. Iglesia suspendida.");
+        if (typeof window.renderSuperAdminPagos === 'function') window.renderSuperAdminPagos();
+        if (typeof window.renderSuperAdminChurches === 'function') window.renderSuperAdminChurches();
+      } catch(e) {
+        console.error(e);
+        customAlert("Error al rechazar: " + e.message);
+      }
+    };
+
+    // ==================== RENDERING PAGOS USUARIO ====================
+    window.renderHistorialPagosUsuario = async function() {
+      const container = document.getElementById('pagos-history-list');
+      if (!container || !activeSessionUser || !activeSessionUser.churchId) return;
+      
+      const elResumen = document.getElementById('pagos-current-plan-summary');
+      if(elResumen) {
+        const pSummary = document.getElementById('current-plan-summary');
+        elResumen.innerHTML = pSummary ? pSummary.innerHTML : "Plan actual";
+      }
+
+      container.innerHTML = '<p style="text-align:center;color:var(--text3);">Cargando historial...</p>';
+      try {
+        const { collection, getDocs, query, where, orderBy } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js");
+        const q = query(
+          collection(window.db, 'pagos'),
+          where('churchId', '==', activeSessionUser.churchId)
+        );
+        const snap = await getDocs(q);
+        
+        if (snap.empty) {
+          container.innerHTML = '<p style="text-align:center;color:var(--text3);">No tienes pagos registrados en el nuevo historial.</p>';
+          return;
+        }
+
+        // Ordenar localmente por createdAt descendente (más reciente primero) ya que Firebase requiere índice si usamos orderBy con where
+        const pagos = [];
+        snap.forEach(docSnap => pagos.push({ id: docSnap.id, ...docSnap.data() }));
+        pagos.sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0));
+
+        let html = '';
+        pagos.forEach(p => {
+          const dateStr = p.createdAt ? new Date(p.createdAt).toLocaleDateString() : 'Sin fecha';
+          
+          let estadoHtml = '';
+          if(p.estado === 'pendiente') estadoHtml = `<span style="background:rgba(245,158,11,0.1); color:#f59e0b; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">En Revisión</span>`;
+          else if(p.estado === 'aprobado') estadoHtml = `<span style="background:rgba(45,212,191,0.1); color:var(--teal); padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Aprobado</span>`;
+          else estadoHtml = `<span style="background:rgba(244,63,94,0.1); color:var(--coral); padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Rechazado</span>`;
+
+          html += `
+          <div class="card" style="margin-bottom: 12px; border-left: 3px solid ${p.estado==='aprobado' ? 'var(--teal)' : p.estado==='pendiente' ? '#f59e0b' : 'var(--coral)'}; border-radius: 12px; padding: 12px; background: var(--bg2); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <p style="margin:0 0 4px; font-size:14px; font-weight:600; color:var(--text);">Renovación: ${(p.planSolicitado||'').toUpperCase()}</p>
+              <p style="margin:0; font-size:11px; color:var(--text3);">${dateStr}</p>
+            </div>
+            <div style="text-align:right;">
+               <div style="margin-bottom: 6px;">${estadoHtml}</div>
+               <button onclick="verComprobanteSa('${p.id}', '${p.receiptUrl}')" style="background:none; border:none; color:var(--gold); font-size:11px; cursor:pointer; text-decoration:underline;">Ver comprobante</button>
+            </div>
+          </div>`;
+        });
+        container.innerHTML = html;
+      } catch(e) {
+        console.error("Error historial:", e);
+        container.innerHTML = '<p style="text-align:center;color:var(--coral);">Error cargando historial.</p>';
+      }
+    };
+
     // Editar datos básicos de la iglesia
     window.saEditChurch = async function(id, currentName, currentEmail, currentPhone) {
       const newName = prompt('Nombre de la Institución:', currentName);
@@ -13123,25 +13378,43 @@ if (btnLoginBackLanding) {
           phone: newPhone,
           updatedAt: new Date().toISOString()
         });
-        window.showToast('Datos de la institución actualizados correctamente.');
+        showToast('Datos de la institución actualizados correctamente.');
         window.renderSuperAdminChurches();
       } catch(e) {
         console.error(e);
-        window.customAlert('Error al actualizar datos: ' + e.message);
+        customAlert('Error al actualizar datos: ' + e.message);
       }
     };
 
-    // Eliminar institución (iglesia)
+    // Eliminar institución (iglesia) y datos en cascada
     window.deleteChurchSa = async function(id, name) {
-      if (!await window.customConfirm(`PELIGRO: ¿Estás seguro de que quieres eliminar PERMANENTEMENTE la institución "${name}" y todo su acceso? Esta acción no se puede deshacer.`)) return;
+      if (!await customConfirm(`PELIGRO: ¿Estás seguro de que quieres eliminar PERMANENTEMENTE la institución "${name}"? Esta acción borrará todas sus canciones y perfiles de usuario de la base de datos. No se puede deshacer.`)) return;
       
       try {
-        await window.deleteDoc(window.doc(window.db, 'churches', id));
-        window.showToast(`La institución "${name}" ha sido eliminada.`);
+        const { collection, query, where, getDocs, deleteDoc, doc } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js");
+        
+        showToast('Eliminando usuarios vinculados...', { duration: 2000 });
+        const usersQ = query(collection(window.db, 'usuarios'), where('churchId', '==', id));
+        const usersSnap = await getDocs(usersQ);
+        for(const docSnap of usersSnap.docs) {
+          await deleteDoc(doc(window.db, 'usuarios', docSnap.id));
+        }
+
+        showToast('Eliminando canciones...', { duration: 2000 });
+        const songsQ = query(collection(window.db, 'canciones'), where('churchId', '==', id));
+        const songsSnap = await getDocs(songsQ);
+        for(const docSnap of songsSnap.docs) {
+          await deleteDoc(doc(window.db, 'canciones', docSnap.id));
+        }
+
+        showToast('Eliminando institución principal...', { duration: 2000 });
+        await deleteDoc(doc(window.db, 'churches', id));
+        
+        showToast(`La institución "${name}" ha sido eliminada por completo.`);
         window.renderSuperAdminChurches();
       } catch(e) {
         console.error(e);
-        window.customAlert('Error al eliminar la institución: ' + e.message);
+        customAlert('Error al eliminar la institución: ' + e.message);
       }
     };
 
@@ -13371,6 +13644,10 @@ if (btnLoginBackLanding) {
         const panelId = target.dataset.satab;
         const panel = document.getElementById(panelId);
         if (panel) panel.style.display = 'block';
+        
+        if (panelId === 'sa-tab-pagos' && typeof window.renderSuperAdminPagos === 'function') {
+          window.renderSuperAdminPagos();
+        }
       });
     });
 
