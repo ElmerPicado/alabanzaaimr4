@@ -6844,12 +6844,13 @@ if (btnLoginBackLanding) {
           };
         }
 
-        // El panel de inicio SIEMPRE es el Repertorio, sin importar el plan ni el rol
-        const inicioTab = document.getElementById('tab-repertorio');
-        if (inicioTab && screenDashboard.classList.contains('active')) {
-          const tabBtn = Array.from(document.querySelectorAll('.nav-tab')).find(t => t.dataset.tab === 'tab-repertorio');
+        // El músico/lider SIEMPRE abre el Repertorio al iniciar sesión
+        const inicioMTab = document.getElementById('mtab-repertorio-musico');
+        if (inicioMTab) {
+          const tabBtn = Array.from(document.querySelectorAll('.nav-tab-musico')).find(t => t.dataset.mtab === 'mtab-repertorio-musico');
           if (tabBtn) tabBtn.click();
         }
+        
       } else {
         // Vista estricta de Músico
         document.getElementById('musico-name-badge').textContent = userData.nombre;
@@ -8050,7 +8051,8 @@ if (btnLoginBackLanding) {
         const asigVal = dataServicio.musicosAsignados ? dataServicio.musicosAsignados[m.usuario] : null;
         if (asigVal) {
           const displayInst = typeof asigVal === 'string' ? asigVal : m.instrumento;
-          if (m.type === 'musico') {
+          const isVocal = ["voz", "cor", "cant"].some(v => displayInst.toLowerCase().includes(v));
+          if (!isVocal) {
             countMusicos++;
             cuerpoMusicos += `  • ${m.nombre} [${displayInst}]\n`;
           } else {
