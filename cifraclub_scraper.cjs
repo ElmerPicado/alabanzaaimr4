@@ -78,8 +78,11 @@ async function scrapeArtist(slug) {
   // Manejar el caso de que sea un disco, ej: juan-carlos-alvarado/discografia/fuego-en-vivo-2006
   const fileSlug = slug.replace(/\//g, '_');
   let artistSlug = slug;
+  let albumName = "";
   if (slug.includes('/')) {
-    artistSlug = slug.split('/')[0];
+    const parts = slug.split('/');
+    artistSlug = parts[0];
+    albumName = parts[parts.length - 1].replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   }
 
   const outputFile = path.join(outputDir, `${fileSlug}.json`);
@@ -165,7 +168,8 @@ async function scrapeArtist(slug) {
         resultSongs.push({
           id: `cifraclub_${fileSlug}_${i+1}`,
           nombre: title,
-          artista: slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          artista: artistSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          album: albumName,
           fuente: songUrl,
           tonoBase: tone,
           letra: rawCifra.trim()

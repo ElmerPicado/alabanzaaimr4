@@ -2787,7 +2787,20 @@
       overflow-y: auto;
       margin-top: 15px;
       padding-right: 5px;
-      background: #1E1E1E;
+      background: var(--bg);
+      padding: 20px;
+    }
+    
+    #panel-lyrics-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 50px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+      min-height: 100%;
+      box-sizing: border-box;
     }
 
     .artist-row-item {
@@ -2848,14 +2861,12 @@
     @media (min-width: 768px) {
       .split-right-panel {
         display: flex;
-        /* Visible on tablet/desktop */
         flex: 1;
-        /* Mitad y mitad */
       }
 
       .split-left-panel {
-        flex: 1;
-        /* Mitad y mitad */
+        flex: 0 0 400px;
+        max-width: 400px;
       }
 
       .chevron-icon {
@@ -6962,6 +6973,7 @@ if (btnLoginBackLanding) {
       btnAddSongGlobal.addEventListener('click', () => {
         editingSongId = null;
         document.getElementById('form-add-song').reset();
+        if (document.getElementById('song-album-input')) document.getElementById('song-album-input').value = "";
         if (typeof window.actualizarListaAutoresDatalist === 'function') {
           window.actualizarListaAutoresDatalist();
         }
@@ -7072,6 +7084,10 @@ if (btnLoginBackLanding) {
                   tipo: ((item.tipo || item.type || "alabanza").toLowerCase().includes("adora") ? "adoracion" : "alabanza"),
                   youtube: (item.youtube || item.url || "").trim()
                 };
+                
+                if (item.album) {
+                  payload.album = fixCorruptedText(item.album.trim());
+                }
 
                 const songRef = doc(db, "biblioteca_canciones", idUnico);
                 batch.set(songRef, payload, { merge: true });
@@ -8614,6 +8630,7 @@ if (btnLoginBackLanding) {
         .trim();
 
       let artista = document.getElementById('song-artist-input').value.trim();
+      let album = document.getElementById('song-album-input') ? document.getElementById('song-album-input').value.trim() : "";
 
       // Vincular automáticamente al artista existente si coincide (sin importar mayúsculas, minúsculas o tildes)
       if (window.cacheSongs) {
@@ -8692,6 +8709,10 @@ if (btnLoginBackLanding) {
         youtube: document.getElementById('song-youtube-input').value.trim(),
         churchId: activeSessionUser && activeSessionUser.churchId ? activeSessionUser.churchId : null
       };
+      
+      if (album) {
+        payloadMetadata.album = fixCorruptedText(album);
+      }
 
       if (chordData) {
         payloadMetadata.chordData = chordData;
@@ -8939,7 +8960,7 @@ if (btnLoginBackLanding) {
         <div class="song-card-info" style="margin-left: 4px; flex:1; min-width:0; width: 100%;">
           <div class="song-card-name" style="font-weight: 600; white-space: normal; overflow: visible; word-break: break-word;">${s.nombre}</div>
           <div class="song-card-artist" style="font-size:11px; color: var(--text2); display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:4px;">
-            <span>${s.artista}</span>
+            <span>${s.artista}${s.album ? ' • <span style="color:var(--gold); font-size:10px;">' + s.album + '</span>' : ''}</span>
             <span>•</span>
             <span style="background:rgba(255,255,255,0.05); padding:1px 6px; border-radius:4px; font-size:10px; color:${tagColor}; border:1px solid rgba(255,255,255,0.08); font-weight:500;">
               ${ultimaVezText}
@@ -9064,6 +9085,7 @@ if (btnLoginBackLanding) {
             editingSongId = s.id;
             document.getElementById('song-name-input').value = s.nombre;
             document.getElementById('song-artist-input').value = s.artista;
+            if (document.getElementById('song-album-input')) document.getElementById('song-album-input').value = s.album || "";
             document.getElementById('song-key-input').value = s.tonoBase;
             document.getElementById('song-type-input').value = s.tipo || "alabanza";
             document.getElementById('song-youtube-input').value = s.youtube || "";
@@ -9790,7 +9812,7 @@ if (btnLoginBackLanding) {
           <div class="song-card-name" style="font-weight: 600; display:flex; align-items:center; gap:6px;">
             ${s.nombre} ${s.oficial ? '<span class="badge-oficial">OFICIAL</span>' : ''}
           </div>
-          <div class="song-card-artist" style="color: var(--text2); font-size: 11px; margin-top: 2px;">${s.artista}</div>
+          <div class="song-card-artist" style="color: var(--text2); font-size: 11px; margin-top: 2px;">${s.artista}${s.album ? ' • <span style="color:var(--gold); font-size:10px;">' + s.album + '</span>' : ''}</div>
         </div>
         
         <!-- Extremo Derecho: Tono y YouTube -->
@@ -9848,7 +9870,35 @@ if (btnLoginBackLanding) {
         filtered = allSongs.filter(s => {
           const sNombre = removeAccents(s.nombre || '').toLowerCase();
           const sArtista = removeAccents(s.artista || '').toLowerCase();
-          return sNombre.includes(query) || sArtista.includes(query);
+          const sAlbum = removeAccents(s.album || '').toLowerCase();
+          return sNombre.includes(query) || sArtista.includes(query) || sAlbum.includes(query);
+        });
+
+        // Ordenar por relevancia: coincidencias de artista/álbum van arriba (según petición del usuario)
+        filtered.sort((a, b) => {
+          const aN = removeAccents(a.nombre || '').toLowerCase();
+          const aAr = removeAccents(a.artista || '').toLowerCase();
+          const aAl = removeAccents(a.album || '').toLowerCase();
+          
+          const bN = removeAccents(b.nombre || '').toLowerCase();
+          const bAr = removeAccents(b.artista || '').toLowerCase();
+          const bAl = removeAccents(b.album || '').toLowerCase();
+
+          const getScore = (sN, sAr, sAl) => {
+            if (sN === query) return 100;
+            if (sAr === query || sAl === query) return 90;
+            if (sAr.startsWith(query) || sAl.startsWith(query)) return 80;
+            if (sN.startsWith(query)) return 70;
+            if (sAr.includes(query) || sAl.includes(query)) return 50; // Artista/Álbum al inicio
+            if (sN.includes(query)) return 10;
+            return 0;
+          };
+
+          const scoreA = getScore(aN, aAr, aAl);
+          const scoreB = getScore(bN, bAr, bAl);
+
+          if (scoreA !== scoreB) return scoreB - scoreA;
+          return aN.localeCompare(bN); // Si hay empate, alfabético
         });
         window._musicoSelectedArtist = null; // Reset filter
       }
@@ -9868,6 +9918,98 @@ if (btnLoginBackLanding) {
           }
 
           listCont.innerHTML = '';
+          
+          function renderArtistSongsInCollapse(artistSongs, collapseDiv) {
+            collapseDiv.innerHTML = '';
+            const albums = new Set();
+            artistSongs.forEach(s => {
+              if (s.album) albums.add(s.album);
+            });
+
+            if (albums.size > 0) {
+              const tabsDiv = document.createElement('div');
+              tabsDiv.style.cssText = 'display:flex; gap:10px; padding: 4px 10px 8px; border-bottom: 1px solid var(--border); margin-bottom: 4px;';
+              
+              const btnCanciones = document.createElement('button');
+              btnCanciones.textContent = 'Canciones';
+              btnCanciones.style.cssText = 'cursor:pointer; background:var(--teal); color:#000; border:none; padding:4px 12px; border-radius:12px; font-weight:600; font-size:11px; outline:none; transition:0.2s;';
+              
+              const btnAlbumes = document.createElement('button');
+              btnAlbumes.textContent = 'Álbumes';
+              btnAlbumes.style.cssText = 'cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text2); border:none; padding:4px 12px; border-radius:12px; font-weight:600; font-size:11px; outline:none; transition:0.2s;';
+              
+              tabsDiv.appendChild(btnCanciones);
+              tabsDiv.appendChild(btnAlbumes);
+
+              const contentCanciones = document.createElement('div');
+              artistSongs.forEach(s => {
+                contentCanciones.appendChild(crearCartaCancionMusico(s, artistSongs));
+              });
+
+              const contentAlbumes = document.createElement('div');
+              contentAlbumes.style.display = 'none';
+              
+              const porAlbum = {};
+              const sinAlbum = [];
+              artistSongs.forEach(s => {
+                if (s.album) {
+                  if (!porAlbum[s.album]) porAlbum[s.album] = [];
+                  porAlbum[s.album].push(s);
+                } else {
+                  sinAlbum.push(s);
+                }
+              });
+
+              Object.keys(porAlbum).sort().forEach(alb => {
+                const header = document.createElement('div');
+                header.style.cssText = 'padding: 10px 10px 4px 10px; color: var(--gold); font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 6px; letter-spacing:0.5px;';
+                header.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg> ${alb.toUpperCase()}`;
+                contentAlbumes.appendChild(header);
+                porAlbum[alb].forEach(s => {
+                  contentAlbumes.appendChild(crearCartaCancionMusico(s, artistSongs));
+                });
+              });
+
+              if (sinAlbum.length > 0) {
+                const header = document.createElement('div');
+                header.style.cssText = 'padding: 10px 10px 4px 10px; color: var(--text3); font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 6px; letter-spacing:0.5px;';
+                header.innerHTML = `OTRAS CANCIONES`;
+                contentAlbumes.appendChild(header);
+                sinAlbum.forEach(s => {
+                  contentAlbumes.appendChild(crearCartaCancionMusico(s, artistSongs));
+                });
+              }
+
+              btnCanciones.onclick = (ev) => {
+                ev.stopPropagation();
+                btnCanciones.style.background = 'var(--teal)';
+                btnCanciones.style.color = '#000';
+                btnAlbumes.style.background = 'rgba(255,255,255,0.05)';
+                btnAlbumes.style.color = 'var(--text2)';
+                contentCanciones.style.display = 'block';
+                contentAlbumes.style.display = 'none';
+              };
+
+              btnAlbumes.onclick = (ev) => {
+                ev.stopPropagation();
+                btnAlbumes.style.background = 'var(--teal)';
+                btnAlbumes.style.color = '#000';
+                btnCanciones.style.background = 'rgba(255,255,255,0.05)';
+                btnCanciones.style.color = 'var(--text2)';
+                contentAlbumes.style.display = 'block';
+                contentCanciones.style.display = 'none';
+              };
+
+              collapseDiv.appendChild(tabsDiv);
+              collapseDiv.appendChild(contentCanciones);
+              collapseDiv.appendChild(contentAlbumes);
+
+            } else {
+              artistSongs.forEach(s => {
+                collapseDiv.appendChild(crearCartaCancionMusico(s, artistSongs));
+              });
+            }
+          }
           if (sortedArtists.length === 0) {
             listCont.innerHTML = `<p style="color:var(--text3); font-size:12px; text-align:center; padding:20px;">No hay canciones registradas.</p>`;
             return;
@@ -9906,10 +10048,7 @@ if (btnLoginBackLanding) {
 
             if (isExpanded) {
               const artistSongs = allSongs.filter(s => (s.artista || 'Desconocido') === art);
-              artistSongs.forEach(s => {
-                const card = crearCartaCancionMusico(s, artistSongs);
-                collapseDiv.appendChild(card);
-              });
+              renderArtistSongsInCollapse(artistSongs, collapseDiv);
             }
 
             header.onclick = (e) => {
@@ -9944,12 +10083,9 @@ if (btnLoginBackLanding) {
                 if (chevron) chevron.style.transform = 'rotate(90deg)';
                 collapseDiv.style.display = 'block';
 
-                collapseDiv.innerHTML = '';
+                collapseDiv.display = 'block';
                 const artistSongs = allSongs.filter(s => (s.artista || 'Desconocido') === art);
-                artistSongs.forEach(s => {
-                  const card = crearCartaCancionMusico(s, artistSongs);
-                  collapseDiv.appendChild(card);
-                });
+                renderArtistSongsInCollapse(artistSongs, collapseDiv);
 
                 window._musicoSelectedArtist = art;
               } else {
@@ -10685,12 +10821,11 @@ if (btnLoginBackLanding) {
       }
       const el = document.getElementById(contentId);
       if (el) {
-        if ('zoom' in el.style) {
-          el.style.zoom = (_currentZoomPercent / 100);
-        } else {
-          el.style.transform = `scale(${_currentZoomPercent / 100})`;
-          el.style.transformOrigin = 'top left';
-        }
+        const isDesktop = window.innerWidth >= 768;
+        const baseSize = isDesktop ? 22 : 26;
+        el.style.fontSize = Math.round(baseSize * (_currentZoomPercent / 100)) + 'px';
+        el.style.transform = 'none';
+        el.style.zoom = 'normal';
       }
 
       const zoomVal = document.getElementById(zoomValId);
@@ -10801,12 +10936,11 @@ if (btnLoginBackLanding) {
 
           const el = document.getElementById(contentId);
           if (el) {
-            if ('zoom' in el.style) {
-              el.style.zoom = (newZoom / 100);
-            } else {
-              el.style.transform = `scale(${newZoom / 100})`;
-              el.style.transformOrigin = 'top left';
-            }
+            const isDesktop = window.innerWidth >= 768;
+            const baseSize = isDesktop ? 22 : 26;
+            el.style.fontSize = Math.round(baseSize * (newZoom / 100)) + 'px';
+            el.style.transform = 'none';
+            el.style.zoom = 'normal';
           }
           const zv = document.getElementById(zoomValId);
           if (zv) zv.textContent = newZoom + '%';
@@ -10913,12 +11047,11 @@ if (btnLoginBackLanding) {
 
       const applyZoomToElem = (el) => {
         if (!el) return;
-        if ('zoom' in el.style) {
-          el.style.zoom = (_currentZoomPercent / 100);
-        } else {
-          el.style.transform = `scale(${_currentZoomPercent / 100})`;
-          el.style.transformOrigin = 'top left';
-        }
+        const isDesktop = window.innerWidth >= 768;
+        const baseSize = isDesktop ? 22 : 26;
+        el.style.fontSize = Math.round(baseSize * (_currentZoomPercent / 100)) + 'px';
+        el.style.transform = 'none';
+        el.style.zoom = 'normal';
       };
 
       applyZoomToElem(document.getElementById('lyrics-modal-content'));
