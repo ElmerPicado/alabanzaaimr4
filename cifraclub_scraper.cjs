@@ -6,7 +6,7 @@ const path = require('path');
 // ==========================================
 
 const artistSlug = process.argv[2] || 'art-aguilera'; // ej. art-aguilera
-const outputDir = path.join(__dirname, 'canciones_cifraclub');
+const outputDir = path.join(__dirname, 'repertorio');
 
 if (!fs.existsSync(outputDir)) {
   fs.mkdirSync(outputDir, { recursive: true });
