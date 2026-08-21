@@ -6226,7 +6226,8 @@ if (btnLoginBackLanding) {
           const file = fileInput.files[0];
 
           const receiptUrl = await compressImage(file);
-          const groupId = crypto.randomUUID();
+          const uuidFallback = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'id_' + Math.random().toString(36).substring(2,15) + Date.now().toString(36);
+          const groupId = uuidFallback;
           
           const expireAt = window.fechaVencimientoPlan(30);
 
@@ -10291,9 +10292,14 @@ if (btnLoginBackLanding) {
 
           let g = `
           <div class="section-group-card" style="background: ${sectionBg}; border: ${sectionBorder}; border-radius: var(--radius); padding: 16px; margin-bottom: 20px; box-shadow: ${sectionGlow};">
-            <h4 style="font-size:12px; font-weight: 700; text-transform:uppercase; color:${sectionColorVar}; letter-spacing:1px; margin: 0 0 12px; display: flex; align-items: center; gap: 6px;">
-              <span>${emoji}</span> ${titulo}
-            </h4>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <h4 style="font-size:12px; font-weight: 700; text-transform:uppercase; color:${sectionColorVar}; letter-spacing:1px; margin: 0; display: flex; align-items: center; gap: 6px;">
+                <span>${emoji}</span> ${titulo}
+              </h4>
+              <button class="btn-add-song-musico" data-type="${type}" style="background: rgba(${color === 'teal' ? '78,205,196' : '155,143,255'}, 0.15); border: none; color: var(--${color}); border-radius: 6px; padding: 4px 10px; font-family: var(--font-body); font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                Agregar +
+              </button>
+            </div>
             <div style="display: flex; flex-direction: column; gap: 8px;">
           `;
 
@@ -10343,13 +10349,9 @@ if (btnLoginBackLanding) {
             });
           }
 
-          // Agregar botón "+"
-          g += `
-        <button class="btn-add-song-musico" data-type="${type}" style="width: 100%; background: rgba(${color === 'teal' ? '78,205,196' : '155,143,255'}, 0.08); border: 1px dashed var(--${color}); color: var(--${color}); border-radius: 10px; padding: 12px; font-family: var(--font-body); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; border-style: dashed;">
-          <span></span> Agregar otra canción
-        </button>`;
 
-          return g;
+
+          return g + '</div></div>';
         };
 
         // Adoración primero, luego Alabanza
@@ -10823,7 +10825,7 @@ if (btnLoginBackLanding) {
       if (el) {
         const isDesktop = window.innerWidth >= 768;
         const baseSize = isDesktop ? 22 : 26;
-        el.style.fontSize = Math.round(baseSize * (_currentZoomPercent / 100)) + 'px';
+        el.style.setProperty('font-size', Math.round(baseSize * (_currentZoomPercent / 100)) + 'px', 'important');
         el.style.transform = 'none';
         el.style.zoom = 'normal';
       }
@@ -10936,9 +10938,8 @@ if (btnLoginBackLanding) {
 
           const el = document.getElementById(contentId);
           if (el) {
-            const isDesktop = window.innerWidth >= 768;
-            const baseSize = isDesktop ? 22 : 26;
-            el.style.fontSize = Math.round(baseSize * (newZoom / 100)) + 'px';
+            const baseSize = window.innerWidth >= 768 ? 22 : 26;
+            el.style.setProperty('font-size', Math.round(baseSize * (newZoom / 100)) + 'px', 'important');
             el.style.transform = 'none';
             el.style.zoom = 'normal';
           }
@@ -11026,7 +11027,16 @@ if (btnLoginBackLanding) {
         if (!btn || btn.dataset.bound) return;
         btn.dataset.bound = 'true';
         const steps = btnId.includes('up2') ? 2 : btnId.includes('up1') ? 1 : btnId.includes('down2') ? -2 : -1;
-        btn.onclick = () => transponerSemitonos(steps, 'panel-lyrics-content', 'panel-lyrics-tone-display', 'panel-lyrics-meta');
+        btn.onclick = () => {
+          const isDesktop = window.innerWidth >= 768;
+          const baseSize = isDesktop ? 22 : 26;
+          const el = document.getElementById('panel-lyrics-content');
+          if (el) {
+            el.style.setProperty('font-size', Math.round(baseSize * (_currentZoomPercent / 100)) + 'px', 'important');
+            el.style.transform = 'none';
+          }
+          transponerSemitonos(steps, 'panel-lyrics-content', 'panel-lyrics-tone-display', 'panel-lyrics-meta');
+        };
       });
     }
 
@@ -11049,7 +11059,7 @@ if (btnLoginBackLanding) {
         if (!el) return;
         const isDesktop = window.innerWidth >= 768;
         const baseSize = isDesktop ? 22 : 26;
-        el.style.fontSize = Math.round(baseSize * (_currentZoomPercent / 100)) + 'px';
+        el.style.setProperty('font-size', Math.round(baseSize * (_currentZoomPercent / 100)) + 'px', 'important');
         el.style.transform = 'none';
         el.style.zoom = 'normal';
       };
@@ -11643,9 +11653,14 @@ if (btnLoginBackLanding) {
 
         let g = `
         <div class="section-group-card" style="background: ${sectionBg}; border: ${sectionBorder}; border-radius: var(--radius); padding: 16px; margin-bottom: 20px; box-shadow: ${sectionGlow};">
-          <h4 style="font-size:12px; font-weight: 700; text-transform:uppercase; color:${sectionColorVar}; letter-spacing:1px; margin: 0 0 12px; display: flex; align-items: center; gap: 6px;">
-            <span>${emoji}</span> ${titulo}
-          </h4>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <h4 style="font-size:12px; font-weight: 700; text-transform:uppercase; color:${sectionColorVar}; letter-spacing:1px; margin: 0; display: flex; align-items: center; gap: 6px;">
+              <span>${emoji}</span> ${titulo}
+            </h4>
+            <button class="btn-add-song-musico" data-type="${type}" style="background: rgba(${color === 'teal' ? '78,205,196' : '155,143,255'}, 0.15); border: none; color: var(--${color}); border-radius: 6px; padding: 4px 10px; font-family: var(--font-body); font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+              Agregar +
+            </button>
+          </div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
         `;
 
@@ -11696,14 +11711,7 @@ if (btnLoginBackLanding) {
             `;
           });
         }
-        g += `
-          </div>
-          <button class="btn-add-song-musico" data-type="${type}" style="width: 100%; background: rgba(${color === 'teal' ? '78,205,196' : '155,143,255'}, 0.08); border: 1px dashed var(--${color}); color: var(--${color}); border-radius: 10px; padding: 12px; font-family: var(--font-body); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; border-style: dashed;">
-            <span></span> Agregar a ${titulo.split(' ')[0]}
-          </button>
-        </div>
-        `;
-        return g;
+        return g + '</div></div>';
       };
 
       html += renderAdminGroup(adoraciones, 'Adoración (Lentas)', 'purple', '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path><path d="M12 2v2"></path><path d="M12 22v-2"></path><path d="m17 20.66-1-1.73"></path><path d="M11 10.27 7 3.34"></path><path d="m20.66 17-1.73-1"></path><path d="m3.34 7 1.73 1"></path><path d="M14 12h8"></path><path d="M2 12h2"></path><path d="m20.66 7-1.73 1"></path><path d="m3.34 17 1.73-1"></path><path d="m17 3.34-1 1.73"></path><path d="m11 13.73-4 6.93"></path></svg>', 1, 'adoracion');
@@ -13650,18 +13658,16 @@ if (btnLoginBackLanding) {
         console.error(e);
         alert("Error al cargar el comprobante.");
       }
-    };
-
-    window.saAction = async function(churchId, action) {
+window.saAction = async function(churchId, action) {
       if(!await customConfirm(`¿Estás seguro de ${action} esta cuenta?`)) return;
       try {
-        const churchRef = doc(db, 'churches', churchId);
+        const churchRef = window.doc(window.db, 'churches', churchId);
         if (action === 'activar') {
           const expDate = new Date();
           expDate.setDate(expDate.getDate() + 30);
           const graciaDate = new Date();
           graciaDate.setDate(graciaDate.getDate() + 35);
-          await updateDoc(churchRef, {
+          await window.updateDoc(churchRef, {
             status: 'activa',
             plan: 'basico',
             memberLimit: window.limiteMiembrosPlan('basico'),
@@ -13669,7 +13675,7 @@ if (btnLoginBackLanding) {
             graceUntil: graciaDate.toISOString()
           });
         } else if (action === 'inactivar') {
-          await updateDoc(churchRef, {
+          await window.updateDoc(churchRef, {
             status: 'inactiva'
           });
         }
@@ -13691,7 +13697,7 @@ if (btnLoginBackLanding) {
           const name = document.getElementById('sa-trial-name').value.trim();
           const email = document.getElementById('sa-trial-email').value.trim();
           
-          const churchId = crypto.randomUUID();
+          const churchId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'id_' + Math.random().toString(36).substring(2,15) + Date.now().toString(36);
           const futureDate = new Date();
           futureDate.setDate(futureDate.getDate() + 15); // 15 dias de prueba
           const futureGracia = new Date();
@@ -13714,7 +13720,8 @@ if (btnLoginBackLanding) {
           const { getAuth, createUserWithEmailAndPassword, sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js");
           const auth = getAuth();
           try {
-            const tempPassword = crypto.randomUUID().slice(0, 8) + "Aa1!";
+            const uuidFallback = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2,15);
+            const tempPassword = uuidFallback.slice(0, 8) + "Aa1!";
             await createUserWithEmailAndPassword(auth, email, tempPassword);
             await sendPasswordResetEmail(auth, email);
           } catch(authErr) {
@@ -13724,7 +13731,7 @@ if (btnLoginBackLanding) {
 
           // Crear admin
           const userId = email.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-          await setDoc(doc(db, "usuarios", userId), {
+          await window.setDoc(window.doc(window.db, "usuarios", userId), {
             nombre: "Admin " + name,
             role: "admin",
             usuario: email,
@@ -13889,7 +13896,7 @@ if (btnLoginBackLanding) {
       
       function renderPublicLyrics() {
         const lyricsContainer = document.getElementById('public-song-lyrics');
-        lyricsContainer.style.fontSize = publicFontSize + 'px';
+        lyricsContainer.style.setProperty('font-size', publicFontSize + 'px', 'important');
         if (typeof window.renderizarLetraTranspuesta === 'function') {
            lyricsContainer.innerHTML = window.renderizarLetraTranspuesta(publicCurrentLyrics, publicOriginalTone, publicCurrentTone);
         } else {
@@ -13964,7 +13971,7 @@ if (btnLoginBackLanding) {
       if (btnFontUp) {
         btnFontUp.addEventListener('click', () => {
           publicFontSize += 2;
-          document.getElementById('public-song-lyrics').style.fontSize = publicFontSize + 'px';
+          document.getElementById('public-song-lyrics').style.setProperty('font-size', publicFontSize + 'px', 'important');
         });
       }
       
@@ -13972,7 +13979,7 @@ if (btnLoginBackLanding) {
       if (btnFontDown) {
         btnFontDown.addEventListener('click', () => {
           publicFontSize = Math.max(10, publicFontSize - 2);
-          document.getElementById('public-song-lyrics').style.fontSize = publicFontSize + 'px';
+          document.getElementById('public-song-lyrics').style.setProperty('font-size', publicFontSize + 'px', 'important');
         });
       }
 
