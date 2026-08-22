@@ -5009,9 +5009,6 @@
         </div>
       </div>
 
-      <div id="superadmin-churches-list">
-        <p style="color:var(--text3);font-size:13px;text-align:center;">Cargando instituciones...</p>
-      </div>
     </main>
   </div>
 
@@ -9372,6 +9369,164 @@ if (btnLoginBackLanding) {
           const sArtista = removeAccents(s.artista || '').toLowerCase();
           return sNombre.includes(query) || sArtista.includes(query);
         });
+        window._saSelectedArtist = null; // Reset filter
+      }
+
+      if (!query) {
+        // Renderizar lista de artistas como un acordeón
+        const artistCounts = {};
+        todas.forEach(s => {
+          const art = s.artista || 'Desconocido';
+          artistCounts[art] = (artistCounts[art] || 0) + 1;
+        });
+        const sortedArtists = Object.keys(artistCounts).sort((a, b) => a.localeCompare(b));
+
+        if (countLabel) {
+          countLabel.textContent = `${sortedArtists.length} artistas`;
+        }
+
+        container.innerHTML = "";
+        if (sortedArtists.length === 0) {
+          container.innerHTML = "<p style='color:var(--text3);font-size:12px;text-align:center;padding:20px;'>No se encontraron canciones.</p>";
+          return;
+        }
+
+        const canManage = (currentUserRole === 'lider' || currentUserRole === 'admin' || currentUserRole === 'superadmin');
+
+        sortedArtists.forEach(art => {
+          const artistGroup = document.createElement('div');
+          artistGroup.className = 'artist-accordion-group';
+          artistGroup.style.marginBottom = '6px';
+
+          const isExpanded = window._saSelectedArtist === art;
+          if (isExpanded) {
+            artistGroup.classList.add('expanded');
+          }
+
+          const header = document.createElement('div');
+          header.className = 'artist-row-item';
+          if (isExpanded) {
+            header.style.borderColor = 'var(--teal)';
+            header.style.background = 'rgba(78, 205, 196, 0.08)';
+          }
+          header.innerHTML = `
+            <span class="artist-row-name">${art}</span>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span class="artist-row-count">${artistCounts[art]} ${artistCounts[art] === 1 ? 'canción' : 'canciones'}</span>
+              ${canManage ? `<button class="btn-delete-artist admin-only" data-artist="${art}" style="background:var(--coral); color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:600; cursor:pointer;">Eliminar</button>` : ''}
+            </div>
+          `;
+
+          const btnDeleteArtist = header.querySelector('.btn-delete-artist');
+          if (btnDeleteArtist) {
+            btnDeleteArtist.onclick = async (e) => {
+              e.stopPropagation();
+              const artistSongs = todas.filter(s => (s.artista || 'Desconocido') === art);
+              if (artistSongs.length === 0) return;
+
+              const confirmed = await customConfirm(`¿Estás seguro que deseas ELIMINAR TODAS las ${artistSongs.length} canciones de "${art}"?\n\nEsta acción no se puede deshacer.`);
+              if (!confirmed) return;
+
+              const verifyName = await customPrompt(`ZONA DE PELIGRO\n\nEstás a punto de borrar TODAS las ${artistSongs.length} canciones de ${art}.\nPara confirmar, ingresa el PIN de seguridad:`, "Acción Destructiva", "Ej: 1234");
+              if (verifyName !== '030819') {
+                if (verifyName !== null) {
+                  customAlert("PIN incorrecto. Operación cancelada por seguridad.");
+                }
+                return;
+              }
+
+              try {
+                btnDeleteArtist.textContent = '...';
+                btnDeleteArtist.disabled = true;
+
+                let deletedCount = 0;
+                const chunkSize = 250;
+                for (let i = 0; i < artistSongs.length; i += chunkSize) {
+                  const chunk = artistSongs.slice(i, i + chunkSize);
+                  const batch = writeBatch(db);
+
+                  for (const song of chunk) {
+                    batch.delete(doc(db, "biblioteca_canciones", song.id));
+                    batch.delete(doc(db, "letras_canciones", song.id));
+                    deletedCount++;
+                  }
+                  await batch.commit();
+                }
+
+                customAlert(`¡Éxito!\nSe eliminaron ${deletedCount} canciones de ${art}.`);
+              } catch (err) {
+                console.error("Error al eliminar artista:", err);
+                customAlert("Error al eliminar: " + err.message);
+                btnDeleteArtist.textContent = 'Eliminar';
+                btnDeleteArtist.disabled = false;
+              }
+            };
+          }
+
+          const collapseDiv = document.createElement('div');
+          collapseDiv.className = 'artist-songs-collapse';
+          collapseDiv.style.display = isExpanded ? 'block' : 'none';
+          collapseDiv.style.padding = '4px 0 8px 0';
+
+          if (isExpanded) {
+            const artistSongs = todas.filter(s => (s.artista || 'Desconocido') === art);
+            artistSongs.forEach(s => {
+              const card = crearCartaCancionAdmin(s, artistSongs);
+              collapseDiv.appendChild(card);
+            });
+          }
+
+          header.onclick = (e) => {
+            e.stopPropagation();
+            const currentlyExpanded = container.querySelector('.artist-accordion-group.expanded');
+
+            const groupEl = artistGroup;
+            const isNowExpanding = !groupEl.classList.contains('expanded');
+
+            if (currentlyExpanded && currentlyExpanded !== groupEl) {
+              currentlyExpanded.classList.remove('expanded');
+              const prevHeader = currentlyExpanded.querySelector('.artist-row-item');
+              if (prevHeader) {
+                prevHeader.style.borderColor = '';
+                prevHeader.style.background = '';
+              }
+              const prevCollapse = currentlyExpanded.querySelector('.artist-songs-collapse');
+              if (prevCollapse) {
+                prevCollapse.style.display = 'none';
+                prevCollapse.innerHTML = '';
+              }
+            }
+
+            if (isNowExpanding) {
+              groupEl.classList.add('expanded');
+              header.style.borderColor = 'var(--teal)';
+              header.style.background = 'rgba(78, 205, 196, 0.08)';
+              collapseDiv.style.display = 'block';
+
+              collapseDiv.innerHTML = '';
+              const artistSongs = todas.filter(s => (s.artista || 'Desconocido') === art);
+              artistSongs.forEach(s => {
+                const card = crearCartaCancionAdmin(s, artistSongs);
+                collapseDiv.appendChild(card);
+              });
+
+              window._saSelectedArtist = art;
+            } else {
+              groupEl.classList.remove('expanded');
+              header.style.borderColor = '';
+              header.style.background = '';
+              collapseDiv.style.display = 'none';
+              collapseDiv.innerHTML = '';
+
+              window._saSelectedArtist = null;
+            }
+          };
+
+          artistGroup.appendChild(header);
+          artistGroup.appendChild(collapseDiv);
+          container.appendChild(artistGroup);
+        });
+        return;
       }
 
       if (countLabel) countLabel.textContent = `${filtradas.length} de ${todas.length} canciones`;
@@ -9382,7 +9537,7 @@ if (btnLoginBackLanding) {
         return;
       }
 
-      // Render max 100 to avoid freezing
+      // Render flat list for search query
       filtradas.slice(0, 100).forEach(s => {
         const card = crearCartaCancionAdmin(s, filtradas);
         container.appendChild(card);
