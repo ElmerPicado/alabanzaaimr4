@@ -4151,10 +4151,12 @@
     const TONOS_CON_BEMOLES = ['F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Dm', 'Gm', 'Cm', 'Fm', 'Bbm', 'Ebm'];
 
     function getIndexAcorde(acorde) {
-      const eq = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
-      let b = acorde.replace(/m$/, '');
-      if (eq[b]) b = eq[b];
-      return ACORDES_SOSTENIDOS.indexOf(b);
+      const eq = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#', 'B#': 'C', 'E#': 'F', 'Cb': 'B', 'Fb': 'E' };
+      const match = acorde.match(/^([A-G][b#]?)(.*)$/);
+      if (!match) return -1;
+      let base = match[1];
+      if (eq[base]) base = eq[base];
+      return ACORDES_SOSTENIDOS.indexOf(base);
     }
 
     function transponerAcordeUnico(acorde, diff, usarBemoles) {
@@ -4163,7 +4165,7 @@
       let base = match[1];
       let mods = match[2];
 
-      const eq = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
+      const eq = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#', 'B#': 'C', 'E#': 'F', 'Cb': 'B', 'Fb': 'E' };
       let baseNormalizada = eq[base] ? eq[base] : base;
 
       let i = ACORDES_SOSTENIDOS.indexOf(baseNormalizada);
