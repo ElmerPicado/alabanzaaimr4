@@ -4998,6 +4998,15 @@
           <button id="btn-recalculate-tones" class="btn-primary"
             style="background:var(--gold);color:#0f0e17;width:auto;padding:10px 24px;font-size:13px;margin-top:6px;font-weight:bold;">🔄 Recalcular Tonos Base</button>
         </div>
+
+        <div class="card" style="border-color: var(--teal); margin-bottom: 20px;">
+          <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--teal); margin-bottom: 12px;">Canciones en la Biblioteca Global</h3>
+          <input type="text" id="search-sa-canciones" placeholder="Buscar canción o artista..." style="width:100%; padding:10px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); margin-bottom:15px; font-family:var(--font-body); font-size:13px; outline:none;">
+          <p id="sa-repertorio-total-count" style="font-size:12px; color:var(--text3); text-align:right; margin-bottom:8px;"></p>
+          <div id="sa-repertorio-list" style="max-height: 400px; overflow-y: auto;">
+             <p style="color:var(--text3);font-size:13px;text-align:center;">Cargando biblioteca...</p>
+          </div>
+        </div>
       </div>
 
       <div id="superadmin-churches-list">
@@ -8938,6 +8947,8 @@ if (btnLoginBackLanding) {
     window._adminSelectedArtist = null;
 
     function crearCartaCancionAdmin(s, playlistContext) {
+      const canManage = (currentUserRole === 'lider' || currentUserRole === 'admin' || currentUserRole === 'superadmin');
+      
       const cardBorder = s.oficial
         ? 'border-bottom: 1.5px solid rgba(244,197,66, 0.4) !important;'
         : (s.tipo === 'adoracion'
@@ -8976,7 +8987,7 @@ if (btnLoginBackLanding) {
           <button class="chip btn-auto-tone" style="cursor:pointer; border:1px solid rgba(244,197,66,0.5); background:rgba(244,197,66,0.15); color:var(--gold); padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Auto-detectar tono base">
             Auto-Tono
           </button>
-          ${(currentUserRole === 'lider' || currentUserRole === 'admin') ? `
+          ${(currentUserRole === 'lider' || currentUserRole === 'admin' || currentUserRole === 'superadmin') ? `
             <button class="chip btn-toggle-oficial" style="cursor:pointer; border:1px solid ${s.oficial ? 'rgba(78,205,196,0.5)' : 'rgba(255,255,255,0.1)'}; background:${s.oficial ? 'rgba(78,205,196,0.15)' : 'transparent'}; color:${s.oficial ? 'var(--teal)' : 'var(--text3)'}; padding: 5px 10px; border-radius: 6px; font-weight:600; font-size:11px; margin:0;" title="Marcar como oficial">
               ${s.oficial ? 'Oficial' : 'Hacer Oficial'}
             </button>
@@ -9345,6 +9356,73 @@ if (btnLoginBackLanding) {
       searchInput.addEventListener('input', debounce(() => renderizarMantenimientoCanciones(), 300));
     }
 
+
+    window.saFiltrarBiblioteca = function(query) {
+      const container = document.getElementById('sa-repertorio-list');
+      const countLabel = document.getElementById('sa-repertorio-total-count');
+      if (!container) return;
+
+      const todas = [...(window.cacheSongs || [])].sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+      let filtradas = todas;
+
+      if (query) {
+        query = removeAccents(query).toLowerCase().trim();
+        filtradas = todas.filter(s => {
+          const sNombre = removeAccents(s.nombre || '').toLowerCase();
+          const sArtista = removeAccents(s.artista || '').toLowerCase();
+          return sNombre.includes(query) || sArtista.includes(query);
+        });
+      }
+
+      if (countLabel) countLabel.textContent = `${filtradas.length} de ${todas.length} canciones`;
+
+      container.innerHTML = "";
+      if (filtradas.length === 0) {
+        container.innerHTML = "<p style='color:var(--text3);font-size:12px;text-align:center;padding:20px;'>No se encontraron canciones.</p>";
+        return;
+      }
+
+      // Render max 100 to avoid freezing
+      filtradas.slice(0, 100).forEach(s => {
+        const card = crearCartaCancionAdmin(s, filtradas);
+        container.appendChild(card);
+      });
+      if (filtradas.length > 100) {
+        const p = document.createElement('p');
+        p.style.cssText = 'color:var(--text3);font-size:12px;text-align:center;padding:10px;';
+        p.textContent = `+ ${filtradas.length - 100} canciones más... usa el buscador.`;
+        container.appendChild(p);
+      }
+    };
+
+    window.renderSuperAdminBiblioteca = async function() {
+      const container = document.getElementById('sa-repertorio-list');
+      if (!container) return;
+      
+      // Asegurar que las canciones estén cargadas en cacheSongs
+      if (!window.cacheSongs || window.cacheSongs.length === 0) {
+        container.innerHTML = "<p style='color:var(--text3);font-size:13px;text-align:center;'>Cargando biblioteca desde la base de datos...</p>";
+        try {
+          const snap = await getDocs(collection(db, "biblioteca_canciones"));
+          window.cacheSongs = [];
+          snap.forEach(doc => window.cacheSongs.push({ id: doc.id, ...doc.data() }));
+        } catch(e) {
+          console.error(e);
+          container.innerHTML = "<p style='color:var(--coral);font-size:13px;text-align:center;'>Error al cargar biblioteca.</p>";
+          return;
+        }
+      }
+
+      window.saFiltrarBiblioteca('');
+      
+      const searchInput = document.getElementById('search-sa-canciones');
+      if (searchInput && !searchInput.dataset.listenerAdded) {
+        searchInput.dataset.listenerAdded = '1';
+        searchInput.addEventListener('input', debounce((e) => {
+          window.saFiltrarBiblioteca(e.target.value);
+        }, 300));
+      }
+    };
 
     // ====================================================
     // LOGICA PARA DROPDOWN MULTISELECT DE INSTRUMENTOS
@@ -13795,6 +13873,8 @@ if (btnLoginBackLanding) {
         
         if (panelId === 'sa-tab-pagos' && typeof window.renderSuperAdminPagos === 'function') {
           window.renderSuperAdminPagos();
+        } else if (panelId === 'sa-tab-biblioteca' && typeof window.renderSuperAdminBiblioteca === 'function') {
+          window.renderSuperAdminBiblioteca();
         }
       });
     });
