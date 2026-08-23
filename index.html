@@ -7412,6 +7412,10 @@ if (btnLoginBackLanding) {
 
     function fixCorruptedText(str) {
       if (typeof str !== 'string') return str;
+      
+      // Limpiar posibles etiquetas HTML corruptas que dejan ">" o "<" antes de un acorde
+      str = str.replace(/(^|\s)(">|>|<)([A-G])/gm, '$1$3');
+      
       if (!str.includes('Ã')) return str;
 
       const cp1252Map = {
