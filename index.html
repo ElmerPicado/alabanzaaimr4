@@ -8574,6 +8574,18 @@ if (btnLoginBackLanding) {
     let cachedAnalysisText = "";
     let cachedAnalysisResult = null;
 
+    document.getElementById('song-lyrics-input').addEventListener('input', function(e) {
+      // Limpieza en vivo de etiquetas HTML corruptas (ej. ">Ab")
+      const val = e.target.value;
+      const cleanVal = val.replace(/(^|\s)(">|>|<)([A-G])/gm, '$1$3');
+      if (val !== cleanVal) {
+        // Mantener cursor en la misma posición (aproximada)
+        const start = e.target.selectionStart;
+        e.target.value = cleanVal;
+        e.target.setSelectionRange(start, start);
+      }
+    });
+
     document.getElementById('btn-auto-tone').addEventListener('click', () => {
       const letra = document.getElementById('song-lyrics-input').value;
       const feedback = document.getElementById('chord-engine-feedback');
@@ -8809,7 +8821,12 @@ if (btnLoginBackLanding) {
           if (h1) nombre = h1.textContent.trim();
 
           const h2 = doc2.querySelector('h2.t3 a') || doc2.querySelector('h2.t3') || doc2.querySelector('h2');
-          if (h2) artista = h2.textContent.trim();
+          if (h2) {
+            const h2Text = h2.textContent.trim();
+            if (!h2Text.toLowerCase().includes('menú') && !h2Text.toLowerCase().includes('menu')) {
+              artista = h2Text;
+            }
+          }
 
           if (!artista) {
             try {
@@ -8822,7 +8839,14 @@ if (btnLoginBackLanding) {
           }
 
           const pre = doc2.querySelector('.cifra_cnt pre') || doc2.querySelector('pre');
-          if (pre) letra = pre.textContent.trim();
+          if (pre) {
+            const divs = pre.querySelectorAll('div');
+            if (divs.length > 0) {
+              letra = Array.from(divs).map(d => d.textContent.replace(/\n$/, '')).join('\n');
+            } else {
+              letra = pre.textContent.trim();
+            }
+          }
 
         } else {
           // --- LaCuerda Parser ---
