@@ -4989,7 +4989,7 @@
               style="background: var(--purple); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600;">📥
               Importar JSON</button>
             <input type="file" id="import-songs-file" accept=".json" style="display:none;">
-            <button id="btn-import-link-sa" class="btn-primary" style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600;" onclick="alert('Función de agregar por link (LaCuerda) estará conectada al scraper local.');">🔗 Agregar por Link (LaCuerda)</button>
+            <button id="btn-import-link-sa" class="btn-primary" style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600;">🔗 Agregar por Link (LaCuerda)</button>
           </div>
         </div>
 
@@ -7022,6 +7022,17 @@ if (btnLoginBackLanding) {
 
         const modal = document.getElementById('admin-song-modal');
         if (modal) modal.classList.add('active');
+      });
+    }
+
+    const btnImportLinkSA = document.getElementById('btn-import-link-sa');
+    if (btnImportLinkSA) {
+      btnImportLinkSA.addEventListener('click', () => {
+        if (btnAddSongSuperadmin) btnAddSongSuperadmin.click();
+        setTimeout(() => {
+          const urlInput = document.getElementById('lacuerda-url-input');
+          if (urlInput) urlInput.focus();
+        }, 100);
       });
     }
 
