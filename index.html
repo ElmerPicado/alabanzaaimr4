@@ -4982,6 +4982,9 @@
             Las canciones agregadas aquí estarán disponibles para TODAS las cuentas de la plataforma.
           </p>
           <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="btn-add-song-superadmin" class="btn-primary"
+              style="background: var(--teal); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600;">➕
+              Nueva Canción</button>
             <button id="btn-import-songs" class="btn-primary"
               style="background: var(--purple); color: #0f0e17; width: auto; margin-top: 0; padding: 10px 16px; font-weight: 600;">📥
               Importar JSON</button>
@@ -6981,6 +6984,28 @@ if (btnLoginBackLanding) {
     const btnAddSongGlobal = document.getElementById('btn-add-song-global');
     if (btnAddSongGlobal) {
       btnAddSongGlobal.addEventListener('click', () => {
+        editingSongId = null;
+        document.getElementById('form-add-song').reset();
+        if (document.getElementById('song-album-input')) document.getElementById('song-album-input').value = "";
+        if (typeof window.actualizarListaAutoresDatalist === 'function') {
+          window.actualizarListaAutoresDatalist();
+        }
+        const btnSubmit = document.querySelector('#form-add-song button[type="submit"]');
+        if (btnSubmit) {
+          btnSubmit.textContent = "Guardar en Repertorio";
+          btnSubmit.style.background = "var(--teal)";
+        }
+        const title = document.getElementById('song-modal-title');
+        if (title) title.textContent = "Agregar Nueva Canción";
+
+        const modal = document.getElementById('admin-song-modal');
+        if (modal) modal.classList.add('active');
+      });
+    }
+
+    const btnAddSongSuperadmin = document.getElementById('btn-add-song-superadmin');
+    if (btnAddSongSuperadmin) {
+      btnAddSongSuperadmin.addEventListener('click', () => {
         editingSongId = null;
         document.getElementById('form-add-song').reset();
         if (document.getElementById('song-album-input')) document.getElementById('song-album-input').value = "";
