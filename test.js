@@ -532,17 +532,17 @@
       }
       if (userVal === "imr4" && passVal === "222222") {
         console.log("Acceso concedido al Administrador General.");
-        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222", churchId: "iglesia-imr4" });
+        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222", churchId: "imr4" });
         return;
       }
       if (userVal === "admin" && passVal === "1234") {
         console.log("Acceso concedido al Administrador General legacy.");
-        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234", churchId: "iglesia-imr4" });
+        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234", churchId: "imr4" });
         return;
       }
       if (userVal === "musico" && passVal === "1234") {
         console.log("Acceso concedido al Músico de Prueba.");
-        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234", churchId: "iglesia-imr4" });
+        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234", churchId: "imr4" });
         return;
       }
 
@@ -614,13 +614,13 @@
             if (docId) uData._docId = docId; // re-añadimos como propiedad de sesión
 
             // === FIX AUTOMÁTICO PARA EPICADO ===
-            if (uData.usuario === 'epicado' && (!uData.churchId || uData.churchId !== 'iglesia-imr4' || uData.role !== 'lider')) {
-              uData.churchId = 'iglesia-imr4';
+            if (uData.usuario === 'epicado' && (!uData.churchId || uData.churchId !== 'imr4' || uData.role !== 'lider')) {
+              uData.churchId = 'imr4';
               uData.role = 'lider';
               try {
                 // Actualizar silenciosamente en la DB
                 updateDoc(doc(db, "usuarios", docId || userIdToSearch), { 
-                  churchId: 'iglesia-imr4', 
+                  churchId: 'imr4', 
                   role: 'lider' 
                 });
               } catch(e) { console.error("Fix db epicado falló:", e); }
@@ -5731,15 +5731,15 @@
         return;
       }
       if (savedUserKey === "imr4" && savedPassword === "222222") {
-        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222", churchId: "iglesia-imr4" });
+        iniciarSesionDashboard({ nombre: "Admin IMR4", role: "lider", usuario: "imr4", password: "222222", churchId: "imr4" });
         return;
       }
       if (savedUserKey === "admin" && savedPassword === "1234") {
-        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234", churchId: "iglesia-imr4" });
+        iniciarSesionDashboard({ nombre: "Administrador", role: "lider", usuario: "admin", password: "1234", churchId: "imr4" });
         return;
       }
       if (savedUserKey === "musico" && savedPassword === "1234") {
-        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234", churchId: "iglesia-imr4" });
+        iniciarSesionDashboard({ nombre: "Músico de Prueba", role: "musico", usuario: "musico", password: "1234", churchId: "imr4" });
         return;
       }
 
